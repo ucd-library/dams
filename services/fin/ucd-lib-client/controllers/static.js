@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 const authUtils = require('../lib/auth');
 const appConfig = require('../lib/fcrepo-app-config');
 
-const {seo} = require('@ucd-lib/fin-service-utils');
+const {seo, records, collections} = require('@ucd-lib/fin-service-utils');
 
 const transform = seo.recordTransform;
 const collectionTransform = seo.collectionTransform;
@@ -35,7 +35,8 @@ module.exports = (app) => {
     isRoot : true,
     appRoutes : config.server.appRoutes,
     getConfig : async (req, res, next) => {
-      let user = req.user;
+      let user = await authUtils.getUserFromRequest(req);
+
       if( user ) {
         let result = {
           loggedIn : true,

@@ -5,11 +5,18 @@ ARG UCD_DAMS_REPO_SERVICE_ROOT=services/fin
 
 # Client Code
 WORKDIR ${FIN_SERVICE_ROOT}
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client ucd-lib-client
-RUN cd ucd-lib-client/client/public && \
-  npm install && \
-  ln -s node_modules/\@ucd-lib/cork-app-load/lib loader
-RUN npm run client-dist
+RUN mkdir -p ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client
+
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/client client
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/client controllers
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/client lib
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/client model
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/index.js .
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/config.js .
+
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/package.json .
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/package-lock.json .
+RUN npm install 
 
 # Models 
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models models
