@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const {middleware} = require('@ucd-lib/fin-service-utils');
 const model = require('./model.js');
-
+const utils = require('../utils.js')
 
 router.post('/', middleware.finac.esRoles, async (req, res) => {
   if( !req.body ) {

@@ -1,0 +1,14 @@
+{
+  "name": "ucd-lib-client",
+  "version": "2.0.0",
+  "description": "The UC Davis DAMS client built on top of fin-server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jrmerz@ucdavis.edu",
+  "license": "MIT",
+  "dependencies": {
+    "@ucd-lib/spa-router-middleware": "^0.2.1"
+  }
+}

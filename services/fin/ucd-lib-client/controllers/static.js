@@ -50,10 +50,10 @@ module.exports = (app) => {
       }
 
       next({
-        collections : await collections.overview(),
+        // collections : await collections.overview(),
         user : user,
         appRoutes : config.server.appRoutes,
-        recordCount: (await records.rootCount()).count,
+        // recordCount: (await records.rootCount()).count,
         env : {
           BUILD_NUM: process.env.BUILD_NUM || '',
           BUILD_TIME: process.env.BUILD_TIME || '',
