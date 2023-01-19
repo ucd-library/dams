@@ -2,7 +2,7 @@ ARG FIN_SERVER_IMAGE
 FROM ${FIN_SERVER_IMAGE} as fin-server
 FROM tesseractshadow/tesseract4re:latest
 
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y curl imagemagick
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
@@ -24,4 +24,4 @@ ARG FIN_SERVER_REPO_TAG
 ENV FIN_SERVER_REPO_HASH ${FIN_SERVER_REPO_HASH}
 ENV FIN_SERVER_REPO_TAG ${FIN_SERVER_REPO_TAG}
 
-CMD node index.js
+# CMD node index.js
