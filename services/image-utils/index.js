@@ -1,4 +1,3 @@
-global.LOGGER_NAME = 'tesseract';
 const {config, logger, jwt} = require('@ucd-lib/fin-service-utils');
 const {exec} = require('child_process');
 const {URL} = require('url');
@@ -33,7 +32,6 @@ class TesseractServer {
       }
 
       let args = '-l eng --psm 1 --oem 3'
-      // see: https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage
       if( req.headers['x-tesseract-args'] ) {
         args = req.headers['x-tesseract-args']
       }
