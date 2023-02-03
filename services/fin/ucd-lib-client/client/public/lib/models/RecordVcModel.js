@@ -20,7 +20,6 @@ class RecordVcModel extends BaseModel {
   // _onSelectedRecordUpdate(e) {
   translate(e) {
     if( e && e.clientMedia ) {
-      // debugger;
       // translate collection and related nodes/items to ui model
       const item = {
         id : e.root['@id'],
@@ -32,9 +31,10 @@ class RecordVcModel extends BaseModel {
         clientMedia : e.clientMedia,
         date : e.root.yearPublished,
         publisher : e.root.publisher.name,
-        keywords : ['?'],
+        keywords : e.root.about,
 
-        callNumber : e.root.identifier[0].split(';')[1].trim(),
+        callNumber : 'D-42',
+        // callNumber : e.root.identifier[0].split(';')[1].trim(),
         // .filter(id => id.match(/^.*,.*box:.*,.*folder:.*$/i)
 
         arkDoi : ['?'],

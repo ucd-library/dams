@@ -85,7 +85,7 @@ module.exports = {
         label : 'Published',
         type : 'range'
       },
-      'node.license' : {
+      'node.license.@id' : {
         label : 'Rights',
         type : 'facet',
         valueMap : rightsMap
@@ -97,10 +97,10 @@ module.exports = {
         ignore : ['CreativeWork', 'MediaObject'],
         valueMap : value => value.replace(/(.)([A-Z])/g, '$1 $2')
       },
-      'node.about.raw' : {
+      'node.about.name.raw' : {
         label : 'Subject',
         type : 'facet',
-        typeahead: 'abouts'
+        typeahead : 'abouts'
       }
     },
 
@@ -111,5 +111,24 @@ module.exports = {
     
     // max number of facets filter options
     maxFacetCount : 50
+  },
+
+  // browse-by side images
+  browseByImages : {
+    collectionPage : [],
+    subjectPage : [
+      {
+        page : 1,
+        leftImgUrl : '/images/watercolors/watercolor-lug-D211_5_38-left-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-lehmann-d76p4c-right-white.png'
+      },
+      {
+        page : 2,
+        leftImgUrl : '/images/watercolors/watercolor-eastman-B-1614-left-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-eastman-B-1614-right-white.png'
+      }
+    ],
+    creatorPage : [],
+    formatPage : []
   }
 };

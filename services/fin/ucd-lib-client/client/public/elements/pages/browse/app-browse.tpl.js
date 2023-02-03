@@ -89,20 +89,6 @@ export default function render() {
     .header-icon {
       width: 135px;
     }
-
-    .left-image {
-      width: 37.5vw;
-      position: absolute;
-      left: -12.5vw;
-      bottom: 0;
-    }
-
-    .right-image {
-      width: 37.5vw;
-      position: absolute;
-      right: -12.5vw;
-      top: 0;
-    }
   
   </style>
   
@@ -165,15 +151,12 @@ export default function render() {
       facet-query-name="node.isPartOf.@id"
       ?hidden="${this.page !== '/browse/collection'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-gold-collections.png"/>
-
     </app-browse-by>
     <app-browse-by id="subject" 
       label="Subject" 
       facet-query-name="node.about.name.raw"
       ?hidden="${this.page !== '/browse/subject'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-green-subjects.png"/>      
-      <img class="left-image" slot="left-image" src="/images/watercolors/watercolor-lug-D211_5_38-left-white.png" />
-      <img class="right-image" slot="right-image" src="/images/watercolors/watercolor-lehmann-d76p4c-right-white.png" />
     </app-browse-by>
     <app-browse-by id="creator" 
       label="Creator" 

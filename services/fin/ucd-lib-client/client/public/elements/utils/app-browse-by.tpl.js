@@ -54,6 +54,10 @@ return html`
     overflow-x: hidden;
   }
 
+  [hidden] {
+    display: none;
+  }
+
   .side-image {
     flex: 1;
   }
@@ -100,6 +104,20 @@ return html`
 
   ucd-theme-pagination {
     justify-content: center;
+  }
+
+  .left-image {
+    width: 37.5vw;
+    position: absolute;
+    left: -12.5vw;
+    bottom: 0;
+  }
+
+  .right-image {
+    width: 37.5vw;
+    position: absolute;
+    right: -12.5vw;
+    top: 0;
   }
 
   @media (max-width: 1310px) {
@@ -157,7 +175,7 @@ return html`
 
 <div class="body">
   <div class="side-image">
-    <slot name="left-image" ?hidden=${this.totalResults < 12}></slot>
+    <img class="left-image" ?hidden=${this.results.length < 12} src="${this.leftImgUrl}"/>
   </div>
   <div class="results">
     <h5>
@@ -181,7 +199,7 @@ return html`
 
   </div>
   <div class="side-image">
-    <slot name="right-image" ?hidden=${this.totalResults < 12}></slot>
+    <img class="right-image" ?hidden=${this.results.length < 12} src="${this.rightImgUrl}"/>
   </div>
 </div>
 

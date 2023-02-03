@@ -3,6 +3,8 @@ import render from "./app-browse-by.tpl.js";
 
 import "@ucd-lib/cork-pagination";
 
+import config from '../../lib/config';
+
 /**
  * @class AppBrowseBy
  * @description base class for the browse by [facet] page elements
@@ -24,6 +26,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
     return {
       facetQueryName : {type: String, attribute: 'facet-query-name'},
       label : {type: String},
+      sideImages : {type: Array},
+      sideImageIndex : {type: Number},
+      leftImgUrl : {type: String},
+      rightImgUrl : {type: String},
       sortByOptions : {type: Array},
       results : {type: Array},
       totalResults : {type: Number},
@@ -56,6 +62,23 @@ export default class AppBrowseBy extends Mixin(LitElement)
         {label : 'Item Quantity', dir : 'dsc', type: 'count'}
       ];
     }
+    switch (this.label.toLowerCase()) {
+      case 'collection':
+        this.sideImages = config.browseByImages.collectionPage;
+        break;
+      case 'subject':
+        this.sideImages = config.browseByImages.subjectPage;
+        break;
+      case 'creator':
+        this.sideImages = config.browseByImages.creatorPage;
+        break;  
+      case 'format':
+        this.sideImages = config.browseByImages.formatPage;
+        break;
+      default:
+        this.sideImages = [];
+        break;
+    }
 
     this._loadResults();
   }
@@ -65,6 +88,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
    * @description reset search properties
    */
   reset() {
+    this.sideImages = [];
+    this.sideImageIndex = 0;
+    this.leftImgUrl = '';
+    this.rightImgUrl = '';
     this.results = [];
     this.totalResults = 0;
     this.resultsPerPage = 30;
@@ -149,6 +176,29 @@ export default class AppBrowseBy extends Mixin(LitElement)
       this.currentIndex, 
       this.currentIndex + this.resultsPerPage 
     );
+
+    this._updateSideImages();
+  }
+
+  /**
+   * @method _updateSideImages
+   * @description update side images based on selected page, curated groups from Kimmy
+   */
+  _updateSideImages() {
+    if( !this.sideImages || (this.sideImages && !this.sideImages.length) ) {
+      this.leftImgUrl = '';
+      this.rightImgUrl = '';
+      return;
+    }
+    this.sideImageIndex = this.currentPage - 1;
+    if( this.currentPage > this.sideImages.length ) {
+      while( this.sideImageIndex + 1 > this.sideImages.length ) {
+        this.sideImageIndex -= this.sideImages.length;
+      }
+    }
+
+    this.leftImgUrl = this.sideImages[this.sideImageIndex].leftImgUrl;
+    this.rightImgUrl = this.sideImages[this.sideImageIndex].rightImgUrl;
   }
 
   /**
