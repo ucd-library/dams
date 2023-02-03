@@ -376,7 +376,7 @@ export default function render() {
     <div class="metadata-row" id="subject">
       <div class="attr">Subjects</div>
       <div class="value" id="subjectValue">
-        ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="">${item}</a>`)}
+        ${this.keywords.map((about, index) => html`${index > 0 ? ', ' : ''}<a href="${about['@id']}">${about['name']}</a>`)}
       </div>
     </div>
 

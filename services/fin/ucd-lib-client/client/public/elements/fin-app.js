@@ -20,7 +20,6 @@ import "./auth/app-auth-footer";
 import "./components/site/ucdlib-site-footer";
 import "./components/site/ucdlib-site-footer-column";
 import "./utils/app-header-colorbar";
-import "./utils/app-browse-by";
 import "./components/graphics/dams-watercolor-overlay";
 
 export class FinApp extends Mixin(LitElement)

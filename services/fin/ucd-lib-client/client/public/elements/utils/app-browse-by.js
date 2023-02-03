@@ -28,7 +28,9 @@ export default class AppBrowseBy extends Mixin(LitElement)
       results : {type: Array},
       totalResults : {type: Number},
       resultsPerPage : {type: Number},
-      currentIndex : {type: Number}
+      currentIndex : {type: Number},
+      totalPages : {type: Number},
+      currentPage : {type: Number}
     };
   }
 
@@ -54,6 +56,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
         {label : 'Item Quantity', dir : 'dsc', type: 'count'}
       ];
     }
+
+    this._loadResults();
   }
 
   /**
@@ -63,8 +67,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
   reset() {
     this.results = [];
     this.totalResults = 0;
-    this.resultsPerPage = 20;
+    this.resultsPerPage = 30;
     this.currentIndex = 0;
+    this.totalPages = 1;
+    this.currentPage = 1;
     this.label = '';
   }
 
@@ -75,11 +81,21 @@ export default class AppBrowseBy extends Mixin(LitElement)
    * @param {Object} e 
    * @returns {Promise} 
    */
-  async _onAppStateUpdate(e) {
+  _onAppStateUpdate(e) {
     if( e.location.page !== 'browse' ) return;
     if( e.location.path.length < 2 ) return;
     if( e.location.path[1] !== this.id ) return; // the page
 
+    this._loadResults(e);
+  }
+
+  /**
+   * @method _loadResults
+   * @description load results based on currentPage
+   *
+   * @param {Object} e event object if called from _onAppStateUpdate
+   */
+  async _loadResults(e) {
     if( this.totalResults === 0 ) {
       this.loading = true;
       this.allResults = await this.BrowseByModel.getFacets(this.facetQueryName);
@@ -87,14 +103,18 @@ export default class AppBrowseBy extends Mixin(LitElement)
       this.loading = false;
     }
 
-    if( e.location.path.length > 2 ) {
+    this.totalPages = this.totalResults / this.resultsPerPage < 1 ? 1 : Math.ceil(this.totalResults / this.resultsPerPage);
+    let pagination = this.shadowRoot.querySelector('ucd-theme-pagination');
+    if( pagination ) pagination.requestUpdate('maxPages', this.totalPages);
+
+    if( e && e.location.path.length > 2 ) {
       this.currentIndex = parseInt(e.location.path[2]);
     } else {
       this.currentIndex = 0;
     }
 
     let sort = 0;
-    if( e.location.path.length > 2 ) {
+    if( e && e.location.path.length > 2 ) {
       sort = parseInt(e.location.path[2]);
     }
     this.sortByOptions.forEach((item, index) => item.selected = (sort === index));
@@ -112,9 +132,15 @@ export default class AppBrowseBy extends Mixin(LitElement)
 
     if( this.sortedAs !== sort.type ) {
       this.allResults.payload.sort((a, b) => {
-        if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
-        if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
-        return 0; 
+        if( sort.type === 'count' ) {
+          if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
+          if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
+          return 0;  
+        } else {
+          if( a[sort.type].toLowerCase() > b[sort.type].toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
+          if( a[sort.type].toLowerCase() < b[sort.type].toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
+          return 0;   
+        }
       });
       this.sortedAs = sort.type;
     }
@@ -123,18 +149,17 @@ export default class AppBrowseBy extends Mixin(LitElement)
       this.currentIndex, 
       this.currentIndex + this.resultsPerPage 
     );
-
-    this.requestUpdate();
   }
 
   /**
-   * @method _onPaginationNav
-   * @description bound to cork-pagination nav event
+   * @method _onPageClicked
+   * @description bound to ucd-theme-pagination nav event
    * 
    * @param {Object} e 
    */
-  _onPaginationNav(e) {
-    this.currentIndex = (e.detail.page-1) * this.resultsPerPage;
+  _onPageClicked(e) {
+    this.currentPage = e.detail.page;
+    this.currentIndex = (this.currentPage - 1) * this.resultsPerPage;
     this._renderResults();
   }
 
@@ -148,6 +173,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
     let sortIndex = parseInt(e.currentTarget.getAttribute('index'));
     this.sortByOptions.forEach((item, index) => item.selected = (index === sortIndex));
     this.currentIndex = 0;
+    this.currentPage = 1;
     this._renderResults();
   }
 
