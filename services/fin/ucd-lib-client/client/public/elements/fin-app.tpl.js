@@ -147,38 +147,6 @@ export default function render() {
       <app-about id="about"></app-about>
       <app-collection id="collection"></app-collection>
       <app-collections id="collections"></app-collections>
-      <!--<app-browse-by id="collection" 
-        label="Collection" 
-        facet-query-name="collection">
-        <dams-watercolor-overlay 
-          icon="star"
-          slot="header-icon">
-        </dams-watercolor-overlay>
-      </app-browse-by>
-      <app-browse-by id="subject" 
-        label="Subject" 
-        facet-query-name="abouts.raw">
-        <dams-watercolor-overlay 
-          icon="star"
-          slot="header-icon">
-        </dams-watercolor-overlay>
-      </app-browse-by>
-      <app-browse-by id="creator" 
-        label="Creator" 
-        facet-query-name="creators">
-        <dams-watercolor-overlay 
-          icon="star"
-          slot="header-icon">
-        </dams-watercolor-overlay>
-      </app-browse-by>
-      <app-browse-by id="format" 
-        label="Format" 
-        facet-query-name="fileFormats">
-        <dams-watercolor-overlay 
-          icon="star"
-          slot="header-icon">
-        </dams-watercolor-overlay>
-      </app-browse-by>-->
       <app-components id="components"></app-components>
     </iron-pages>
     <div class="footer site-frame">
@@ -204,7 +172,7 @@ export default function render() {
             <li><app-auth-footer></app-auth-footer></li>
           </ul>
         </ucdlib-site-footer-column>
-        <div insert-into="below-address" hidden="${this.showVersion}">
+        <div insert-into="below-address" ?hidden="${this.showVersion}">
           <div><b>Build Information</b></div>
           <div>${this.appVersion}</div>
           <div>Build Time: ${this.localBuildTime}</div>

@@ -99,7 +99,7 @@ return html`
   id="imgRoot"
   >
   <img id="img" src="${this.data.thumbnailUrl}" style="height:${this.imgHeight}px; width: 100%; display: block" onload="this.style.display='block';" />
-  <div ?hidden="[[!isVideo]]" class="video-thumbnail"></div>
+  <div ?hidden="${!this.isVideo}" class="video-thumbnail"></div>
 </div>
 
 <div class="card-text">

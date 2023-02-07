@@ -43,14 +43,14 @@ class AppRecord extends Mixin(LitElement)
 
     this.record = {};
     this.currentRecordId = '';
-    this.name = 'Yuletide Vintage of Values 1968';
+    this.name = '';
     this.collectionName = '';
     
-    this.date = '1968';
-    this.publisher = 'Sherry-Lehmann Inc.';
-    this.keywords = ['Wine--Marketing', 'Manuscripts--Catalogs'];
-    this.callNumber = 'D-192, Box:28, Folder:3';
-    this.collectionImg = '/images/stub/slater.jpg';
+    this.date = '';
+    this.publisher = '';
+    this.keywords = [];
+    this.callNumber = '';
+    this.collectionImg = '';
 
     this.size = '';
     this.rights = {};
@@ -117,7 +117,7 @@ class AppRecord extends Mixin(LitElement)
 
     this.renderedRecordId = vcRecord.id;
     this.record = vcRecord;
-    
+  
     this.currentRecordId = this.record.id;
     this.name = this.record.name;
     this.collectionName = this.record.collectionName;

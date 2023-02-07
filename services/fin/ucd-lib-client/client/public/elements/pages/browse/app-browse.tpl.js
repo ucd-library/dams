@@ -85,59 +85,90 @@ export default function render() {
     .title-section {
       text-align: center;
     }
+
+    .header-icon {
+      width: 135px;
+    }
   
   </style>
   
-  
-    <div class="title-section">
-      <h1>Browse<br><span class="fw-light">Digital Collections</span></h1>
-    </div>
-    <section class="browse-buttons site-frame">
-      <div class="priority-links">
-        <div class="priority-links__item">
-          <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collection">
-            <div class="vertical-link__figure">
-              <!-- <ucdlib-icon class="vertical-link__image" src="http://localhost:3000/images/ucd-logo.svg"></ucdlib-icon> -->
-              <!-- <ucdlib-icon class="vertical-link__image" icon="ucd-public:fa-box-archive"></ucdlib-icon>  -->
-              <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-box-archive"></ucdlib-icon>
-            </div>
-            <div class="vertical-link__title">Collections</div>
-          </a>
-        </div>
-        <div class="priority-links__item">
-          <a class="vertical-link vertical-link--circle category-brand--secondary" href="/search">
-            <div class="vertical-link__figure">
-              <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:photo-stack"></ucdlib-icon>
-            </div>
-            <div class="vertical-link__title">All Items</div>
-          </a>
-        </div>
-        <div class="priority-links__item">
-          <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/creator">
-            <div class="vertical-link__figure">
-              <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-wand-magic-sparkles"></ucdlib-icon>
-            </div>
-            <div class="vertical-link__title">Creators</div>
-          </a>
-        </div>
-        <div class="priority-links__item">
-          <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/format">
-            <div class="vertical-link__figure">
-              <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-photo-film"></ucdlib-icon>
-            </div>
-            <div class="vertical-link__title">Formats</div>
-          </a>
-        </div>
-        <div class="priority-links__item">
-          <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/subject">
-            <div class="vertical-link__figure">
-              <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-star"></ucdlib-icon>
-            </div>
-            <div class="vertical-link__title">Subjects</div>
-          </a>
-        </div>
+    <div ?hidden="${this.page !== '/browse'}">
+
+      <div class="title-section">
+        <h1>Browse<br><span class="fw-light">Digital Collections</span></h1>
       </div>
-    
-    </section>
+      <section class="browse-buttons site-frame">
+        <div class="priority-links">
+          <div class="priority-links__item">
+            <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collection">
+              <div class="vertical-link__figure">
+                <!-- <ucdlib-icon class="vertical-link__image" src="http://localhost:3000/images/ucd-logo.svg"></ucdlib-icon> -->
+                <!-- <ucdlib-icon class="vertical-link__image" icon="ucd-public:fa-box-archive"></ucdlib-icon>  -->
+                <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-box-archive"></ucdlib-icon>
+              </div>
+              <div class="vertical-link__title">Collections</div>
+            </a>
+          </div>
+          <div class="priority-links__item">
+            <a class="vertical-link vertical-link--circle category-brand--secondary" href="/search">
+              <div class="vertical-link__figure">
+                <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:photo-stack"></ucdlib-icon>
+              </div>
+              <div class="vertical-link__title">All Items</div>
+            </a>
+          </div>
+          <div class="priority-links__item">
+            <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/creator">
+              <div class="vertical-link__figure">
+                <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-wand-magic-sparkles"></ucdlib-icon>
+              </div>
+              <div class="vertical-link__title">Creators</div>
+            </a>
+          </div>
+          <div class="priority-links__item">
+            <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/format">
+              <div class="vertical-link__figure">
+                <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-photo-film"></ucdlib-icon>
+              </div>
+              <div class="vertical-link__title">Formats</div>
+            </a>
+          </div>
+          <div class="priority-links__item">
+            <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/subject">
+              <div class="vertical-link__figure">
+                <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-star"></ucdlib-icon>
+              </div>
+              <div class="vertical-link__title">Subjects</div>
+            </a>
+          </div>
+        </div>
+      
+      </section>
+    </div>
+
+    <app-browse-by id="collection" 
+      label="Collection" 
+      facet-query-name="node.isPartOf.@id"
+      ?hidden="${this.page !== '/browse/collection'}">
+      <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-gold-collections.png"/>
+    </app-browse-by>
+    <app-browse-by id="subject" 
+      label="Subject" 
+      facet-query-name="node.about.name.raw"
+      ?hidden="${this.page !== '/browse/subject'}">
+      <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-green-subjects.png"/>      
+    </app-browse-by>
+    <app-browse-by id="creator" 
+      label="Creator" 
+      facet-query-name="node.creator"
+      ?hidden="${this.page !== '/browse/creator'}">
+      <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-red-creators.png"/>
+    </app-browse-by>
+    <app-browse-by id="format" 
+      label="Format" 
+      facet-query-name="node.fileFormat"
+      ?hidden="${this.page !== '/browse/format'}">
+      <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-blue-formats.png"/>
+    </app-browse-by>
   
   `;}

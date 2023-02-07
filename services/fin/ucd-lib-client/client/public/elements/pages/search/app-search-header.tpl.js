@@ -114,6 +114,7 @@ return html`
       display: block;
       text-align: center;
       margin-bottom: 1rem;
+      padding-top: 2rem;
     }
     app-search-box {
       width: 80%;
@@ -134,7 +135,7 @@ return html`
 
 <div class="searchContainer">
   <div style="margin: 1rem auto 0;">
-    <h4 class="site-name-search">Digital Collections</h4>
+    <h2 class="site-name-search">Digital Collections</h2>
     <app-search-box 
       id="searchBox" 
       @search="${this._onSearch}" 

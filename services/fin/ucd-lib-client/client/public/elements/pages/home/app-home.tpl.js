@@ -571,8 +571,6 @@ return html`
     <div class="priority-links__item">
       <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collection">
         <div class="vertical-link__figure">
-          <!-- <ucdlib-icon class="vertical-link__image" src="http://localhost:3000/images/ucd-logo.svg"></ucdlib-icon> -->
-          <!-- <ucdlib-icon class="vertical-link__image" icon="ucd-public:fa-box-archive"></ucdlib-icon>  -->
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-box-archive"></ucdlib-icon>
         </div>
         <div class="vertical-link__title">Collections</div>
