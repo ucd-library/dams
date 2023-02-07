@@ -23,7 +23,11 @@ class AppBrowse extends Mixin(LitElement)
   }
 
   async firstUpdated() {
-    this.page = this.AppStateModel.locationElement.location.pathname;
+    this._onAppStateUpdate(await this.AppStateModel.get());
+  }
+
+  _onAppStateUpdate(e) {
+    this.page = e.location.pathname;
   }
   
 }
