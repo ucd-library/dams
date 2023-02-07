@@ -1,41 +1,48 @@
-// Imports the Google Cloud client library
-const {Storage} = require('@google-cloud/storage');
+const pubsub = require('./lib/pubSub');
+const gcs = require('./lib/gcs.js');
+const gcssyncConfig = require('./lib/config.js');
 
-// For more information on ways to initialize Storage, please see
-// https://googleapis.dev/nodejs/storage/latest/Storage.html
+// TODO: wire up activemq to listen for messages from fcrepo
 
+class GcsSync {
 
-// Creates a client using Application Default Credentials
-const storage = new Storage();
+  constructor() {
+    pubsub.on('message', message => this.onMessage(message));
 
-
-// access a bucket 
-const bucket = storage.bucket('dams-client-products');
-
-(async () => {
-  // list files in a bucket
-  let files = (await bucket.getFiles({
-    prefix : 'foo/',
-    delimiter : '/'
-  }))[0];
-  console.log(files.length);
-
-  // get sha256 hash of gcs file
-  for( let file of files ) {
-    const hash = (await file.getMetadata())[0];
-    console.log(hash);
+    gcssyncConfig.loaded.then(config => {
+      this.config = config.gcssync || {};
+      this.config.containers.forEach(container => {
+        container.bucket = container.bucket.replace('{{DATA_ENV}}', config.dataEnv);
+        pubsub.listen(container.bucket);
+      });
+    });
   }
 
-  // loop files in gcs response and check if file is folder
-  for( let file of files ) {
-    const isFolder = file.name.endsWith('/');
-    console.log(isFolder);
-  }
+  async onMessage(message) {
+    let container = this.config.containers.find(container => {
+      if( container.bucket === message.attributes.bucketId ) {
+        if( message.data.name.startsWith(container.basePath.replace(/^\//, '')) ) {
+          return true;
+        }
+      }
+      return false;
+    });
 
-  // check if gcs file is folder
-  for( let file of files ) {
-    const isFolder = file.name.endsWith('/');
-    console.log(isFolder);
-  }
+    if( container && container.direction === 'gcs-to-fcrepo' ) {
+      await gcs.syncToFcrepo('/'+message.data.name, container.bucket, {
+        proxyBinary : container.proxyBinary,
+        crawlChildren : false,
+        basePath : container.basePath
+      });
+    }
 
-})();
+    message.ack();
+  }
+}
+
+new GcsSync();
+
+// pubsub.on('message', (msg) => {
+//   console.log('pubsub message', msg);
+// });
+// pubsub.listenToBucket('dams-client-products');
