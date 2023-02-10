@@ -5,7 +5,7 @@ const config = require('../config');
 const seo = require('@ucd-lib/fin-service-utils/lib/seo');
 const graphConcat = seo.graphConcat;
 const RecordGraph = require('../utils/RecordGraph.js').default;
-const ClientMedia = require('../../../../../node-utils/lib/client-media/model.js');
+const ClientMedia = require('../../../../lib/client-media/model.js');
 
 class RecordService extends BaseService {
 
