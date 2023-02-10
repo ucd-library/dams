@@ -2,10 +2,6 @@ import { LitElement } from 'lit';
 import utils from "../../../../lib/utils"
 import "./app-search-result-creator"
 
-// import CollectionInterface from "../../../interfaces/CollectionInterface"
-// import AppStateInterface from "../../../interfaces/AppStateInterface"
-// import MediaInterface from "../../../interfaces/MediaInterface"
-
 export default class AppSearchResult extends Mixin(LitElement)
   .with(LitCorkUtils) {
 
@@ -41,17 +37,16 @@ export default class AppSearchResult extends Mixin(LitElement)
     this.year = '';
     this.tabindex = 0;
 
-    // this._injectModel('AppStateModel', 'CollectionModel', 'MediaModel');
+    this._injectModel('AppStateModel', 'CollectionModel', 'MediaModel');
     this.baseUrl = window.location.protocol+'//'+window.location.host+'/fcrepo/rest';
   }
 
-  ready() {
-    super.ready();
-    // this.addEventListener('click', e => this._onClick());
-    // this.addEventListener('keyup', e => {
-    //   if( e.which !== 13 ) return;
-    //   this._onClick();
-    // });
+  firstUpdated() {
+    this.addEventListener('click', e => this._onClick());
+    this.addEventListener('keyup', e => {
+      if( e.which !== 13 ) return;
+      this._onClick();
+    });
   }
 
   updated() {
@@ -63,7 +58,7 @@ export default class AppSearchResult extends Mixin(LitElement)
    * @description Fired when this element is clicked
    */
   _onClick() {
-    // this._setWindowLocation(this.fetchId);
+    this._setWindowLocation(this.fetchId);
   }
 
   /**

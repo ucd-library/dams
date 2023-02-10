@@ -6,7 +6,7 @@ class BrowseByService extends BaseService {
   constructor() {
     super();
     this.store = BrowseByStore;
-    this.recordsBaseUrl = '/api/records';
+    this.recordsBaseUrl = '/api/item';
   }
 
   /**
@@ -31,7 +31,7 @@ class BrowseByService extends BaseService {
     };
 
     return this.request({
-      url : `${this.recordsBaseUrl}/search`,
+      url : this.recordsBaseUrl,
       fetchOptions : {
         method : 'POST',
         headers : {
