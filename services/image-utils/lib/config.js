@@ -32,9 +32,14 @@ config.iaReader = {
   }
 }
 
+config.port = env.PORT || 3000;
+
 config.workflow = {
   rootPath : env.WORKFLOW_ROOT_PATH || '/workflow',
-  gcsBucket : env.GOOGLE_CLOUD_WORKFLOW_BUCKET || 'dams-client-products'
+  gcsBuckets : {
+    products : env.GOOGLE_CLOUD_WORKFLOW_BUCKET || 'dams-client-products',
+    tmp : env.GOOGLE_CLOUD_WORKFLOW_TMP_BUCKET || 'dams-workflow-tmp-space'
+  }
 }
 
 module.exports = config;

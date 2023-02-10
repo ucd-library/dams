@@ -1,0 +1,23 @@
+main:
+    params: [args]
+    steps:
+      - get_pages:
+          call: http.get
+          args:
+              url: ${args.baseUrl + "/" + args.workflowId}
+          result: workflow_info
+      - ocr_pages:
+          parallel:
+              concurrency_limit: 5
+              for:
+                  value: page
+                  range: ${[1, workflow_info.body.pageCount]}
+                  steps:
+                    - ocr_page:
+                        call: http.post
+                        args:
+                            url: ${args.baseUrl + "/pdf-to-ia-reader/" + args.workflowId + "/" + page}
+  # - cleanup:
+  #   call: http.delete
+  #   args:
+  #     url: ${args.baseUrl}/${args.workflowId}

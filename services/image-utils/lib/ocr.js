@@ -15,7 +15,7 @@ class TesseractWrapper {
     let response = await exec(command, {cwd: dir});
     
     return {
-      result : path.join(dir, name+opts.output),
+      result : path.join(dir, name+'.'+opts.output),
       stdout : response.stdout,
       stderr : response.stderr,
       command,

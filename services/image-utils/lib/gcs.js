@@ -1,32 +1,56 @@
 const exec = require('./exec.js');
 const config = require('./config.js');
+const {Storage} = require('@google-cloud/storage');
 
-class GcsCliWrapper {
+const storage = new Storage();
+class GcsWrapper {
 
-  async init() {
-    if( this.initialized ) return;
-    if( this.initializing ) {
-      await this.initializing;
-      return;
-    }
-
-    this.initializing = new Promise(async (resolve, reject) => {
-      await exec(`gcloud auth login --quiet --cred-file=${config.google.serviceAccountFile}`)
-      await exec(`gcloud config set project ${config.google.project}`)
-
-      this.initialized = true;
-      resolve();
-    });
-
-    return this.initializing;
+  constructor() {
+    this.client = storage;
   }
 
-  async copy(from, to) {
-    await this.init();
-    return exec(`gsutil cp ${from} ${to}`);
+  getGcsFileObjectFromPath(gcsFile) {
+    return storage.bucket(gcsFile.split('/')[2])
+      .file(gcsFile.split('/').slice(3).join('/'));
+  }
+
+  readFileToMemory(gcsFile) {
+    return new Promise((resolve, reject) => {
+      let file = this.getGcsFileObjectFromPath(gcsFile);
+      file.download((err, contents) => {
+        if( err ) return reject(err);
+        resolve(contents);
+      });
+    });
+  }
+
+  streamUpload(gcsFile, stream) {
+    return new Promise((resolve, reject) => {
+      let file = this.getGcsFileObjectFromPath(gcsFile);
+      let writeStream = file.createWriteStream();
+      stream.pipe(writeStream);
+
+      writeStream.on('error', reject);
+      writeStream.on('finish', resolve);
+    });
+  }
+
+  /**
+   * @method cleanFolder
+   * @description remove all files in a gcs folder
+   * 
+   */
+  cleanFolder(bucket, folder) {
+    // ensure proper folder format
+    folder = folder.replace(/\/$/, '').replace(/^\//, '')+'/';
+
+    return storage.bucket(bucket).deleteFiles({
+      force: true,
+      prefix: folder
+    });
   }
 
 
 }
 
-module.exports = new GcsCliWrapper();
+module.exports = new GcsWrapper();
