@@ -1,6 +1,7 @@
-const pubsub = require('./lib/pubSub');
-const gcs = require('./lib/gcs.js');
+const {gc} = require('@ucd-lib/fin-node-utils');
 const gcssyncConfig = require('./lib/config.js');
+
+const {pubsub, gcs} = gc;
 
 // TODO: wire up activemq to listen for messages from fcrepo
 

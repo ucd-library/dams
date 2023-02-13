@@ -50,7 +50,7 @@ class ImageMagickWrapper {
 
     let fileParts = path.parse(inputFile);
 
-    if( page ) {
+    if( page !== '' ) {
       inputFile = inputFile+'['+page+']'
       page = '-'+page;
     }
