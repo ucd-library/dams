@@ -38,7 +38,7 @@ main:
                                     annotations:
                                         run.googleapis.com/launch-stage: ALPHA
                                 kind: "Job"
-                                spec:
+                                spec: 
                                     template:
                                         spec:
                                             template:

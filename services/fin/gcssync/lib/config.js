@@ -9,6 +9,7 @@ const {waitUntil, config} = require('@ucd-lib/fin-service-utils');
 class GcsConfig {
 
   constructor() {
+    this.CONFIG_PATH = '/fin/io/config.json';
     this.loaded = this.load();
     this.config = null;
   }
@@ -29,7 +30,7 @@ class GcsConfig {
     await waitUntil(url.hostname, url.port);
 
     let res = await api.get({
-      path: '/finio/config.json',
+      path: this.CONFIG_PATH,
       host : config.fcrepo.host,
       superuser : true,
       directAccess : true

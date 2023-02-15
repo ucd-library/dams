@@ -4,6 +4,6 @@
   },
   "@graph" : [{
     "@id" : "",
-    "schema:name" : "Root of fin io config"
+    "schema:name" : "Root of fin workflow config"
   }]
 }

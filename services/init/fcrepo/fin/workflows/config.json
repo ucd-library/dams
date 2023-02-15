@@ -1,6 +1,5 @@
 {
   "defaults" : {
-    "gcProjectId" : "{{GOOGLE_CLOUD_PROJECT}}",
     "tmpGcsBucket" : "dams-workflow-tmp-space"
   },
 

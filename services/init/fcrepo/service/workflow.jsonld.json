@@ -4,7 +4,7 @@
     "http://digital.ucdavis.edu/schema#Service",
     "http://digital.ucdavis.edu/schema#ProxyService"
   ],
-  "urlTemplate": "http://workflow:3000/{{fcPath}}?workflow={{svcPath}}",
+  "urlTemplate": "http://workflow:3000/{{svcPath}}?fcPath={{fcPath}}",
   "description": "Run a workflow",
   "identifier": "workflow",
   "title": "Fin Workflow Service",
