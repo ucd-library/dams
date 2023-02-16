@@ -14,8 +14,8 @@ main:
       - get_pages:
           call: http.get
           args:
-              url: ${args.baseUrl + "/" + args.workflowId}
-          result: workflow_info
+              url: ${args.baseUrl + "/pdf-to-ia-reader/getNumPages/" + args.finWorkflowId}
+          result: pdf_info
       - setup_ocr_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
@@ -24,7 +24,7 @@ main:
               body:
                   apiVersion: run.googleapis.com/v1
                   metadata:
-                      name: ${args.workflowId}
+                      name: ${args.gcWorkflowName + "-" + args.finWorkflowId}
                       labels:
                           cloud.googleapis.com/location: ${location}
                       annotations:
@@ -34,7 +34,7 @@ main:
                       template:
                           spec:
                               parallelism: 50
-                              taskCount: ${workflow_info.body.pageCount}
+                              taskCount: ${pdf_info.body.pageCount}
                               template:
                                   spec:
                                       containers:
@@ -47,7 +47,7 @@ main:
                                                     memory: "2Gi"
                                                     cpu: "1000m"
                                             command: "node"
-                                            args: ${["cli/pdf-to-ia-reader.js", args.workflowId]}
+                                            args: ${["cli/pdf-to-ia-reader.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
                                       timeoutSeconds: 300
                                       serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
@@ -55,7 +55,7 @@ main:
       - ocr_page:
           call: googleapis.run.v1.namespaces.jobs.run
           args:
-              name: ${"namespaces/" + project_id + "/jobs/" + args.workflowId}
+              name: ${"namespaces/" + project_id + "/jobs/" + args.gcWorkflowName + "-" + args.finWorkflowId}
               location: ${location}
           result: job_execution
   # - cleanup:

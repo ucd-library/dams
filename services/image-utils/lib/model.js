@@ -15,11 +15,15 @@ const hocrToDjvu = require('./hocr-to-djvu.js');
 class ImageUtils {
 
   constructor() {
-    this.initPdfToIaReaderWorkflow = this.initPdfToIaReaderWorkflow.bind(this);
+    this.TMP_DIR =  process.env.WORKFLOW_TMP_DIR || '/workflow';
   }
 
   unzip(file) {
 
+  }
+
+  getLocalFile(workflowInfo) {
+    return workflowInfo.data.tmpGcsPath.replace('gs://', this.TMP_DIR);
   }
 
   /**
@@ -30,117 +34,64 @@ class ImageUtils {
    * 
    * @param {*} pdfStream 
    */
-  async initPdfToIaReaderWorkflow(pdfStream, filename, metadata) {
-    let workflowInfo = await this.initWorkflow(pdfStream, filename, metadata);
+  async getNumPdfPagesService(workflowId) {
+    let workflowInfo = await this.getWorkflowInfo(workflowId);
 
-    // TODO: check if sha256 match, if so, no-op unless force flag is set
+    let localFile = this.getLocalFile(workflowInfo);
+    let dir = path.parse(localFile).dir;
 
-    let pageCount = await this.getNumPdfPages(workflowInfo.localFile);
+    await fs.mkdirp(dir);
+    await gcs.getGcsFileObjectFromPath(workflowInfo.data.tmpGcsPath)
+      .download({
+        destination: localFile
+      })
 
-    workflowInfo.pageCount = pageCount;
-    workflowInfo.metadata = metadata;
-    workflowInfo.workflowMetadatafile = 'gs://'+path.join(config.workflow.gcsBuckets.products, metadata['fin-path'], 'ia', 'workflow.json');
+    let pageCount = await this.getNumPdfPages(localFile);
 
-    // write workflow file to both products folder and tmp folder
-    await gcs.client.bucket(config.workflow.gcsBuckets.tmp)
-      .file(path.join(workflowInfo.id, 'workflow.json'))
-      .save(JSON.stringify(workflowInfo), {
-        contentType : 'application/json'
-      });
+    await fs.remove(dir);
 
-    await gcs.client.bucket(config.workflow.gcsBuckets.products)
-      .file(path.join(metadata['fin-path'].replace(/^\//, ''), 'ia', 'workflow.json'))
-      .save(JSON.stringify(workflowInfo), {
-        contentType : 'application/json'
-      });
-
-    // this step only needed to read the number of pdf pages
-    await fs.remove(workflowInfo.dir);
-
-    return workflowInfo;
+    return pageCount;
   }
 
   async runPdfToIaReaderPage(workflowId, page) {
     let workflowInfo = await this.getWorkflowInfo(workflowId);
+    
+    let localFile = this.getLocalFile(workflowInfo);
+    let dir = path.parse(localFile).dir;
+    let sourceName = path.parse(localFile).name;
 
-    await fs.mkdirp(workflowInfo.dir);
-    await gcs.getGcsFileObjectFromPath(workflowInfo.tmpGcsPath)
+    await fs.mkdirp(dir);
+    await gcs.getGcsFileObjectFromPath(workflowInfo.data.tmpGcsPath)
       .download({
-        destination: workflowInfo.localFile
+        destination: localFile
       })
 
-    await this.imageToIaReader(workflowInfo.localFile, page);
-    await fs.unlink(workflowInfo.localFile);
+    await this.imageToIaReader(localFile, page);
+    await fs.unlink(localFile);
         
-    let files = await fs.readdir(workflowInfo.dir);
-    let sourceName = path.parse(workflowInfo.filename).name;
+    let files = await fs.readdir(dir);
     let resultFiles = [];
 
     for( let file of files ) {
       let fileInfo = path.parse(file);
       let dstName = `${sourceName}-${page}${fileInfo.ext}`;
 
-      logger.info('Copying file from '+path.join(workflowInfo.dir, file)+' to '+workflowInfo.productGcsFolder+'/ia/'+dstName);
-      gcs.streamUpload(
-        workflowInfo.productGcsFolder+'/ia/'+dstName,
-        fs.createReadStream(path.join(workflowInfo.dir, file))
+      let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia/'+dstName;
+
+      logger.info('Copying file from '+path.join(dir, file)+' to '+gcsPath);
+      await gcs.streamUpload(
+        gcsPath,
+        fs.createReadStream(path.join(dir, file))
       );
 
-      resultFiles.push(workflowInfo.productGcsFolder+'/ia/'+dstName);
+      resultFiles.push(gcsPath);
     }
     
-    await fs.remove(workflowInfo.dir);
+    await fs.remove(dir);
 
     return resultFiles;
   }
 
-  /**
-   * @method initWorkflow
-   * @description given a file stream and filename, this function will create a
-   * a unique id for the workflow, create a directory in the tmp bucket, and
-   * stream the file to the local directory for reading and processing.
-   * 
-   * @param {*} fileStream 
-   * @param {*} filename 
-   * @returns 
-   */
-  async initWorkflow(fileStream, filename, metadata) {
-    let localFsStream = new PassThrough();
-    let gcsStream = new PassThrough();
-    let shaStream = new PassThrough();
-
-    fileStream.pipe(localFsStream);
-    fileStream.pipe(gcsStream);
-    fileStream.pipe(shaStream);
-
-
-    let id = uuid();
-    let dir = path.join(config.workflow.rootPath, id);
-    await fs.mkdirp(dir);
-
-    let gcsPath = 'gs://'+path.join(config.workflow.gcsBuckets.tmp, id, filename);
-    let localFile = path.join(dir, filename);
-
-    let gcsPromise = gcs.streamUpload(gcsPath, gcsStream);
-    let localFsPromise = this.writeFileStream(localFile, localFsStream);
-
-    let hash = crypto.createHash('sha256');
-    shaStream.on('data', (chunk) => hash.update(chunk));
-
-    await Promise.all([gcsPromise, localFsPromise]);
-
-    let sha256 = hash.digest('hex');
-
-    return {
-      id, 
-      dir, 
-      filename,
-      tmpGcsPath: gcsPath,
-      productGcsFolder : 'gs://'+path.join(config.workflow.gcsBuckets.products, metadata['fin-path']),
-      localFile, 
-      sha256
-    };
-  }
 
   async cleanupWorkflow(workflowId) {
     await gcs.cleanFolder(config.workflow.gcsBuckets.tmp, workflowId);
@@ -163,22 +114,6 @@ class ImageUtils {
     return parseInt(stdout.trim());
   }
 
-  /**
-   * @method writeFileStream
-   * @description promise wrapper around a write stream
-   * 
-   * @param {String} filePath fs path to write to
-   * @param {Object} stream file stream to write
-   * @returns 
-   */
-  writeFileStream(filePath, stream) {
-    return new Promise((resolve, reject) => {
-      let writeStream = fs.createWriteStream(filePath)
-        .on('close', resolve)
-        .on('error', reject);
-      stream.pipe(writeStream);
-    });
-  }
 
   async imageToIaReader(file, page, opts={}) {
     let localFile = await this.toLocalFile(file);

@@ -70,4 +70,17 @@ router.post('/pdf-to-ia-reader/:workflowId/:page', async (req, res) => {
 
 });
 
+router.get('/pdf-to-ia-reader/getNumPages/:workflowId', async (req, res) => {
+  try {    
+    let pageCount = await model.getNumPdfPagesService(req.params.workflowId);
+    res.json({success: true, pageCount});
+  } catch(e) {
+    res.status(500).json({
+      error : e.message,
+      stack : e.stack
+    });
+  }
+
+});
+
 module.exports = router;
