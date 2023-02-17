@@ -4,7 +4,10 @@
   "description": "The UC Davis DAMS client built on top of fin-server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dist": "cd client && ./build.sh",
+    "watch": "cd client && webpack --watch",
+    "analyze-bundle": "cd client && webpack --profile --json webpack-dist.config.js > stats.json && webpack-bundle-analyzer -m server stats.json"
   },
   "author": "jrmerz@ucdavis.edu",
   "license": "MIT",
