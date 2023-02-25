@@ -12,11 +12,11 @@ config.ocr = {
     fill : 'black',
     fuzz : '30% +opaque "#FFFFFF"',
     deskew : '40%',
-    trim : '+repage',
+    // trim : '+repage',
     filter : 'catrom',
     // 'sigmoidal-contrast' : '10,50%',
     quality : 100,
-    resize : (IA_BOOK_SIZE*OCR_TO_IA_BOOK_SCALE)+'x\\>',
+    resize : (IA_BOOK_SIZE*OCR_TO_IA_BOOK_SCALE)+'x',
   }
 }
 

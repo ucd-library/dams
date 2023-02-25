@@ -4,9 +4,6 @@ const fs = require('fs-extra');
 const ocr = require('./ocr.js');
 const exec = require('./exec.js');
 const {logger} = require('@ucd-lib/fin-service-utils');
-const uuid = require('uuid/v4');
-const crypto = require('crypto');
-const {PassThrough} = require('stream');
 
 const imageMagick = require('./image-magick.js');
 const config = require('./config.js');
@@ -53,7 +50,7 @@ class ImageUtils {
     return pageCount;
   }
 
-  async runPdfToIaReaderPage(workflowId, page) {
+  async runPdfToIaReaderPage(workflowId, page, opts={}) {
     let workflowInfo = await this.getWorkflowInfo(workflowId);
     
     let localFile = this.getLocalFile(workflowInfo);
@@ -64,9 +61,25 @@ class ImageUtils {
     await gcs.getGcsFileObjectFromPath(workflowInfo.data.tmpGcsPath)
       .download({
         destination: localFile
-      })
+      });
 
-    await this.imageToIaReader(localFile, page);
+    // create the pageCount file when we run the first page
+    if( page+'' === '0' ) {
+      let pageCount = await this.getNumPdfPages(localFile);
+      let pageCountFile = path.join(dir, 'page-count.txt');
+      await fs.writeFile(pageCountFile, pageCount+'');
+
+      let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia/page-count.txt';
+
+      await gcs.streamUpload(
+        gcsPath,
+        fs.createReadStream(pageCountFile)
+      );
+
+      await fs.unlink(pageCountFile);
+    }
+
+    await this.imageToIaReader(localFile, page, opts);
     await fs.unlink(localFile);
         
     let files = await fs.readdir(dir);
@@ -75,13 +88,25 @@ class ImageUtils {
     for( let file of files ) {
       let fileInfo = path.parse(file);
       let dstName = `${sourceName}-${page}${fileInfo.ext}`;
+      let uploadOpts = {};
+
+      if( fileInfo.ext === '.djvu' ) {
+        uploadOpts.contentType = 'text/xml';
+      }
+
+      // keep the ocr img file as is, if we are uploading all files.
+      // this is only for debugging
+      if( fileInfo.base.match(/-ocr-ready.*\.jpg$/) ) {
+        dstName = file;
+      }
 
       let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia/'+dstName;
 
       logger.info('Copying file from '+path.join(dir, file)+' to '+gcsPath);
       await gcs.streamUpload(
         gcsPath,
-        fs.createReadStream(path.join(dir, file))
+        fs.createReadStream(path.join(dir, file)),
+        uploadOpts
       );
 
       resultFiles.push(gcsPath);
@@ -123,16 +148,73 @@ class ImageUtils {
 
     logger.info('Generating IA Reader Image for: '+localFile);
     let aiImage = await imageMagick.iaReaderImage(localFile, page);
+    let aiImageDim = await imageMagick.getImageDimensions(aiImage.output);
+
+    let iaImageInfo = path.parse(aiImage.output);
+    await fs.writeFileSync(
+      path.join(iaImageInfo.dir, iaImageInfo.name+'.json'), 
+      JSON.stringify(aiImageDim)
+    );
 
     logger.info('Running OCR for: '+ocrImage.output);
     let ocrResult = await ocr.ocr({filepath: ocrImage.output, output: 'hocr'});
 
-    await hocrToDjvu(ocrResult.result, config.iaReader.ocrScale);
+    await hocrToDjvu(ocrResult.result, config.iaReader.ocrScale, aiImageDim);
 
-    await fs.unlink(ocrResult.result);
-    await fs.unlink(ocrImage.output);
+    if( opts.keepTmpFiles !== true ) {
+      await fs.unlink(ocrResult.result);
+      await fs.unlink(ocrImage.output);
+    }
 
     logger.info('ImageUtils.imageToIaReader() complete');
+  }
+
+  async finalizeAiReader(workflowId) {
+    let workflowInfo = await this.getWorkflowInfo(workflowId);
+
+    let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia';
+    let files = await gcs.listFiles('gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia');
+    files = files[0];
+
+    let iaManifest = {
+      data : []
+    };
+
+    for( let file of files ) {
+      let fileParts = path.parse(file.name);
+      if( fileParts.ext === '.json' ) {
+        let t = (await gcs.readFileToMemory(baseGcsPath+'/'+fileParts.base)).toString('utf-8');
+        let pageData = JSON.parse(t);
+
+        pageData.width = parseInt(pageData.width);
+        pageData.height = parseInt(pageData.height);
+        pageData.page = parseInt(fileParts.name.split('-').pop());
+        pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/'+file.bucket.name+'/ia/'+fileParts.name+'.jpg';
+        iaManifest.data.push(pageData);
+      }
+
+    }
+
+    if( iaManifest.data.length === 0 ) {
+      console.log('No page files found.  Aborting');
+      return;
+    }
+
+    iaManifest.data.sort((a,b) => {
+      return a.page - b.page;
+    });
+
+    await gcs.getGcsFileObjectFromPath(baseGcsPath+'/ia-manifest.json')
+      .save(JSON.stringify(iaManifest), {
+        contentType: 'application/json'
+      });
+
+    for( let file of files ) {
+      let fileParts = path.parse(file.name);
+      if( fileParts.ext === '.json' ) {
+        await file.delete();
+      }
+    }
   }
 
   /**

@@ -24,9 +24,12 @@ main:
               body:
                   apiVersion: run.googleapis.com/v1
                   metadata:
-                      name: ${args.gcWorkflowName + "-" + args.finWorkflowId}
+                      name: ${"dams-" + args.finWorkflowId}
                       labels:
                           cloud.googleapis.com/location: ${location}
+                          project: dams
+                          fin-workflow-name: ${args.gcWorkflowName}
+                          workflow-step: ocr
                       annotations:
                           run.googleapis.com/launch-stage: ALPHA
                   kind: "Job"
@@ -55,9 +58,51 @@ main:
       - ocr_page:
           call: googleapis.run.v1.namespaces.jobs.run
           args:
-              name: ${"namespaces/" + project_id + "/jobs/" + args.gcWorkflowName + "-" + args.finWorkflowId}
+              name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
               location: ${location}
           result: job_execution
+      - setup_ocr_finalize_job:
+          call: googleapis.run.v1.namespaces.jobs.create
+          args:
+              location: ${location}
+              parent: ${"namespaces/" + project_id}
+              body:
+                  apiVersion: run.googleapis.com/v1
+                  metadata:
+                      name: ${"dams-" + args.finWorkflowId + "-finalize"}
+                      labels:
+                          cloud.googleapis.com/location: ${location}
+                          project: dams
+                          fin-workflow-name: ${args.gcWorkflowName}
+                          workflow-step: finalize
+                      annotations:
+                          run.googleapis.com/launch-stage: ALPHA
+                  kind: "Job"
+                  spec: 
+                      template:
+                          spec:
+                              template:
+                                  spec:
+                                      containers:
+                                          - image: ${job_container}
+                                            resources:
+                                                requests:
+                                                    memory: "2Gi"
+                                                    cpu: "1000m"
+                                                limits:
+                                                    memory: "2Gi"
+                                                    cpu: "1000m"
+                                            command: "node"
+                                            args: ${["cli/finalize-ia-reader.js", args.finWorkflowId]}
+                                      timeoutSeconds: 300
+                                      serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
+      - finalize_ocr:
+          call: googleapis.run.v1.namespaces.jobs.run
+          args:
+              name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId + "-finalize"}
+              location: ${location}
+          result: job_execution
+
   # - cleanup:
   #   call: http.delete
   #   args:

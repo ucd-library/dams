@@ -77,6 +77,12 @@ class ImageMagickWrapper {
     let {stdout, stderr} = await exec(cmd);
     return {input:file, output: files.output, cmd, stdout, stderr}
   }
+
+  async getImageDimensions(file) {
+    let {stdout, stderr} = await exec(`identify -format "%wx%h" ${file}`);
+    let [width, height] = stdout.trim().split('x');
+    return {width, height};
+  }
 }
 
 module.exports = new ImageMagickWrapper();

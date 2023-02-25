@@ -2,10 +2,15 @@ const fs = require('fs');
 const path = require('path');
 const {parseString} = require('xml2js');
 const xmlbuilder = require('xmlbuilder');
+const config = require('./config.js');
 
-function rootDjvu() {
+function rootDjvu(imageDim) {
   const xml = xmlbuilder.create('OBJECT');
-  xml.ele('PARAM', {name: 'foo', value: 'bar'})
+  xml.att('height', imageDim.height);
+  xml.att('width', imageDim.width);
+  xml.att('type', 'image/x.djvu');
+
+  xml.ele('PARAM', {name: 'DPI', value: config.iaReader.imageMagick.density})
   const mainColumn = xml.ele('HIDDENTEXT').ele('PAGECOLUMN');
   return {xml, mainColumn};
 }
@@ -18,9 +23,11 @@ function rootDjvu() {
  * @param {Number} scaleFactor scale factor between the ocr image and image used to
  *                 render inside the IA reader.  Default is 1.  Ex.  if the IA reader
  *                 image is 1/2 the size of the ocr image, then scaleFactor = 2.
+ * @param {Object} imageDim contains the height/width of the image used to render
+ * 
  * @returns 
  */
-function run(hocrFile, scaleFactor=1) {
+function run(hocrFile, scaleFactor=1, imageDim={}) {
   let fileInfo = path.parse(hocrFile);
   let djvuFile = path.join(fileInfo.dir, fileInfo.name + '.djvu');
 
@@ -30,7 +37,7 @@ function run(hocrFile, scaleFactor=1) {
     parseString(xml, (error, result) => {
       if( error ) return reject(error);
 
-      const {xml, mainColumn} = rootDjvu();
+      const {xml, mainColumn} = rootDjvu(imageDim);
 
       for( let div of result.html.body ) {
         let page = div.div[0];
@@ -49,12 +56,20 @@ function run(hocrFile, scaleFactor=1) {
                   .split(';')
                   .map(item => item.trim())
                   .map(item => {
-                    return item.split(' ').map(num => Math.floor(parseInt(num)/scaleFactor)).join(',')
+                    let bbox = item.split(' ')
+                      .map((num) => Math.floor(parseInt(num)/scaleFactor))
+                    
+                    return [bbox[0], bbox[3], bbox[2], bbox[1]].join(',')
                   });
+
+                let xconf = word.$.title.split(';')
+                  .map(item => item.trim())
+                  .find(item => item.startsWith('x_wconf'));
+                if( !xconf ) xconf = '';
 
                 xmlLine.ele('WORD', {
                   coords : meta[0],
-                  'x-confidence' : meta[1].replace('x_wconf ', '')
+                  'x-confidence' : xconf.replace('x_wconf ', '').trim()
                 }, word._ || '');
               }); // line
             }) // paragraph

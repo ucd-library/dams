@@ -6,8 +6,12 @@ if( page === undefined ) {
   page = process.env.CLOUD_RUN_TASK_INDEX;
 }
 
-console.log(node, file, worflowId, page);
-model.runPdfToIaReaderPage(worflowId, page)
+let opts = {
+  keepTmpFiles : false
+}
+
+console.log(node, file, worflowId, page, opts);
+model.runPdfToIaReaderPage(worflowId, page, opts)
   .then(() => {
     console.log('done');
     process.exit(0);
