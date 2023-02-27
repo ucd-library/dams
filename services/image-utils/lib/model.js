@@ -64,20 +64,20 @@ class ImageUtils {
       });
 
     // create the pageCount file when we run the first page
-    if( page+'' === '0' ) {
-      let pageCount = await this.getNumPdfPages(localFile);
-      let pageCountFile = path.join(dir, 'page-count.txt');
-      await fs.writeFile(pageCountFile, pageCount+'');
+    // if( page+'' === '0' ) {
+    //   let pageCount = await this.getNumPdfPages(localFile);
+    //   let pageCountFile = path.join(dir, 'page-count.txt');
+    //   await fs.writeFile(pageCountFile, pageCount+'');
 
-      let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia/page-count.txt';
+    //   let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia/page-count.txt';
 
-      await gcs.streamUpload(
-        gcsPath,
-        fs.createReadStream(pageCountFile)
-      );
+    //   await gcs.streamUpload(
+    //     gcsPath,
+    //     fs.createReadStream(pageCountFile)
+    //   );
 
-      await fs.unlink(pageCountFile);
-    }
+    //   await fs.unlink(pageCountFile);
+    // }
 
     await this.imageToIaReader(localFile, page, opts);
     await fs.unlink(localFile);
@@ -100,7 +100,7 @@ class ImageUtils {
         dstName = file;
       }
 
-      let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia/'+dstName;
+      let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath+'/'+dstName;
 
       logger.info('Copying file from '+path.join(dir, file)+' to '+gcsPath);
       await gcs.streamUpload(
@@ -172,8 +172,8 @@ class ImageUtils {
   async finalizeAiReader(workflowId) {
     let workflowInfo = await this.getWorkflowInfo(workflowId);
 
-    let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia';
-    let files = await gcs.listFiles('gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia');
+    let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath;
+    let files = await gcs.listFiles('gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath);
     files = files[0];
 
     let iaManifest = {
@@ -189,7 +189,7 @@ class ImageUtils {
         pageData.width = parseInt(pageData.width);
         pageData.height = parseInt(pageData.height);
         pageData.page = parseInt(fileParts.name.split('-').pop());
-        pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/'+file.bucket.name+'/ia/'+fileParts.name+'.jpg';
+        pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/'+file.bucket.name+'/'+workflowInfo.data.gcsSubpath+'/'+fileParts.name+'.jpg';
         iaManifest.data.push(pageData);
       }
 
@@ -204,7 +204,7 @@ class ImageUtils {
       return a.page - b.page;
     });
 
-    await gcs.getGcsFileObjectFromPath(baseGcsPath+'/ia-manifest.json')
+    await gcs.getGcsFileObjectFromPath(baseGcsPath+'/manifest.json')
       .save(JSON.stringify(iaManifest), {
         contentType: 'application/json'
       });

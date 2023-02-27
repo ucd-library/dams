@@ -1,9 +1,11 @@
 const {config} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
+const fetch = require('node-fetch');
 
 const BINARY = 'http://fedora.info/definitions/v4/repository#Binary';
 const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
 
+const IA_READER_WORKFLOWS = ['pdf-to-ia-reader'];
 
 module.exports = async function(path, graph, headers, utils) {
   let item = {};
@@ -263,6 +265,9 @@ module.exports = async function(path, graph, headers, utils) {
   utils.setYearFromDate(item);
 
   item._ = {};
+  if( !item.clientMedia ) {
+    item.clientMedia = {};
+  }
 
   utils.stripFinHost(headers)
 
@@ -274,6 +279,19 @@ module.exports = async function(path, graph, headers, utils) {
       headers.link.type.find(item => item.rel === 'type' && item.url === ARCHIVAL_GROUP) ) {
       item._['archival-group'] = item['@id'];
       item._.esId = item['@id'];
+    }
+
+    // check for completed ia reader workflow
+    if( headers.link.workflow ) {
+      let iaReaderSupport = headers.link.workflow.find(item => IA_READER_WORKFLOWS.includes(item.type));
+      if( iaReaderSupport ) {
+        let workflowInfo = await fetch(config.gateway.host+'/fcrepo/rest'+iaReaderSupport.url);
+        workflowInfo = await workflowInfo.json()
+
+        item.clientMedia.iaReader = {
+          manifest : item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
+        }
+      }
     }
   }
 
