@@ -182,6 +182,8 @@ class ImageUtils {
 
     for( let file of files ) {
       let fileParts = path.parse(file.name);
+      if( fileParts.base === 'manifest.json' ) continue;
+
       if( fileParts.ext === '.json' ) {
         let t = (await gcs.readFileToMemory(baseGcsPath+'/'+fileParts.base)).toString('utf-8');
         let pageData = JSON.parse(t);
