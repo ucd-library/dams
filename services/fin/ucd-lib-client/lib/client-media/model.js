@@ -12,6 +12,7 @@ class ClientMedia {
     this.index = [];
 
     for( let node of graph ) {
+      // debugger;
       this.index[node['@id']] = node;
       if( !node._ ) node._ = {};
       node._.clientMedia = {};
@@ -123,6 +124,8 @@ class ClientMedia {
    */
   _crawlMedia(node, media, crawled={}) {
     node = this.getNode(node);
+
+    if( !node ) return; // TODO remove, hack for /item/ark:/87293/d3tq5rj7p where jpg media _getNode() returns null object, is item structure wrong?
 
     if( !media ) {
       media = [];

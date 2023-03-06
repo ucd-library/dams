@@ -24,7 +24,7 @@ class RecordVcModel extends BaseModel {
       const item = {
         id : e.root['@id'],
         name : e.root.name,
-        collectionId : e.root.isPartOf[0]['@id'],
+        collectionId : e.root.isPartOf['@id'] || e.root.isPartOf[0]['@id'],
         collectionName : e.root.creator.name,
         collectionItemsCount : 42,
         collectionImg : e.root.image.url,
