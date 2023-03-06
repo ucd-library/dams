@@ -8,7 +8,7 @@ function _exec(cmd, options={}) {
       options.shell = '/bin/bash'
     };
 
-    logger.debug('Executing shell command: ', cmd, options);
+    logger.info('Executing shell command: ', cmd, options);
 
     exec(cmd, options, (error, stdout, stderr) => {
       logger.debug('Executing shell command result: ', cmd, options, {error, stdout, stderr});

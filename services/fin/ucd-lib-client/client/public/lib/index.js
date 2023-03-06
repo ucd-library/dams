@@ -8,7 +8,7 @@ module.exports = {
   CollectionVcModel : require('./models/CollectionVcModel'),
   MediaModel : require('./models/MediaModel'),
   CitationModel : require('./models/CitationsModel'),
-  SeoModel : require('./models/SeoModel'),
+  // SeoModel : require('./models/SeoModel'),
   FiltersModel : require('./models/FiltersModel'),
   FcAppConfigModel : require('./models/FcAppConfigModel'),
   BrowseByModel : require('./models/BrowseByModel')

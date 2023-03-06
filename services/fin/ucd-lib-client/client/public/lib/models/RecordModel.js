@@ -45,13 +45,13 @@ class RecordModel extends ElasticSearchModel {
 
     
  
-    // debugger;
     // only trigger a change if the root record changed.
     if( result.id !== this.currentRecordId ) {
       this.currentRecordId = result.id;
       AppStateModel.setSelectedRecord(result.payload);
-      // debugger;
-      AppStateModel.setSelectedRecordMedia(Object.values(result.payload.index).filter(r => r.image && parseInt(r.position) === 1)[0]);
+      // if( result.payload ) {
+        AppStateModel.setSelectedRecordMedia(Object.values(result.payload.index).filter(r => r.image && parseInt(r.position) === 1)[0]);
+      // }
       //
       // result.payload.index[result.payload.clientMedia.id]
       // if( result.payload.clientMedia.id === result.payload.root.id ) then need to render image with position 1
@@ -168,6 +168,19 @@ class RecordModel extends ElasticSearchModel {
     await this.service.defaultSearch(storeId, searchDocument, compact, singleNode);
 
     return this.store.getDefaultSearch(storeId);
+  }
+
+  /**
+     * @method getIaBookManifest
+     * @description load a records IA bookreader page data by id
+     * 
+     * @param {String} id record id
+     * @param {String} bookTitle title of book to build manifest url
+     * 
+     * @returns {Promise} resolves to record
+     */
+  async getIaBookManifest(id, bookTitle) {
+    return await this.service.getIaBookManifest(id, bookTitle);
   }
     
 

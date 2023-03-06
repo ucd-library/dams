@@ -10,6 +10,10 @@ return html`
     box-sizing: border-box;
   }
 
+  [hidden] {
+    display: none !important;
+  }
+
   .wrapper {
     /* display: flex; */
     /* flex-direction: column; */
@@ -39,6 +43,19 @@ return html`
   img {
     max-width: 100%;
   }
+
+  app-bookreader-viewer.fullscreen {
+    background-color: white;
+    position: fixed;
+    padding: 0px;
+    margin: 0px;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+  }
+
 </style>
 
 <div class="wrapper">
@@ -51,11 +68,20 @@ return html`
       <img src="${this.bagOfFilesImage}" ?hidden="${!this.bagOfFilesImage}" />
     </div>
     <app-image-viewer id="image"></app-image-viewer>
+    <app-bookreader-viewer id="bookreader" .fullscreen="${this.brFullscreen}" .bookData="${this.bookData}"></app-bookreader-viewer>
     <app-video-viewer id="video"></app-video-viewer>
     <app-audio-viewer id="audio"></app-audio-viewer>
   </iron-pages>
 
-  <app-media-viewer-nav @zoom-in="${this._onZoomIn}"></app-media-viewer-nav>
+  <app-media-viewer-nav 
+    .isBookReader="${this.isBookReader}"
+    @zoom-in="${this._onZoomIn}" 
+    @br-bookview-toggle="${this._onToggleBookView}"
+    @br-expand-view="${this._onExpandBookView}"
+    @br-collapse-view="${this._onCollapseBookView}"
+    @br-zoom-in="${this._onBRZoomIn}" 
+    @br-zoom-out="${this._onBRZoomOut}">
+  </app-media-viewer-nav>
 </div>
 
 `;}

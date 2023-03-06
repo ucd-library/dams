@@ -1,0 +1,19 @@
+{
+  "defaults" : {
+    "tmpGcsBucket" : "dams-workflow-tmp-space",
+    "gcsBucket" : "dams-client-products",
+    "notifyOnSuccess" : "/svc:reindex"
+  },
+
+  "definitions" : {
+
+    "pdf-to-ia-reader" : {
+      "type" : "gc-workflow",
+      "data" : {
+        "gcsSubpath" : "ia",
+        "baseUrl" : "{{IMAGE_UTILS_SERVICE_URL}}"
+      }
+    }
+
+  }
+}

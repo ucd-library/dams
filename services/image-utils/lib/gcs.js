@@ -24,14 +24,29 @@ class GcsWrapper {
     });
   }
 
-  streamUpload(gcsFile, stream) {
+  streamUpload(gcsFile, stream, opts) {
     return new Promise((resolve, reject) => {
       let file = this.getGcsFileObjectFromPath(gcsFile);
-      let writeStream = file.createWriteStream();
+      let writeStream = file.createWriteStream(opts);
       stream.pipe(writeStream);
 
       writeStream.on('error', reject);
       writeStream.on('finish', resolve);
+    });
+  }
+
+  /**
+   * @method listFiles
+   * @description list files in a gcs folder
+   */
+  listFiles(gcsPath) {
+    let bucket = gcsPath.split('/')[2];
+    let folder = gcsPath.split('/').slice(3).join('/');
+
+    return storage.bucket(bucket).getFiles({
+      prefix: folder+'/',
+      delimiter: '/',
+      autoPaginate: false
     });
   }
 

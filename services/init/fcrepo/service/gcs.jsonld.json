@@ -4,10 +4,10 @@
     "http://digital.ucdavis.edu/schema#Service",
     "http://digital.ucdavis.edu/schema#ProxyService"
   ],
-  "urlTemplate": "http://workflow:3000/{{svcPath}}?fcPath={{fcPath}}",
-  "description": "Run a workflow",
-  "identifier": "workflow",
-  "title": "Fin Workflow Service",
+  "urlTemplate": "http://gcs:3000{{fcPath}}?svcPath={{svcPath}}",
+  "description": "Access GCS Resources",
+  "identifier": "gcs",
+  "title": "gcs",
   "@context": {
     "title": {
       "@id": "http://purl.org/dc/elements/1.1/title"
