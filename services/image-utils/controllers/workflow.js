@@ -57,20 +57,21 @@ router.delete('/:workflowId', async (req, res) => {
   }
 });
 
-router.post('/pdf-to-ia-reader/:workflowId/:page', async (req, res) => {
-  try {    
-    let files = await model.runPdfToIaReaderPage(req.params.workflowId, req.params.page);
-    res.json({success: true, files});
-  } catch(e) {
-    res.status(500).json({
-      error : e.message,
-      stack : e.stack
-    });
-  }
+// for debugging - dont' remove
+// router.post('/ia-reader/:workflowId/:page', async (req, res) => {
+//   try {    
+//     let files = await model.runPdfToIaReaderPage(req.params.workflowId, req.params.page);
+//     res.json({success: true, files});
+//   } catch(e) {
+//     res.status(500).json({
+//       error : e.message,
+//       stack : e.stack
+//     });
+//   }
 
-});
+// });
 
-router.get('/pdf-to-ia-reader/getNumPages/:workflowId', async (req, res) => {
+router.get('/ia-reader/getNumPages/:workflowId', async (req, res) => {
   try {    
     let pageCount = await model.getNumPdfPagesService(req.params.workflowId);
     res.json({success: true, pageCount});

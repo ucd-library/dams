@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const ocr = require('./ocr.js');
 const exec = require('./exec.js');
-const {logger} = require('@ucd-lib/fin-service-utils');
+const {logger, RDF_URIS} = require('@ucd-lib/fin-service-utils');
 
 const imageMagick = require('./image-magick.js');
 const config = require('./config.js');
@@ -12,7 +12,9 @@ const hocrToDjvu = require('./hocr-to-djvu.js');
 class ImageUtils {
 
   constructor() {
+    this.IMAGE_TYPES = ['.jpeg', '.png', '.tiff', '.jpg', '.tif', '.gif', '.bmp', '.webp'];
     this.TMP_DIR =  process.env.WORKFLOW_TMP_DIR || '/workflow';
+    fs.mkdirp(this.TMP_DIR);
   }
 
   unzip(file) {
@@ -43,7 +45,13 @@ class ImageUtils {
         destination: localFile
       })
 
-    let pageCount = await this.getNumPdfPages(localFile);
+    let pageCount = 0;
+
+    if( localFile.match(/\.pdf$/) ) {
+      pageCount = await this.getNumPdfPages(localFile);
+    } else {
+      pageCount = await this.getNumImgListPages(localFile, workflowInfo);
+    }
 
     await fs.remove(dir);
 
@@ -63,23 +71,53 @@ class ImageUtils {
         destination: localFile
       });
 
-    // create the pageCount file when we run the first page
-    // if( page+'' === '0' ) {
-    //   let pageCount = await this.getNumPdfPages(localFile);
-    //   let pageCountFile = path.join(dir, 'page-count.txt');
-    //   await fs.writeFile(pageCountFile, pageCount+'');
+    if( !localFile.match(/\.pdf$/) ) {
+      let node = await this.getNodeFromJsonLdFile(localFile, workflowInfo.data.finPath);
+      if( !node ) throw new Error('Failed to find main node in jsonld file: '+localFile);
 
-    //   let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/ia/page-count.txt';
+      let pageParts, pageName, pageDir, gcsTmpPagePath;
 
-    //   await gcs.streamUpload(
-    //     gcsPath,
-    //     fs.createReadStream(pageCountFile)
-    //   );
+      if( node[RDF_URIS.PROPERTIES.HAS_PART] ) {
+        page = node[RDF_URIS.PROPERTIES.HAS_PART][parseInt(page)];
+        pageParts = page['@id'].split('/');
+        pageName = pageParts.pop();
+        pageDir = pageParts.pop();
+        gcsTmpPagePath = 'gs://'+path.join(workflowInfo.data.tmpGcsBucket, pageDir, pageName);
+      
+      } else {
+        // use file list of hasPart is not provided
+        let files = (await gcs.listFiles(workflowInfo.data.tmpGcsPath))[0];
+        let pageCount = 0;
 
-    //   await fs.unlink(pageCountFile);
-    // }
+        for( let file of files ) {
+          if( this.IMAGE_TYPES.includes(path.parse(file.name).ext) ) {
+            if( pageCount === parseInt(page) ) {
+              pageName = file.name.split('/').pop();
+              gcsTmpPagePath = 'gs://'+path.join(workflowInfo.data.tmpGcsBucket, file.name);
+              break;
+            }
+            pageCount++;
+          }
+        }
+      }
 
-    await this.imageToIaReader(localFile, page, opts);
+      await fs.unlink(localFile);
+      localFile = path.join(this.TMP_DIR, pageName);
+      sourceName = path.parse(pageName).name;
+      dir = path.parse(localFile).dir;
+
+      await gcs.getGcsFileObjectFromPath(gcsTmpPagePath)
+      .download({
+        destination: localFile
+      });
+
+      await this.imageToIaReader(localFile, null, opts);
+
+    } else {
+      await this.imageToIaReader(localFile, page, opts);
+    }
+
+    
     await fs.unlink(localFile);
         
     let files = await fs.readdir(dir);
@@ -87,7 +125,12 @@ class ImageUtils {
 
     for( let file of files ) {
       let fileInfo = path.parse(file);
+
       let dstName = `${sourceName}-${page}${fileInfo.ext}`;
+      if( !localFile.match(/\.pdf$/) ) {
+        dstName = `${sourceName}${fileInfo.ext}`;
+      }
+
       let uploadOpts = {};
 
       if( fileInfo.ext === '.djvu' ) {
@@ -137,6 +180,33 @@ class ImageUtils {
   async getNumPdfPages(file) {
     let {stdout, stderr} = await exec(`pdfinfo ${file} | awk '/^Pages:/ {print $2}'`);
     return parseInt(stdout.trim());
+  }
+
+  async getNumImgListPages(file, workflowInfo={}) {
+    if( !workflowInfo.data ) workflowInfo.data = {};
+    let node = await this.getNodeFromJsonLdFile(file, workflowInfo.data.finPath);
+
+    let pageCount = 0;
+    if( !node ) return pageCount;
+
+    if( node[RDF_URIS.PROPERTIES.HAS_PART] ) {
+      return (node[RDF_URIS.PROPERTIES.HAS_PART] || []).length;
+    }
+
+    let files = (await gcs.listFiles(workflowInfo.data.tmpGcsPath))[0];
+    files.forEach(file => {
+      if( this.IMAGE_TYPES.includes(path.parse(file.name).ext) ) pageCount++;
+    });
+
+    return pageCount;
+  };
+
+  async getNodeFromJsonLdFile(file, finPath) {
+    let jsonld = JSON.parse(await fs.readFile(file, 'utf8'));
+    if( jsonld['graph'] ) jsonld = jsonld['graph'];
+    if( !Array.isArray(jsonld) ) jsonld = [jsonld];
+
+    return jsonld.find(n => n['@id'] === 'info:fedora'+finPath || n['@id'] === '');
   }
 
 

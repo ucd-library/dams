@@ -14,8 +14,18 @@ main:
       - get_pages:
           call: http.get
           args:
-              url: ${args.baseUrl + "/pdf-to-ia-reader/getNumPages/" + args.finWorkflowId}
+              url: ${args.baseUrl + "/ia-reader/getNumPages/" + args.finWorkflowId}
           result: pdf_info
+      - set_parallelism:
+          assign:
+            - parallelism: ${pdf_info.body.pageCount}
+      - check_parallelism:
+          switch:
+            - condition: ${parallelism > 50}
+              steps:
+                - set_max_parallelism:
+                    assign:
+                      - parallelism: 50
       - setup_ocr_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
@@ -36,7 +46,7 @@ main:
                   spec: 
                       template:
                           spec:
-                              parallelism: 50
+                              parallelism: ${parallelism}
                               taskCount: ${pdf_info.body.pageCount}
                               template:
                                   spec:

@@ -44,6 +44,10 @@ class ImageMagickWrapper {
    * @returns {Object}
    */
   getFileNames(inputFile, type='', page='') {
+    if( page === null || page === undefined ) {
+      page = '';
+    }
+
     if( !['ia-reader', 'ocr'].includes(type) ) {
       throw new Error('Unknown type: '+type);
     }
