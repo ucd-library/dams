@@ -9,8 +9,8 @@ const appConfig = require('../lib/fcrepo-app-config');
 
 const {seo, records, collections} = require('@ucd-lib/fin-service-utils');
 
-const transform = seo.recordTransform;
-const collectionTransform = seo.collectionTransform;
+// const transform = seo.recordTransform;
+// const collectionTransform = seo.collectionTransform;
 
 const loaderPath = path.join(__dirname, '..', 'client', config.server.assets, 'loader', 'loader.js');
 const loaderSrc = fs.readFileSync(loaderPath, 'utf-8');
@@ -92,7 +92,7 @@ module.exports = (app) => {
       try {
         if( isCollection ) {
           let collection = await collections.get(isCollection);
-          collection = collectionTransform(collection._source);
+          // collection = collectionTransform(collection._source);
           jsonld = JSON.stringify(collection, '  ', '  ');
     
           let keywords = [];
@@ -112,7 +112,7 @@ module.exports = (app) => {
 
           let id = req.originalUrl;
           let record = await records.esGet(id);
-          record = transform(record._source);
+          // record = transform(record._source);
           jsonld = JSON.stringify(record, '  ', '  ');
     
           let keywords = [];

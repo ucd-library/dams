@@ -2,8 +2,8 @@ const {BaseService} = require('@ucd-lib/cork-app-utils');
 const RecordStore = require('../stores/RecordStore');
 const deepEqual = require('deep-equal');
 const config = require('../config');
-const seo = require('@ucd-lib/fin-service-utils/lib/seo');
-const graphConcat = seo.graphConcat;
+// const seo = require('@ucd-lib/fin-service-utils/lib/seo');
+// const graphConcat = seo.graphConcat;
 const RecordGraph = require('../utils/RecordGraph.js').default;
 const ClientMedia = require('../../../../lib/client-media/model.js');
 
@@ -28,9 +28,25 @@ class RecordService extends BaseService {
         let rg = new RecordGraph(result.body);
         // get clientMedia for entire collection, even if viewing a single item
         rg.clientMedia = new ClientMedia(id.split('/media')[0], result.body.node);
+
         this.store.setRecordLoaded(id, rg);
       },
       onError : e => this.store.setRecordError(id, e)
+    });
+  }
+
+  getIaBookManifest(id, bookTitle) {
+    return this.request({
+      url : `/fcrepo/rest${id}/media/${bookTitle}/svc:gcs/dams-client-products/ia/manifest.json`,
+      // fetchOptions : {
+      //   headers : {
+      //     'Accept' : 'application/ld+json'
+      //   },
+      // },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
     });
   }
 
