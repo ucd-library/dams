@@ -23,6 +23,9 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
       showNavLeft : { type : Boolean },
       showNavRight : { type : Boolean },
       isLightbox : { attribute: 'is-lightbox', type : Boolean },
+      isBookReader : { type : Boolean },
+      brSinglePage : { type : Boolean },
+      brFullscreen : { type : Boolean },
       singleImage : { type : Boolean },
       mediaList : { type : Array },
       showOpenLightbox : { type : Boolean },
@@ -39,7 +42,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
     this.icon = '';
     this.iconWidth = 40;
     
-    this.thumbnails = [{},{},{},{},{},{},{},{}];
+    this.thumbnails = [];
 
     this.thumbnailsPerFrame = 10;
     this.leftMostThumbnail = 0;
@@ -47,6 +50,9 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
     this.showNavLeft = false;
     this.showNavRight = false;
     this.isLightbox = false;
+    this.isBookReader = false;
+    this.brSinglePage = false;
+    this.brFullscreen = false;
     this.singleImage = false;
     this.mediaList = [];
     this.showOpenLightbox = false;
@@ -234,7 +240,13 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
     // sort thumbnails, and add each mediaGroup into mediaList
     let mediaList = [];
     record.clientMedia.mediaGroups.forEach(mg => {
-      let nodes = mg.display.hasPart.map(item => record.index[item['@id']]);
+      let nodes = [];
+      if( mg.display.hasPart ) {
+        nodes = mg.display.hasPart.map(item => record.index[item['@id']]);
+      } else {
+        nodes.push(mg.display['@id']);
+      }
+
       mediaList.push(...utils.organizeMediaList(nodes));
     });
     this.mediaList = mediaList;
@@ -354,6 +366,59 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
    */
   _onZoomOutClicked(e) {
     this.dispatchEvent(new CustomEvent('zoom-out'));
+  }
+
+  /**
+   * @method _onBRZoomInClicked
+   * @description bound to bookreader zoom icon click event.  emit zoom event
+   * 
+   * @param {Object} e HTML click event
+   */
+  _onBRZoomInClicked(e) {
+    this.dispatchEvent(new CustomEvent('br-zoom-in'));
+  }
+
+  /**
+   * @method _onBRZoomOutClicked
+   * @description bound to bookreader zoom icon click event.  emit zoom event
+   * 
+   * @param {Object} e HTML click event
+   */
+  _onBRZoomOutClicked(e) {
+    this.dispatchEvent(new CustomEvent('br-zoom-out'));
+  }
+
+  /**
+   * @method _onToggleBookView
+   * @description bound to book view single vs book mode click event.  emit event
+   * 
+   * @param {Object} e HTML click event
+   */
+  _onToggleBookView(e) {
+    this.dispatchEvent(new CustomEvent('br-bookview-toggle'));
+    this.brSinglePage = !this.brSinglePage;
+  }
+
+  /**
+   * @method _onExpandBookView
+   * @description bound to book view full page click event.  emit event
+   * 
+   * @param {Object} e HTML click event
+   */
+  _onExpandBookView(e) {
+    this.dispatchEvent(new CustomEvent('br-expand-view'));
+    this.brFullscreen = true;
+  }
+
+  /**
+   * @method _onCollapseBookView
+   * @description bound to book view full page collapse click event.  emit event
+   * 
+   * @param {Object} e HTML click event
+   */
+  _onCollapseBookView(e) {
+    this.dispatchEvent(new CustomEvent('br-collapse-view'));
+    this.brFullscreen = false;
   }
 
   /**

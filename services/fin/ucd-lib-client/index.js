@@ -38,7 +38,7 @@ require('./controllers/identifier')(app);
 /**
  * setup sitemap
  */
-require('./models/sitemap').middleware(app);
+// require('./models/sitemap').middleware(app);
 
 /**
  * setup static routes

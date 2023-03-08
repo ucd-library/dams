@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const BUILD_IE = false;
 
 let configs = require('@ucd-lib/cork-app-build').watch({
@@ -19,6 +20,14 @@ configs.forEach((config, index) => {
     test: /\.(xml|csl)$/,
     use: ['raw-loader']
   });
+  config.module.rules.push({
+    test: /\.js$/,
+    include: /\@internetarchive/,
+    loader: "babel-loader",
+    options: {
+      rootMode: "upward"
+    }
+  });
 
   config.output.publicPath = '/js/'
   config.output.chunkFilename = '[name].'+config.output.filename;
@@ -31,6 +40,14 @@ configs.forEach((config, index) => {
       plugin.use.options.plugins = ["syntax-dynamic-import"];
     });
   }
+
+  config['plugins'] = [
+    new webpack.ProvidePlugin({
+      // Make $ and jQuery available without importing
+      $: 'jquery',
+      jQuery: 'jquery',
+    })
+  ];
 });
 
 module.exports = configs;

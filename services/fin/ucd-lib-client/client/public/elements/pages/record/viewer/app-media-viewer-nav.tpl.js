@@ -60,17 +60,15 @@ export default function render() {
     height: 5rem;
   }
 
+  .layout.fullscreen {
+    border-bottom: none;
+    padding-top: 0.5rem;
+    margin: 0;
+  }
 
   #thumbnailInnerContainer {
     padding-top: 7px;
   }
-
- 
-  #thumbnails {
-    /* (48px width + 10px margin + 4px border) * 8 thumbnails */
-    /* max-width: 496px; */
-  }
-
 
   #thumbnails {
     overflow: hidden;
@@ -150,6 +148,7 @@ export default function render() {
 
   #buttonWrapper {
     padding-right: 1rem;
+    z-index: 1000;
   }
 
   #buttonWrapper div {
@@ -230,10 +229,18 @@ export default function render() {
     color: var(--color-aggie-blue-80);
   }
 
+  ucdlib-icon.single-page-book {
+    width: 6% !important;
+    height: 50%;
+    position: relative;
+    top: 25%;
+    left: 1%;
+  }
+
 </style>
 
 
-<div class="layout ${this.isLightbox ? 'lightbox' : ''}">
+<div class="layout ${this.isLightbox ? 'lightbox' : ''} ${this.brFullscreen ? 'fullscreen' : ''}">
 
   <div id="navLeft" ?hidden="${this.singleImage}">
     <ucdlib-icon 
@@ -247,7 +254,7 @@ export default function render() {
     </ucdlib-icon>
   </div>
 
-  <div id="thumbnails" ?hidden="${this.singleImage}">
+  <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader}">
     <div id="thumbnailInnerContainer">
 
       ${this.thumbnails.map(item => item.selected ? html`
@@ -278,7 +285,7 @@ export default function render() {
     </div>
   </div>
 
-  <div id="navRight" ?hidden="${this.singleImage}">
+  <div id="navRight" ?hidden="${this.singleImage || this.isBookReader}">
     <ucdlib-icon 
       icon="ucdlib-dams:fa-chevron-right"
       tabindex="0" 
@@ -304,12 +311,40 @@ export default function render() {
     </span>
   </div> -->
   <div id="buttonWrapper" style="white-space: nowrap" ?hidden="${this.isLightbox}">
-    <div @click="${this._onZoomInClicked}">
+
+    <div @click="${this._onToggleBookView}" ?hidden="${!this.isBookReader}">
+      <ucdlib-icon icon="ucdlib-dams:fa-book-open" ?hidden="${!this.brSinglePage}"></ucdlib-icon>
+      <ucdlib-icon icon="ucdlib-dams:page-single" ?hidden="${this.brSinglePage}" class="single-page-book"></ucdlib-icon>
+    </div>
+
+    <div @click="${this._onBRZoomOutClicked}" ?hidden="${!this.brFullscreen}">
+      <ucdlib-icon icon="ucdlib-dams:fa-minus"></ucdlib-icon>
+    </div>  
+    <div @click="${this._onBRZoomInClicked}" ?hidden="${!this.brFullscreen}">
+      <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
+    </div>  
+
+    <div @click="${this._onExpandBookView}" ?hidden="${!this.isBookReader || this.brFullscreen}">
+      <ucdlib-icon icon="ucdlib-dams:fa-up-right-and-down-left-from-center"></ucdlib-icon>
+    </div>  
+    <div @click="${this._onCollapseBookView}" ?hidden="${!this.isBookReader || !this.brFullscreen}">
+      <ucdlib-icon icon="ucdlib-dams:fa-down-left-and-up-right-to-center"></ucdlib-icon>
+    </div>  
+
+    <div @click="${this._onZoomInClicked}" ?hidden="${this.isBookReader}">
       <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass-plus"></ucdlib-icon>
     </div>  
-    <div>
+    <div ?hidden="${this.brFullscreen}">
       <app-share-btn></app-share-btn>
     </div>    
+
+    <!-- this is moved next to the bookreader slider -->
+    <div class="br-search" ?hidden="${!this.brFullscreen}">
+      <div>
+        <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
+      </div>
+    </div>  
+
   </div>
   <div id="textSearchWrapper" ?hidden="${!this.searchingText}">
     <div class="search-container" style="flex:1">
@@ -332,6 +367,7 @@ export default function render() {
     <div class="${this.searchingText ? 'text-search' : ''}" style="display: none;" @click="${this._onSearchClicked}">
       <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
     </div>
+
     <div @click="${this._onZoomOutClicked}">
       <ucdlib-icon icon="ucdlib-dams:fa-minus"></ucdlib-icon>
     </div>  
