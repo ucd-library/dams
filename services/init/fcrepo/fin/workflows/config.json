@@ -7,11 +7,18 @@
 
   "definitions" : {
 
-    "pdf-to-ia-reader" : {
+    "book-to-ia-reader" : {
       "type" : "gc-workflow",
       "data" : {
         "gcsSubpath" : "ia",
         "baseUrl" : "{{IMAGE_UTILS_SERVICE_URL}}"
+      }
+    },
+
+    "video-to-stream" : {
+      "type" : "gc-workflow",
+      "data" : {
+        "gcsSubpath" : "streaming"
       }
     }
 

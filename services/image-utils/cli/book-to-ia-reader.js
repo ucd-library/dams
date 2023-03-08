@@ -11,7 +11,7 @@ let opts = {
 }
 
 console.log(node, file, worflowId, page, opts);
-model.runPdfToIaReaderPage(worflowId, page, opts)
+model.runToIaReaderPage(worflowId, page, opts)
   .then(() => {
     console.log('done');
     process.exit(0);

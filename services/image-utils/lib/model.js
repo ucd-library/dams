@@ -17,23 +17,16 @@ class ImageUtils {
     fs.mkdirp(this.TMP_DIR);
   }
 
-  unzip(file) {
-
-  }
-
   getLocalFile(workflowInfo) {
     return workflowInfo.data.tmpGcsPath.replace('gs://', this.TMP_DIR);
   }
 
   /**
-   * @method initPdfToIaReaderWorkflow
-   * @description Setup the process of converting a pdf to IA Reader images and
-   * ocr.  This function will, create a workflow directory in the provided bucket
-   * and stream pdf there.
+   * @method getNumPagesService
    * 
-   * @param {*} pdfStream 
+   * @param {*} workflowId 
    */
-  async getNumPdfPagesService(workflowId) {
+  async getNumPagesService(workflowId) {
     let workflowInfo = await this.getWorkflowInfo(workflowId);
 
     let localFile = this.getLocalFile(workflowInfo);
@@ -58,7 +51,7 @@ class ImageUtils {
     return pageCount;
   }
 
-  async runPdfToIaReaderPage(workflowId, page, opts={}) {
+  async runToIaReaderPage(workflowId, page, opts={}) {
     let workflowInfo = await this.getWorkflowInfo(workflowId);
     
     let localFile = this.getLocalFile(workflowInfo);
@@ -160,6 +153,45 @@ class ImageUtils {
     return resultFiles;
   }
 
+  async runVideoToStream(workflowId) {
+    let workflowInfo = await this.getWorkflowInfo(workflowId);
+    
+    let localFile = this.getLocalFile(workflowInfo);
+    let dir = path.parse(localFile).dir;
+    let sourceName = path.parse(localFile).name;
+
+    await fs.mkdirp(dir);
+    await gcs.getGcsFileObjectFromPath(workflowInfo.data.tmpGcsPath)
+      .download({
+        destination: localFile
+      });
+
+    let {stdout, stderr} = await exec(`${__dirname}/ffmpeg/convert.sh ${localFile}`);
+
+    await fs.unlink(localFile);
+        
+    dir = path.join(dir, 'stream');
+    let files = await fs.readdir(dir);
+    let resultFiles = [];
+
+    for( let file of files ) {
+      let uploadOpts = {};
+      let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath+'/'+file;
+
+      logger.info('Copying file from '+path.join(dir, file)+' to '+gcsPath);
+      await gcs.streamUpload(
+        gcsPath,
+        fs.createReadStream(path.join(dir, file)),
+        uploadOpts
+      );
+
+      resultFiles.push(gcsPath);
+    }
+    
+    await fs.remove(dir);
+
+    return resultFiles;
+  }
 
   async cleanupWorkflow(workflowId) {
     await gcs.cleanFolder(config.workflow.gcsBuckets.tmp, workflowId);

@@ -2,10 +2,18 @@ ARG FIN_SERVER_IMAGE
 FROM ${FIN_SERVER_IMAGE} as fin-server
 FROM tesseractshadow/tesseract4re:latest
 
-RUN apt-get update && apt-get install -y curl imagemagick zip unzip poppler-utils
+RUN apt-get update && apt-get install -y curl imagemagick zip unzip poppler-utils wget xz-utils
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get update && apt-get install -y nodejs
 COPY policy.xml /etc/ImageMagick-6/policy.xml
+
+# Install FFMPEG
+RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+#RUN md5sum -c ffmpeg-release-amd64-static.tar.xz.md5
+RUN tar xvf ffmpeg-release-amd64-static.tar.xz
+RUN mv ffmpeg-*-amd64-static/ffmpeg /usr/local/bin
+RUN mv ffmpeg-*-amd64-static/ffprobe /usr/local/bin
+RUN rm -rf ffmpeg-release-amd64-static.tar.xz ffmpeg-*-amd64-static
 
 COPY --from=fin-server /fin/api /fin-api
 RUN cd /fin-api && npm link

@@ -73,7 +73,7 @@ router.delete('/:workflowId', async (req, res) => {
 
 router.get('/ia-reader/getNumPages/:workflowId', async (req, res) => {
   try {    
-    let pageCount = await model.getNumPdfPagesService(req.params.workflowId);
+    let pageCount = await model.getNumPagesService(req.params.workflowId);
     res.json({success: true, pageCount});
   } catch(e) {
     res.status(500).json({

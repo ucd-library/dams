@@ -60,7 +60,7 @@ main:
                                                     memory: "2Gi"
                                                     cpu: "1000m"
                                             command: "node"
-                                            args: ${["cli/pdf-to-ia-reader.js", args.finWorkflowId]}
+                                            args: ${["cli/book-to-ia-reader.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
                                       timeoutSeconds: 300
                                       serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
