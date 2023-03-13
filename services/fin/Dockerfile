@@ -4,7 +4,7 @@ FROM ${FIN_SERVER_IMAGE}
 ARG UCD_DAMS_REPO_SERVICE_ROOT=services/fin
 
 # Client Code
-RUN mkdir -p ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client
+RUN mkdir -p ${FIN_SERVICE_ROOT}/ucd-lib-client
 
 WORKDIR ${FIN_SERVICE_ROOT}/ucd-lib-client
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/package.json .
