@@ -18,6 +18,9 @@
     "urlTemplate": {
       "@id": "http://digital.ucdavis.edu/schema#urlTemplate"
     },
+    "url": {
+      "@id": "http://digital.ucdavis.edu/schema#url"
+    },
     "description": {
       "@id": "http://purl.org/dc/elements/1.1/description"
     }
