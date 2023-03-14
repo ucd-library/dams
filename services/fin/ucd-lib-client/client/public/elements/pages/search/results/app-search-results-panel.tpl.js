@@ -1,11 +1,13 @@
 import { html } from 'lit';
 
+import '@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.js'
+
 export default function render() {
 return html`
 <style include="shared-styles">
   :host {
     display: block;
-    max-width: 1150px;
+    /* max-width: 1150px; */
     position: relative;
     margin: 0 5px
   }
@@ -15,12 +17,14 @@ return html`
   .header {
     font-size: var(--fs-sm);
     display: flex;
-    /* display: grid;
-    grid-template-columns: 5fr 4fr; */
     align-items: center;
     margin-bottom: 11px;
     margin-top: 5px;
     padding: 1.5rem;
+  }
+
+  .header > * {
+    flex: 1;
   }
 
   select {
@@ -46,8 +50,14 @@ return html`
     display: none;
   }
 
+  ucd-theme-pagination {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
   h3 {
-    border-top: 1px solid var(--light-background-color);
+    /* border-top: 1px solid var(--light-background-color); */
     margin: 15px 0 0 0;
     padding: 15px 0 0 0;
     color: var(--default-primary-color);
@@ -63,13 +73,7 @@ return html`
   }
 
   .grid .item {
-    1display: block;
-    1position: absolute;
     /* visibility: hidden; */
-    1top : 25px;
-    1left: 25px;
-    1will-change: top, left;
-    1transition: top 500ms ease-out, left 500ms ease-out;
   }
 
   .grid dams-item-card {
@@ -97,7 +101,7 @@ return html`
   .total {
     font-size: .9rem;
     padding-left: 10px;
-    /* flex: 1; */
+    flex: 2;
   }
 
   .mobile-total {
@@ -125,13 +129,6 @@ return html`
     justify-content: center;
     height: 250px;
     color: red;
-  }
-
-  cork-pagination {
-    display: inline-block;
-
-    --cork-color : var(--default-primary-color);
-    --cork-background-color : var(--default-secondary-color);
   }
 
   #numPerPage {
@@ -267,9 +264,6 @@ return html`
   @media( min-width: 975px ) {
     .header {
       display: flex;
-      /* display: grid;
-      grid-template-columns: 5fr 4fr;
-      align-items: center; */
     }
     .mobile-header {
       display: none;
@@ -278,33 +272,24 @@ return html`
 </style>
 
 <div class="header">
-  <div class="total" ?hidden="${this.showLoading}">${this.total} results found</div>
-  
-  <!-- <div class="filler"></div> -->
-  <div style="margin: 0 10px; font-size: .9rem; display: inline-flex; max-width: 5rem">
-    <span style="margin: auto 5px">Display:</span>
-    <ucdlib-icon icon="ucdlib-dams:result-display-grid" @click="${this._onLayoutToggle}" type="grid" class="grid-layout-icon selected-layout"></ucdlib-icon>
-    <ucdlib-icon icon="ucdlib-dams:result-display-mosaic" @click="${this._onLayoutToggle}" type="mosaic" class="mosaic-layout-icon"></ucdlib-icon>
-    <ucdlib-icon icon="ucdlib-dams:result-display-list" @click="${this._onLayoutToggle}" type="list" class="list-layout-icon"></ucdlib-icon>
-  
-    <select id="numPerPage" on-change="_onPageSizeChange">
-      <option value="50">50</option>
-      <option value="20">20</option>
-      <option value="10" selected>10</option>
-    </select>
-    <div style="margin: 0 10px; font-size: .9rem; min-width: max-content">items per page</div>
-  </div>
-  <!-- <div style="flex: .25"></div> -->
-  
-  
-  <!-- <div>
-    <select id="numPerPage" on-change="_onPageSizeChange">
-      <option value="50">50</option>
-      <option value="20">20</option>
-      <option value="10" selected>10</option>
-    </select>
-  </div>-->
-  <!-- <div style="margin: 0 10px; font-size: .9rem">items per page</div> -->
+  <div style="flex: .25"><ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:photo-stack"></ucdlib-icon></div>
+  <div><span style="font-weight: bold">${this.total} item results</span> from <a href="">${this.totalCollections} collections</a></div>  
+
+  <div class="filler"></div>  
+
+  <span style="margin: auto 5px">Display:</span>
+  <div style="flex: .2"><ucdlib-icon icon="ucdlib-dams:result-display-grid" @click="${this._onLayoutToggle}" type="grid" class="grid-layout-icon selected-layout"></ucdlib-icon></div>
+  <div style="flex: .2"><ucdlib-icon icon="ucdlib-dams:result-display-mosaic" @click="${this._onLayoutToggle}" type="mosaic" class="mosaic-layout-icon"></ucdlib-icon></div>
+  <div style="flex: .2"><ucdlib-icon icon="ucdlib-dams:result-display-list" @click="${this._onLayoutToggle}" type="list" class="list-layout-icon"></ucdlib-icon></div>
+
+  <select id="numPerPage" @change="${this._onPageSizeChange}" style="flex: .05">
+    <option value="50">50</option>
+    <option value="20">20</option>
+    <option value="10" selected>10</option>
+  </select>
+  <div style="margin: 0 10px; font-size: .9rem">items per page</div>
+
+  <div></div> 
 </div>
 
 <div class="mobile-header">
@@ -367,21 +352,6 @@ return html`
   </div>
 </div>
 
-<app-top-active-filters></app-top-active-filters>
-
-<div class="collections" ?hidden="${!this.showCollectionResults}">
-  <!--<div ?hidden="${!this.collectionResults.length}">-->
-  <!-- <div style="display: none"> -->
-  <div>
-    <h3>Collections</h3>
-    <div style="text-align:center" class="collections-content">
-      ${this.collectionResults.map(res => html`
-        <dams-collection-card .collection="${res}" data-collectionid="${res.collectionId}" @click=${this._onCollectionClicked}></dams-collection-card>
-      `)}
-    </div>  
-  </div>
-</div>
-
 <div ?hidden="${this.showError}">
   <div ?hidden="${this.showLoading}">
 
@@ -412,17 +382,26 @@ return html`
 <div class="loading" ?hidden="${!this.showLoading}">
   <paper-spinner-lite ?active="${this.showLoading}"></paper-spinner-lite>
 </div>
-
-<div style="text-align:center" ?hidden="${this.showLoading}">
-  <cork-pagination 
-    total-results="${this.paginationTotal}" 
-    items-per-page="${this.numPerPage}"
-    current-index="${this.currentIndex}"
-    on-nav="_onPaginationNav">
-  </cork-pagination>
-</div>
+  
+<ucd-theme-pagination
+  current-page=${this.currentIndex + 1}
+  max-pages=${this.paginationTotal}
+  @page-change=${this._onPageClicked}>
+</ucd-theme-pagination>
 
 <div ?hidden="${!this.totalOverMaxWindow}" style="text-align: center">Digital Collections limits results to 
   10,000.  Use keywords and/or filters to refine search.
 </div>
+
+<!-- <div class="collections" ?hidden="${!this.showCollectionResults}">
+  <div>
+    <h3>Collections</h3>
+    <div style="text-align:center" class="collections-content">
+      ${this.collectionResults.map(res => html`
+        <dams-collection-card .collection="${res}" data-collectionid="${res.collectionId}" @click=${this._onCollectionClicked}></dams-collection-card>
+      `)}
+    </div>  
+  </div>
+</div> -->
+
 `;}

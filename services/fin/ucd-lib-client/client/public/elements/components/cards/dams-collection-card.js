@@ -20,7 +20,8 @@ export default class DamsCollectionCard extends LitElement {
       imgSrc: {type: String, attribute: 'img-src'},
       cardTitle: {type: String, attribute: 'card-title'},
       itemCt: {type: Number, attribute: 'item-ct'},
-      href: {type: String}
+      href: {type: String},
+      darkBg: {type: Boolean}
     };
   }
 
@@ -31,15 +32,15 @@ export default class DamsCollectionCard extends LitElement {
     this.cardTitle = "";
     this.itemCt = 0;
     this.href = "";
-
+    this.darkBg = false;
   }
 
   /**
-   * @method updated
+   * @method willUpdate
    * @description Lit lifecycle method called when element is updated.
    * @param {Map} props - Properties that have changed.
    */
-  updated(props) {
+  willUpdate(props) {
     if ( props.has('collection') && this.collection['@id'] ) {
       if ( this.collection.associatedMedia ) {
         this.imgSrc = this.collection.thumbnailUrl ? this.collection.thumbnailUrl : this.collection.associatedMedia.thumbnailUrl;
@@ -52,7 +53,7 @@ export default class DamsCollectionCard extends LitElement {
         this.itemCt = this.collection.recordCount;
         this.href = this.collection['@id'];
       }
-
+      this.darkBg = props.has('darkBg');
     }
   }
 }

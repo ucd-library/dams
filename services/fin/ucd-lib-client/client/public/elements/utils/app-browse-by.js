@@ -1,7 +1,7 @@
 import { LitElement } from 'lit';
 import render from "./app-browse-by.tpl.js";
 
-import "@ucd-lib/cork-pagination";
+// import "@ucd-lib/cork-pagination";
 
 import config from '../../lib/config';
 

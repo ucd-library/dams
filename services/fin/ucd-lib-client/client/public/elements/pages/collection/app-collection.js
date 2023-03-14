@@ -116,7 +116,7 @@ class AppCollection extends Mixin(LitElement)
         return {
           title : rg.root.name,
           thumbnailUrl : rg.root.image.url,
-          itemUrl : ''
+          itemUrl : rg.root['@id']
         };
       })
     }
@@ -196,7 +196,6 @@ class AppCollection extends Mixin(LitElement)
     // editor.setValue(assetDefs.textSearchFields[type].join('\n'));
     editor.setValue(JSON.stringify(this.displayData, null, '\t'));
     editor.getSession().on('change', () => {
-      debugger;
       // let values = editor.getValue()
       //   .split('\n')
       //   .map(item => item.trim())

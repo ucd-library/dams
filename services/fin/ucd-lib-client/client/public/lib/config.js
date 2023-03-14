@@ -53,19 +53,19 @@ module.exports = {
         type : 'facet',
         valueMap : (value) => {
           if ( value.match(/^video\/(.*)/i) ) {
-            return 'Video ('+value.match(/^video\/(.*)/)[1]+')';
+            return 'format: Video ('+value.match(/^video\/(.*)/)[1]+')';
           }
           if( value.match(/^image\/(.*)/i) ) {
-            return 'Image ('+value.match(/^image\/(.*)/)[1]+')';
+            return 'format: Image ('+value.match(/^image\/(.*)/)[1]+')';
           }
           if( value === 'application/pdf' ) {
-            return 'PDF';
+            return 'format: PDF';
           }
           if( value.match(/(\w*)\/(.*)/) ) {
             let match = value.match(/(\w*)\/(.*)/);
-            return match[1]+' ('+match[2]+')';
+            return 'format: '+match[1]+' ('+match[2]+')';
           }
-          return value;
+          return'format: '+value;
         }
       },
       'node.collectionId' : {
@@ -85,11 +85,11 @@ module.exports = {
         label : 'Published',
         type : 'range'
       },
-      'node.license.@id' : {
-        label : 'Rights',
-        type : 'facet',
-        valueMap : rightsMap
-      },
+      // 'node.license.@id' : {
+      //   label : 'Rights',
+      //   type : 'facet',
+      //   valueMap : rightsMap
+      // },
       'node.type.raw' : {
         label : 'Type',
         type : 'facet',
@@ -106,7 +106,7 @@ module.exports = {
 
     textFields : {
       record : ['node.name', 'node.description', 'node.identifier', 'node.about', 'node.keywords', 'node.alternativeHeadline', 'node.indexableContent'],
-      collection : ['name', 'description', 'about', 'keywords']
+      collection : ['node.name', 'node.description', 'node.about', 'node.keywords']
     },
     
     // max number of facets filter options

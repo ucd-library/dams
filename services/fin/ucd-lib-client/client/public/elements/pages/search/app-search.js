@@ -3,6 +3,7 @@ import render from "./app-search.tpl.js";
 
 import "./results/app-search-results-panel"
 import "./filtering/app-filters-panel"
+import "./results/app-search-results-collections";
 
 export class AppSearch extends Mixin(LitElement)
             .with(LitCorkUtils) {
@@ -29,7 +30,7 @@ export class AppSearch extends Mixin(LitElement)
     this.firstLoad = true;
     this.appState = {};
     this.wideFiltersPanel = false;
-    
+
     this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'SearchVcModel');
   }
 

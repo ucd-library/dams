@@ -130,7 +130,6 @@ class AppRecord extends Mixin(LitElement)
 
     this._updateLinks(this.AppStateModel.locationElement.location, record);
 
-    // debugger;
     // if( this.AppStateModel.locationElement.location.pathname.split('/media').length < 2 ) {
     //   // pull image with position 1
 
@@ -237,7 +236,7 @@ class AppRecord extends Mixin(LitElement)
     // this._setTarHref();
 
     // render citations.. this might need to load library, do it last
-    // debugger;
+
     // this.citations.push({
     //   type : 'mla',
     //   text : await citations.renderEsRecord(this.record.root, 'mla')
@@ -309,7 +308,7 @@ class AppRecord extends Mixin(LitElement)
    * @param {Object} e payload
    */
   // _onRecordVcUpdate(e) {
-  //   debugger;
+
   // }
 
   // _renderFcLink(record, media) {

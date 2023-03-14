@@ -147,8 +147,9 @@ return html`
   </div>
   <br />
 </div>
-<div id="filter-box">
 
+<div id="filter-box">
+  <app-top-active-filters></app-top-active-filters>
 </div>
 
 `;}

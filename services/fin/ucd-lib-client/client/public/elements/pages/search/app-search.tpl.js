@@ -66,4 +66,6 @@ return html`
     </app-search-results-panel>
   </div>
 </div>
+
+<app-search-results-collections id="collectionsPanel"></app-search-results-collections>
 `;}

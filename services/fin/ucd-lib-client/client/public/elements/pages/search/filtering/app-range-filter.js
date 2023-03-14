@@ -1,71 +1,51 @@
-import {PolymerElement} from "@polymer/polymer/polymer-element"
+import { LitElement } from "lit";
 import "../../../utils/app-range-slider"
-import RecordInterface from '../../../interfaces/RecordInterface'
-import CollectionInterface from '../../../interfaces/CollectionInterface'
-import template from "./app-range-filter.html"
+import render from "./app-range-filter.tpl.js"
 
-export default class AppRangeFilter extends Mixin(PolymerElement)
-  .with(EventInterface, RecordInterface, CollectionInterface) {
-
-  static get template() {
-    let tag = document.createElement('template');
-    tag.innerHTML = template;
-    return tag;
-  }
+export default class AppRangeFilter extends Mixin(LitElement)
+  .with(LitCorkUtils) {
 
   static get properties() {
     return {
-      label : {
-        type : String,
-        value : ''
-      },
-      filter : {
-        type : String,
-        value : ''
-      },
-
-      absMinValue : {
-        type : Number,
-        value : -1
-      },
-      absMaxValue : {
-        type : Number,
-        value : -1 
-      },
-
-      minValue : {
-        type : Number,
-        value : -1
-      },
-      maxValue : {
-        type : Number,
-        value : Number.MAX_VALUE
-      },
-
-      showUnknown : {
-        type : Boolean,
-        value : false
-      }
-
+      label : { type : String },
+      filter : { type : String },
+      absMinValue : { type : Number },
+      absMaxValue : { type : Number },
+      minValue : { type : Number },
+      maxValue : { type : Number },
+      showUnknown : { type : Boolean }
     }
   }
 
   constructor() {
     super();
+    this.render = render.bind(this);
     this.active = true;
-    this._injectModel('AppStateModel');
+
+    this.label = '';
+    this.filter = '';
+    this.absMinValue = -1;
+    this.absMaxValue = -1;
+    this.minValue = -1;
+    this.maxValue = Number.MAX_VALUE;
+    this.showUnknown = false;
+
+    this._injectModel('AppStateModel', 'RecordModel', 'CollectionModel');
   }
 
-  connectedCallback() {
-    super.connectedCallback();
+  // connectedCallback() {
+  //   super.connectedCallback();
+  // }
+
+  firstUpdated() {
     this.resize();
   }
 
   resize() {
-    this.$.slider._onResize();
+    this.shadowRoot.querySelector('#slider')._onResize();
 
     setTimeout(() => {
-      this.$.slider._onResize();
+      this.shadowRoot.querySelector('#slider')._onResize();
     }, 100);
   }
 
@@ -78,7 +58,7 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
   _isDefaultState() {
     if( !this._isFilterApplied() ) {
       
-      let searchDoc = this._getCurrentSearchDocument();
+      let searchDoc = this.RecordModel.getCurrentSearchDocument();
       this._removeRangeFilter(searchDoc, this.filter);
       this.RecordModel.setSearchLocation(searchDoc);
 
@@ -95,8 +75,8 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
     this.minValue = e.detail.min;
     this.maxValue = e.detail.max;
 
-    this.$.minValueInput.value = this.minValue;
-    this.$.maxValueInput.value = this.maxValue;
+    this.shadowRoot.querySelector('#minValueInput').value = this.minValue;
+    this.shadowRoot.querySelector('#maxValueInput').value = this.maxValue;
 
     this._onRangeNullChange();
   }
@@ -112,17 +92,18 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
       lte: this.maxValue
     }
 
-    if( this.$.unknown.checked ) {
+    if( this.shadowRoot.querySelector('#unknown').checked ) {
       value.includeNull = true;
     }
 
     // remove filter and return
     if( this._isDefaultState() ) return;
 
-    let searchDoc = this._getCurrentSearchDocument();
-    this._setPaging(searchDoc, 0);
-    this._appendRangeFilter(searchDoc, this.filter, value);
+    let searchDoc = this.RecordModel.getCurrentSearchDocument();
+    this.RecordModel.setPaging(searchDoc, 0);
+    this.RecordModel.appendRangeFilter(searchDoc, this.filter, value);
     this.RecordModel.setSearchLocation(searchDoc);
+    debugger;
   }
 
   /**
@@ -130,15 +111,15 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
    * @description bound to min/max number inputs.
    */
   _onInputChange() {
-    let min = this.$.minValueInput.value;
-    let max = this.$.maxValueInput.value;
+    let min = this.shadowRoot.querySelector('#minValueInput').value;
+    let max = this.shadowRoot.querySelector('#maxValueInput').value;
 
     if( min < this.absMinValue ) {
-      this.$.minValueInput.value = this.absMinValue;
+      this.shadowRoot.querySelector('#minValueInput').value = this.absMinValue;
       min = this.absMinValue;
     }
     if( max > this.absMaxValue ) {
-      this.$.maxValueInput.value = this.absMaxValue;
+      this.shadowRoot.querySelector('#maxValueInput').value = this.absMaxValue;
       max = this.absMaxValue;
     }
     if( min > max ) min = max;
@@ -184,7 +165,7 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
 
     // grab default aggregations for collection
     let cid = this.selectedCollection;
-    let result = await this._defaultRecordSearch(this.selectedCollection);
+    let result = await this.RecordModel.defaultSearch(this.selectedCollection);
     if( cid !== this.selectedCollection ) return; // make sure we haven't updated
     this.default = result;
 
@@ -201,11 +182,11 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
     // make sure any current values are set correctly
     if( this.minValue < this.absMinValue || !this.currentFilters[this.filter] ) {
       this.minValue = this.absMinValue;
-      this.$.minValueInput.value = this.minValue;
+      this.shadowRoot.querySelector('#minValueInput').value = this.minValue;
     }
     if( this.maxValue > this.absMaxValue || !this.currentFilters[this.filter] ) {
       this.maxValue = this.absMaxValue;
-      this.$.maxValueInput.value = this.maxValue;
+      this.shadowRoot.querySelector('#maxValueInput').value = this.maxValue;
     }
 
     // now set the current filters from search
@@ -214,9 +195,9 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
 
       this.minValue = value.gte;
       this.maxValue = value.lte;
-      this.$.minValueInput.value = this.minValue;
-      this.$.maxValueInput.value = this.maxValue;
-      this.$.unknown.checked = value.includeNull ? true : false;
+      this.shadowRoot.querySelector('#minValueInput').value = this.minValue;
+      this.shadowRoot.querySelector('#maxValueInput').value = this.maxValue;
+      this.shadowRoot.querySelector('#unknown').checked = value.includeNull ? true : false;
     }
 
     this._notifySelected();
@@ -231,7 +212,7 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
   _isFilterApplied() {
     if( this.minValue === this.absMinValue &&
       this.maxValue === this.absMaxValue &&
-      this.$.unknown.checked === true ) {
+      this.shadowRoot.querySelector('#unknown').checked === true ) {
       return false;
     }
     return true;
@@ -247,7 +228,7 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
 
     if( this.minValue !== this.absMinValue || 
         this.maxValue !== this.absMaxValue ||
-        !this.$.unknown.checked ) {
+        !this.shadowRoot.querySelector('#unknown').checked ) {
       selected = true;
     }
 
@@ -286,7 +267,7 @@ export default class AppRangeFilter extends Mixin(PolymerElement)
   reset() {
     this.minValue = this.absMinValue;
     this.maxValue = this.absMaxValue;
-    this.$.unknown.checked = true;
+    this.shadowRoot.querySelector('#unknown').checked = true;
     
     this._onRangeNullChange();
   }
