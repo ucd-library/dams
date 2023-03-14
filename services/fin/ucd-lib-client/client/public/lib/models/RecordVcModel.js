@@ -12,12 +12,11 @@ class RecordVcModel extends BaseModel {
   }
 
   /**
-   * @method _onSelectedRecordUpdate
+   * @method translate
    * @description listen for record search update events, transform data for ui and emit event to update
    * 
    * @param {Object} e 
    */
-  // _onSelectedRecordUpdate(e) {
   translate(e) {
     if( e && e.clientMedia ) {
       // translate collection and related nodes/items to ui model

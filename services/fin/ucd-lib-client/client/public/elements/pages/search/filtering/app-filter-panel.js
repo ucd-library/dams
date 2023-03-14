@@ -1,39 +1,34 @@
-  import {PolymerElement} from "@polymer/polymer/polymer-element"
+import { LitElement } from "lit";
+
 import "@polymer/paper-tabs/paper-tabs"
 import "@ucd-lib/cork-toggle-panel/cork-toggle-panel"
 
 import "./app-range-filter"
-import template from "./app-filter-panel.html"
+import render from "./app-filter-panel.tpl.js"
 import "./app-facet-filter"
 
-export class AppFilterPanel extends PolymerElement {
+export class AppFilterPanel extends Mixin(LitElement)
+    .with(LitCorkUtils) {
 
   static get properties() {
     return {
-      filter : {
-        type : Object,
-        value : null,
-        observer : '_render'
-      },
-      opened : {
-        type : Boolean,
-        value : false,
-        observer : '_toggleOpened'
-      },
-      selected : {
-        type : Array,
-        value : () => []
-      }
+      filter : { type : Object },  // , observer : '_render' },
+      opened : { type : Boolean },  // , observer : '_toggleOpened' },
+      selected : { type : Array }
     };
   }
 
-  static get template() {
-    let tag = document.createElement('template');
-    tag.innerHTML = template;
-    return tag;
+  constructor() {
+    super();
+    this.render = render.bind(this);
+    this._injectModel('AppStateModel');
+
+    this.filter = {};
+    this.opened = false;
+    this.selected = []
   }
 
-  _render() {
+  firstUpdated() {
     if( !this.filter ) return;
 
     this.innerHTML = '';
@@ -53,12 +48,12 @@ export class AppFilterPanel extends PolymerElement {
       let index = this.selected.findIndex(item => item.label === e.detail.label);
       if( index > -1 ) return;
       e.detail.niceLabel = this._getLabel(e.detail.label);
-      this.push('selected', e.detail);
+      this.selected.push(e.detail);
     });
     ele.addEventListener('remove-selected', (e) => {
       let index = this.selected.findIndex(item => item.label === e.detail.label);
       if( index === -1 ) return;
-      this.splice('selected', index, 1);
+      this.selected.splice(index, 1);
     });
     ele.addEventListener('set-selected', (e) => {
       if( e.detail.selected ) {
@@ -71,7 +66,7 @@ export class AppFilterPanel extends PolymerElement {
 
     this.ele = ele;
     
-    this.$.filters.appendChild(ele);
+    this.shadowRoot.querySelector('#filters').appendChild(ele);
   }
 
   _getLabel(label) {
@@ -128,6 +123,7 @@ export class AppFilterPanel extends PolymerElement {
     }
 
     this._notifyFilterClicked(e.currentTarget.getAttribute('label'));
+    this.toggle();
   }
 
   /**

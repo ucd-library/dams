@@ -32,7 +32,7 @@ export default class AppTopActiveFilters extends Mixin(LitElement)
 
     let active = [];
     this.currentFilters = e.searchDocument.filters || {};
-    
+
     for( let key in this.currentFilters ) {
       let filter = this.currentFilters[key];
 
@@ -51,7 +51,7 @@ export default class AppTopActiveFilters extends Mixin(LitElement)
           bucket : key,
           type : 'range',
           value : value,
-          label :  value.gte+' to '+value.lte
+          label :  'published: '+value.gte+' to '+value.lte
         });
       }
     }

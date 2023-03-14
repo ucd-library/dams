@@ -404,12 +404,10 @@ class RecordModel extends ElasticSearchModel {
     for( var key in searchDocument.filters ) {
       if( key === 'isPartOf.@id' ) continue;
       
-      let type = config.elasticSearch.facets['node.'+key].type;
-      // let type = config.elasticSearch.facets[key].type;
+      let type = config.elasticSearch.facets[key].type;
 
       if( type === 'facet' ) {
-        let bucket = defaultSearch.payload.aggregations.facets['node.'+key];
-        // let bucket = defaultSearch.payload.aggregations.facets[key];
+        let bucket = defaultSearch.payload.aggregations.facets[key];
         if( bucket === undefined ) {
           corrections = true;
           console.warn(`Collection '${collectionId}' unknown bucket '${key}', correcting search.`);

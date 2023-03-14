@@ -39,7 +39,7 @@ class CollectionVcModel extends BaseModel {
         title : rootNode.name,
         thumbnailUrl : rootNode.image.url,
         keywords : rootNode.keywords,
-        callNumber : rootNode.image.url.split(rootNode['@id']+'/')[1].split('/')[0], // hack to splice from image url, find actual source
+        callNumber : 'D-42', // TODO where to source?
         // items : [
         //   e.payload.node
         // ],

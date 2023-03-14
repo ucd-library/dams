@@ -1,13 +1,10 @@
-import {PolymerElement} from "@polymer/polymer/polymer-element"
+import { LitElement} from 'lit';
 import "@polymer/iron-pages/iron-pages"
 import "./app-filter-panel"
 import "../app-collection-info-panel"
 import "../../../utils/app-tabs"
 
-import RecordInterface from "../../../interfaces/RecordInterface"
-import CollectionInterface from "../../../interfaces/CollectionInterface"
-
-import template from "./app-filters-panel.html"
+import render from "./app-filters-panel.tpl.js"
 
 // init facet filters from template
 import config from "../../../../lib/config"
@@ -27,57 +24,36 @@ for( var key in config.elasticSearch.facets ) {
 }
 
 
-class AppFiltersPanel extends Mixin(PolymerElement)
-      .with(EventInterface, RecordInterface) {
-  
-  static get template() {
-    let tag = document.createElement('template');
-    tag.innerHTML = template;
-    return tag;
-  }
+class AppFiltersPanel extends Mixin(LitElement)
+      .with(LitCorkUtils) {
 
   static get properties() {
     return {
-      facetFilters : {
-        type : Array,
-        value : function() {
-          return facetFilters;
-        }
-      },
-      selectedTab : {
-        type : String,
-        value : '',
-        notify: true
-      },
-
-      selectedCollection : {
-        type : Object,
-        value : () => {}
-      },
-
-      collectionMode : {
-        type : Boolean,
-        value : false
-      },
-
-      tabs : {
-        type : Array,
-        value : () => [
-          {label : 'Information', value: 'info'},
-          {label : 'Filters', value: 'filters'}
-        ]
-      }
+      facetFilters : { type : Array },
+      selectedTab : { type : String },
+      selectedCollection : { type : Object },
+      collectionMode : { type : Boolean },
+      tabs : { type : Array }
     }
   }
 
   constructor() {
     super();
+    this.render = render.bind(this);
     this.active = true;
     this._injectModel('AppStateModel');
+
+    this.facetFilters = facetFilters;
+    this.selectedTab = '';
+    this.selectedCollection = {};
+    this.collectionMode = false;
+    this.tabs = [
+      {label : 'Information', value: 'info'},
+      {label : 'Filters', value: 'filters'}
+    ];
   }
 
-  ready() {
-    super.ready();
+  firstUpdated() {
     this._onSelectedCollectionUpdate();
   }
 

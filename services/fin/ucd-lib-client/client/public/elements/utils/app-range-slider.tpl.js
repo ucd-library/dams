@@ -1,4 +1,12 @@
+import { html } from 'lit';
+import { sharedStyles } from '../styles/shared-styles';
+
+export default function render() { 
+  return html`
+
+
 <style>
+  ${sharedStyles}
   :host {
     display: block;
     position: relative;
@@ -71,27 +79,29 @@
 
 <div id="fillLine" 
   prop="range" 
-  on-mousedown="_onMoveStart" 
-  on-touchstart="_onMoveStart">
+  @mousedown="${this._onMoveStart}" 
+  @touchstart="${this._onMoveStart}">
 </div>
 
-<div id="lowNumberLabel" class="label" moving$="[[isMoving]]">[[minValueLabel]]</div>
-<div id="highNumberLabel" class="label" moving$="[[isMoving]]">[[maxValueLabel]]</div>
+<div id="lowNumberLabel" class="label" ?moving="${this.isMoving}">${this.minValueLabel}</div>
+<div id="highNumberLabel" class="label" ?moving="${this.isMoving}">${this.maxValueLabel}</div>
 
 <div id="lowNumberBtn" 
   class="btn" 
   prop="min" 
-  on-mousedown="_onMoveStart" 
-  on-touchstart="_onMoveStart" 
-  moving$="[[movingMin]]" >
+  @mousedown="${this._onMoveStart}" 
+  @touchstart="${this._onMoveStart}" 
+  ?moving="${this.movingMin}" >
   <div></div>
 </div>
 
 <div id="highNumberBtn" 
   class="btn" 
   prop="max" 
-  on-mousedown="_onMoveStart" 
-  on-touchstart="_onMoveStart" 
-  moving$="[[movingMax]]">
+  @mousedown="${this._onMoveStart}" 
+  @touchstart="${this._onMoveStart}" 
+  ?moving="${this.movingMax}">
   <div></div>
 </div>
+
+`;}
