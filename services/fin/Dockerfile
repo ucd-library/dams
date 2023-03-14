@@ -16,7 +16,6 @@ RUN npm link @ucd-lib/fin-api
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/client client
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/controllers controllers
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/lib lib
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/model model
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/index.js .
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/config.js .
 
