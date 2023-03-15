@@ -50,40 +50,45 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this.AppStateModel.setLocation(id);
   }
 
-  /**
-   * @description _onSearchVcUpdate, fired when record search viewController updates
-   * @param {*} e 
-   */
-   _onSearchVcUpdate(e) {
-    if( e.state !== 'loaded' ) return;
+  // /**
+  //  * @description _onSearchVcUpdate, fired when record search viewController updates
+  //  * @param {*} e 
+  //  */
+  // _onSearchVcUpdate(e) {
+  //   if( e.state !== 'loaded' ) return;
 
-    // if( !e.payload.matchedCollections.length ) {
-    //   this.results = [];
-    // } else {
-    //   debugger;
-    //   // TODO: transform data in view controller? data's pretty simple
-    //   // this.results.push(e.payload.results[0]['node'][0]);
-    //   // this.results[0]['title'] = this.results[0]['name'];
-    //   this.results = e.payload.matchedCollections;
-  
-    // }
-    // console.log('results: ', this.results);
-    // this.showResults = this.results.length > 0;
-  }
+  //   this.results = [];
+  //   e.payload.results.forEach(result => {
+
+  //     // need to add object with data used in collection card
+  //     debugger
+  //     /*
+  //     this.imgSrc = this.collection.thumbnailUrl;
+  //     this.cardTitle = this.collection.name;
+  //     this.itemCt = this.collection.recordCount;
+  //     this.href = this.collection['@id'];
+  //     */
+  //     let match = this.results.filter(r => r.collectionId['@id'] === result.collectionId['@id'])[0];
+  //     if( !match ) {
+  //       result['name'] = result['title'];
+  //       this.results.push(result);
+  //     }
+  //   });
+  // }
 
   _onCollectionSearchUpdate(e) {
     if( e.state !== 'loaded' ) return;
     if( !e.payload.results.length ) {
       this.results = [];
     } else {
-      debugger;
       // TODO: transform data in view controller? data's pretty simple
+      //  but need more collections to test with
       this.results.push(e.payload.results[0]['node'][0]);
       this.results[0]['title'] = this.results[0]['name'];
       // this.results = e.payload.matchedCollections;
-  
+      
     }
-    console.log('results: ', this.results);
+    // console.log('results: ', this.results);
     this.showResults = this.results.length > 0;
   }
 

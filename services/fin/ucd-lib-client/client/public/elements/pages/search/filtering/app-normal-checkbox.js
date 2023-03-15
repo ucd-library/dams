@@ -1,75 +1,43 @@
-import {PolymerElement} from "@polymer/polymer/polymer-element"
-import "@polymer/paper-checkbox/paper-checkbox"
+import { LitElement} from 'lit';
 
-import template from "./app-normal-checkbox.html"
+import render from "./app-normal-checkbox.tpl.js"
 
-export class AppNormalCheckbox extends PolymerElement {
+export class AppNormalCheckbox extends Mixin(LitElement)
+    .with(LitCorkUtils) {
   
   static get properties() {
     return {
-      value : {
-        type : String,
-        value : ''
-      },
-      label : {
-        type : String,
-        value : ''
-      },
-      labelMap : {
-        type : Object,
-        value : null,
-        observer : '_onLabelMapUpdate'
-      },
-      labelMapType : {
-        type : String,
-        value : null
-      },
-      realLabel: {
-        type: String,
-        computed: '_realLabel(value, label)'
-      },
-      checked : {
-        type : Boolean,
-        value : false,
-        notify: true,
-        reflectToAttribute : true
-      },
-      disabled : {
-        type : Boolean,
-        value : false,
-      },
-
-      ariaChecked : {
-        type : String,
-        reflectToAttribute : true,
-        computed: '_computeAriaChecked(checked)'
-      },
-      ariaDisabled : {
-        type : String,
-        reflectToAttribute : true,
-        computed: '_computeAriaDisabled(disabled)'
-      },
-      role : {
-        type : String,
-        value : 'checkbox',
-        reflectToAttribute : true
-      },
-      tabindex : {
-        type : Number,
-        computed: '_computeTabIndex(disabled)',
-        reflectToAttribute : true
-      }
+      value : { type : String },
+      label : { type : String },
+      labelMap : { type : Object },
+      labelMapType : { type : String },
+      realLabel: { type: String },
+      checked : { type : Boolean },
+      disabled : { type : Boolean },
+      ariaChecked : { type : String },
+      ariaDisabled : { type : String },
+      role : { type : String },
+      tabindex : { type : Number }
     };
-  }
-
-  static get template() {
-    let tag = document.createElement('template');
-    tag.innerHTML = template;
-    return tag;
   }
 
   constructor() {
     super();
+    this.render = render.bind(this);
+    this.active = true;
+
+    this.value = '';
+    this.label = '';
+    this.labelMap = null;
+    this.labelMapType = null;
+    this.realLabel = '';
+    this.checked = false;
+    this.disabled = false;
+    this.ariaChecked = '';
+    this.ariaDisabled = '';
+    this.role = 'checkbox';
+    this.tabindex = 0;
+
     this.addEventListener('click', e => this._onClick(e));
     this.addEventListener('keyup', e => {
       if( e.which !== 13 ) return;

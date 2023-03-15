@@ -103,7 +103,6 @@ export default class AppRangeFilter extends Mixin(LitElement)
     this.RecordModel.setPaging(searchDoc, 0);
     this.RecordModel.appendRangeFilter(searchDoc, this.filter, value);
     this.RecordModel.setSearchLocation(searchDoc);
-    debugger;
   }
 
   /**

@@ -1,7 +1,16 @@
-<style include="shared-styles">
+import { html } from 'lit';
+import { sharedStyles } from '../../../styles/shared-styles';
+
+export default function render() { 
+  return html`
+
+<style>
+  ${sharedStyles}
   :host {
     display: block
   }
+
+  [hidden] { display: none !important; }
 
   .filter {
     padding: 4px 5px;
@@ -89,51 +98,52 @@
 </style>
 
 <!-- typeahead search -->
-<div class="typehead-panel" hidden$="[[!includeTypeahead]]">
+<div class="typehead-panel" ?hidden="${!this.includeTypeahead}">
   <input id="typeahead" 
     type="text" 
-    placeholder="Search [[label]]s" 
-    on-keyup="_onTypeaheadKeyup" />
+    placeholder="Search ${this.label}s" 
+    @keyup="${this._onTypeaheadKeyup}" />
 </div>
 
 <!-- used for large lists -->
-<iron-list id="list" items="[[bucketsIronList]]" as="item">
-  <template>
+<div id="list">
+  ${this.bucketsIronList.map((item, index) => html`
     <div class="filter">
-
       <app-normal-checkbox
-        type$="[[label]]"
-        index$="[[index]]"
-        value$="[[item.key]]"
-        label-map="[[valueMap]]"
-        checked$="[[item.active]]" 
-        on-change="_toggleFilter"
-        disabled$="[[item.disabled]]">
+        type="${item.label}"
+        index="${index}"
+        value="${item.key}"
+        label-map="${item.valueMap}"
+        ?checked="${item.active}" 
+        @change="${this._toggleFilter}"
+        ?disabled="${item.disabled}">
       </app-normal-checkbox>
 
-      <div class="count">[[item.doc_count]]</div>
+      <div class="count">${item.doc_count}</div>
     </div>
-  </template>
-</iron-list>
+  `)}
+</div>
 
 <!-- used for small lists -->
 <div class="overflow">
   <div>  
-    <template is="dom-repeat" items="[[buckets]]">
-      <div class="filter">
+    ${this.buckets.map((item, index) => html`
+    <div class="filter">
 
-        <app-normal-checkbox
-          type$="[[label]]"
-          index$="[[index]]"
-          value$="[[item.key]]"
-          label-map="[[valueMap]]"
-          checked$="[[item.active]]" 
-          on-change="_toggleFilter"
-          disabled$="[[item.disabled]]">
-        </app-normal-checkbox>
+      <app-normal-checkbox
+        type="${item.label}"
+        index="${index}"
+        value="${item.key}"
+        label-map="${item.valueMap}"
+        ?checked="${item.active}" 
+        @change="${this._toggleFilter}"
+        ?disabled="${item.disabled}">
+      </app-normal-checkbox>
 
-        <div class="count">[[item.doc_count]]</div>
-      </div>
-    </template>
+      <div class="count">${item.doc_count}</div>
+    </div>
+    `)}
   </div>
 </div>
+
+`;}

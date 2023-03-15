@@ -1,4 +1,12 @@
-<style include="shared-styles">
+import { html } from 'lit';
+import { sharedStyles } from '../../../styles/shared-styles';
+
+export default function render() { 
+  return html`
+
+<style>
+  ${sharedStyles}
+
   :host {
     display: block;
     cursor: pointer;
@@ -12,6 +20,8 @@
     cursor: default;
     outline: none !important;
   }
+
+  [hidden] { display: none !important; }
 
   iron-icon {
     display: none;
@@ -52,7 +62,11 @@
   }
 </style>
 
-<div checked$="[[checked]]" disabled$="[[disabled]]">
+<div ?checked="${this.checked}" ?disabled="${this.disabled}">
+
+  <!-- TODO change to ucdlib-icon -->
   <iron-icon icon="fin-icons:close"></iron-icon>
-  <span class="value">[[realLabel]]</span>
+
+  <span class="value">${this._realLabel()}</span>
 </div>
+`;}

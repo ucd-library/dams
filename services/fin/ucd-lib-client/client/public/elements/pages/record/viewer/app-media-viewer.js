@@ -184,7 +184,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
         brView.classList.add('fullscreen');
         brView.shadowRoot.querySelector('#BookReader').classList.add('fullscreen');
         document.body.style.overflow = 'hidden';
-        brView.br.resize();
 
         let mediaNav = this.shadowRoot.querySelector('app-media-viewer-nav');
         let brNav = brView.shadowRoot.querySelector('.BRfooter');
@@ -198,6 +197,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
           let brSearch = mediaNav.shadowRoot.querySelector('.br-search');
           if( brSearch ) brNav.prepend(brSearch);
         }
+        brView.br.resize();
       }
     }
 
@@ -214,12 +214,12 @@ export default class AppMediaViewer extends Mixin(LitElement)
         brView.classList.remove('fullscreen');
         brView.shadowRoot.querySelector('#BookReader').classList.remove('fullscreen');
         document.body.style.overflow = '';
-        brView.br.resize();
-
         let mediaNav = brView.shadowRoot.querySelector('app-media-viewer-nav');
         if( mediaNav ) {
           this.shadowRoot.querySelector('.wrapper').append(mediaNav);
         }
+
+        brView.br.resize();
       }
     }
   }

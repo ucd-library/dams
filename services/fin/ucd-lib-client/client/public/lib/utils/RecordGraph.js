@@ -48,7 +48,7 @@ class RecordGraph {
       });
     });
 
-    console.log(children);
+    // console.log(children);
     return children;
   }
 

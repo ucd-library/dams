@@ -24,7 +24,7 @@ return html`
       color: var(--color-aggie-gold);
       font-weight: 700;
       margin: 0;
-      padding: 3rem;
+      padding: 3rem 3rem 0.5rem 4rem;
     }
 
     .card-grid {
