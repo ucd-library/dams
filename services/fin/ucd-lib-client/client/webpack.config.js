@@ -50,4 +50,6 @@ configs.forEach((config, index) => {
   ];
 });
 
-module.exports = configs;
+// console.log(configs[0]);
+
+module.exports = configs[0];
