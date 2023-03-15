@@ -9,18 +9,14 @@ return html`
     margin-left: 10px;
     padding-top: 10px;
     padding-bottom: 5px;
-    border-top: 1px solid var(--light-background-color);
     font-size: var(--fs-sm);
   }
 
-  .layout {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
   iron-icon {
-    color: var(--default-secondary-color);
+    color: var(--color-aggie-blue-80);
     margin-left: -6px;
+    width: 27px;
+    height: 27px;
   }
 
   .title {
@@ -30,15 +26,28 @@ return html`
 
   .rm-btn {
     font-weight: bold;
-    font-style: italic;
-    display: flex;
+    text-transform: lowercase;
+    display: inline;
     margin-right: 12px;
     cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.85rem;
+    border-radius: 35px;
+    background-color: var(--color-aggie-blue-40);
   }
+
+  .rm-btn:hover iron-icon {
+    fill: var(--color-aggie-gold-80);
+    border-radius: 50%;
+    background-color: var(--color-aggie-blue-90);
+    transition: background-color .3s ease-in-out;
+    transition: fill .3s ease-in-out;
+  }
+
+
 </style>  
 
 <div class="layout">
-  <div class="title">Active Filters:</div>
   ${this.activeFilters.map((item, index) => html`
     <div @click="${this._onRemoveFilterClicked}" class="rm-btn" index="${index}" role="button" tabindex="0">
       <iron-icon icon="fin-icons:close"></iron-icon> ${item.label}

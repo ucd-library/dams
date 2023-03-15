@@ -31,6 +31,41 @@ class CollectionService extends BaseService {
     });
   }
 
+  getDisplayData(id) {
+    return this.request({
+      url : '/fcrepo/rest/application/ucd-lib-client'+id,
+      fetchOptions : {
+        headers : {
+          'Accept' : 'application/ld+json',
+          // 'Accept' : 'application/ld+json; profile="http://www.w3.org/ns/json-ld#flattened"',
+          'Prefer' : 'return=representation; omit="http://fedora.info/definitions/fcrepo#ServerManaged"'
+        },
+      },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    });
+  }
+
+  saveDisplayData(id, displayData) {
+    return this.request({
+      url : '/fcrepo/rest/application/ucd-lib-client'+id,
+      fetchOptions : {
+        method : 'PUT',
+        headers : {
+          'Accept' : 'application/ld+json',
+          'Prefer' : 'handling=lenient'
+        },
+        body : '{' + JSON.stringify(displayData) + '}'
+      },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    });
+  }
+
   async overview() {
     return this.request({
       url : `${this.baseUrl}/all`,

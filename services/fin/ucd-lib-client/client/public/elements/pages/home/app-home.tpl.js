@@ -710,7 +710,7 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
         `)}
       </div>
       <div class="featured-more">
-        <a href="/collections" class="btn btn--primary">Browse all collections</a>
+        <a href="/browse/collection" class="btn btn--primary">Browse all collections</a>
       
       </div>
     </div>

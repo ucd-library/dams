@@ -1,90 +1,59 @@
-import {PolymerElement} from "@polymer/polymer/polymer-element"
-import template from "./app-range-slider.html"
+import { LitElement } from "lit";
 
-export default class AppRangeSlider extends PolymerElement {
+import render from "./app-range-slider.tpl.js"
 
-  static get template() {
-    let tag = document.createElement('template');
-    tag.innerHTML = template;
-    return tag;
-  }
+export default class AppRangeSlider extends Mixin(LitElement)
+.with(LitCorkUtils) {
+
 
   static get properties() {
     return {
       // absolute min/max values for slider
-      absMinValue : {
-        type : Number,
-        value : 0,
-        observer : '_renderAsync'
-      },
-      absMaxValue : {
-        type : Number,
-        value : 100,
-        observer : '_renderAsync'
-      },
+      absMinValue : { type : Number, attribute : 'abs-min-value' }, // observer : '_renderAsync' },
+      absMaxValue : { type : Number, attribute : 'abs-max-value' }, // observer : '_renderAsync' },
 
       // current min/max values for slider (where the btns are)
-      minValue : {
-        type : Number,
-        value : 10,
-        observer : '_renderAsync'
-      },
-      maxValue : {
-        type : Number,
-        value : 90,
-        observer : '_renderAsync'
-      },
+      minValue : { type : Number, attribute : 'min-value' }, // observer : '_renderAsync' },
+      maxValue : { type : Number, attribute : 'max-value' }, // observer : '_renderAsync' },
 
       // labels for slide btns
-      minValueLabel : {
-        type : String,
-        value : ''
-      },
-      maxValueLabel : {
-        type : String,
-        value : ''
-      },
+      minValueLabel : { type : String },
+      maxValueLabel : { type : String },
 
       // current widget size info
       // used so we don't have to ask the DOM on each render
-      width : {
-        type : Number,
-        value : 1
-      },
-      height : {
-        type : Number,
-        value : 1
-      },
-      btnHeight : {
-        type : Number,
-        value : 1
-      },
+      width : { type : Number },
+      height : { type : Number },
+      btnHeight : { type : Number },
 
       // string that indicate type of move
-      moving : {
-        type : String,
-        value : ''
-      },
+      moving : { type : String },
 
       // different moving flags for binding UI element classes
-      movingMin : {
-        type : Boolean,
-        value : false
-      },
-      movingMax : {
-        type : Boolean,
-        value : false
-      },
-      isMoving : {
-        type : Boolean,
-        value : false
-      }
+      movingMin : { type : Boolean },
+      movingMax : { type : Boolean },
+      isMoving : { type : Boolean }
     }
   }
 
-  
   constructor() {
     super();
+    this.render = render.bind(this);
+
+    this.absMinValue = 0;
+    this.absMaxValue = 100;
+    this.minValue = 10;
+    this.maxValue = 90;
+    this.minValueLabel = '';
+    this.maxValueLabel = '';
+    this.width = 1;
+    this.height = 50;
+    this.btnHeight = 1;
+    this.moving = '';
+    this.movingMin = false;
+    this.movingMax = false;
+    this.isMoving = false;
+
     this._windowResizeListener = this._onResize.bind(this);
     this._windowMouseListener = this._onMoveStop.bind(this);
 
@@ -98,10 +67,6 @@ export default class AppRangeSlider extends PolymerElement {
    */
   connectedCallback() {
     super.connectedCallback();
-    
-    requestAnimationFrame(() => {
-      this._onResize();
-    });
 
     window.addEventListener('resize', this._windowResizeListener);
     window.addEventListener('mouseup', this._windowMouseListener);
@@ -123,6 +88,13 @@ export default class AppRangeSlider extends PolymerElement {
     window.removeEventListener('touchcancel', this._windowMouseListener);
   }
 
+  willUpdate() {
+    requestAnimationFrame(() => {
+      this._onResize();
+      this._renderAsync();
+    });
+  }
+
   /**
    * @method _onResize
    * @description cache the element size so we don't have to look it up
@@ -133,9 +105,12 @@ export default class AppRangeSlider extends PolymerElement {
     this.width = this.offsetWidth || 1;
     this.height = this.offsetHeight;
     this.left = this.offsetLeft;
-
-    this.btnHeight = this.$.lowNumberBtn.offsetHeight;
-    this._render();
+    let lowNumberBtn = this.shadowRoot.querySelector('#lowNumberBtn');
+    if( lowNumberBtn ) {
+      this.height = 50;
+      this.btnHeight = 25;
+      this._render();
+    }
   }
 
   /**
@@ -180,7 +155,7 @@ export default class AppRangeSlider extends PolymerElement {
   }
 
   /**
-   * @method _renderAsync
+   * @method _render
    * @description set the current top/left px values for all btns,
    * labels and lines bases on current min/max values.
    */
@@ -188,16 +163,16 @@ export default class AppRangeSlider extends PolymerElement {
     let hh = this.height * 0.60;
 
     // set line heights
-    this.$.numberLine.style.top = hh+'px';
-    this.$.fillLine.style.top = hh+'px';
+    this.shadowRoot.querySelector('#numberLine').style.top = hh+'px';
+    this.shadowRoot.querySelector('#fillLine').style.top = hh+'px';
 
     // set btn heights
     let hBtnHeight = this.btnHeight / 2;
-    this.$.lowNumberBtn.style.top = (hh - hBtnHeight) +'px';
-    this.$.highNumberBtn.style.top = (hh - hBtnHeight) +'px';
+    this.shadowRoot.querySelector('#lowNumberBtn').style.top = (hh - hBtnHeight) +'px';
+    this.shadowRoot.querySelector('#highNumberBtn').style.top = (hh - hBtnHeight) +'px';
 
-    this.$.lowNumberLabel.style.top = (hh - hBtnHeight - 22) +'px';
-    this.$.highNumberLabel.style.top = (hh - hBtnHeight - 22) +'px';
+    this.shadowRoot.querySelector('#lowNumberLabel').style.top = (hh - hBtnHeight - 22) +'px';
+    this.shadowRoot.querySelector('#highNumberLabel').style.top = (hh - hBtnHeight - 22) +'px';
 
     // set btn left
     let lv = ( this.minValue < this.absMinValue ) ? this.absMinValue : this.minValue;
@@ -206,17 +181,17 @@ export default class AppRangeSlider extends PolymerElement {
     let minPxValue = this._valueToPx(lv);
     let maxPxValue = this._valueToPx(uv);
 
-    this.$.lowNumberBtn.style.left = (minPxValue - hBtnHeight)  + 'px';
-    this.$.highNumberBtn.style.left = (maxPxValue - hBtnHeight) + 'px';
+    this.shadowRoot.querySelector('#lowNumberBtn').style.left = (minPxValue - hBtnHeight)  + 'px';
+    this.shadowRoot.querySelector('#highNumberBtn').style.left = (maxPxValue - hBtnHeight) + 'px';
 
-    this.$.lowNumberLabel.style.left = (minPxValue - hBtnHeight) + 'px';
-    this.$.highNumberLabel.style.left = (maxPxValue - hBtnHeight) + 'px';
+    this.shadowRoot.querySelector('#lowNumberLabel').style.left = (minPxValue - hBtnHeight) + 'px';
+    this.shadowRoot.querySelector('#highNumberLabel').style.left = (maxPxValue - hBtnHeight) + 'px';
     
-    this.$.fillLine.style.left = minPxValue +'px';
-    this.$.fillLine.style.width = (maxPxValue - minPxValue)  +'px';
+    this.shadowRoot.querySelector('#fillLine').style.left = minPxValue +'px';
+    this.shadowRoot.querySelector('#fillLine').style.width = (maxPxValue - minPxValue)  +'px';
 
-    this.minValueLabel = this.renderLabel(this.minValue);
-    this.maxValueLabel = this.renderLabel(this.maxValue);
+    this.minValueLabel = this.minValue;
+    this.maxValueLabel = this.maxValue;
   }
 
   /**
@@ -254,7 +229,6 @@ export default class AppRangeSlider extends PolymerElement {
     if( !this.moving ) return;
     e.preventDefault();
 
-
     // handle both mouse and touch event
     let left;
     if( e.type === 'touchmove' ) {
@@ -266,8 +240,6 @@ export default class AppRangeSlider extends PolymerElement {
     
     if( this.moving === 'min' ) {
       this.minValue = this._pxToValue(left);
-    } else if( this.moving === 'max' ) {
-      this.maxValue = this._pxToValue(left);
     } else if( this.moving === 'max' ) {
       this.maxValue = this._pxToValue(left);
     } else if( this.moving === 'range' ) {
@@ -311,19 +283,6 @@ export default class AppRangeSlider extends PolymerElement {
         }
       })
     );
-  }
-
-  /**
-   * @method renderLabel
-   * @description render the label value.  Override if you want
-   * anything other than the number.
-   * 
-   * @param {Number} value current value to render
-   * 
-   * @returns {String}
-   */
-  renderLabel(value) {
-    return value;
   }
 
 }

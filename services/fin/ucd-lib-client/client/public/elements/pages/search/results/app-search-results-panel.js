@@ -1,13 +1,13 @@
 import { LitElement } from 'lit';
 import render from "./app-search-results-panel.tpl.js";
 
-import "@ucd-lib/cork-pagination";
+// import "@ucd-lib/cork-pagination";
 import "@polymer/paper-spinner/paper-spinner-lite";
 
 import "./app-search-grid-result";
 import "./app-search-list-result";
 import "../../../utils/app-collection-card";
-import "../filtering/app-top-active-filters";
+// import "../filtering/app-top-active-filters";
 import "../../../components/cards/dams-collection-card";
 import "../../../components/cards/dams-item-card";
 
@@ -23,7 +23,7 @@ class AppSearchResultsPanel extends Mixin(LitElement)
   static get properties() {
     return {
       results : { type: Array }, // array of search results
-      collectionResults : { type: Array }, // array of collection search results
+      // collectionResults : { type: Array }, // array of collection search results
       gridMargin : { type: Number }, // size in px's between each masonary layout cell
       isGridLayout : { type: Boolean }, // are we in grid layout
       isListLayout : { type: Boolean },
@@ -31,7 +31,7 @@ class AppSearchResultsPanel extends Mixin(LitElement)
       total : { type: String }, // UI display of total results
       numPerPage : { type: Number },
       currentIndex : { type: Number },
-      showCollectionResults : { type: Boolean },
+      // showCollectionResults : { type: Boolean },
       showError : { type: Boolean },
       showLoading : { type: Boolean },
       errorMsg : { type: Boolean },
@@ -121,8 +121,10 @@ class AppSearchResultsPanel extends Mixin(LitElement)
       }
 
       this.results = results;
-      this.paginationTotal = total;
       this.numPerPage = numPerPage;
+      this.paginationTotal = results.length / numPerPage;
+      if( this.paginationTotal < 1 ) this.paginationTotal = 1;
+
       this.shadowRoot.querySelector('#numPerPage').value = numPerPage+'';
       this.shadowRoot.querySelector('#numPerPageM').value = numPerPage+'';
       this.currentIndex = currentIndex;
@@ -366,8 +368,8 @@ class AppSearchResultsPanel extends Mixin(LitElement)
    */
    _onSearchVcUpdate(e) {
     if( e.state !== 'loaded' ) return;
-    // debugger;
-    this.collectionResults = [... new Set(e.payload.results.map(c => c.collectionId['@id']))]; // e.payload.results.filter(c => c.collection);
+
+    // this.collectionResults = [... new Set(e.payload.results.map(c => c.collectionId['@id']))]; // e.payload.results.filter(c => c.collection);
   }
 
   /**

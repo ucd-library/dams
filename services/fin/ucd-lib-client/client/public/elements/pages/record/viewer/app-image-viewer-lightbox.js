@@ -76,7 +76,6 @@ export default class AppImageViewer extends Mixin(LitElement)
    * @method show
    */
   async show() {
-    debugger;
     this.visible = true;
     this.style.display = 'block';
     // this.shadowRoot.querySelector('#safeCover').style.display = 'block';

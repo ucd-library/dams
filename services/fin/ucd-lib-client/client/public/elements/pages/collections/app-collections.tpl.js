@@ -1,5 +1,5 @@
 import { html } from 'lit';
-import sharedStylesCss from "../../styles/shared-styles";
+import { sharedStyles } from "../../styles/shared-styles";
 // import { classMap } from 'lit/directives/class-map';
 // import { styleMap } from 'lit/directives/style-map';
 
@@ -77,9 +77,7 @@ return html`
     margin-top: 40px;
   }
 
-  ${sharedStylesCss}
-
-
+  ${sharedStyles}
 </style>
 
 <div class="content">

@@ -7,6 +7,7 @@ import "../../components/search-box";
 import "../../components/nav-bar";
 // import "../../components/icon";
 import "../../components/filterButton";
+import "./filtering/app-top-active-filters";
 
 class AppSearchHeader extends Mixin(LitElement)
       .with(LitCorkUtils) {
@@ -41,13 +42,11 @@ class AppSearchHeader extends Mixin(LitElement)
     this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel');
   }
   /**
-   * @method ready
-   * @description It gets the model information for the Collections when 
-   * function is fired.
+   * @method willUpdate
+   * @description Lit lifestyle function, called before render
    * 
    */
-  async ready() {
-    super.ready();
+  async willUpdate() {
     this._setCollections(await this.CollectionModel.overview());
   }
 
@@ -58,10 +57,11 @@ class AppSearchHeader extends Mixin(LitElement)
    _onAppStateUpdate(e) {
     this.drawerOpen = e.filtersDrawerOpen ? true : false;
     this.appState = e;
-    if( 
-      e.location.path[0] !== 'search' // &&
-      // e.location.path[0] !== 'collection' // todo this may change, for now the collection page is no longer a search page
-    ) return;
+    if( e.location.path[0] !== 'search' ) {
+      this.shadowRoot.querySelector('app-top-active-filters').style.display = 'none';
+      return;
+    } 
+    this.shadowRoot.querySelector('app-top-active-filters').style.display = 'block';
     this._searchFromAppState();
   }
 

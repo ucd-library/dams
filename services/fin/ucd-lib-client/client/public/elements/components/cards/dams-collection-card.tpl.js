@@ -104,6 +104,18 @@ return html`
     padding-top: 75%;
   }
 
+  .marketing-highlight__body.dark h4 {
+    color: var(--color-white);
+    font-size: 1.5rem;
+    text-align: left;
+  }
+
+  .marketing-highlight__body.dark p {
+    color: var(--color-black-30);
+    font-size: 1.1rem;
+    text-align: left;
+  }
+
 </style>  
 
 <!-- <div class="container"><a href="${this.href}">
@@ -126,12 +138,12 @@ return html`
 
 <a href="" class="marketing-highlight category-brand--secondary u-space-mb o-box">
   <div class="marketing-highlight__image">
-    <div class="aspect--4x3 u-background-image" role="img" aria-label="" style="background-image:url(${this.collection.thumbnailUrl});">
+    <div class="aspect--4x3 u-background-image" role="img" aria-label="" style="background-image:url(${this.imgSrc});">
   </div>
   </div>
-  <div class="marketing-highlight__body">
-    <h4 class="marketing-highlight__title">${this.collection.title}</h4>
-    <p class="marketing-highlight__items">${this.collection.collectionItemsCount} items</p>
+  <div class="marketing-highlight__body ${this.darkBg ? 'dark' : ''}">
+    <h4 class="marketing-highlight__title">${this.cardTitle}</h4>
+    <p class="marketing-highlight__items">${this.itemCt || 0} items</p>
   </div>
 </a>
 
