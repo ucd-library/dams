@@ -7,12 +7,12 @@ const fetch = require('node-fetch');
 const authUtils = require('../lib/auth');
 const appConfig = require('../lib/fcrepo-app-config');
 
-const {seo, records, collections} = require('@ucd-lib/fin-service-utils');
+const {seo, records, collections, logger} = require('@ucd-lib/fin-service-utils');
 
 // const transform = seo.recordTransform;
 // const collectionTransform = seo.collectionTransform;
 
-const loaderPath = path.join(__dirname, '..', 'client', config.server.assets, 'loader', 'loader.js');
+const loaderPath = path.join(__dirname, '..', 'client', config.client.assets, 'loader', 'loader.js');
 const loaderSrc = fs.readFileSync(loaderPath, 'utf-8');
 const bundle = `
   <script>
@@ -24,7 +24,8 @@ const bundle = `
   <script>${loaderSrc}</script>`;
 
 module.exports = (app) => {
-  let assetsDir = path.join(__dirname, '..', 'client', config.server.assets);
+  let assetsDir = path.join(__dirname, '..', 'client', config.client.assets);
+  logger.info('CLIENT_ENV='+config.client.env.CLIENT_ENV+', Serving static assets from '+assetsDir);
 
   /**
    * Setup SPA app routes
@@ -52,17 +53,9 @@ module.exports = (app) => {
       next({
         // collections : await collections.overview(),
         user : user,
-        appRoutes : config.server.appRoutes,
+        appRoutes : config.client.appRoutes,
         // recordCount: (await records.rootCount()).count,
-        env : {
-          BUILD_NUM: process.env.BUILD_NUM || '',
-          BUILD_TIME: process.env.BUILD_TIME || '',
-          APP_VERSION: process.env.APP_VERSION || '',
-          UCD_LIB_SERVER_REPO_HASH: process.env.UCD_LIB_SERVER_REPO_HASH || '',
-          UCD_LIB_SERVER_REPO_TAG: process.env.UCD_LIB_SERVER_REPO_TAG || '',
-          CORE_SERVER_REPO_HASH: process.env.CORE_SERVER_REPO_HASH || '',
-          CORE_SERVER_REPO_TAG: process.env.CORE_SERVER_REPO_TAG || ''
-        },
+        env : config.client.env,
         fcAppConfig : appConfig.config
       });
     },
