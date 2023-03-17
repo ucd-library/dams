@@ -286,21 +286,21 @@ module.exports = async function(path, graph, headers, utils) {
     if( headers.link.workflow ) {
       let iaReaderSupport = headers.link.workflow.find(item => IA_READER_WORKFLOW === item.type);
       if( iaReaderSupport ) {
-        let workflowInfo = await fetch(config.gateway.host+'/fcrepo/rest'+iaReaderSupport.url);
+        let workflowInfo = await fetch(config.gateway.host+config.fcrepo.root+iaReaderSupport.url);
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.iaReader = {
-          manifest : fcrepo.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
+          manifest : config.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
         }
       }
 
       let streamVideoSupport = headers.link.workflow.find(item => STREAMING_VIDEO_WORKFLOW === item.type);
       if( streamVideoSupport ) {
-        let workflowInfo = await fetch(config.gateway.host+'/fcrepo/rest'+streamVideoSupport.url);
+        let workflowInfo = await fetch(config.gateway.host+config.fcrepo.root+streamVideoSupport.url);
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.streamingVideo = {
-          manifest : fcrepo.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/playlist.m3u8'
+          manifest : config.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/playlist.m3u8'
         }
       }
     }
