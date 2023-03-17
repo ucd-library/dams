@@ -7,7 +7,8 @@ export default function render() {
 <style>
   ${sharedStyles}
   :host {
-    display: block
+    display: block;
+    padding-right: 0.8rem;
   }
 
   [hidden] { display: none !important; }
@@ -94,6 +95,28 @@ export default function render() {
   paper-checkbox[disabled] .key {
     color: var(--secondary-text-color);
     font-style: italic;
+  }
+
+  .overflow::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 7px;
+    background-color: var(--color-aggie-blue-60);
+  }
+
+  .overflow::-webkit-scrollbar {
+    width: 2px;
+    background-color: transparent;
+    padding-right: 1rem;
+  }
+
+  .overflow::-webkit-scrollbar-thumb {
+    border-radius: 7px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: var(--color-aggie-blue-80);
+  }
+
+  .overflow::-webkit-scrollbar-track {
+    width: 2px;
   }
 </style>
 

@@ -174,10 +174,21 @@ export default function render() {
         </ucdlib-site-footer-column>
         <div insert-into="below-address" ?hidden="${this.showVersion}">
           <div><b>Build Information</b></div>
-          <div>${this.appVersion}</div>
+          <div>App Version: ${this.appVersion}</div>
           <div>Build Time: ${this.localBuildTime}</div>
-          <div>fin-server: ${this.coreTag} @ ${this.coreHash}</div>
-          <div>fin-ucd-lib-server: ${this.clientTag} @ ${this.clientHash}</div>
+          <div>Build Number: ${this.buildNum}</div>
+          <div>Client Env: ${this.clientEnv}</div>
+          <div>Fin App Version: ${this.finAppVersion}</div>
+          <div>Fin Branch Name: ${this.finBranchName}</div>
+          <div>Fin Repo Tag: ${this.finRepoTag}</div>
+          <div>Fin Server Image: ${this.finServerImage}</div>
+          <div>Fin Server Repo Hash: ${this.finServerRepoHash}</div>
+          <div>DAMS Deployment Branch: ${this.damsDeployBranch}</div>
+          <div>DAMS Deployment SHA: ${this.damsDeploySha}</div>
+          <div>DAMS Deployment Tag: ${this.damsDeployTag}</div>
+          <div>DAMS Repo Branch: ${this.damsRepoBranch}</div>
+          <div>DAMS Repo SHA: ${this.damsRepoSha}</div>
+          <div>DAMS Repo Tag: ${this.damsRepoTag}</div>
         </div>
       </ucdlib-site-footer>
     </div>
