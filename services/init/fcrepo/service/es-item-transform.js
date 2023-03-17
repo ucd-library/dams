@@ -275,11 +275,11 @@ module.exports = async function(path, graph, headers, utils) {
   if( headers.link ) {
     if( headers.link['archival-group'] ) {
       item._['archival-group'] = headers.link['archival-group'].map(item => item.url);
-      item._.esId = item._['archival-group'][0];
+      item._.graphId = item._['archival-group'][0];
     } else if( headers.link.type && 
       headers.link.type.find(item => item.rel === 'type' && item.url === ARCHIVAL_GROUP) ) {
       item._['archival-group'] = item['@id'];
-      item._.esId = item['@id'];
+      item._.graphId = item['@id'];
     }
 
     // check for completed ia reader workflow
@@ -290,7 +290,7 @@ module.exports = async function(path, graph, headers, utils) {
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.iaReader = {
-          manifest : item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
+          manifest : fcrepo.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
         }
       }
 
@@ -300,23 +300,30 @@ module.exports = async function(path, graph, headers, utils) {
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.streamingVideo = {
-          manifest : item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/playlist.m3u8'
+          manifest : fcrepo.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/playlist.m3u8'
         }
       }
     }
   }
 
-  if( !item._.esId && item['@type'].includes(BINARY) ) {
-    item._.esId = item['@id'];
+  if( !item._.graphId && item['@type'].includes(BINARY) ) {
+    item._.graphId = item['@id'];
   }
 
   if( gitsource ) {
-    item._.gitsource = {};
+    item._.source = {};
     for( let attr in gitsource ) {
       if( !attr.startsWith(ioUtils.GIT_SOURCE_PROPERTY_BASE) ) continue;
-      item._.gitsource[attr.replace(ioUtils.GIT_SOURCE_PROPERTY_BASE, '')] = gitsource[attr][0]['@value'] || gitsource[attr][0]['@id'];
+      item._.source[attr.replace(ioUtils.GIT_SOURCE_PROPERTY_BASE, '')] = gitsource[attr][0]['@value'] || gitsource[attr][0]['@id'];
     }
+    item._.source.type = 'git';
   }
 
-  return item;
+  graph = {
+    '@id' : item._.graphId,
+    '@graph' : [item],
+  };
+  delete item._.graphId;
+
+  return graph;
 }

@@ -7,7 +7,7 @@ class ItemsModel extends ElasticSearchModel {
     this.transformService = 'es-item-transform';
   }
 
-  is(id, types=[]) {
+  is(id) {
     if( id.match(/^\/item\//) ) return true;
     return false;
   }
