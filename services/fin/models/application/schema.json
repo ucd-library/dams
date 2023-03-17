@@ -3,19 +3,19 @@
 
   "properties" : {
 
-    "@id" : {
+    "@graph.@id" : {
       "type" : "keyword"
     },
 
-    "applicationId" : {
+    "@graph.applicationId" : {
       "type" : "keyword"
     },
 
-    "identifier" : {
+    "@graph.identifier" : {
       "type":  "keyword"
     },
 
-    "name" : {
+    "@graph.name" : {
       "type" : "keyword"
     }
   }

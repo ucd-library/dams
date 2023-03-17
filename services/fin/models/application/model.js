@@ -6,7 +6,7 @@ class ApplicationsModel extends ElasticSearchModel {
     super('application');
   }
 
-  is(id, types=[]) {
+  is(id) {
     if( id.match(/^\/application\//) ) return true;
     return false;
   }

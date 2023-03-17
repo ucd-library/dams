@@ -92,7 +92,10 @@ module.exports = async function(path, graph, headers, utils) {
 
   item.applicationId = item['@id'].split('/').splice(0, 3).join('/');
 
+  graph = {
+    '@id' : item.applicationId,
+    '@graph' : [item],
+  };
 
-
-  return item;
+  return graph;
 }

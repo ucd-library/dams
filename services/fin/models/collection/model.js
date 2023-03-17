@@ -7,7 +7,7 @@ class CollectionsModel extends ElasticSearchModel {
     this.transformService = 'es-collection-transform';
   }
 
-  is(id, types=[]) {
+  is(id) {
     if( id.match(/^\/collection\//) ) return true;
     return false;
   }
