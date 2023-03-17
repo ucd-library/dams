@@ -104,7 +104,7 @@ export default function render() {
   }
 
   .overflow::-webkit-scrollbar {
-    width: 2px;
+    width: 9px;
     background-color: transparent;
     padding-right: 1rem;
   }
@@ -117,6 +117,14 @@ export default function render() {
 
   .overflow::-webkit-scrollbar-track {
     width: 2px;
+  }
+
+  /* basic support for FF, Chrome/Safari should support -webkit above */
+  @supports(scrollbar-color: red blue) {
+    * {
+      scrollbar-color: var(--color-aggie-blue-80) var(--color-aggie-blue-50);
+      scrollbar-width: thin;
+    }
   }
 </style>
 
