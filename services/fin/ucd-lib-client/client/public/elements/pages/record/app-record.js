@@ -113,12 +113,12 @@ class AppRecord extends Mixin(LitElement)
     if( !record ) return;
 
     let vcRecord = this.RecordVcModel.translate(record);
-    if( vcRecord.id === this.renderedRecordId ) return;
+    if( vcRecord['@id'] === this.renderedRecordId ) return;
 
-    this.renderedRecordId = vcRecord.id;
+    this.renderedRecordId = vcRecord['@id'];
     this.record = vcRecord;
   
-    this.currentRecordId = this.record.id;
+    this.currentRecordId = this.record['@id'];
     this.name = this.record.name;
     this.collectionName = this.record.collectionName;
     this.date = this.record.date;
@@ -134,16 +134,16 @@ class AppRecord extends Mixin(LitElement)
     //   // pull image with position 1
 
     //   //    pathname + record.root.image.url for second links in ark/fedora
-    //   // record.data.node.filter(r => parseInt(r.position) === 1 && r.image)[0].id === /item/bla
-    //   // record.data.node.filter(r => parseInt(r.position) === 1 && r.image)[0].image.url === /fcrepo/bla
+    //   // record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].id === /item/bla
+    //   // record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].image.url === /fcrepo/bla
     //   this.arkDoi = [
     //     this.AppStateModel.locationElement.location.pathname.split('/media')[0],
-    //     record.data.node.filter(r => parseInt(r.position) === 1 && r.image)[0].id,
+    //     record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].id,
     //   ];
   
     //   this.fedoraLinks = [
     //     '/fcrepo/rest' + this.AppStateModel.locationElement.location.pathname.split('/media')[0],
-    //     record.data.node.filter(r => parseInt(r.position) === 1 && r.image)[0].image.url + '/fcr:metadata',
+    //     record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].image.url + '/fcr:metadata',
     //   ]; 
   
     // } else {
@@ -280,12 +280,12 @@ class AppRecord extends Mixin(LitElement)
       // pull image with position 1
       this.arkDoi = [
         location.pathname.split('/media')[0],
-        record.data.node.filter(r => parseInt(r.position) === 1 && r.image)[0].id,
+        record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].image.url,
       ];
   
       this.fedoraLinks = [
         '/fcrepo/rest' + location.pathname.split('/media')[0],
-        record.data.node.filter(r => parseInt(r.position) === 1 && r.image)[0].image.url + '/fcr:metadata',
+        record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].image.url + '/fcr:metadata',
       ]; 
   
     } else {
@@ -434,7 +434,7 @@ class AppRecord extends Mixin(LitElement)
    * @param {Object} record 
    */
   // _renderIdentifier(record, media) {
-  //   if( !record.identifier ) {
+  //   if( !record['@id']entifier ) {
   //     return this.$.identifier.classList.add('hidden');
   //   }
 

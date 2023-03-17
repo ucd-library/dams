@@ -21,7 +21,7 @@ class RecordVcModel extends BaseModel {
     if( e && e.clientMedia ) {
       // translate collection and related nodes/items to ui model
       const item = {
-        id : e.root['@id'],
+        '@id' : e.root['@id'],
         name : e.root.name,
         collectionId : e.root.isPartOf['@id'] || e.root.isPartOf[0]['@id'],
         collectionName : e.root.creator.name,

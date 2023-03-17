@@ -148,25 +148,25 @@ export default function render() {
 
     <app-browse-by id="collection" 
       label="Collection" 
-      facet-query-name="node.isPartOf.@id"
+      facet-query-name="@graph.isPartOf.@id"
       ?hidden="${this.page !== '/browse/collection'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-gold-collections.png"/>
     </app-browse-by>
     <app-browse-by id="subject" 
       label="Subject" 
-      facet-query-name="node.about.name.raw"
+      facet-query-name="@graph.about.name.raw"
       ?hidden="${this.page !== '/browse/subject'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-green-subjects.png"/>      
     </app-browse-by>
     <app-browse-by id="creator" 
       label="Creator" 
-      facet-query-name="node.creator"
+      facet-query-name="@graph.creator"
       ?hidden="${this.page !== '/browse/creator'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-red-creators.png"/>
     </app-browse-by>
     <app-browse-by id="format" 
       label="Format" 
-      facet-query-name="node.fileFormat"
+      facet-query-name="@graph.fileFormat"
       ?hidden="${this.page !== '/browse/format'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-blue-formats.png"/>
     </app-browse-by>

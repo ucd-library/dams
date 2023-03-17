@@ -21,7 +21,8 @@ class CollectionVcModel extends BaseModel {
     if( e.state === 'loaded' ) {
 
       // translate collection and related nodes/items to ui model
-      const rootNode = e.payload.node[0];
+      const rootNode = e.payload['@graph'][0];
+
       // e.payload.node.shift();
       // todo this will come from admin application storage pref
       // let highlightedCollections = [];
@@ -34,11 +35,11 @@ class CollectionVcModel extends BaseModel {
       // }
 
       const collection = {
-        id : e.payload.id,
+        id : e.payload['@id'],
         description : rootNode.description,
         title : rootNode.name,
         thumbnailUrl : rootNode.image.url,
-        keywords : rootNode.keywords,
+        keywords : rootNode.keywords || [],
         callNumber : 'D-42', // TODO where to source?
         // items : [
         //   e.payload.node

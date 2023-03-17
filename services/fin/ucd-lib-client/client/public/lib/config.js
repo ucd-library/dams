@@ -48,7 +48,7 @@ module.exports = {
   // facets to show on left side
   elasticSearch : {
     facets : {
-      'node.fileFormat' : {
+      '@graph.fileFormat' : {
         label : 'File Format',
         type : 'facet',
         valueMap : (value) => {
@@ -68,7 +68,7 @@ module.exports = {
           return'format: '+value;
         }
       },
-      'node.collectionId' : {
+      '@graph.collectionId' : {
         label : 'Collection',
         type : 'facet',
         valueMap : (value) => {
@@ -77,11 +77,11 @@ module.exports = {
           return value;
         }
       },
-      'node.creator' : {
+      '@graph.creator' : {
         label : 'Creator',
         type : 'facet'
       },
-      'node.yearPublished' : {
+      '@graph.yearPublished' : {
         label : 'Published',
         type : 'range'
       },
@@ -90,14 +90,14 @@ module.exports = {
       //   type : 'facet',
       //   valueMap : rightsMap
       // },
-      'node.type.raw' : {
+      '@graph.type.raw' : {
         label : 'Type',
         type : 'facet',
         typeahead: 'type',
         ignore : ['CreativeWork', 'MediaObject'],
         valueMap : value => value.replace(/(.)([A-Z])/g, '$1 $2')
       },
-      'node.about.name.raw' : {
+      '@graph.about.name.raw' : {
         label : 'Subject',
         type : 'facet',
         typeahead : 'abouts'
@@ -105,8 +105,8 @@ module.exports = {
     },
 
     textFields : {
-      record : ['node.name', 'node.description', 'node.identifier', 'node.about', 'node.keywords', 'node.alternativeHeadline', 'node.indexableContent'],
-      collection : ['node.name', 'node.description', 'node.about', 'node.keywords']
+      record : ['@graph.name', '@graph.description', '@graph.identifier', '@graph.about', '@graph.keywords', '@graph.alternativeHeadline', '@graph.indexableContent'],
+      collection : ['@graph.name', '@graph.description', '@graph.about', '@graph.keywords']
     },
     
     // max number of facets filter options

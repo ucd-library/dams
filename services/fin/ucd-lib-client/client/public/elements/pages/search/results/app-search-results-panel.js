@@ -386,7 +386,7 @@ class AppSearchResultsPanel extends Mixin(LitElement)
 
     let collections = [];
     e.payload.results.forEach(result => {
-      if( !collections.includes(result.collectionId['@id']) ) {
+      if( result.collectionId && !collections.includes(result.collectionId['@id']) ) {
         collections.push(result.collectionId['@id']);
       }
     });
