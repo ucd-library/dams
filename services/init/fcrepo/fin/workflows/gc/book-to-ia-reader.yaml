@@ -10,7 +10,7 @@ main:
           assign:
             - location: us-central1
             - project_id: digital-ucdavis-edu
-            - job_container: gcr.io/ucdlib-pubreg/dams-image-utils
+            - job_container: gcr.io/ucdlib-pubreg/dams-image-utils:sandbox
       - get_pages:
           call: http.get
           args:
