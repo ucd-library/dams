@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "cd client && ./build.sh",
-    "build": "cd client && webpack",
+    "dist": "cd client && ./dist.sh",
+    "build": "cd client && ./build.sh",
     "watch": "cd client && ./watch.sh",
     "analyze-bundle": "cd client && webpack --profile --json webpack-dist.config.js > stats.json && webpack-bundle-analyzer -m server stats.json"
   },
