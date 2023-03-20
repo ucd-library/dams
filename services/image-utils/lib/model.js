@@ -327,6 +327,8 @@ class ImageUtils {
       });
 
     for( let file of files ) {
+      if( fileParts.base === 'manifest.json' ) continue;
+
       let fileParts = path.parse(file.name);
       if( fileParts.ext === '.json' ) {
         await file.delete();
