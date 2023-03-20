@@ -160,7 +160,7 @@ export default function render() {
     </app-browse-by>
     <app-browse-by id="creator" 
       label="Creator" 
-      facet-query-name="@graph.creator"
+      facet-query-name="@graph.creator.name"
       ?hidden="${this.page !== '/browse/creator'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-red-creators.png"/>
     </app-browse-by>

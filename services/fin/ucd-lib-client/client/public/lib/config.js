@@ -77,7 +77,7 @@ module.exports = {
           return value;
         }
       },
-      '@graph.creator' : {
+      '@graph.creator.name' : {
         label : 'Creator',
         type : 'facet'
       },

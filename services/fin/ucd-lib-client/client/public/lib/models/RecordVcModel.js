@@ -23,14 +23,14 @@ class RecordVcModel extends BaseModel {
       const item = {
         '@id' : e.root['@id'],
         name : e.root.name,
-        collectionId : e.root.isPartOf['@id'] || e.root.isPartOf[0]['@id'],
+        collectionId : !e.root.isPartOf ? '' : e.root.isPartOf['@id'] || e.root.isPartOf[0]['@id'],
         collectionName : e.root.creator.name,
         collectionItemsCount : 42,
         collectionImg : e.root.image.url,
         clientMedia : e.clientMedia,
         date : e.root.yearPublished,
-        publisher : e.root.publisher.name,
-        keywords : e.root.about,
+        publisher : !e.root.publisher ? '' : e.root.publisher.name,
+        keywords : !e.root.about.length ? [e.root.about] : e.root.about,
 
         callNumber : 'D-42',
         // callNumber : e.root.identifier[0].split(';')[1].trim(),

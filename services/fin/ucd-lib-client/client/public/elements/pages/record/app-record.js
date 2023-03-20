@@ -123,7 +123,7 @@ class AppRecord extends Mixin(LitElement)
     this.collectionName = this.record.collectionName;
     this.date = this.record.date;
     this.publisher = this.record.publisher;
-    this.keywords = this.record.keywords;
+    this.keywords = this.record.keywords || [];
     this.callNumber = this.record.callNumber;
     // this.callNumber = record.root.identifier[0].split(';')[1].trim();
     this.collectionImg = this.record.collectionImg;

@@ -87,6 +87,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
         }
       });
 
+      if( !e.root['@id'] || !bookTitle ) return;
+
       let brData = await this.RecordModel.getIaBookManifest(e.root['@id'], bookTitle);
       if( brData && brData.body ) {
         this.mediaType = 'bookreader';
