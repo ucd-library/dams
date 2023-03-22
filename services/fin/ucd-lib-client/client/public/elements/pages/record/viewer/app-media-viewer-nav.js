@@ -24,6 +24,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
       showNavRight : { type : Boolean },
       isLightbox : { attribute: 'is-lightbox', type : Boolean },
       isBookReader : { type : Boolean },
+      hideZoom : { type : Boolean },
       brSinglePage : { type : Boolean },
       brFullscreen : { type : Boolean },
       singleImage : { type : Boolean },
@@ -51,6 +52,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
     this.showNavRight = false;
     this.isLightbox = false;
     this.isBookReader = false;
+    this.hideZoom = false;
     this.brSinglePage = false;
     this.brFullscreen = false;
     this.singleImage = false;
@@ -232,10 +234,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
    */
   _onSelectedRecordUpdate(record) {
     this.leftMostThumbnail = 0;
-    // if( !record ) {
-    //   this.singleImage = true;
-    //   return;
-    // }
+    if( !record ) {
+      this.singleImage = true;
+      return;
+    }
 
     // sort thumbnails, and add each mediaGroup into mediaList
     let mediaList = [];

@@ -10,11 +10,20 @@ class AppFooter extends Mixin(LitElement)
     return { 
       localBuildTime : {type: String},
       appVersion : {type: String},
-      clientTag : {type: String},
-      clientHash : {type: String},
-      coreTag : {type: String},
-      coreHash : {type: String},
-      showVersion : {type: Boolean}
+      showVersion : {type: Boolean},
+      buildNum : {type: String},
+      clientEnv : {type: String},
+      finAppVersion : {type: String},
+      finBranchName : {type: String},
+      finRepoTag : {type: String},
+      finServerImage : {type: String},
+      finServerRepoHash : {type: String},
+      damsDeployBranch : {type: String},
+      damsDeploySha : {type: String},
+      damsDeployTag : {type: String},
+      damsRepoBranch : {type: String},
+      damsRepoSha : {type: String},
+      damsRepoTag : {type: String}
     };
   }
 
@@ -23,12 +32,23 @@ class AppFooter extends Mixin(LitElement)
     this.active = true;
     this.render = render.bind(this);
 
-    this.appVersion = APP_CONFIG.env.APP_VERSION;
-    this.clientTag = APP_CONFIG.env.UCD_LIB_SERVER_REPO_TAG;
-    this.clientHash = APP_CONFIG.env.UCD_LIB_SERVER_REPO_HASH;
-    this.coreTag = APP_CONFIG.env.CORE_SERVER_REPO_TAG;
-    this.coreHash = APP_CONFIG.env.CORE_SERVER_REPO_HASH;
-    this.showVersion = APP_CONFIG.env.APP_VERSION.match(/(alpha|beta|rc)/) ? true : false;
+    this.showVersion = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH !== 'main';
+
+    this.appVersion = APP_CONFIG.env.APP_VERSION;    
+    this.buildNum = APP_CONFIG.env.BUILD_NUM;
+    this.clientEnv = APP_CONFIG.env.CLIENT_ENV;
+    this.finAppVersion = APP_CONFIG.env.FIN_APP_VERSION;
+    this.finBranchName = APP_CONFIG.env.FIN_BRANCH_NAME;
+    this.finRepoTag = APP_CONFIG.env.FIN_REPO_TAG;
+    this.finServerImage = APP_CONFIG.env.FIN_SERVER_IMAGE;
+    this.finServerRepoHash = APP_CONFIG.env.FIN_SERVER_REPO_HASH;
+    this.damsDeployBranch = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH;
+    this.damsDeploySha = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_SHA;
+    this.damsDeployTag = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_TAG;
+    this.damsRepoBranch = APP_CONFIG.env.UCD_DAMS_REPO_BRANCH;
+    this.damsRepoSha = APP_CONFIG.env.UCD_DAMS_REPO_SHA;
+    this.damsRepoTag = APP_CONFIG.env.UCD_DAMS_REPO_TAG;
+
     if( APP_CONFIG.env.BUILD_TIME ) {
       this.localBuildTime = new Date(APP_CONFIG.env.BUILD_TIME).toISOString().replace('T', ' ');
     } else {

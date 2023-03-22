@@ -75,6 +75,7 @@ return html`
 
   <app-media-viewer-nav 
     .isBookReader="${this.isBookReader}"
+    .hideZoom="${this.mediaType === 'bookreader' || this.mediaType === 'video'}"
     @zoom-in="${this._onZoomIn}" 
     @br-bookview-toggle="${this._onToggleBookView}"
     @br-expand-view="${this._onExpandBookView}"

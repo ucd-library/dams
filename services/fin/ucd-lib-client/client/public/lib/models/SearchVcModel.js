@@ -22,7 +22,7 @@ class SearchVcModel extends BaseModel {
 
       // translate RecordGraph's to ui model
       const matchedItems = [];
-      // const matchedCollections = [];
+      const matchedCollections = [];
 
       e.payload.results.forEach(result => {
         // const associatedMedia = result.getChildren(result.data.id).associatedMedia;
@@ -37,19 +37,19 @@ class SearchVcModel extends BaseModel {
         let collectionId;
         if( Array.isArray(result.root.isPartOf) ) {
           collectionId = result.root.isPartOf.filter(c => c['@id'].indexOf('/collection') > -1)[0]; //result.root.isPartOf[0]['@id']; 
-        } else {
+        } else if (result.root.isPartOf) {
           collectionId = { '@id' : result.root.isPartOf['@id'] };
         }
 
-        // if( !matchedCollections.find(c => c['@id'] ===  collectionId['@id'])) {
-        //   matchedCollections.push({
-        //     '@id' : collectionId['@id'],
-        //     title : result.root.publisher ? result.root.publisher.name : '',
-        //     name : result.root.publisher ? result.root.publisher.name : '',
-        //     thumbnailUrl : result.root.thumbnailUrl,
-        //     recordCount : 42
-        //   });
-        // }
+        if( collectionId && !matchedCollections.find(c => c['@id'] ===  collectionId['@id'])) {
+          matchedCollections.push({
+            '@id' : collectionId['@id'],
+            title : result.root.publisher ? result.root.publisher.name : '',
+            name : result.root.publisher ? result.root.publisher.name : '',
+            thumbnailUrl : result.root.thumbnailUrl,
+            recordCount : 42
+          });
+        }
         
 
         matchedItems.push({
@@ -72,7 +72,7 @@ class SearchVcModel extends BaseModel {
       });
 
       e.payload.results = matchedItems;
-      // e.payload.matchedCollections = matchedCollections;
+      e.payload.matchedCollections = matchedCollections;
       // todo save translated data to store
       // todo this really will emit from this.store.setRecordSearchState() or similar
       this.emit('search-vc-update', e); 

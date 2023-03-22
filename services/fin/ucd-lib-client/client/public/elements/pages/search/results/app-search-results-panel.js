@@ -23,6 +23,7 @@ class AppSearchResultsPanel extends Mixin(LitElement)
   static get properties() {
     return {
       results : { type: Array }, // array of search results
+      totalCollections : { type: Number },
       // collectionResults : { type: Array }, // array of collection search results
       gridMargin : { type: Number }, // size in px's between each masonary layout cell
       isGridLayout : { type: Boolean }, // are we in grid layout
@@ -63,6 +64,7 @@ class AppSearchResultsPanel extends Mixin(LitElement)
       this.isMosaicLayout = true;
     }
     
+    this.totalCollections = 0;
     this.total = '0';
     this.numPerPage = 1;
     this.currentIndex = 0;
@@ -353,6 +355,19 @@ class AppSearchResultsPanel extends Mixin(LitElement)
     }));
   }
 
+  _scrollToCollections(e) {
+    e.preventDefault();
+
+    let pagination = this.shadowRoot.querySelector('ucd-theme-pagination');
+    if( pagination ) {
+      window.scrollTo({
+        top: pagination.offsetTop + 100,
+        left: 0,
+        behavior: 'smooth'
+      });        
+    }
+  }
+ 
   /**
    * @method _updateCollectionResultsVisibility
    * @description bound to collection visibility updates (see contructor).  Fired
@@ -369,8 +384,23 @@ class AppSearchResultsPanel extends Mixin(LitElement)
    _onSearchVcUpdate(e) {
     if( e.state !== 'loaded' ) return;
 
-    // this.collectionResults = [... new Set(e.payload.results.map(c => c.collectionId['@id']))]; // e.payload.results.filter(c => c.collection);
+    let collections = [];
+    e.payload.results.forEach(result => {
+      if( result.collectionId && !collections.includes(result.collectionId['@id']) ) {
+        collections.push(result.collectionId['@id']);
+      }
+    });
+    this.totalCollections = collections.length;
   }
+
+  // _onCollectionSearchUpdate(e) {
+  //   if( e.state !== 'loaded' ) return;
+  //   if( !e.payload.results.length ) {
+  //     this.totalCollections = 0;
+  //   } else {
+  //     this.totalCollections = e.payload.results.length;      
+  //   }
+  // }
 
   /**
    * @method _onCollectionClicked

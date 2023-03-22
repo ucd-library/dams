@@ -47,87 +47,41 @@ export default class AppMediaViewer extends Mixin(LitElement)
       if( !this.$.lightbox ) this.$.lightbox = document.getElementById('lightbox');
 
       this._onAppStateUpdate(await this.AppStateModel.get());
-
-      let selectedRecord = await this.AppStateModel.getSelectedRecord();
-      if( selectedRecord ) {
-        await this._onSelectedRecordUpdate(selectedRecord);
-        let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
-        if( selectedRecordMedia ) this._onSelectedRecordMediaUpdate(selectedRecordMedia);
-      }
     }
 
-    /**
-     * @method _onRecordUpdate
-     * @description from RecordModel, listen for loading events and reset UI.
-     * 
-     * @param {Object} e state event 
-     */
-    async _onRecordUpdate(e) {
-      if( e.state === 'loading' ) {
-        this.mediaType = '';
-        return;
-      }
-      // if( e.state !== 'loaded' ) return;
- 
-    }
+    async _onAppStateUpdate(e) {
+      // TODO eventually support mutiple mediaGroups, combine different media types into same viewer/nav?
+      let mediaGroup = e.selectedRecord?.clientMedia?.mediaGroups;
+      if( !mediaGroup || !mediaGroup.length ) return;
+      mediaGroup = mediaGroup[0];
+      
+      let mediaType = utils.getMediaType(mediaGroup.display).toLowerCase().replace(/object/i, '');
 
-    /**
-     * @method _onSelectedRecordUpdate
-     * @description from RecordModel
-     * 
-     * @param {Object} e state event 
-     */
-    async _onSelectedRecordUpdate(e) {
-      let bookTitle = '';
-      this.isBookReader = false;
-      e.clientMedia.mediaGroups.forEach(media => {
-        if( media.display.clientMedia.iaReader ) {
-          this.isBookReader = true;
-          bookTitle = media.display.filename;
+      if ( mediaType === "imagelist" ) {
+        mediaType = "image";
+      } else if ( mediaType === "streamingvideo" ) {
+        mediaType = "video";
+      }
+
+      if( mediaType === 'bagoffiles' && selectedRecordMedia.thumbnailUrl ) {
+        this.bagOfFilesImage = selectedRecordMedia.thumbnailUrl;
+      } else {
+        this.bagOfFilesImage = '';
+      }
+
+      if( mediaGroup.display.clientMedia.iaReader ) {
+        mediaType = 'bookreader';
+        this.isBookReader = true;
+        let brData = await this.RecordModel.getIaBookManifest(e.selectedRecord.root['@id'], mediaGroup.display.filename);
+        if( brData && brData.body ) {
+          this.mediaType = 'bookreader';
+          this.bookData = JSON.parse(brData.body);
         }
-      });
-
-      let brData = await this.RecordModel.getIaBookManifest(e.root['@id'], bookTitle);
-      if( brData && brData.body ) {
-        this.mediaType = 'bookreader';
-        this.bookData = JSON.parse(brData.body);
-      }
-    }
-
-    _onAppStateUpdate(e) {
-      if( e.selectedRecord && e.selectedRecord.index[e.location.pathname] !== e.selectedRecordMedia && e.selectedRecord.root['@id'] !== e.location.pathname ) {
-        let selectedRecordMedia = e.selectedRecord.index[e.location.pathname];
-        this.selectedRecordMediaId = selectedRecordMedia.id;
-        // }
-        // if( !e.selectedRecordMedia ) {
-        //   this.selectedRecordMediaId = '';
-        //   return this.mediaType = '';
-        // }
-        // if( e.selectedRecordMedia['@id'] === this.selectedRecordMediaId ) {
-        //   return;
-        // }
-  
-        // this.selectedRecordMediaId = e.selectedRecordMedia['@id'];
-  
-        let mediaType = utils.getMediaType(selectedRecordMedia).toLowerCase().replace(/object/i, '');
-        if ( mediaType === "imagelist" ) {
-          mediaType = "image";
-        } else if ( mediaType === "streamingvideo" ){
-          mediaType = "video";
-        }
-  
-        if( mediaType === 'bagoffiles' && selectedRecordMedia.thumbnailUrl ) {
-          this.bagOfFilesImage = selectedRecordMedia.thumbnailUrl;
-        } else {
-          this.bagOfFilesImage = '';
-        }
-  
-        this.mediaType = mediaType;
-        this.AppStateModel.setSelectedRecordMedia(selectedRecordMedia);
       }
 
+      this.mediaType = mediaType;
+      this.AppStateModel.setSelectedRecordMedia(e.selectedRecord.index[e.location.pathname]);
     }
-
 
     /**
      * @method _onZoomIn
@@ -184,7 +138,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
         brView.classList.add('fullscreen');
         brView.shadowRoot.querySelector('#BookReader').classList.add('fullscreen');
         document.body.style.overflow = 'hidden';
-        brView.br.resize();
 
         let mediaNav = this.shadowRoot.querySelector('app-media-viewer-nav');
         let brNav = brView.shadowRoot.querySelector('.BRfooter');
@@ -198,6 +151,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
           let brSearch = mediaNav.shadowRoot.querySelector('.br-search');
           if( brSearch ) brNav.prepend(brSearch);
         }
+        brView.br.resize();
       }
     }
 
@@ -214,12 +168,12 @@ export default class AppMediaViewer extends Mixin(LitElement)
         brView.classList.remove('fullscreen');
         brView.shadowRoot.querySelector('#BookReader').classList.remove('fullscreen');
         document.body.style.overflow = '';
-        brView.br.resize();
-
         let mediaNav = brView.shadowRoot.querySelector('app-media-viewer-nav');
         if( mediaNav ) {
           this.shadowRoot.querySelector('.wrapper').append(mediaNav);
         }
+
+        brView.br.resize();
       }
     }
   }

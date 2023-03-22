@@ -54,53 +54,12 @@ class AppSearchResultsCollections extends Mixin(LitElement)
    * @description _onSearchVcUpdate, fired when record search viewController updates
    * @param {*} e 
    */
-   _onSearchVcUpdate(e) {
+  _onSearchVcUpdate(e) {
     if( e.state !== 'loaded' ) return;
 
-    // if( !e.payload.matchedCollections.length ) {
-    //   this.results = [];
-    // } else {
-    //   debugger;
-    //   // TODO: transform data in view controller? data's pretty simple
-    //   // this.results.push(e.payload.results[0]['node'][0]);
-    //   // this.results[0]['title'] = this.results[0]['name'];
-    //   this.results = e.payload.matchedCollections;
-  
-    // }
-    // console.log('results: ', this.results);
-    // this.showResults = this.results.length > 0;
-  }
-
-  _onCollectionSearchUpdate(e) {
-    if( e.state !== 'loaded' ) return;
-    if( !e.payload.results.length ) {
-      this.results = [];
-    } else {
-      debugger;
-      // TODO: transform data in view controller? data's pretty simple
-      this.results.push(e.payload.results[0]['node'][0]);
-      this.results[0]['title'] = this.results[0]['name'];
-      // this.results = e.payload.matchedCollections;
-  
-    }
-    console.log('results: ', this.results);
+    this.results = e.payload.matchedCollections;
     this.showResults = this.results.length > 0;
   }
-
-  // /**
-  //  * @method _onCollectionClicked
-  //  * @description bound to app-collection-card click event
-  //  * 
-  //  * @param {Object} e click|keyup event
-  //  */
-  // _onCollectionClicked(e) {
-  //   if( e.type === 'keyup' && e.which !== 13 ) return;
-
-  //   const location = e.target.dataset.collectionid;
-  //   if( location ) {
-  //     this.AppStateModel.setLocation(location);
-  //   }
-  // }
 
 }
 

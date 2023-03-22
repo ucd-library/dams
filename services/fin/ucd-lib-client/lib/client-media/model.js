@@ -12,7 +12,6 @@ class ClientMedia {
     this.index = [];
 
     for( let node of graph ) {
-      // debugger;
       this.index[node['@id']] = node;
       if( !node._ ) node._ = {};
       node._.clientMedia = {};
@@ -32,8 +31,8 @@ class ClientMedia {
       let nodes = this.mediaGroups[i];
 
       // filter out nodes that don't have displayType or fileType
-      let displayNodes = nodes.filter(node => node._.clientMedia.displayTypeIndex != -1 && node._.clientMedia.fileTypeIndex != -1);
-      
+      let displayNodes = nodes.filter(node => node._.clientMedia.displayTypeIndex >= -1 && node._.clientMedia.fileTypeIndex >= -1);
+
       displayNodes.sort((a, b) => {
         let aCm = a._.clientMedia;
         let bCm = b._.clientMedia;
@@ -56,7 +55,13 @@ class ClientMedia {
       this.mediaGroups[i] = mediaGroup;
 
       if( displayNodes.length ) {
-        mediaGroup.display = displayNodes[0];
+        let clientMedia = displayNodes.filter(node => Object.keys(node.clientMedia).length > 0)[0];
+        if( clientMedia ) {
+          // TODO for now use first node with clientMedia, later need support for multiple media groups
+          mediaGroup.display = clientMedia;
+        } else {
+          mediaGroup.display = displayNodes[0];
+        }
       }
 
       displayNodes.forEach(node => {
@@ -96,7 +101,7 @@ class ClientMedia {
 
     definition.MEDIA_LINK.forEach(link => {
       if( !node[link] ) return;
-      let nodes = node[link];
+      let nodes = Array.isArray(node[link]) ? node[link] : [node[link]];
 
       for( let child of nodes ) {
         this._crawlMedia(child);

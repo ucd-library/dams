@@ -48,7 +48,7 @@ module.exports = {
   // facets to show on left side
   elasticSearch : {
     facets : {
-      'node.fileFormat' : {
+      '@graph.fileFormat' : {
         label : 'File Format',
         type : 'facet',
         valueMap : (value) => {
@@ -65,23 +65,27 @@ module.exports = {
             let match = value.match(/(\w*)\/(.*)/);
             return 'format: '+match[1]+' ('+match[2]+')';
           }
-          return'format: '+value;
+          return 'format: '+value;
         }
       },
-      'node.collectionId' : {
+      '@graph.isPartOf.@id' : {
         label : 'Collection',
         type : 'facet',
         valueMap : (value) => {
-          let collection = APP_CONFIG.collections.find(c => c['@id'] === value);
-          if( collection && collection.name ) return collection.name;
-          return value;
+          // let collection = APP_CONFIG.collections.find(c => c['@id'] === value);
+          // if( collection && collection.name ) return collection.name;
+          // return value;
+          return 'collection: '+value;
         }
       },
-      'node.creator' : {
+      '@graph.creator.name' : {
         label : 'Creator',
-        type : 'facet'
+        type : 'facet',
+        valueMap : (value) => {
+          return 'creator: '+value;
+        }
       },
-      'node.yearPublished' : {
+      '@graph.yearPublished' : {
         label : 'Published',
         type : 'range'
       },
@@ -90,14 +94,14 @@ module.exports = {
       //   type : 'facet',
       //   valueMap : rightsMap
       // },
-      'node.type.raw' : {
+      '@graph.type.raw' : {
         label : 'Type',
         type : 'facet',
         typeahead: 'type',
         ignore : ['CreativeWork', 'MediaObject'],
         valueMap : value => value.replace(/(.)([A-Z])/g, '$1 $2')
       },
-      'node.about.name.raw' : {
+      '@graph.about.name.raw' : {
         label : 'Subject',
         type : 'facet',
         typeahead : 'abouts'
@@ -105,8 +109,8 @@ module.exports = {
     },
 
     textFields : {
-      record : ['node.name', 'node.description', 'node.identifier', 'node.about', 'node.keywords', 'node.alternativeHeadline', 'node.indexableContent'],
-      collection : ['node.name', 'node.description', 'node.about', 'node.keywords']
+      record : ['@graph.name', '@graph.description', '@graph.identifier', '@graph.about', '@graph.keywords', '@graph.alternativeHeadline', '@graph.indexableContent'],
+      collection : ['@graph.name', '@graph.description', '@graph.about', '@graph.keywords']
     },
     
     // max number of facets filter options
@@ -115,7 +119,6 @@ module.exports = {
 
   // browse-by side images
   browseByImages : {
-    collectionPage : [],
     subjectPage : [
       {
         page : 1,
@@ -128,7 +131,29 @@ module.exports = {
         rightImgUrl : '/images/watercolors/watercolor-eastman-B-1614-right-white.png'
       }
     ],
-    creatorPage : [],
-    formatPage : []
+    creatorPage : [
+      {
+        page : 1,
+        leftImgUrl : '/images/watercolors/watercolor-campbell-mc022_2_40-left-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-eastman-P-2214-right-white.png'
+      },
+      {
+        page : 2,
+        leftImgUrl : '/images/watercolors/watercolor-everest-d3d02x-left-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-greene-D192_6_141-right-white.png'
+      }
+    ],
+    formatPage : [
+      {
+        page : 1,
+        leftImgUrl : '/images/watercolors/watercolor-027-Willow_Slough-left-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-d3b979-036-left-white.png'
+      },
+      {
+        page : 2,
+        leftImgUrl : '/images/watercolors/watercolor-d3dt26-221-right-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-d3031v-1962-right-white.png'
+      }
+    ]
   }
 };

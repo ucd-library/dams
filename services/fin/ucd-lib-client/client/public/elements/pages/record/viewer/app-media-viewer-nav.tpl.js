@@ -331,7 +331,7 @@ export default function render() {
       <ucdlib-icon icon="ucdlib-dams:fa-down-left-and-up-right-to-center"></ucdlib-icon>
     </div>  
 
-    <div @click="${this._onZoomInClicked}" ?hidden="${this.isBookReader}">
+    <div @click="${this._onZoomInClicked}" ?hidden="${this.isBookReader || this.hideZoom}">
       <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass-plus"></ucdlib-icon>
     </div>  
     <div ?hidden="${this.brFullscreen}">

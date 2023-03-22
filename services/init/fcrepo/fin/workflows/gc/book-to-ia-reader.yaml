@@ -11,6 +11,7 @@ main:
             - location: us-central1
             - project_id: digital-ucdavis-edu
             - job_container: gcr.io/ucdlib-pubreg/dams-image-utils:sandbox
+            - client_email: dams-local-dev
       - get_pages:
           call: http.get
           args:
@@ -63,7 +64,7 @@ main:
                                             args: ${["cli/book-to-ia-reader.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
                                       timeoutSeconds: 300
-                                      serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
+                                      serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - ocr_page:
           call: googleapis.run.v1.namespaces.jobs.run
@@ -105,7 +106,7 @@ main:
                                             command: "node"
                                             args: ${["cli/finalize-ia-reader.js", args.finWorkflowId]}
                                       timeoutSeconds: 300
-                                      serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
+                                      serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
       - finalize_ocr:
           call: googleapis.run.v1.namespaces.jobs.run
           args:

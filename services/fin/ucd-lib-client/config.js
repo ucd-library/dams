@@ -24,19 +24,19 @@ config.client = {
 
   env : {
     CLIENT_ENV : env,
-    FIN_APP_VERSION : process.env.FIN_APP_VERSION,
-    FIN_REPO_TAG : process.env.FIN_REPO_TAG,
-    FIN_BRANCH_NAME : process.env.FIN_BRANCH_NAME,
-    FIN_SERVER_REPO_HASH : process.env.FIN_SERVER_REPO_HASH,
-    APP_VERSION : process.env.APP_VERSION,
-    BUILD_NUM : process.env.BUILD_NUM,
-    UCD_DAMS_REPO_BRANCH : process.env.UCD_DAMS_REPO_BRANCH,
-    UCD_DAMS_REPO_TAG : process.env.UCD_DAMS_REPO_TAG,
-    UCD_DAMS_REPO_SHA : process.env.UCD_DAMS_REPO_SHA,
-    UCD_DAMS_DEPLOYMENT_SHA : process.env.UCD_DAMS_DEPLOYMENT_SHA,
-    UCD_DAMS_DEPLOYMENT_BRANCH : process.env.UCD_DAMS_DEPLOYMENT_BRANCH,
-    UCD_DAMS_DEPLOYMENT_TAG : process.env.UCD_DAMS_DEPLOYMENT_TAG,
-    FIN_SERVER_IMAGE : process.env.FIN_SERVER_IMAGE
+    FIN_APP_VERSION : process.env.FIN_APP_VERSION || '',
+    FIN_REPO_TAG : process.env.FIN_REPO_TAG || '',
+    FIN_BRANCH_NAME : process.env.FIN_BRANCH_NAME || '',
+    FIN_SERVER_REPO_HASH : process.env.FIN_SERVER_REPO_HASH || '',
+    APP_VERSION : process.env.APP_VERSION || '',
+    BUILD_NUM : process.env.BUILD_NUM || '',
+    UCD_DAMS_REPO_BRANCH : process.env.UCD_DAMS_REPO_BRANCH || '',
+    UCD_DAMS_REPO_TAG : process.env.UCD_DAMS_REPO_TAG || '',
+    UCD_DAMS_REPO_SHA : process.env.UCD_DAMS_REPO_SHA || '',
+    UCD_DAMS_DEPLOYMENT_SHA : process.env.UCD_DAMS_DEPLOYMENT_SHA || '',
+    UCD_DAMS_DEPLOYMENT_BRANCH : process.env.UCD_DAMS_DEPLOYMENT_BRANCH || '',
+    UCD_DAMS_DEPLOYMENT_TAG : process.env.UCD_DAMS_DEPLOYMENT_TAG || '',
+    FIN_SERVER_IMAGE : process.env.FIN_SERVER_IMAGE || ''
   }
 };
 

@@ -11,11 +11,11 @@ class RecordGraph {
   }
 
   init() {
-    for( let item of this.data.node ) {
+    for( let item of this.data['@graph'] ) {
       item.id = item['@id'];
 
       // if the node id is the main data id, this is the root
-      if( item['@id'] === this.data.id ) {
+      if( item['@id'] === this.data['@id'] ) {
         this.root = item;
       }
 
@@ -48,7 +48,7 @@ class RecordGraph {
       });
     });
 
-    console.log(children);
+    // console.log(children);
     return children;
   }
 

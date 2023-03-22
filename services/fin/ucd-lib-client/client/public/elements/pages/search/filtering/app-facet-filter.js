@@ -1,83 +1,58 @@
-import {PolymerElement} from "@polymer/polymer/polymer-element"
+import { LitElement} from 'lit';
 
-import FiltersInterface from '../../../interfaces/FiltersInterface'
-import RecordInterface from '../../../interfaces/RecordInterface'
-
-import template from './app-facet-filter.html'
+import render from './app-facet-filter.tpl.js'
 
 import clone from "clone"
 import "./app-facet-checkbox"
-import "@polymer/iron-list"
 
-class AppFacetFilter extends Mixin(PolymerElement)
-  .with(EventInterface, FiltersInterface, RecordInterface) {
+class AppFacetFilter extends Mixin(LitElement)
+  .with(LitCorkUtils) {
 
   static get properties() {
     return {
-      label : {
-        type : String,
-        value : ''
-      },
-      filter : {
-        type : String,
-        value : ''
-      },
-      ignore : {
-        type : Array,
-        value : () => []
-      },
-      valueMap : {
-        type : Object,
-        value : null,
-      },
-      buckets : {
-        type : Array,
-        value : () => []
-      },
-      bucketsIronList : {
-        type : Array,
-        value : () => []
-      },
-      ironListActive : {
-        type : Boolean,
-        value : false
-      },
-      notified : {
-        type : Object,
-        value : () => ({})
-      },
-      includeTypeahead : {
-        type : Boolean,
-        value : false
-      },
-      typeaheadField : {
-        type : String,
-        value : ''
-      }
+      label : { type : String },
+      filter : { type : String },
+      ignore : { type : Array },
+      valueMap : { type : Object },
+      buckets : { type : Array },
+      bucketsIronList : { type : Array },
+      ironListActive : { type : Boolean },
+      notified : { type : Object },
+      includeTypeahead : { type : Boolean },
+      typeaheadField : { type : String }
     };
   }
 
   constructor() {
     super();
     this.active = true;
+    this.render = render.bind(this);
+
     this.updateTimer = -1;
+    this.label = '';
+    this.filter = '';
+    this.ignore = [];
+    this.valueMap = null;
+    this.buckets = [];
+    this.bucketsIronList = [];
+    this.ironListActive = false;
+    this.notified = {};
+    this.includeTypeahead = false;
+    this.typeaheadField = '';
+
+    this._injectModel('FiltersModel', 'RecordModel');
   }
 
   resize() {
     requestAnimationFrame(() => {
-      this.$.list.fire('iron-resize');
+      this.shadowRoot.querySelector('#list').fire('iron-resize');
     });
-  }
-
-  static get template() {
-    let tag = document.createElement('template');
-    tag.innerHTML = template;
-    return tag;
   }
 
   _onFilterBucketsUpdate(e) {
     if( e.filter !== this.filter ) return;
-
+    // TODO temp remove oac isPartOf records
+    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org'));
     e.buckets.forEach(item => {
       if( this.notified[item.key] && !item.active ) {
         this._notifySelected(item.active, item.key);
@@ -87,20 +62,20 @@ class AppFacetFilter extends Mixin(PolymerElement)
     });
 
     if( Object.keys(e.buckets).length > 50 ) {
-      this.$.list.style.display = 'block';
-      let top = this.$.list.scrollTop;
+      this.shadowRoot.querySelector('#list').style.display = 'block';
+      let top = this.shadowRoot.querySelector('#list').scrollTop;
 
       this.bucketsIronList = e.buckets;
       this.buckets = [];
       this.ironListActive = true;
 
       // make sure we don't change scroll position
-      this.$.list.scrollTop = top;
+      this.shadowRoot.querySelector('#list').scrollTop = top;
       requestAnimationFrame(() => {
-        this.$.list.scrollTop = top;
+        this.shadowRoot.querySelector('#list').scrollTop = top;
       });
     } else {
-      this.$.list.style.display = 'none';
+      this.shadowRoot.querySelector('#list').style.display = 'none';
       this.bucketsIronList = [];
       this.buckets = e.buckets;
       this.ironListActive = false;
@@ -127,9 +102,9 @@ class AppFacetFilter extends Mixin(PolymerElement)
    * @param {String} key filter key 
    */
   onParentFilterClicked(key) {
-    let searchDoc = this._getCurrentSearchDocument();
-    this._setPaging(searchDoc, 0);
-    this._removeKeywordFilter(searchDoc, this.filter, key);
+    let searchDoc = this.RecordModel.getCurrentSearchDocument()
+    this.RecordModel.setPaging(searchDoc, 0);
+    this.RecordModel.removeKeywordFilter(searchDoc, this.filter, key);
     this.RecordModel.setSearchLocation(searchDoc);
 
     this._notifySelected(false, key);
@@ -169,14 +144,14 @@ class AppFacetFilter extends Mixin(PolymerElement)
     if( item.empty ) return;
 
     // reset typeahead incase it was active
-    this.$.typeahead.value = '';
+    this.shadowRoot.querySelector('#typeahead').value = '';
     if( this.originalBuckets ) {
       this.originalBuckets = null;
     }
 
-    let searchDoc = this._getCurrentSearchDocument();
-    this._setPaging(searchDoc, 0);
-    this._appendKeywordFilter(searchDoc, this.filter, item.key);
+    let searchDoc = this.RecordModel.getCurrentSearchDocument();
+    this.RecordModel.setPaging(searchDoc, 0);
+    this.RecordModel.appendKeywordFilter(searchDoc, this.filter, item.key);
     this.RecordModel.setSearchLocation(searchDoc);
 
     this._notifySelected(true, item.key);
@@ -186,9 +161,9 @@ class AppFacetFilter extends Mixin(PolymerElement)
     let buckets = this.getBuckets();
     let item = buckets[parseInt(e.currentTarget.getAttribute('index'))];
 
-    let searchDoc = this._getCurrentSearchDocument();
-    this._setPaging(searchDoc, 0);
-    this._removeKeywordFilter(searchDoc, this.filter, item.key);
+    let searchDoc = this.RecordModel.getCurrentSearchDocument();
+    this.RecordModel.setPaging(searchDoc, 0);
+    this.RecordModel.removeKeywordFilter(searchDoc, this.filter, item.key);
     this.RecordModel.setSearchLocation(searchDoc);
 
     this._notifySelected(false, item.key);
@@ -205,7 +180,7 @@ class AppFacetFilter extends Mixin(PolymerElement)
   }
 
   _updateTypeahead() {
-    let text = this.$.typeahead.value;
+    let text = this.shadowRoot.querySelector('#typeahead').value;
     if( !text ) {
       if( this.originalBuckets ) {
 

@@ -108,10 +108,6 @@ return html`
     font-style: italic; 
   }
 
-  .filler {
-    flex: 1;
-  }
-
   paper-spinner-lite {
     --paper-spinner-color: var(--default-secondary-color);
   }
@@ -251,6 +247,15 @@ return html`
     box-shadow: inset -2px 0 0 var(--color-aggie-gold), inset 0 -2px 0 var(--color-aggie-gold), inset 2px 0 0 var(--color-aggie-gold), inset 0 2px 0 var(--color-aggie-gold);
   }
 
+  .header a {
+    color: var(--color-aggie-blue-70);
+    cursor: pointer;
+  }
+
+  .header .photo-stack ucdlib-icon {
+    fill: var(--color-aggie-blue-60);
+  }
+
   @media( max-width: 400px ) {
     .mobile-header .row2 {
       flex-direction: column;
@@ -272,12 +277,12 @@ return html`
 </style>
 
 <div class="header">
-  <div style="flex: .25"><ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:photo-stack"></ucdlib-icon></div>
-  <div><span style="font-weight: bold">${this.total} item results</span> from <a href="">${this.totalCollections} collections</a></div>  
+  <div style="flex: .2" class="photo-stack"><ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:photo-stack"></ucdlib-icon></div>
+  <div style="flex: 1.5"><span style="font-weight: bold">${this.total} item results</span><span ?hidden="${this.results.length === 0}"> from <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collections</a></span></div>  
 
-  <div class="filler"></div>  
+  <div style="flex: 2"></div>  
 
-  <span style="margin: auto 5px">Display:</span>
+  <span style="flex: .5; text-align: right; padding-right: 1rem;">Display:</span>
   <div style="flex: .2"><ucdlib-icon icon="ucdlib-dams:result-display-grid" @click="${this._onLayoutToggle}" type="grid" class="grid-layout-icon selected-layout"></ucdlib-icon></div>
   <div style="flex: .2"><ucdlib-icon icon="ucdlib-dams:result-display-mosaic" @click="${this._onLayoutToggle}" type="mosaic" class="mosaic-layout-icon"></ucdlib-icon></div>
   <div style="flex: .2"><ucdlib-icon icon="ucdlib-dams:result-display-list" @click="${this._onLayoutToggle}" type="list" class="list-layout-icon"></ucdlib-icon></div>
@@ -389,7 +394,7 @@ return html`
   @page-change=${this._onPageClicked}>
 </ucd-theme-pagination>
 
-<div ?hidden="${!this.totalOverMaxWindow}" style="text-align: center">Digital Collections limits results to 
+<div ?hidden="${!this.totalOverMaxWindow}" style="text-align: center" class="limit-results">Digital Collections limits results to 
   10,000.  Use keywords and/or filters to refine search.
 </div>
 
