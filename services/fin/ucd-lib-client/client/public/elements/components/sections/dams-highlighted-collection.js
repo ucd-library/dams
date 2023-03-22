@@ -35,12 +35,12 @@ export default class DamsHighlightedCollection extends LitElement {
   }
 
   /**
-   * @method updated
+   * @method willUpdate
    * @description Lit lifecycle method called when element is updated.
    * @param {Map} props - Properties that have changed.
    */
-  updated(props) {
-    if ( props.has('collection') ) {
+  willUpdate(props) {
+    if ( this.collection ) {
       if ( this.collection.label ) {
         this._collectionTitle = this.collection.label;
       } else if ( this.collection.associatedMedia.name ) {

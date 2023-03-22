@@ -8,9 +8,9 @@ return html`
     <style>
         :host {
             display: block;
-            /* padding-bottom: 8px; */
-            background: black;
             box-sizing: border-box;
+            width: 60%;
+            margin: auto;
         }
 
         /*

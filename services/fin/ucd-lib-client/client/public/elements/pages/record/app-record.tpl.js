@@ -380,7 +380,7 @@ export default function render() {
       </div>
     </div>
 
-    <div class="metadata-row" id="callNumber">
+    <div ?hidden="${!this.callNumber}" class="metadata-row" id="callNumber">
       <div class="attr">Call Number</div>
       <div class="value" id="callNumberValue">${this.callNumber}</div>
     </div>

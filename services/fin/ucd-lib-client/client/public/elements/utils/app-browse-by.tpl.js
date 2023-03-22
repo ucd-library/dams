@@ -62,6 +62,10 @@ return html`
     flex: 1;
   }
 
+  .side-image.no-flex {
+    flex: 0;
+  }
+
   .results {
     width: 100%;
     box-sizing: border-box;
@@ -69,7 +73,7 @@ return html`
     padding: 2rem 10rem 0;
   }
 
-  .results > * {
+  .results > .table > * {
     display: flex;
     box-sizing: border-box;
     width: 100%;
@@ -79,7 +83,7 @@ return html`
     margin: 0;
   }
 
-  .results > * > *:first-child {
+  .results > .table > * > *:first-child {
     flex: 1;
   }
 
@@ -104,6 +108,9 @@ return html`
 
   ucd-theme-pagination {
     justify-content: center;
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
   }
 
   .left-image {
@@ -120,6 +127,24 @@ return html`
     top: 0;
   }
 
+  .card-grid {
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-gap: var(--spacing-default);
+    max-width: 93%;
+  }
+
+  .results-footer {
+    margin: 0 auto;
+    width: 65%;
+    padding: 2rem 2rem 0;
+  }
+
+  .results-footer > * {
+    margin: 0 3rem;
+  }
+
   @media (max-width: 1310px) {
     .results {
       padding: 2rem 2rem 0;
@@ -128,7 +153,8 @@ return html`
     .side-image .right-image {
       display: none;
     }
-    .header {
+    .header,
+    .results-footer {
       width: 65%;
     }
     h1 {
@@ -142,7 +168,8 @@ return html`
     .results {
       padding: 2rem 5rem 0;
     }
-    .header {
+    .header,
+    .results-footer {
       width: auto;
     }
   }
@@ -174,32 +201,49 @@ return html`
 </div>
 
 <div class="body">
-  <div class="side-image">
-    <img class="left-image" ?hidden=${this.results.length < 12} src="${this.leftImgUrl}"/>
+  <div class="side-image ${this.label.toLowerCase() === 'collection' ? 'no-flex' : ''}">
+    <img class="left-image" ?hidden=${this.results.length < 12 || this.label.toLowerCase() === 'collection'} src="${this.leftImgUrl}"/>
   </div>
+
+
+
   <div class="results">
-    <h5>
-      <div>${this.label}</div>
-      <div>Items</div>
-    </h5>
-    ${this.results.map(item => html`
-      <div class="list-item">
-        <div class="list-key"><a href="${this.getFilterUrl(item)}">${item.key}</a></div>
-        <div class="list-count">${item.count}</div>
-      </div>
-    `)}
+    <div class="table" ?hidden="${this.label.toLowerCase() === 'collection'}">
+      <h5>
+        <div>${this.label}</div>
+        <div>Items</div>
+      </h5>
 
-    <div class="dotted-line-break"></div>
+      ${this.results.map(item => html`
+        <div class="list-item">
+          <div class="list-key"><a href="${this.getFilterUrl(item)}">${item.key}</a></div>
+          <div class="list-count">${item.count}</div>
+        </div>
+      `)}
+    </div>
 
-    <ucd-theme-pagination
-      current-page=${this.currentPage}
-      max-pages=${this.totalPages}
-      @page-change=${this._onPageClicked}>
-    </ucd-theme-pagination>
+    <div ?hidden="${this.label.toLowerCase() !== 'collection'}">
 
+      <div class="card-grid">
+        ${this.results.map(res => html`
+          <dams-collection-card data-id="${this.label.toLowerCase() === 'collection' ? res['key'] : ''}" @click=${this._onCollectionClicked}></dams-collection-card>
+        `)}
+      </div>  
+
+    </div>
+
+    <div class="results-footer">
+      <div class="dotted-line-break"></div>
+
+      <ucd-theme-pagination
+        current-page=${this.currentPage}
+        max-pages=${this.totalPages}
+        @page-change=${this._onPageClicked}>
+      </ucd-theme-pagination>
+    </div>
   </div>
-  <div class="side-image">
-    <img class="right-image" ?hidden=${this.results.length < 12} src="${this.rightImgUrl}"/>
+  <div class="side-image ${this.label.toLowerCase() === 'collection' ? 'no-flex' : ''}">
+    <img class="right-image" ?hidden=${this.results.length < 12 || this.label.toLowerCase() === 'collection'} src="${this.rightImgUrl}"/>
   </div>
 </div>
 

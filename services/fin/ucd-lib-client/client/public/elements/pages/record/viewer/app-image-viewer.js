@@ -37,7 +37,8 @@ export default class AppImageViewer extends Mixin(LitElement)
   }
 
   _onAppStateUpdate(e) {
-    if( e.selectedRecord.index[e.location.pathname] !== e.selectedRecordMedia ) { // && e.selectedRecord.root['@id'] !== e.location.pathname ) {
+    // TODO change to use clientMedia instead of selectedrecord root node?
+    if( e.selectedRecord.index[e.location.pathname] !== e.selectedRecordMedia ) {
       let selectedRecordMedia = e.selectedRecord.index[e.location.pathname];
       this._onSelectedRecordMediaUpdate(selectedRecordMedia);
     }
@@ -63,6 +64,7 @@ export default class AppImageViewer extends Mixin(LitElement)
       this.media.image = this.media.hasPart[0].image;
     }
 
+    debugger;
     if ( this.media.image.width < this.height) this.height = this.media.image.width;
     let url = this.MediaModel.getImgUrl(this.media.image.url, '', this.height);
     let r = 600 / this.media.image.height;

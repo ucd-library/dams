@@ -280,7 +280,7 @@ class AppRecord extends Mixin(LitElement)
       // pull image with position 1
       this.arkDoi = [
         location.pathname.split('/media')[0],
-        record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].image.url,
+        record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].image.url.replace('/fcrepo/rest', ''),
       ];
   
       this.fedoraLinks = [

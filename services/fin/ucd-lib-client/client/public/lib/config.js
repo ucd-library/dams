@@ -115,7 +115,6 @@ module.exports = {
 
   // browse-by side images
   browseByImages : {
-    collectionPage : [],
     subjectPage : [
       {
         page : 1,
@@ -128,7 +127,29 @@ module.exports = {
         rightImgUrl : '/images/watercolors/watercolor-eastman-B-1614-right-white.png'
       }
     ],
-    creatorPage : [],
-    formatPage : []
+    creatorPage : [
+      {
+        page : 1,
+        leftImgUrl : '/images/watercolors/watercolor-campbell-mc022_2_40-left-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-eastman-P-2214-right-white.png'
+      },
+      {
+        page : 2,
+        leftImgUrl : '/images/watercolors/watercolor-everest-d3d02x-left-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-greene-D192_6_141-right-white.png'
+      }
+    ],
+    formatPage : [
+      {
+        page : 1,
+        leftImgUrl : '/images/watercolors/watercolor-027-Willow_Slough-left-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-d3b979-036-left-white.png'
+      },
+      {
+        page : 2,
+        leftImgUrl : '/images/watercolors/watercolor-d3dt26-221-right-white.png',
+        rightImgUrl : '/images/watercolors/watercolor-d3031v-1962-right-white.png'
+      }
+    ]
   }
 };

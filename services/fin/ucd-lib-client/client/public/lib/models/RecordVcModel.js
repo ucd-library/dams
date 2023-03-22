@@ -19,6 +19,15 @@ class RecordVcModel extends BaseModel {
    */
   translate(e) {
     if( e && e.clientMedia ) {
+
+      let callNumber = '';
+      if( e.root.identifier ) {
+        if( !Array.isArray(e.root.identifier) ) e.root.identifier = [e.root.identifier];
+        e.root.identifier.forEach(id => {
+          let match = id.match(/[a-zA-Z]{1,2}-\d{3}/g);
+          if( match ) callNumber = match[0];
+        });  
+      }
       // translate collection and related nodes/items to ui model
       const item = {
         '@id' : e.root['@id'],
@@ -30,12 +39,8 @@ class RecordVcModel extends BaseModel {
         clientMedia : e.clientMedia,
         date : e.root.yearPublished,
         publisher : !e.root.publisher ? '' : e.root.publisher.name,
-        keywords : !e.root.about.length ? [e.root.about] : e.root.about,
-
-        callNumber : 'D-42',
-        // callNumber : e.root.identifier[0].split(';')[1].trim(),
-        // .filter(id => id.match(/^.*,.*box:.*,.*folder:.*$/i)
-
+        keywords : Array.isArray(e.root.about) ? e.root.about : e.root.about || [],
+        callNumber,
         arkDoi : ['?'],
         fedoraLinks : ['?'],
         citationText : '?',

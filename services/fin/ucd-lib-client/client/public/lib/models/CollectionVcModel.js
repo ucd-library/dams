@@ -34,13 +34,22 @@ class CollectionVcModel extends BaseModel {
         // });
       // }
 
+      let callNumber = '';
+      if( rootNode.identifier ) {
+        if( !Array.isArray(rootNode.identifier) ) rootNode.identifier = [rootNode.identifier];
+        rootNode.identifier.forEach(id => {
+          let match = id.match(/[a-zA-Z]{1,2}-\d{3}/g);
+          if( match ) callNumber = match[0];
+        });  
+      }
+
       const collection = {
         id : e.payload['@id'],
         description : rootNode.description,
         title : rootNode.name,
         thumbnailUrl : rootNode.image.url,
         keywords : rootNode.keywords || [],
-        callNumber : 'D-42', // TODO where to source?
+        callNumber,
         // items : [
         //   e.payload.node
         // ],

@@ -353,7 +353,7 @@ export default function render() {
       </div>
       <div class="collection-header">
         <h1>${this.title}</h1>
-        <h3>Collection #${this.callNumber}</h3>
+        <h3 ?hidden="${!this.callNumber}">Collection #${this.callNumber}</h3>
         <a href="${this._href}" class="btn--alt btn--round">View ${this.items.length} items</a>
       </div>
     </div>

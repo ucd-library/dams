@@ -2,6 +2,7 @@ import { LitElement } from 'lit';
 import render from "./app-browse-by.tpl.js";
 
 // import "@ucd-lib/cork-pagination";
+import "../components/cards/dams-collection-card";
 
 import config from '../../lib/config';
 
@@ -51,7 +52,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
 
     this.reset();
 
-    this._injectModel('BrowseByModel', 'AppStateModel', 'RecordModel');
+    this._injectModel('BrowseByModel', 'AppStateModel', 'RecordModel', 'CollectionModel');
   }
 
   firstUpdated() {
@@ -157,6 +158,9 @@ export default class AppBrowseBy extends Mixin(LitElement)
   _renderResults() {
     let sort = this.sortByOptions.find(item => item.selected);
 
+    // TODO temp remove oac isPartOf ?
+    // this.allResults.payload = this.allResults.payload.filter(r => !r.key.includes('oac.cdlib.org/findaid'));
+
     if( this.sortedAs !== sort.type ) {
       this.allResults.payload.sort((a, b) => {
         if( sort.type === 'count' ) {
@@ -171,7 +175,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
       });
       this.sortedAs = sort.type;
     }
-
+    
     this.results = this.allResults.payload.slice(
       this.currentIndex, 
       this.currentIndex + this.resultsPerPage 

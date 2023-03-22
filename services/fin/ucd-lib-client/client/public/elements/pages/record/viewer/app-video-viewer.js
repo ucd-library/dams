@@ -55,13 +55,15 @@ export default class AppVideoViewer extends Mixin(LitElement)
     }
 
     this.fullPath = e.location.fullpath;
+
+    // TODO change to support multiple media groups
+    this._onSelectedRecordMediaUpdate(
+      e.selectedRecord.clientMedia.mediaGroups[0].display
+    );
   }
 
   async firstUpdated(e) {
-    let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
-    if( selectedRecordMedia ) this._onSelectedRecordMediaUpdate(selectedRecordMedia);
-
-    this.fullPath = (await this.AppStateModel.get()).location.fullpath;
+    this._onAppStateUpdate(await this.AppStateModel.get());
     
     // webpack module is base64 encoded URL, check if this happened 
     // and decode, then set svg to innerHtml inside the shadow dom.
@@ -163,7 +165,9 @@ export default class AppVideoViewer extends Mixin(LitElement)
     let mediaType = utils.getMediaType(this.media);
     let manifestUri = config.fcrepoBasePath+this.media['@id'];
 
-    if( mediaType === 'StreamingVideo' ) {
+    if( this.media.clientMedia?.streamingVideo?.manifest ) {
+      manifestUri = this.media.clientMedia.streamingVideo.manifest;
+    } else if( mediaType === 'StreamingVideo' ) {
       manifestUri += '/playlist.m3u8'
     }
 

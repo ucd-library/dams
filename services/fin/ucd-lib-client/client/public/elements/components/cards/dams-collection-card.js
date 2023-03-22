@@ -12,11 +12,13 @@ import render from "./dams-collection-card.tpl.js";
  * @prop {Number} itemCt - The total number of items in the collections.
  * @prop {String} href - Link to the collection landing page.
  */
-export default class DamsCollectionCard extends LitElement {
+export default class DamsCollectionCard extends Mixin(LitElement)
+  .with(LitCorkUtils) {
 
   static get properties() {
     return {
       collection: {type: Object},
+      id: {type: String, attribute: 'data-id'},
       imgSrc: {type: String, attribute: 'img-src'},
       cardTitle: {type: String, attribute: 'card-title'},
       itemCt: {type: Number, attribute: 'item-ct'},
@@ -28,20 +30,27 @@ export default class DamsCollectionCard extends LitElement {
   constructor() {
     super();
     this.render = render.bind(this);
+ 
+    this.collection = {};
+    this.id = "";
     this.imgSrc = "";
     this.cardTitle = "";
     this.itemCt = 0;
     this.href = "";
     this.darkBg = false;
+
+    this._injectModel('CollectionModel');
   }
 
   /**
-   * @method willUpdate
-   * @description Lit lifecycle method called when element is updated.
+   * @method firstUpdated
+   * @description Lit lifecycle method called when element is first updated.
    * @param {Map} props - Properties that have changed.
    */
-  willUpdate(props) {
-    if ( props.has('collection') && this.collection['@id'] ) {
+  firstUpdated(props) {
+    if ( this.id && Object.keys(this.collection).length === 0 ) { 
+      this._getCollection(this.id);
+    } else if ( this.collection && this.collection['@id'] ) {
       if ( this.collection.associatedMedia ) {
         this.imgSrc = this.collection.thumbnailUrl ? this.collection.thumbnailUrl : this.collection.associatedMedia.thumbnailUrl;
         this.cardTitle = this.collection.label ? this.collection.label : this.collection.associatedMedia.name;
@@ -55,6 +64,20 @@ export default class DamsCollectionCard extends LitElement {
       }
       this.darkBg = props.has('darkBg');
     }
+  }
+
+  async _getCollection(id) {
+    await this.CollectionModel.get(id);
+  }
+
+  _onCollectionUpdate(e) {
+    if ( e.state !== 'loaded' || e.payload.results.id !== this.id ) return;
+
+    this.collection = e.payload.results;
+    this.imgSrc = this.collection.thumbnailUrl;
+    this.cardTitle = this.collection.title;
+    this.itemCt = 42;
+    this.href = this.collection.id;
   }
 }
 
