@@ -1,0 +1,35 @@
+{
+  "dynamic": false,
+
+  "properties" : {
+
+    "@id" : {
+      "type" : "keyword"
+    },
+
+    "bookId" : {
+      "type" : "keyword"
+    },
+
+    "archivalGroup" : {
+      "type" : "keyword"
+    },
+
+    "page" : {
+      "type" : "integer"
+    },
+
+    "content" : {
+      "type" : "text"
+    },
+
+    "_.updated" : {
+      "type" : "date"
+    },
+
+    "roles" : {
+      "type":  "keyword"
+    }
+
+  }
+}

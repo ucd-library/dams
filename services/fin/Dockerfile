@@ -22,6 +22,9 @@ COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/models models
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/index.js .
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/config.js .
 
+# development client build, so we have one by default
+RUN npm run build
+# production client build
 RUN npm run dist
 
 # Models 
