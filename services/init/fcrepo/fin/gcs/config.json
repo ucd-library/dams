@@ -2,13 +2,13 @@
   "sync" : {
     "containers" : [
       {
-        "bucket" : "dams-client-{{DATA_ENV}}",
+        "bucket" : "dams-client-{{GCS_BUCKET_ENV}}",
         "basePath" : "/application/ucd-lib-client/item",
         "direction" : "fcrepo-to-gcs",
         "initDataHydration" : true
       },
       {
-        "bucket" : "dams-client-{{DATA_ENV}}",
+        "bucket" : "dams-client-{{GCS_BUCKET_ENV}}",
         "basePath" : "/application/ucd-lib-client/collection",
         "direction" : "fcrepo-to-gcs",
         "initDataHydration" : true

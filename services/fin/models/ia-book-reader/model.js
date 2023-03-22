@@ -1,10 +1,13 @@
-const {ElasticSearchModel, logger, gc, config} = require('@ucd-lib/fin-service-utils');
+const {dataModels, logger, gc, config} = require('@ucd-lib/fin-service-utils');
+const schema = require('./schema.json');
 const {gcs} = gc;
+const {FinEsDataModel} = dataModels;
 
-class IaBookReader extends ElasticSearchModel {
+class IaBookReader extends FinEsDataModel {
 
   constructor() {
     super('ia-book-reader');
+    this.schema = schema;
     this.transformService = 'ia-book-reader-transform';
     this.expectGraph = false;
   }

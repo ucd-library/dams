@@ -4,9 +4,9 @@
     "http://digital.ucdavis.edu/schema#Service",
     "http://digital.ucdavis.edu/schema#ProxyService"
   ],
-  "urlTemplate": "http://essync:3000/elastic-search/{{fcPath}}{{svcPath}}",
+  "urlTemplate": "http://es-index-management:3000/{{fcPath}}{{svcPath}}",
   "description": "Manage Elastic Search aliases and indexes",
-  "identifier": "elastic-search",
+  "identifier": "es-index-management",
   "title": "Elastic Search",
   "@context": {
     "title": {

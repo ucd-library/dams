@@ -427,7 +427,7 @@ export default function render() {
 
     <h2 class="admin-heading">Debug ${this.collectionId}</h2>
     <div class="admin-content">
-      <h4 class="admin-box-title">essync</h4>
+      <h4 class="admin-box-title">dbsync</h4>
       <!-- json injected admin data -->
     </div>
 
