@@ -51,8 +51,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     async _onAppStateUpdate(e) {
       // TODO eventually support mutiple mediaGroups, combine different media types into same viewer/nav?
-      let mediaGroup = e.selectedRecord.clientMedia.mediaGroups;
-      if( !mediaGroup ) return;
+      let mediaGroup = e.selectedRecord?.clientMedia?.mediaGroups;
+      if( !mediaGroup || !mediaGroup.length ) return;
       mediaGroup = mediaGroup[0];
       
       let mediaType = utils.getMediaType(mediaGroup.display).toLowerCase().replace(/object/i, '');

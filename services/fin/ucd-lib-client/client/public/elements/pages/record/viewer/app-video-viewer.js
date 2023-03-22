@@ -64,26 +64,28 @@ export default class AppVideoViewer extends Mixin(LitElement)
 
   async firstUpdated(e) {
     this._onAppStateUpdate(await this.AppStateModel.get());
+
+    requestAnimationFrame(async () => {
+      // webpack module is base64 encoded URL, check if this happened 
+      // and decode, then set svg to innerHtml inside the shadow dom.
+      if( SPRITE_SHEET.indexOf('data:image/svg+xml;base64') > -1 ) {
+        SPRITE_SHEET = atob(SPRITE_SHEET.replace('data:image/svg+xml;base64,', ''));
+      }
+      this.shadowRoot.querySelector('#sprite-plyr').innerHTML = SPRITE_SHEET;
     
-    // webpack module is base64 encoded URL, check if this happened 
-    // and decode, then set svg to innerHtml inside the shadow dom.
-    if( SPRITE_SHEET.indexOf('data:image/svg+xml;base64') > -1 ) {
-      SPRITE_SHEET = atob(SPRITE_SHEET.replace('data:image/svg+xml;base64,', ''));
-    }
-    this.shadowRoot.querySelector('#sprite-plyr').innerHTML = SPRITE_SHEET;
-  
-    // decide where to put css
-    // The PLYR library isn't aware of shadydom so we need to manually
-    // place our styles in document.head w/o shadydom touching them.
-    let plyrStyles = document.createElement('style');
-    plyrStyles.innerHTML = VIDEO_STYLES;
-    if( window.ShadyDOM && window.ShadyDOM.inUse ) {
-      document.head.appendChild(plyrStyles);
-      this.hideControls = false;
-    } else {
-      this.shadowRoot.appendChild(plyrStyles);
-      this.hideControls = true;
-    }
+      // decide where to put css
+      // The PLYR library isn't aware of shadydom so we need to manually
+      // place our styles in document.head w/o shadydom touching them.
+      let plyrStyles = document.createElement('style');
+      plyrStyles.innerHTML = VIDEO_STYLES;
+      if( window.ShadyDOM && window.ShadyDOM.inUse ) {
+        document.head.appendChild(plyrStyles);
+        this.hideControls = false;
+      } else {
+        this.shadowRoot.appendChild(plyrStyles);
+        this.hideControls = true;
+      }
+    });    
   }
 
   /**

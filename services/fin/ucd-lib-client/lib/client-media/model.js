@@ -55,7 +55,13 @@ class ClientMedia {
       this.mediaGroups[i] = mediaGroup;
 
       if( displayNodes.length ) {
-        mediaGroup.display = displayNodes[0];
+        let clientMedia = displayNodes.filter(node => Object.keys(node.clientMedia).length > 0)[0];
+        if( clientMedia ) {
+          // TODO for now use first node with clientMedia, later need support for multiple media groups
+          mediaGroup.display = clientMedia;
+        } else {
+          mediaGroup.display = displayNodes[0];
+        }
       }
 
       displayNodes.forEach(node => {

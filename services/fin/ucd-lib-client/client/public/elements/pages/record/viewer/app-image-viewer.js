@@ -64,7 +64,6 @@ export default class AppImageViewer extends Mixin(LitElement)
       this.media.image = this.media.hasPart[0].image;
     }
 
-    debugger;
     if ( this.media.image.width < this.height) this.height = this.media.image.width;
     let url = this.MediaModel.getImgUrl(this.media.image.url, '', this.height);
     let r = 600 / this.media.image.height;
