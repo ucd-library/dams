@@ -51,7 +51,8 @@ class AppFacetFilter extends Mixin(LitElement)
 
   _onFilterBucketsUpdate(e) {
     if( e.filter !== this.filter ) return;
-
+    // TODO temp remove oac isPartOf records
+    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org'));
     e.buckets.forEach(item => {
       if( this.notified[item.key] && !item.active ) {
         this._notifySelected(item.active, item.key);

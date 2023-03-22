@@ -65,21 +65,25 @@ module.exports = {
             let match = value.match(/(\w*)\/(.*)/);
             return 'format: '+match[1]+' ('+match[2]+')';
           }
-          return'format: '+value;
+          return 'format: '+value;
         }
       },
-      '@graph.collectionId' : {
+      '@graph.isPartOf.@id' : {
         label : 'Collection',
         type : 'facet',
         valueMap : (value) => {
-          let collection = APP_CONFIG.collections.find(c => c['@id'] === value);
-          if( collection && collection.name ) return collection.name;
-          return value;
+          // let collection = APP_CONFIG.collections.find(c => c['@id'] === value);
+          // if( collection && collection.name ) return collection.name;
+          // return value;
+          return 'collection: '+value;
         }
       },
       '@graph.creator.name' : {
         label : 'Creator',
-        type : 'facet'
+        type : 'facet',
+        valueMap : (value) => {
+          return 'creator: '+value;
+        }
       },
       '@graph.yearPublished' : {
         label : 'Published',

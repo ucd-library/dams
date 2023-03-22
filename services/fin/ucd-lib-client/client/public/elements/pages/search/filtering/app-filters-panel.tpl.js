@@ -116,7 +116,7 @@ export default function render() {
   </div>
 
   <app-tabs 
-    tabs="${this.tabs}" 
+    .tabs="${this.tabs}" 
     selected="${this.selectedTab}" 
     ?hidden="${!this.collectionMode}">
   </app-tabs>
