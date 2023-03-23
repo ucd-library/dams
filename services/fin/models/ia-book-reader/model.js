@@ -1,10 +1,14 @@
-const {ElasticSearchModel, logger, gc, config} = require('@ucd-lib/fin-service-utils');
+const {dataModels, logger, gc, config} = require('@ucd-lib/fin-service-utils');
+const schema = require('./schema.json');
+const clone = require('clone');
 const {gcs} = gc;
+const {FinEsDataModel} = dataModels;
 
-class IaBookReader extends ElasticSearchModel {
+class IaBookReader extends FinEsDataModel {
 
   constructor() {
     super('ia-book-reader');
+    this.schema = schema;
     this.transformService = 'ia-book-reader-transform';
     this.expectGraph = false;
   }
@@ -46,9 +50,9 @@ class IaBookReader extends ElasticSearchModel {
     // if we have a result, check the hash
     if( results.hits.total.value > 0 ) {
       let page = results.hits.hits[0]._source;
-      if( page === json.iaManifestHash ) {
-        logger.info(`ES Indexer skipping ${this.moduleName} book update: ${json.path}.  Manifest hash has not changed.`);
-        return;
+      if( page && page._ && page._.iaManifestHash === json.iaManifestHash ) {
+        logger.info(`ES Indexer skipping ${this.modelName} book update: ${json.path}.  Manifest hash has not changed.`);
+        return {message: `ES Indexer skipping ${this.modelName} book update: ${json.path}.  Manifest hash has not changed.`};
       }
     }
 
@@ -58,11 +62,12 @@ class IaBookReader extends ElasticSearchModel {
     // remove old pages
     await this.remove(json.path, index);
 
-    let roles = await this.getEsRoles({
+    let roles = await this.getAccessRoles({
       '@id' : json.archivalGroup
     });
 
     // index new pages
+    let dbResponses = [];
     for( let page of json.iaManifest.data ) {
       page['@id'] = page.path.replace(/^\/fcrepo\/rest/, '');
       delete page.path;
@@ -70,20 +75,31 @@ class IaBookReader extends ElasticSearchModel {
       page.bookId = json.path;
       page.archivalGroup = json.archivalGroup;
       page.roles = roles;
+
+      // set page metadata
+      if( json._ ) {
+        page._ = clone(json._);
+      } else {
+        page._ = {};
+      }
       page._.iaManifestHash = json.iaManifestHash;
 
-      await this.client.index({
+      let response = await this.client.index({
         index,
         id : page['@id'],
         body : page
       });
+
+      dbResponses.push(response);
     }
+
+    return {updates: dbResponses};
   }
 
   async remove(id, index) {
     if( !index ) index = this.writeIndexAlias;
 
-    logger.info(`ES Indexer removing ${this.moduleName} book: ${id} pages`);
+    logger.info(`ES Indexer removing ${this.modelName} book: ${id} pages`);
     return await this.client.deleteByQuery({
       index,
       body : {

@@ -31,10 +31,14 @@ module.exports = async function(path, graph, headers, utils) {
         let workflowInfo = await fetch(config.gateway.host+config.fcrepo.root+iaReaderSupport.url);
         workflowInfo = await workflowInfo.json();
 
+        iaManifest = config.gateway.host+config.fcrepo.root+item['@id'] + '/svc:gcs/' + workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
+        
 
         
-        iaManifest = config.gateway.host+config.fcrepo.root+item['@id'] + '/svc:gcs/' + workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
-        iaManifestHash = await gcs.getGcsFileMetadata('gs://'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json');
+        iaManifestHash = await gcs.getGcsFileMetadata('gs://'+workflowInfo.data.gcsBucket+item['@id']+'/'+workflowInfo.data.gcsSubpath+'/manifest.json');
+        if( iaManifestHash ) {
+          iaManifestHash = iaManifestHash.md5Hash;
+        }
       }
     }
   }

@@ -1,9 +1,12 @@
-const {ElasticSearchModel} = require('@ucd-lib/fin-service-utils');
+const {dataModels} = require('@ucd-lib/fin-service-utils');
+const schema = require('./schema.json');
+const {FinEsDataModel} = dataModels;
 
-class ApplicationsModel extends ElasticSearchModel {
+class ApplicationsModel extends FinEsDataModel {
 
   constructor() {
     super('application');
+    this.schema = schema;
   }
 
   is(id) {

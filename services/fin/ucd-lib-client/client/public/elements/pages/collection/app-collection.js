@@ -23,7 +23,7 @@ class AppCollection extends Mixin(LitElement)
       items : { type : Array }, 
       yearPublished : { type : Number }, 
       highlightedItems : { type : Array },
-      essync : { type : Object },
+      dbsync : { type : Object },
       watercolor : { type : String },
       displayData : { type : Array },
       selectedFilename : { type : String }
@@ -45,7 +45,7 @@ class AppCollection extends Mixin(LitElement)
     this.items = [];
     this.yearPublished = 0;
     this.highlightedItems = [];
-    this.essync = {};
+    this.dbsync = {};
     this.watercolor = 'rose';
     this.displayData = [];
     this.selectedFilename = '';
@@ -134,10 +134,10 @@ class AppCollection extends Mixin(LitElement)
   
           const response = adminData.body;
           if( response && !this.adminRendered ) {
-            this.essync = response.essync;
+            this.dbsync = response.dbsync;
   
             this.shadowRoot.querySelector('.admin-content')
-              .appendChild((new JSONFormatter(Object.values(this.essync)[0], 1)).render());
+              .appendChild((new JSONFormatter(Object.values(this.dbsync)[0], 1)).render());
             this.adminRendered = true;
             this.shadowRoot.querySelector('.admin-heading').style.display = '';
             this.shadowRoot.querySelector('.admin-content').style.display = '';  
