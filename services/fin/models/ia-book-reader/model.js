@@ -9,12 +9,13 @@ class IaBookReader extends FinEsDataModel {
   constructor() {
     super('ia-book-reader');
     this.schema = schema;
+    this.bindToWorkflow = 'book-to-ia-reader';
     this.transformService = 'ia-book-reader-transform';
     this.expectGraph = false;
   }
 
-  is(id) {
-    if( id.match(/^\/item\//) ) return true;
+  is(id, types=[], workflows=[]) {
+    if( workflows.includes(this.bindToWorkflow) ) return true;
     return false;
   }
 
