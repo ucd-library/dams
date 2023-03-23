@@ -1,7 +1,7 @@
 {
   "defaults" : {
     "tmpGcsBucket" : "dams-workflow-tmp-space",
-    "gcsBucket" : "dams-client-products",
+    "gcsBucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
     "notifyOnSuccess" : "/svc:reindex"
   },
 
