@@ -46,6 +46,10 @@
       "type": "text"
     },
 
+    "@graph.itemCount" : {
+      "type": "integer"
+    },
+
     "@graph.coverage" : {
       "type":  "keyword"
     },
