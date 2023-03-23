@@ -306,6 +306,11 @@ module.exports = async function(path, graph, headers, utils) {
     }
   }
 
+  // only add if there is content
+  if( Object.keys(item.clientMedia).length === 0 ) {
+    delete item.clientMedia;
+  }
+
   if( !item._.graphId && item['@type'].includes(BINARY) ) {
     item._.graphId = item['@id'];
   }

@@ -279,8 +279,14 @@ class ImageUtils {
     files = files[0];
 
     let iaManifest = {
-      data : []
+      data : [],
+      hashes : {}
     };
+
+    for( let file of files ) {
+      let fileParts = path.parse(file.name);
+      iaManifest.hashes[fileParts.base] = file.metadata.md5Hash;
+    }
 
     for( let file of files ) {
       let fileParts = path.parse(file.name);
@@ -290,14 +296,21 @@ class ImageUtils {
         let t = (await gcs.readFileToMemory(baseGcsPath+'/'+fileParts.base)).toString('utf-8');
         let pageData = JSON.parse(t);
 
+        // lookup the md5 hashes for file
+        pageData.md5Hashes = {
+          jpg : iaManifest.hashes[fileParts.name+'.jpg'],
+          djvu : iaManifest.hashes[fileParts.name+'.djvu']
+        };
+
         pageData.width = parseInt(pageData.width);
         pageData.height = parseInt(pageData.height);
         pageData.page = parseInt(fileParts.name.split('-').pop());
         pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/'+file.bucket.name+'/'+workflowInfo.data.gcsSubpath+'/'+fileParts.name+'.jpg';
         iaManifest.data.push(pageData);
       }
-
     }
+
+    delete iaManifest.hashes;
 
     if( iaManifest.data.length === 0 ) {
       console.log('No page files found.  Aborting');
@@ -314,6 +327,8 @@ class ImageUtils {
       });
 
     for( let file of files ) {
+      if( fileParts.base === 'manifest.json' ) continue;
+
       let fileParts = path.parse(file.name);
       if( fileParts.ext === '.json' ) {
         await file.delete();
