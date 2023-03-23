@@ -97,26 +97,21 @@ export default function render() {
     font-style: italic;
   }
 
-  .overflow::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 7px;
-    background-color: var(--color-aggie-blue-60);
+  .overflow {
+    overflow-y: scroll;
   }
 
   .overflow::-webkit-scrollbar {
-    width: 9px;
-    background-color: transparent;
-    padding-right: 1rem;
+    width: 10px;
   }
-
-  .overflow::-webkit-scrollbar-thumb {
-    border-radius: 7px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: var(--color-aggie-blue-80);
-  }
-
   .overflow::-webkit-scrollbar-track {
-    width: 2px;
+    background: var(--color-aggie-blue-60);
+    border-left: 4px solid var(--color-aggie-blue-40);
+    border-right: 4px solid var(--color-aggie-blue-40);
+  }
+  .overflow::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background: var(--color-aggie-blue-80);
   }
 
   /* basic support for FF, Chrome/Safari should support -webkit above */

@@ -32,7 +32,7 @@ export default function render() {
   #fillLine {
     position: absolute;
     cursor: move;
-    background-color: var(--default-primary-color);
+    background-color: var(--color-aggie-blue-80) ;
     height: 3px;
   }
 
@@ -48,7 +48,7 @@ export default function render() {
     height: 15px;
     width: 15px;
     border-radius: 15px;
-    background-color: var(--default-primary-color);
+    background-color: var(--color-aggie-blue-80) ;
     transition: all 150ms linear;
   }
 
