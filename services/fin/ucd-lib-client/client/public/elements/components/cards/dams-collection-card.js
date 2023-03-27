@@ -23,7 +23,7 @@ export default class DamsCollectionCard extends Mixin(LitElement)
       cardTitle: {type: String, attribute: 'card-title'},
       itemCt: {type: Number, attribute: 'item-ct'},
       href: {type: String},
-      darkBg: {type: Boolean}
+      darkBg: {type: Boolean, attribute: 'data-dark-bg'}
     };
   }
 
@@ -62,8 +62,8 @@ export default class DamsCollectionCard extends Mixin(LitElement)
         this.itemCt = this.collection.count;
         this.href = this.collection.id;
       }
-      this.darkBg = props.has('darkBg');
     }
+    this.darkBg = this.attributes['data-dark-bg'] ? true : false;
   }
 
   async _getCollection(id) {

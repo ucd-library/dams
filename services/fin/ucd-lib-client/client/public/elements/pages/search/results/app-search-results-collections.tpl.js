@@ -49,7 +49,7 @@ return html`
       <div style="text-align:center" class="collections-content">
         <div class="card-grid">
           ${this.results.map(res => html`
-            <dams-collection-card .darkBg="${true}" data-id="${res['@id']}" @click=${this._onCollectionClicked}></dams-collection-card>
+            <dams-collection-card data-dark-bg data-id="${res['@id']}" @click=${this._onCollectionClicked}></dams-collection-card>
           `)}
         </div>  
       </div>
