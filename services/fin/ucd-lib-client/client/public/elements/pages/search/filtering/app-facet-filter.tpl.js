@@ -109,12 +109,16 @@ export default function render() {
     border-left: 4px solid var(--color-aggie-blue-40);
     border-right: 4px solid var(--color-aggie-blue-40);
   }
+  .overflow[no-overflow]::-webkit-scrollbar-track {
+    background: transparent;
+    border: none;
+  }
   .overflow::-webkit-scrollbar-thumb {
     border-radius: 6px;
     background: var(--color-aggie-blue-80);
   }
 
-  /* basic support for FF, Chrome/Safari should support -webkit above */
+  /* basic support for FF. Chrome/Safari should support -webkit styles above */
   @supports(scrollbar-color: red blue) {
     * {
       scrollbar-color: var(--color-aggie-blue-80) var(--color-aggie-blue-50);
@@ -151,7 +155,7 @@ export default function render() {
 </div>
 
 <!-- used for small lists -->
-<div class="overflow">
+<div class="overflow" ?no-overflow="${this.noOverflow}">
   <div>  
     ${this.buckets.map((item, index) => html`
     <div class="filter">

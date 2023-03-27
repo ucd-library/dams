@@ -20,7 +20,7 @@ class AppCollection extends Mixin(LitElement)
       thumbnailUrl : { type : String },
       callNumber : { type : String },
       keywords : { type : Array },    
-      items : { type : Array }, 
+      items : { type : Number }, 
       yearPublished : { type : Number }, 
       highlightedItems : { type : Array },
       dbsync : { type : Object },
@@ -42,7 +42,7 @@ class AppCollection extends Mixin(LitElement)
     this.thumbnailUrl = '';
     this.callNumber = '';
     this.keywords = [];    
-    this.items = [];
+    this.items = 0;
     this.yearPublished = 0;
     this.highlightedItems = [];
     this.dbsync = {};
@@ -98,7 +98,7 @@ class AppCollection extends Mixin(LitElement)
     this.thumbnailUrl = e.payload.results.thumbnailUrl;
     this.callNumber = e.payload.results.callNumber;
     this.keywords = e.payload.results.keywords;
-    // this.items = e.payload.results.items[0];
+    this.items = e.payload.results.count;
     this.yearPublished = e.payload.results.yearPublished;
     // this.highlightedItems = e.payload.results.highlightedItems;
     

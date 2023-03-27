@@ -19,7 +19,8 @@ class AppFacetFilter extends Mixin(LitElement)
       ironListActive : { type : Boolean },
       notified : { type : Object },
       includeTypeahead : { type : Boolean },
-      typeaheadField : { type : String }
+      typeaheadField : { type : String },
+      noOverflow : { type : Boolean }
     };
   }
 
@@ -39,6 +40,7 @@ class AppFacetFilter extends Mixin(LitElement)
     this.notified = {};
     this.includeTypeahead = false;
     this.typeaheadField = '';
+    this.noOverflow = false;
 
     this._injectModel('FiltersModel', 'RecordModel');
   }
@@ -51,8 +53,10 @@ class AppFacetFilter extends Mixin(LitElement)
 
   _onFilterBucketsUpdate(e) {
     if( e.filter !== this.filter ) return;
+    
     // TODO temp remove oac isPartOf records
     e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org'));
+
     e.buckets.forEach(item => {
       if( this.notified[item.key] && !item.active ) {
         this._notifySelected(item.active, item.key);
@@ -88,6 +92,8 @@ class AppFacetFilter extends Mixin(LitElement)
         }
       })
     );
+
+    this.noOverflow = e.buckets.length < 6;
   }
 
   getBuckets() {

@@ -65,7 +65,7 @@ export default function render() {
   </style>
 
   <div class="label" @click="${this._onToggleClicked}" @keyup="${this._onToggleClicked}" role="button" tabindex="0">
-    <div style="flex:1">${this.filter.label}</div>
+    <div style="flex: 1; font-size: 1.15rem">${this.filter.label}</div>
     <iron-icon icon="arrow-drop-down" ?closed="${!this.opened}"></iron-icon>
     <div class="highlight"></div>
   </div>
