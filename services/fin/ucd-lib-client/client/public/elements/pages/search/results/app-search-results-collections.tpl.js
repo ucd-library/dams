@@ -31,8 +31,8 @@ return html`
       margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-gap: var(--spacing-default);
-      max-width: 93%;
+      grid-gap: 3rem;
+      max-width: 91%;
     }
 
     ucd-theme-pagination {

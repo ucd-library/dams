@@ -74,7 +74,7 @@ return html`
     background-size: cover;
     background-color: transparent;
     background-position: center center;
-    width: 250px;
+    max-width: 383px;
   }
 
   .card-text {

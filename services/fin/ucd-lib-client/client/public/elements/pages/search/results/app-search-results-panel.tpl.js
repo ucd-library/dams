@@ -82,6 +82,15 @@ return html`
     max-width: 383px;
   }
 
+  .masonry {
+    margin: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
   .list {
     margin: 10px;
   }
@@ -232,6 +241,7 @@ return html`
   .masonry .item {
     display: block;
     position: absolute;
+    width: 30%;
     /* visibility: hidden; */
     top : 25px;
     left: 25px;
@@ -278,9 +288,9 @@ return html`
 
 <div class="header">
   <div style="flex: .2" class="photo-stack"><ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:photo-stack"></ucdlib-icon></div>
-  <div style="flex: 1.5"><span style="font-weight: bold">${this.total} item results</span><span ?hidden="${this.results.length === 0}"> from <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collections</a></span></div>  
+  <div style="flex: 3"><span style="font-weight: bold">${this.total} item results</span><span ?hidden="${this.results.length === 0}"> from <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collections</a></span></div>  
 
-  <div style="flex: 2"></div>  
+  <div style="flex: .5"></div>  
 
   <span style="flex: .5; text-align: right; padding-right: 1rem;">Display:</span>
   <div style="flex: .2"><ucdlib-icon icon="ucdlib-dams:result-display-grid" @click="${this._onLayoutToggle}" type="grid" class="grid-layout-icon selected-layout"></ucdlib-icon></div>
