@@ -48,7 +48,7 @@ module.exports = {
   // facets to show on left side
   elasticSearch : {
     facets : {
-      '@graph.isPartOf.@id' : {
+      '@graph.publisher.name' : {
         label : 'Collection',
         type : 'facet',
         valueMap : (value) => {

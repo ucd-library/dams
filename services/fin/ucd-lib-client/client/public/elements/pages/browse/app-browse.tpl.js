@@ -148,7 +148,7 @@ export default function render() {
 
     <app-browse-by id="collections" 
       label="Collection" 
-      facet-query-name="@graph.isPartOf.@id"
+      facet-query-name="@graph.publisher.name"
       ?hidden="${this.page !== '/browse/collections'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-gold-collections.png"/>
     </app-browse-by>

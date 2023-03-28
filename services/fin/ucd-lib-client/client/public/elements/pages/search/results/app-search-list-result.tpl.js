@@ -111,7 +111,7 @@ return html`
       <!-- <div class="spacer"></div> -->
 
       <div class="collection-details">
-        <p><span class="label">Collection:</span> ${this.data.collectionName}</p>
+        <p><span class="label">Collection:</span> ${this.data.collection}</p>
         <p><span class="label">Creator:</span> ${this.data.creator}</p>
         <p><span class="label">Date:</span> ${this.data.date}</p>
         <p><span class="label">Format:</span> ${this.data.format}</p>

@@ -35,6 +35,10 @@
       "type" : "keyword" 
     },
 
+    "@graph.publisher.name" : {
+      "type" : "keyword" 
+    },
+
     "@graph.about.name" : {
       "type" : "text",
       "analyzer": "autocomplete", 
