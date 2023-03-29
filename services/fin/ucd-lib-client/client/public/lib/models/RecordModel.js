@@ -174,13 +174,12 @@ class RecordModel extends ElasticSearchModel {
      * @method getIaBookManifest
      * @description load a records IA bookreader page data by id
      * 
-     * @param {String} id record id
-     * @param {String} bookTitle title of book to build manifest url
+     * @param {String} url the manifest url
      * 
      * @returns {Promise} resolves to record
      */
-  async getIaBookManifest(id, bookTitle) {
-    return await this.service.getIaBookManifest(id, bookTitle);
+  async getIaBookManifest(url) {
+    return await this.service.getIaBookManifest(url);
   }
     
 

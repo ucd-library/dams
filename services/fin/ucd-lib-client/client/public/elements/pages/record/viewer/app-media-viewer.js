@@ -53,9 +53,16 @@ export default class AppMediaViewer extends Mixin(LitElement)
       // TODO eventually support mutiple mediaGroups, combine different media types into same viewer/nav?
       let mediaGroup = e.selectedRecord?.clientMedia?.mediaGroups;
       if( !mediaGroup || !mediaGroup.length ) return;
-      mediaGroup = mediaGroup[0];
+      // mediaGroup = mediaGroup[0];
       
-      let mediaType = utils.getMediaType(mediaGroup.display).toLowerCase().replace(/object/i, '');
+      let mediaType;
+      mediaGroup.forEach(media => {
+        let type = utils.getMediaType(media.display);
+        if( type ) {
+          mediaType = type.toLowerCase().replace(/object/i, '');
+          mediaGroup = media;
+        }
+      });
 
       if ( mediaType === "imagelist" ) {
         mediaType = "image";
@@ -69,10 +76,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
         this.bagOfFilesImage = '';
       }
 
-      if( mediaGroup.display.clientMedia.iaReader ) {
+      if( mediaGroup.display.clientMedia && mediaGroup.display.clientMedia.iaReader ) {
         mediaType = 'bookreader';
         this.isBookReader = true;
-        let brData = await this.RecordModel.getIaBookManifest(e.selectedRecord.root['@id'], mediaGroup.display.filename);
+        let brData = await this.RecordModel.getIaBookManifest(mediaGroup.display.clientMedia.iaReader.manifest);
         if( brData && brData.body ) {
           this.mediaType = 'bookreader';
           this.bookData = JSON.parse(brData.body);

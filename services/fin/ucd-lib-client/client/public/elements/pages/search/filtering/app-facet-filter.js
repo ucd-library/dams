@@ -40,14 +40,19 @@ class AppFacetFilter extends Mixin(LitElement)
     this.notified = {};
     this.includeTypeahead = false;
     this.typeaheadField = '';
-    this.noOverflow = false;
+    this.noOverflow = true;
 
     this._injectModel('FiltersModel', 'RecordModel');
   }
 
   resize() {
     requestAnimationFrame(() => {
-      this.shadowRoot.querySelector('#list').fire('iron-resize');
+      let overflowDiv = this.shadowRoot.querySelector('.overflow');
+
+      // TODO more testing here, pretty sure 200px is correct but it's possible it's different
+      if( overflowDiv && overflowDiv.offsetHeight >= 200 ) {
+        this.noOverflow = false;
+      }
     });
   }
 
@@ -92,8 +97,6 @@ class AppFacetFilter extends Mixin(LitElement)
         }
       })
     );
-
-    this.noOverflow = e.buckets.length < 6;
   }
 
   getBuckets() {

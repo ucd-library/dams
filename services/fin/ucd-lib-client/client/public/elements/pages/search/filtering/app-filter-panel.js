@@ -12,8 +12,8 @@ export class AppFilterPanel extends Mixin(LitElement)
 
   static get properties() {
     return {
-      filter : { type : Object },  // , observer : '_render' },
-      opened : { type : Boolean },  // , observer : '_toggleOpened' },
+      filter : { type : Object },
+      opened : { type : Boolean },
       selected : { type : Array }
     };
   }
@@ -28,6 +28,8 @@ export class AppFilterPanel extends Mixin(LitElement)
     this.selected = []
   }
 
+  // this used to be an observer to filter changing..
+  //   willUpdate doesn't work and updated renders the filters twice, but one of them works
   firstUpdated() {
     if( !this.filter ) return;
 
@@ -83,12 +85,12 @@ export class AppFilterPanel extends Mixin(LitElement)
    */
   toggle() {
     this.opened = !this.opened;
+    this._toggleOpened();
   }
 
   /**
    * @method _toggleOpened
-   * @description bound to opened observer.  if opened is true,
-   * tell the child to resize
+   * @description if opened is true, tell the child to resize
    */
   _toggleOpened() {
     if( !this.opened ) return;
