@@ -47,7 +47,7 @@ class SearchVcModel extends BaseModel {
             title : result.root.publisher ? result.root.publisher.name : '',
             name : result.root.publisher ? result.root.publisher.name : '',
             thumbnailUrl : result.root.thumbnailUrl,
-            recordCount : 42
+            recordCount : result.root.itemCount
           });
         }
         

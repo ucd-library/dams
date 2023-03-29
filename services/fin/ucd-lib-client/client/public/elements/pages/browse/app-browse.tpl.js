@@ -100,7 +100,7 @@ export default function render() {
       <section class="browse-buttons site-frame">
         <div class="priority-links">
           <div class="priority-links__item">
-            <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collection">
+            <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collections">
               <div class="vertical-link__figure">
                 <!-- <ucdlib-icon class="vertical-link__image" src="http://localhost:3000/images/ucd-logo.svg"></ucdlib-icon> -->
                 <!-- <ucdlib-icon class="vertical-link__image" icon="ucd-public:fa-box-archive"></ucdlib-icon>  -->
@@ -146,10 +146,10 @@ export default function render() {
       </section>
     </div>
 
-    <app-browse-by id="collection" 
+    <app-browse-by id="collections" 
       label="Collection" 
-      facet-query-name="@graph.isPartOf.@id"
-      ?hidden="${this.page !== '/browse/collection'}">
+      facet-query-name="@graph.publisher.name"
+      ?hidden="${this.page !== '/browse/collections'}">
       <img class="header-icon" slot="header-icon" src="/images/watercolors/watercolor-splat-gold-collections.png"/>
     </app-browse-by>
     <app-browse-by id="subject" 

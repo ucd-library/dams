@@ -19,7 +19,8 @@ class AppFacetFilter extends Mixin(LitElement)
       ironListActive : { type : Boolean },
       notified : { type : Object },
       includeTypeahead : { type : Boolean },
-      typeaheadField : { type : String }
+      typeaheadField : { type : String },
+      noOverflow : { type : Boolean }
     };
   }
 
@@ -39,20 +40,28 @@ class AppFacetFilter extends Mixin(LitElement)
     this.notified = {};
     this.includeTypeahead = false;
     this.typeaheadField = '';
+    this.noOverflow = true;
 
     this._injectModel('FiltersModel', 'RecordModel');
   }
 
   resize() {
     requestAnimationFrame(() => {
-      this.shadowRoot.querySelector('#list').fire('iron-resize');
+      let overflowDiv = this.shadowRoot.querySelector('.overflow');
+
+      // TODO more testing here, pretty sure 200px is correct but it's possible it's different
+      if( overflowDiv && overflowDiv.offsetHeight >= 200 ) {
+        this.noOverflow = false;
+      }
     });
   }
 
   _onFilterBucketsUpdate(e) {
     if( e.filter !== this.filter ) return;
+    
     // TODO temp remove oac isPartOf records
     e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org'));
+
     e.buckets.forEach(item => {
       if( this.notified[item.key] && !item.active ) {
         this._notifySelected(item.active, item.key);

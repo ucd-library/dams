@@ -48,6 +48,16 @@ module.exports = {
   // facets to show on left side
   elasticSearch : {
     facets : {
+      '@graph.publisher.name' : {
+        label : 'Collection',
+        type : 'facet',
+        valueMap : (value) => {
+          // let collection = APP_CONFIG.collections.find(c => c['@id'] === value);
+          // if( collection && collection.name ) return collection.name;
+          // return value;
+          return 'collection: '+value;
+        }
+      },
       '@graph.fileFormat' : {
         label : 'File Format',
         type : 'facet',
@@ -68,21 +78,19 @@ module.exports = {
           return 'format: '+value;
         }
       },
-      '@graph.isPartOf.@id' : {
-        label : 'Collection',
-        type : 'facet',
-        valueMap : (value) => {
-          // let collection = APP_CONFIG.collections.find(c => c['@id'] === value);
-          // if( collection && collection.name ) return collection.name;
-          // return value;
-          return 'collection: '+value;
-        }
-      },
       '@graph.creator.name' : {
         label : 'Creator',
         type : 'facet',
         valueMap : (value) => {
           return 'creator: '+value;
+        }
+      },
+      '@graph.about.name.raw' : {
+        label : 'Subject',
+        type : 'facet',
+        typeahead : 'abouts',
+        valueMap : (value) => {
+          return 'subject: '+value;
         }
       },
       '@graph.yearPublished' : {
@@ -94,18 +102,13 @@ module.exports = {
       //   type : 'facet',
       //   valueMap : rightsMap
       // },
-      '@graph.type.raw' : {
-        label : 'Type',
-        type : 'facet',
-        typeahead: 'type',
-        ignore : ['CreativeWork', 'MediaObject'],
-        valueMap : value => value.replace(/(.)([A-Z])/g, '$1 $2')
-      },
-      '@graph.about.name.raw' : {
-        label : 'Subject',
-        type : 'facet',
-        typeahead : 'abouts'
-      }
+      // '@graph.type.raw' : {
+      //   label : 'Type',
+      //   type : 'facet',
+      //   typeahead: 'type',
+      //   ignore : ['CreativeWork', 'MediaObject'],
+      //   valueMap : value => value.replace(/(.)([A-Z])/g, '$1 $2')
+      // }
     },
 
     textFields : {

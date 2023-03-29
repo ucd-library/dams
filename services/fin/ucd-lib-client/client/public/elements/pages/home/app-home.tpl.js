@@ -569,7 +569,7 @@ return html`
 <section class="browse-buttons site-frame">
   <div class="priority-links">
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collection">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collections">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-box-archive"></ucdlib-icon>
         </div>

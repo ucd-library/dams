@@ -23,7 +23,7 @@ export default class DamsCollectionCard extends Mixin(LitElement)
       cardTitle: {type: String, attribute: 'card-title'},
       itemCt: {type: Number, attribute: 'item-ct'},
       href: {type: String},
-      darkBg: {type: Boolean}
+      darkBg: {type: Boolean, attribute: 'data-dark-bg'}
     };
   }
 
@@ -39,44 +39,44 @@ export default class DamsCollectionCard extends Mixin(LitElement)
     this.href = "";
     this.darkBg = false;
 
-    this._injectModel('CollectionModel');
+    this._injectModel('CollectionModel', 'CollectionVcModel');
   }
 
   /**
-   * @method firstUpdated
-   * @description Lit lifecycle method called when element is first updated.
+   * @method willUpdate
+   * @description Lit lifecycle method called when element is updated.
    * @param {Map} props - Properties that have changed.
    */
-  firstUpdated(props) {
-    if ( this.id && Object.keys(this.collection).length === 0 ) { 
+  willUpdate(props) {
+    if ( (this.id && Object.keys(this.collection).length === 0) || (this.id && this.collection.id !== this.id) ) { 
       this._getCollection(this.id);
-    } else if ( this.collection && this.collection['@id'] ) {
+    } else if ( this.collection && this.collection.id ) {
       if ( this.collection.associatedMedia ) {
         this.imgSrc = this.collection.thumbnailUrl ? this.collection.thumbnailUrl : this.collection.associatedMedia.thumbnailUrl;
-        this.cardTitle = this.collection.label ? this.collection.label : this.collection.associatedMedia.name;
-        this.itemCt = this.collection.associatedMedia.recordCount;
-        this.href = this.collection.associatedMedia['@id'];
+        this.cardTitle = this.collection.title ? this.collection.title : this.collection.associatedMedia.name;
+        this.itemCt = this.collection.associatedMedia.recordCount; // TODO should we use associatedMedia still? or VC
+        this.href = this.collection.associatedMedia.id;
       } else {
         this.imgSrc = this.collection.thumbnailUrl;
-        this.cardTitle = this.collection.name;
-        this.itemCt = this.collection.recordCount;
-        this.href = this.collection['@id'];
+        this.cardTitle = this.collection.title;
+        this.itemCt = this.collection.count;
+        this.href = this.collection.id;
       }
-      this.darkBg = props.has('darkBg');
     }
+    this.darkBg = this.attributes['data-dark-bg'] ? true : false;
   }
 
   async _getCollection(id) {
     await this.CollectionModel.get(id);
   }
 
-  _onCollectionUpdate(e) {
+  _onCollectionVcUpdate(e) {
     if ( e.state !== 'loaded' || e.payload.results.id !== this.id ) return;
 
     this.collection = e.payload.results;
     this.imgSrc = this.collection.thumbnailUrl;
     this.cardTitle = this.collection.title;
-    this.itemCt = 42;
+    this.itemCt = e.payload.results.count;
     this.href = this.collection.id;
   }
 }

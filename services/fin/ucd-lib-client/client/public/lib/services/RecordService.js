@@ -35,14 +35,9 @@ class RecordService extends BaseService {
     });
   }
 
-  getIaBookManifest(id, bookTitle) {
+  getIaBookManifest(url) {
     return this.request({
-      url : `/fcrepo/rest${id}/media/${bookTitle}/svc:gcs/dams-client-products/ia/manifest.json`,
-      // fetchOptions : {
-      //   headers : {
-      //     'Accept' : 'application/ld+json'
-      //   },
-      // },
+      url,
       checkCached : () => null,
       onLoading : null,
       onLoad : null,

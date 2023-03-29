@@ -31,8 +31,8 @@ return html`
       margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-gap: var(--spacing-default);
-      max-width: 93%;
+      grid-gap: 3rem;
+      max-width: 91%;
     }
 
     ucd-theme-pagination {
@@ -49,7 +49,7 @@ return html`
       <div style="text-align:center" class="collections-content">
         <div class="card-grid">
           ${this.results.map(res => html`
-            <dams-collection-card .collection="${res}" .darkBg="${true}" data-id="${res['@id']}" @click=${this._onCollectionClicked}></dams-collection-card>
+            <dams-collection-card data-dark-bg data-id="${res['@id']}" @click=${this._onCollectionClicked}></dams-collection-card>
           `)}
         </div>  
       </div>

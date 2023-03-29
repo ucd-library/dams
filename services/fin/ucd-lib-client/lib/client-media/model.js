@@ -55,7 +55,7 @@ class ClientMedia {
       this.mediaGroups[i] = mediaGroup;
 
       if( displayNodes.length ) {
-        let clientMedia = displayNodes.filter(node => Object.keys(node.clientMedia).length > 0)[0];
+        let clientMedia = displayNodes.filter(node => node.clientMedia && Object.keys(node.clientMedia).length > 0)[0];
         if( clientMedia ) {
           // TODO for now use first node with clientMedia, later need support for multiple media groups
           mediaGroup.display = clientMedia;
@@ -242,6 +242,7 @@ class ClientMedia {
       let found = false;
       for( let link of definition.CRAWL_LINKS ) {
         if( !node[link] ) continue;
+        if( !Array.isArray(node[link]) ) node[link] = [node[link]]; // make sure list is an array, hack for ark:/87287/d7xs9t with single hasPart
         node = this.getNode(node[link][0]);
         if( node ) {
           found = true;

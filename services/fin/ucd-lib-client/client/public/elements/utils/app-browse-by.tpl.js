@@ -225,8 +225,8 @@ return html`
     <div ?hidden="${this.label.toLowerCase() !== 'collection'}">
 
       <div class="card-grid">
-        ${this.results.map(res => html`
-          <dams-collection-card data-id="${this.label.toLowerCase() === 'collection' ? res['key'] : ''}" @click=${this._onCollectionClicked}></dams-collection-card>
+        ${this.collectionResults.map(res => html`
+          <dams-collection-card .collection=${res} data-id="${this.label.toLowerCase() === 'collection' ? res.id : ''}" @click=${this._onCollectionClicked}></dams-collection-card>
         `)}
       </div>  
 

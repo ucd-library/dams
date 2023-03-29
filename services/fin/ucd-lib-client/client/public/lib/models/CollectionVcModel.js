@@ -50,9 +50,7 @@ class CollectionVcModel extends BaseModel {
         thumbnailUrl : rootNode.image.url,
         keywords : rootNode.keywords || [],
         callNumber,
-        // items : [
-        //   e.payload.node
-        // ],
+        count : rootNode.itemCount,
         yearPublished : rootNode.yearPublished
         // highlightedCollections
       };
