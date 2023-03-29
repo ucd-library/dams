@@ -1,7 +1,8 @@
 const config = require('../config.js');
 const api = require('@ucd-lib/fin-api');
-const {activemq, waitUntil} = require('@ucd-lib/fin-service-utils');
+const {ActiveMqClient, waitUntil} = require('@ucd-lib/fin-service-utils');
 
+const {ActiveMqStompClient} = ActiveMqClient;
 const CONTAINS = 'http://www.w3.org/ns/ldp#contains';
 const BINARY = 'http://fedora.info/definitions/v4/repository#Binary';
 const MIME_TYPE = 'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType'
@@ -15,16 +16,16 @@ api.setConfig({
 class AppConfig {
 
   constructor() {
-    activemq.onMessage(e => this.handleMessage(e));
-    activemq.connect('ucd-lib-client', '/queue/ucd-lib-client');
+    // this.activemq = new ActiveMqStompClient('app');
+    // this.activemq.onMessage(e => this.handleMessage(e));
+    // this.activemq.connect('/queue/ucd-lib-client');
     this.ROOT_PATH = '/application/'+config.server.appName;
     this.config = {};
     this.reload(true);
   }
 
-
   handleMessage(msg) {
-    let id = msg.headers['org.fcrepo.jms.identifier'];
+    let id = msg.headers[this.activemq.ACTIVE_MQ_HEADER_ID];
 
     if( !id.match(this.ROOT_PATH) ) return;
     this.reload();

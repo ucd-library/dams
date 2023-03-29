@@ -1,6 +1,7 @@
-const {dataModels} = require('@ucd-lib/fin-service-utils');
+const {dataModels, ActiveMqClient} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
+const {ActiveMqStompClient} = ActiveMqClient;
 
 class ItemsModel extends FinEsDataModel {
 
@@ -8,11 +9,43 @@ class ItemsModel extends FinEsDataModel {
     super('item');
     this.schema = schema;
     this.transformService = 'es-item-transform';
+    this.activemq = new ActiveMqStompClient('item');
+    this.activemq.connect({listen: false});
   }
 
   is(id) {
     if( id.match(/^\/item\//) ) return true;
     return false;
+  }
+
+  async update(jsonld, index) {
+    await super.update(jsonld, index);
+
+    if( !jsonld['@graph'] ) return;
+
+    let reindex = [];
+    for( let node of jsonld['@graph'] ) {
+      if( !node.isPartOf ) continue;
+
+      let isPartOf = node.isPartOf;
+      if( !Array.isArray(isPartOf) ) {
+        isPartOf = [isPartOf];
+      }
+
+      for( let part of isPartOf ) {
+        if( part['@id'] && part['@id'].match(/^\/collection\//) ) {
+          reindex.push(part['@id']);
+        }
+      }
+    }
+
+    for( let collectionId of reindex ) {
+      console.log('sending reindex event for collection', collectionId);
+      await this.activemq.sendMessage(
+        {'@id' : collectionId},
+        {'edu.ucdavis.library.eventType' : 'Reindex'}
+      );
+    }
   }
 
   async getFiles(id, files=[]) {

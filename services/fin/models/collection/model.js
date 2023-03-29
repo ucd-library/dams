@@ -1,4 +1,4 @@
-const {dataModels} = require('@ucd-lib/fin-service-utils');
+const {dataModels, RDF_URIS} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 
@@ -8,7 +8,9 @@ class CollectionsModel extends FinEsDataModel {
     super('collection');
 
     // we lookup item counts for a collection by querying the item index
-    this.itemAlias = 'item-read';
+    // since this is used for a write op, we need to use the write alias
+    this.itemAlias = 'item-write';
+    this.collectionType = 'http://schema.org/Collection';
 
     this.schema = schema;
     this.transformService = 'es-collection-transform';
@@ -20,35 +22,26 @@ class CollectionsModel extends FinEsDataModel {
   }
 
   /**
-   * @method get
-   * @description override get to add itemCount to collection
+   * @method update
+   * @description override update to add itemCount to collection
    * 
-   * @param {*} id 
-   * @param {*} opts 
-   * @param {*} index 
-   * @returns 
+   * @param {Object} jsonld 
+   * @param {String} index 
+   * @returns {Promise}
    */
-  async get(id, opts={}, index) {
-    let result = await super.get(id, opts={}, index);
-    if( result ) await this.getItemCount(result);
-    return result;
-  }
+  async update(jsonld, index) {
+    // find the collection node
+    if( jsonld['@graph'] ) {
+      let collection = jsonld['@graph'].find(node => {
+        return node['@type'] && node['@type'].includes(this.collectionType);
+      });
 
-  /**
-   * @method search
-   * @description override search to add itemCount to collection
-   * 
-   * @param {*} searchDocument 
-   * @param {*} options 
-   * @param {*} index 
-   */
-  async search(searchDocument, options={debug:false}, index) {
-    let response = await super.search(searchDocument, options, index);
-    for( let result of response.results ) {
-      await this.getItemCount(result);
-      console.log(result);
+      if( collection ) {
+        collection.itemCount = await this.getItemCount(collection['@id']);
+      }
     }
-    return response;
+
+    return super.update(jsonld, index);
   }
 
   /**
@@ -59,24 +52,21 @@ class CollectionsModel extends FinEsDataModel {
    * 
    * @returns {Promise}
    */
-  async getItemCount(collection) {
+  async getItemCount(id) {
     let result = await this.client.count({
       index : this.itemAlias,
       body: {
         query: {
           bool : {
             must : [
-              {term: {'@graph.isPartOf.@id': collection['@id']}}
+              {term: {'@graph.isPartOf.@id': id}}
             ]
           }
         }
       }
     });
 
-    let graph = this.utils.singleNode(collection['@id'], collection['@graph']);
-    if( graph.length ) {
-      graph[0].itemCount = result.count;
-    }
+    return result.count;
   }
 }
 
