@@ -82,7 +82,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
         let brData = await this.RecordModel.getIaBookManifest(mediaGroup.display.clientMedia.iaReader.manifest);
         if( brData && brData.body ) {
           this.mediaType = 'bookreader';
-          this.bookData = JSON.parse(brData.body);
+          this.bookData = typeof brData.body === 'string' ? JSON.parse(brData.body) : brData.body;
         }
       }
 
