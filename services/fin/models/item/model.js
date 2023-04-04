@@ -39,10 +39,9 @@ class ItemsModel extends FinEsDataModel {
       }
     }
 
-    for( let collectionId of reindex ) {
-      console.log('sending reindex event for collection', collectionId);
+    for( let id of reindex ) {
       await this.activemq.sendMessage(
-        {'@id' : collectionId},
+        {'@id' : id},
         {'edu.ucdavis.library.eventType' : 'Reindex'}
       );
     }
