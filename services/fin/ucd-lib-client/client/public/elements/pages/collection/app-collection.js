@@ -2,6 +2,8 @@ import { LitElement} from 'lit';
 import render from "./app-collection.tpl.js";
 import JSONFormatter from 'json-formatter-js'
 
+import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
+
 import "../../components/cards/dams-item-card";
 import '../../components/citation';
 
@@ -26,7 +28,8 @@ class AppCollection extends Mixin(LitElement)
       dbsync : { type : Object },
       watercolor : { type : String },
       displayData : { type : Array },
-      selectedFilename : { type : String }
+      isAdmin : { type : Boolean },
+      editMode : { type : Boolean }
     };
   }
 
@@ -48,7 +51,8 @@ class AppCollection extends Mixin(LitElement)
     this.dbsync = {};
     this.watercolor = 'rose';
     this.displayData = [];
-    this.selectedFilename = '';
+    this.isAdmin = false;
+    this.editMode = false;
 
     this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'CollectionVcModel');
   }
@@ -108,6 +112,12 @@ class AppCollection extends Mixin(LitElement)
     this.RecordModel.searchHighlighted(this.collectionId, true, true);
   }
 
+  /**
+   * @method _onDefaultRecordSearchUpdate
+   * @description fired from default search
+   * 
+   * @param {Object} e 
+   */
   _onDefaultRecordSearchUpdate(e) {
     if( e.state !== 'loaded' || this.highlightedItems.length ) return;
 
@@ -123,11 +133,53 @@ class AppCollection extends Mixin(LitElement)
   }
 
   /**
+   * @method _onEditClicked
+   * @description admin ui, edit button click event
+   * 
+   * @param {Object} e 
+   */
+  _onEditClicked(e) {
+    this.editMode = true;
+  }
+
+  /**
+   * @method _onSaveClicked
+   * @description admin ui, save button click event
+   * 
+   * @param {Object} e 
+   */
+  _onSaveClicked(e) {
+    // TODO save to fcrepo container
+    //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
+  }
+
+  /**
+   * @method _onCancelEditClicked
+   * @description admin ui, cancel editing button click event
+   * 
+   * @param {Object} e 
+   */
+  _onCancelEditClicked(e) {
+    this.editMode = false;
+  }
+
+  /**
+   * @method _onWatercolorChanged
+   * @description admin ui, change to featured image watercolor
+   * 
+   * @param {Object} e 
+   */
+  _onWatercolorChanged(e) {
+    this.watercolor = e.target.classList[0];
+  }
+
+  /**
    * @description _showAdminPanel, checks if user is an admin and populates admin section with data
    */
   async _showAdminPanel() {
     const user = APP_CONFIG.user;
     if( user && user.loggedIn && user.roles.includes('admin') ) {
+      this.isAdmin = true;
       if( !this.adminRendered ) {
         const adminData = await this.CollectionModel.getAdminData(this.collectionId);
         if( adminData && adminData.response && adminData.response.status === 200 ) {
@@ -205,18 +257,18 @@ class AppCollection extends Mixin(LitElement)
     });
   }
 
-  async _onSave(e) {
-    e.preventDefault();
-    let editor = ace.edit(this.shadowRoot.querySelector('.display-editor-root'));
-    this.displayData = JSON.parse(editor.getValue().replace(/\n|\t/g, ''));
-    // await this.CollectionModel.saveDisplayData(this.collectionId, this.displayData);
+  // async _onSave(e) {
+  //   e.preventDefault();
+  //   let editor = ace.edit(this.shadowRoot.querySelector('.display-editor-root'));
+  //   this.displayData = JSON.parse(editor.getValue().replace(/\n|\t/g, ''));
+  //   // await this.CollectionModel.saveDisplayData(this.collectionId, this.displayData);
 
-    this._parseDisplayData();
-  }
+  //   this._parseDisplayData();
+  // }
 
   async _onFileChange(e) {    
-    this.selectedFilename = e.target.value.split('\\').pop();
-    if( this.selectedFilename.length ) {
+    let selectedFilename = e.target.value.split('\\').pop();
+    if( selectedFilename.length ) {
 
       let file = this.shadowRoot.querySelector('#file-upload').files[0];
       await fetch(`/fcrepo/rest/application/ucd-lib-client${this.collectionId}/featuredImage.jpg`, {
