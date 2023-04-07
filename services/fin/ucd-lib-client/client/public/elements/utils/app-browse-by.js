@@ -141,13 +141,14 @@ export default class AppBrowseBy extends Mixin(LitElement)
   
       // TODO temp remove oac isPartOf ?
       this.allResults.payload = this.allResults.payload.filter(r => !r.key.includes('oac.cdlib.org/findaid'));
-  
+
+      debugger;
       this.totalResults = this.allResults.payload.length;
-      if( this.label.toLowerCase() === 'collection' ) {
-        this.allResults.payload.forEach(async (item, index) => {
-          await this.CollectionModel.get(item.key);
-        });
-      }
+      // if( this.label.toLowerCase() === 'collection' ) {
+      //   this.allResults.payload.forEach(async (item, index) => {
+      //     await this.CollectionModel.get(item.key);
+      //   });
+      // }
       this.loading = false;
     }
 

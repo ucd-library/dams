@@ -61,7 +61,7 @@ class AppHome extends Mixin(LitElement)
     this.textTrio = {};
     this.heroImgOptions = {};
     this.heroImgCurrent = {};
-    this.editMode = true;
+    this.editMode = false;
     this._injectModel('FcAppConfigModel', 'CollectionModel', 'RecordModel');
   }
 
@@ -71,19 +71,27 @@ class AppHome extends Mixin(LitElement)
    */
   async firstUpdated() {
     // Get featured collections
-    this.featuredCollections = this.FcAppConfigModel.getFeaturedCollections();
-    this.featuredCollectionsCt = this.featuredCollections.length;
-    let groupText = this.FcAppConfigModel.getAppText('hp-trio');
-    if ( groupText ) this.textTrio = groupText;
-    if ( this.featuredCollectionsCt > 1 && groupText ) this.showCollectionGroup = true;
+    // this.featuredCollections = this.FcAppConfigModel.getFeaturedCollections();
+    // this.featuredCollectionsCt = this.featuredCollections.length;
+    // let groupText = this.FcAppConfigModel.getAppText('hp-trio');
+    // if ( groupText ) this.textTrio = groupText;
+    // if ( this.featuredCollectionsCt > 1 && groupText ) this.showCollectionGroup = true;
+    let d = await this.CollectionModel.getHomepageDefaultCollections();
+    if( d.response.ok && d.body.results.length ) {
+      this.featuredCollections = d.body.results;
+      this.featuredCollectionsCt = this.featuredCollections.length;
+    }
 
     // Get recent collections
-    let d = await this.CollectionModel.getRecentCollections();
-    if ( d.response.ok && Array.isArray(APP_CONFIG.collections) ) {
-      d.body.results.forEach(item => {
-        let collectionData = APP_CONFIG.collections.find(c => c['@id'] === item['@id']);
-        if ( collectionData ) this.recentCollections.push(collectionData);
-      });
+    d = await this.CollectionModel.getRecentCollections();
+    // if ( d.response.ok && Array.isArray(APP_CONFIG.collections) ) {
+    //   d.body.results.forEach(item => {
+    //     let collectionData = APP_CONFIG.collections.find(c => c['@id'] === item['@id']);
+    //     if ( collectionData ) this.recentCollections.push(collectionData);
+    //   });
+    // }
+    if( d.response.ok && d.body.results.length ) {
+      this.recentCollections = d.body.results;
     }
 
     // Get hero image options

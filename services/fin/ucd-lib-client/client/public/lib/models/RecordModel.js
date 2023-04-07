@@ -398,6 +398,7 @@ class RecordModel extends ElasticSearchModel {
       collectionId = searchDocument.filters['isPartOf.@id'].value[0];
     }
 
+    debugger;
     let defaultSearch = await this.defaultSearch(collectionId, compact, singleNode);
     let corrections = false;
     for( var key in searchDocument.filters ) {

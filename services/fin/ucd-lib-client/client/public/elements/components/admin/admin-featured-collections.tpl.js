@@ -62,8 +62,17 @@ return html`
 <h2>Add Content:</h2>
 <div style="display: flex; width: 50%; margin: 0 auto; justify-content: space-between">
 
+    <!-- <div style="background-color: var(--color-aggie-blue-40); height: 75px">
+        <img src="/images/icons/" style="width: 150px" />
+    </div>
+    <div class="dots flex-expand"></div>
+    <div class="icon-wrapper edit" @click="${this._onTrashClicked}">
+        <ucdlib-icon icon="ucdlib-dams:fa-trash"></ucdlib-icon>
+    </div> -->
+
     <div class="img-box">
-        <img src="/images/icons/dams-admin-collection-single.svg" height="100%" />
+        <ucdlib-icon icon="ucdlib-dams:dams-admin-collection-single"></ucdlib-icon>
+        <!-- <img src="/images/icons/dams-admin-collection-single.svg" height="100%" /> -->
     </div>
     <div class="img-box">
         <img src="/images/icons/dams-admin-text.svg" height="100%" />

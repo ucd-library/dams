@@ -24,6 +24,8 @@ export default function render() {
       width: 100vw;
     }
 
+    [hidden] { display: none !important; }
+
     :host > div {
       padding: 0 40px;
     }
@@ -565,7 +567,7 @@ export default function render() {
       <div style="margin-bottom: .4rem;">
         <span class="label">Coverage: </span> ${this.yearPublished}
       </div>
-      <div style="margin-bottom: .4rem;">
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.keywords || !this.keywords.length}">
         <span class="label">Subjects: </span> 
         ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="">${item}</a>`)}
       </div>

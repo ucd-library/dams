@@ -387,7 +387,8 @@ return html`
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: var(--spacing-default) 0;
+    margin: var(--spacing-default) 0 0;
+    padding-bottom: 3rem;
   }
   .splat-stars {
     width: 9rem;
@@ -721,17 +722,11 @@ return html`
   
 
   <div class="card-trio">
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-item-card .collection="${{}}"></dams-item-card>
-
-
-  <!-- TODO figure out where to source the collections -->
   ${this.recentCollections.map((collection) => 
       html`
-      <dams-collection-card .collection="${collection}"></dams-collection-card>
+      <dams-collection-card data-id="${collection['@id']}"></dams-collection-card>
       `
       )}
-      <dams-collection-card .collection="${this.recentCollections[0]}"></dams-collection-card>
   </div>
 </section>
 
@@ -799,11 +794,11 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
             small taste of these extensive collections.
           </div>
         </div>
+
+
         <div class="card-trio">
-          ${[1,2,3].map(i => html`
-            ${this.featuredCollectionsCt > i || 1 == 1? html`
-              <dams-collection-card .collection="${this.featuredCollections[i] || {}}"></dams-collection-card>
-            ` : html``}
+          ${this.featuredCollections.map(collection => html`
+            <dams-collection-card data-id="${collection['@id']}"></dams-collection-card>
           `)}
         </div>
       </div>
@@ -812,8 +807,7 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
       </div>
 
       <div class="featured-more">
-        <a href="/browse/collection" class="btn btn--primary">Browse all collections</a>
-      
+        <a href="/browse/collections" class="btn btn--primary">Browse all collections</a>
       </div>
   </section>
 
@@ -829,7 +823,7 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
         to store and manage the digital assets of UC Davis Library, increasing access
         to previously undiscoverable digital assets.
       </p>
-      <a href="/collections" class="btn--more-about btn--alt btn--round">More about this project</a>
+      <a href="/about" class="btn--more-about btn--alt btn--round">More about this project</a>
     </div>
   </section>
 
