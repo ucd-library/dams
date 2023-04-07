@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 const authUtils = require('../lib/auth');
 const appConfig = require('../lib/fcrepo-app-config');
 
-const {seo, records, collections, logger} = require('@ucd-lib/fin-service-utils');
+const {seo, models, logger} = require('@ucd-lib/fin-service-utils');
 
 // const transform = seo.recordTransform;
 // const collectionTransform = seo.collectionTransform;
@@ -23,9 +23,12 @@ const bundle = `
   </script>
   <script>${loaderSrc}</script>`;
 
-module.exports = (app) => {
+module.exports = async (app) => {
   let assetsDir = path.join(__dirname, '..', 'client', config.client.assets);
   logger.info('CLIENT_ENV='+config.client.env.CLIENT_ENV+', Serving static assets from '+assetsDir);
+
+  let collectionModel = await models.get('collection');
+  collectionModel = collectionModel.model;
 
   /**
    * Setup SPA app routes
@@ -51,7 +54,7 @@ module.exports = (app) => {
       }
 
       next({
-        // collections : await collections.overview(),
+        collectionLabels : await collectionModel.allLabels(),
         user : user,
         appRoutes : config.client.appRoutes,
         // recordCount: (await records.rootCount()).count,

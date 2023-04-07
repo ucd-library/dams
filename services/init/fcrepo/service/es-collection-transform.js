@@ -200,5 +200,10 @@ module.exports = async function(path, graph, headers, utils) {
   };
   delete item._.graphId;
 
+  // set the collection name to a graph property
+  if( graph['@id'] === item['@id'] ) {
+    graph.name = item.name;
+  }
+
   return graph;
 }
