@@ -68,6 +68,32 @@ class CollectionsModel extends FinEsDataModel {
 
     return result.count;
   }
+
+  /**
+   * @method allLabels
+   * @description get all labels for collections
+   * 
+   * @returns {Promise} resolves to map of id to label
+   */
+  async allLabels() {
+    let result = await this.esSearch(
+      {
+        from : 0,
+        size : 10000
+      },
+      {
+        _source_excludes : false,
+        _source_includes : ['@id', 'name']
+      }   
+    );
+
+    let map = {};
+    for( let hit of result.hits.hits ) {
+      map[hit._source['@id']] = hit._source.name;
+    }
+
+    return map;
+  }
 }
 
 module.exports = new CollectionsModel();

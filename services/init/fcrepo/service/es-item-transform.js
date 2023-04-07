@@ -286,7 +286,8 @@ module.exports = async function(path, graph, headers, utils) {
     if( headers.link.workflow ) {
       let iaReaderSupport = headers.link.workflow.find(item => IA_READER_WORKFLOW === item.type);
       if( iaReaderSupport ) {
-        let workflowInfo = await fetch(config.gateway.host+config.fcrepo.root+iaReaderSupport.url);
+        let url = new URL(iaReaderSupport.url);
+        let workflowInfo = await fetch(config.gateway.host+url.pathname+url.search);
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.iaReader = {
@@ -296,7 +297,8 @@ module.exports = async function(path, graph, headers, utils) {
 
       let streamVideoSupport = headers.link.workflow.find(item => STREAMING_VIDEO_WORKFLOW === item.type);
       if( streamVideoSupport ) {
-        let workflowInfo = await fetch(config.gateway.host+config.fcrepo.root+streamVideoSupport.url);
+        let url = new URL(iaReaderSupport.url);
+        let workflowInfo = await fetch(config.gateway.host+url.pathname+url.search);
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.streamingVideo = {
