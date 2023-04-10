@@ -93,7 +93,7 @@ class AppCollection extends Mixin(LitElement)
    * @description _onCollectionVcUpdate, fired when collection viewController updates
    * @param {*} e 
    */
-   _onCollectionVcUpdate(e) {
+   async _onCollectionVcUpdate(e) {
     if( e.state !== 'loaded' ) return;
     
     this.collectionId = e.payload.results.id;
@@ -106,6 +106,21 @@ class AppCollection extends Mixin(LitElement)
     this.yearPublished = e.payload.results.yearPublished;
     // this.highlightedItems = e.payload.results.highlightedItems;
     
+    // TODO pull from app container, otherwise default to most recent 3 items by year published descending    
+    let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, 3);
+    debugger;
+    if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
+      // itemUrl, title, thumbnailUrl
+      this.highlightedItems = highlightedItems.body.results.map(item => {
+        return {
+          title : item['@graph'][0].name,
+          thumbnailUrl : item['@graph'][0].thumbnailUrl,
+          itemUrl : item['@graph'][0]['@id']
+        };
+      });
+      // this.highlightedItems = highlightedItems.body.results;
+    }
+
     this._showAdminPanel();
 
     // search highlighted collection items

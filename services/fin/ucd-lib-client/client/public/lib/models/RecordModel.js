@@ -475,6 +475,22 @@ class RecordModel extends ElasticSearchModel {
     return this.emptySearchDocument();
   }
 
+  getRecentItems(collectionId, limit=3) {
+    let searchDocument = {
+        filters: {
+            '@graph.isPartOf.@id': {
+                type: 'keyword',
+                value: [
+                    collectionId
+                ],
+                op: 'or'
+            }
+        },
+        limit
+    };
+    return this.service.searchRecentItems(searchDocument);
+  }
+
   typeaheadSearch(searchDocument, opts={}) {
     try {
       return this.service.typeaheadSearch(searchDocument, opts);
