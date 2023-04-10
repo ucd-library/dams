@@ -148,8 +148,11 @@ class AppFacetFilter extends Mixin(LitElement)
   }
 
   _toggleFilter(e) {
-    if( e.currentTarget.checked ) this.appendFilter(e);
-    else this.removeFilter(e);
+    if( !e.currentTarget.hasAttribute('checked') ) {
+      this.appendFilter(e);
+    } else {
+      this.removeFilter(e);
+    }
   }
 
   appendFilter(e) {
