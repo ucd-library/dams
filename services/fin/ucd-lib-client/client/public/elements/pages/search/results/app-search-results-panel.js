@@ -111,7 +111,6 @@ class AppSearchResultsPanel extends Mixin(LitElement)
     this.showError = false;
     clearTimeout(this.showLoadingTimer);
     this.showLoading = false;
-    debugger;
 
     requestAnimationFrame(() => {
       this.total = total;

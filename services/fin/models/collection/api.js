@@ -32,6 +32,6 @@ function errorToDetails(e) {
   }
 }
 
-defaultEsApiGenerator(model, router);
+defaultEsApiGenerator(model, {router});
 
 module.exports = router;

@@ -38,7 +38,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
       resultsPerPage : {type: Number},
       currentIndex : {type: Number},
       totalPages : {type: Number},
-      currentPage : {type: Number}
+      currentPage : {type: Number},
+      isCollectionPage : {type: Boolean}
     };
   }
 
@@ -53,13 +54,13 @@ export default class AppBrowseBy extends Mixin(LitElement)
 
     this.reset();
 
-    this._injectModel('BrowseByModel', 'AppStateModel', 'RecordModel', 'CollectionModel', 'CollectionVcModel');
+    this._injectModel('BrowseByModel', 'AppStateModel', 'RecordModel', 'CollectionModel');
   }
 
   async firstUpdated() {
     this._onAppStateUpdate(await this.AppStateModel.get());
-
-    if( this.label.toLowerCase() === 'collection' ) {
+    this.isCollectionPage = this.label.toLowerCase() === 'collection';
+    if( this.isCollectionPage ) {
       this.sortByOptions = [
         {label : 'A-Z', type: 'key', dir : 'asc', selected: true},
         {label : 'Recent', dir : 'dsc', type: 'key'},
@@ -104,6 +105,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this.totalPages = 1;
     this.currentPage = 1;
     this.label = '';
+    this.isCollectionPage = false;
   }
 
   /**
@@ -121,12 +123,12 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this._loadResults(e);
   }
 
-  _onCollectionVcUpdate(e) {
-    if ( e.state !== 'loaded' ) return;
-    if( this.collectionResults.filter(r => r.id === e.payload.results.id)[0] ) return;
-    this.collectionResults.push(e.payload.results);
-    this._renderCollections(e);
-  }
+  // _onCollectionVcUpdate(e) {
+  //   if ( e.state !== 'loaded' ) return;
+  //   if( this.collectionResults.filter(r => r.id === e.payload.results.id)[0] ) return;
+  //   this.collectionResults.push(e.payload.results);
+  //   this._renderCollections(e);
+  // }
 
   /**
    * @method _loadResults
@@ -137,18 +139,13 @@ export default class AppBrowseBy extends Mixin(LitElement)
   async _loadResults(e) {
     if( this.totalResults === 0 ) {
       this.loading = true;
-      this.allResults = await this.BrowseByModel.getFacets(this.facetQueryName);
-  
-      // TODO temp remove oac isPartOf ?
-      this.allResults.payload = this.allResults.payload.filter(r => !r.key.includes('oac.cdlib.org/findaid'));
-
-      debugger;
-      this.totalResults = this.allResults.payload.length;
-      // if( this.label.toLowerCase() === 'collection' ) {
-      //   this.allResults.payload.forEach(async (item, index) => {
-      //     await this.CollectionModel.get(item.key);
-      //   });
-      // }
+      if( this.isCollectionPage ) { 
+        this._searchBrowseByCollections();        
+      } else {
+        this.allResults = await this.BrowseByModel.getFacets(this.facetQueryName);
+        this.totalResults = this.allResults.payload.length;
+      }
+      
       this.loading = false;
     }
 
@@ -178,7 +175,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
    * params
    */
   _renderResults() {
-    if( this.label === 'Collection' ) {
+    if( this.isCollectionPage ) {
       this._renderCollections();
       this._updateSideImages();
       return;
@@ -209,34 +206,78 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this._updateSideImages();
   }
 
+  async _searchBrowseByCollections() {
+    // this.sortByOptions.filter(s => s.selected)[0]
+    //  {label: 'A-Z', type: 'key', dir: 'asc', selected: true}
+    //  {label: 'Recent', dir: 'dsc', type: 'key'}
+    //  {label: 'Item Quantity', dir: 'dsc', type: 'count'}
+    let sort = {};
+    let sortBy = this.sortByOptions.filter(s => s.selected)[0];
+    
+    if( sortBy.label === 'A-Z' ) {
+      sort = {"name" : "asc"};
+    } else if( sortBy.label === 'Recent' ) {
+      sort = {"@graph.yearPublished" : "desc"};
+    } else {
+      sort = {"@graph.itemCount" : "desc"};
+    }
+    let searchDocument = {
+      text : '',
+      filters : {},
+      sort : [
+        sort
+      ],
+      limit : this.resultsPerPage,
+      offset : this.currentIndex,
+      facets : {}
+    }
+
+    this.allResults = await this.CollectionModel.search(searchDocument);
+    this.allResults = this.allResults.body.results;
+    this.collectionResults = [];
+    this.collectionResults.push(...this.allResults.map(r => {
+      return {
+        thumbnailUrl : r['@graph'][0].thumbnailUrl, 
+        title : r.name,
+        count : r['@graph'][0].itemCount,
+        id : r['@id']
+      }
+    }));
+
+    this.totalResults = this.allResults.length;
+  }
+
   /**
    * @method _renderCollections
    * @description render the collections array based on currentPage and sort
    * params
    */
   _renderCollections() {
-    let sort = this.sortByOptions.find(item => item.selected);
-    if( sort.type === 'count' ) {
-      this.collectionResults.sort((a, b) => {
-        if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
-        if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
-        return 0;
-      });
-    } else {
-      // TODO handle sort by date
+    // TODO is sorting already handled by the searchDocument sent to collectionModel.search()? it should be
 
-      // sort by title
-      this.collectionResults.sort((a, b) => {
-        if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
-        if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
-        return 0;   
-      });
-    }
+    // let sort = this.sortByOptions.find(item => item.selected);
+    // if( sort.type === 'count' ) {
+    //   this.collectionResults.sort((a, b) => {
+    //     if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
+    //     if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
+    //     return 0;
+    //   });
+    // } else {
+    //   // TODO handle sort by date
+
+    //   // sort by title
+    //   this.collectionResults.sort((a, b) => {
+    //     if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
+    //     if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
+    //     return 0;   
+    //   });
+    // }
     
-    this.collectionResults = this.collectionResults.slice(
-      this.currentIndex, 
-      this.currentIndex + this.resultsPerPage 
-    );
+    // this.collectionResults = this.collectionResults.slice(
+    //   this.currentIndex, 
+    //   this.currentIndex + this.resultsPerPage 
+    // );
+
     this.requestUpdate();
     this.shadowRoot.querySelectorAll('dams-collection-card').forEach(wc => wc.requestUpdate());
   }
@@ -279,7 +320,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
    * @description called when collection img on home page is clicked 
    * @param {Object} e
    */
-_onCollectionClicked(e) {
+  _onCollectionClicked(e) {
     e.preventDefault();
     if( e.type === 'keyup' && e.which !== 13 ) return;
     let id = e.currentTarget.getAttribute('data-id');
@@ -297,6 +338,9 @@ _onCollectionClicked(e) {
     this.sortByOptions.forEach((item, index) => item.selected = (index === sortIndex));
     this.currentIndex = 0;
     this.currentPage = 1;
+    if( this.isCollectionPage ) {
+      this._searchBrowseByCollections();
+    }
     this._renderResults();
   }
 

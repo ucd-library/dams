@@ -297,7 +297,7 @@ module.exports = async function(path, graph, headers, utils) {
 
       let streamVideoSupport = headers.link.workflow.find(item => STREAMING_VIDEO_WORKFLOW === item.type);
       if( streamVideoSupport ) {
-        let url = new URL(iaReaderSupport.url);
+        let url = new URL(streamVideoSupport.url);
         let workflowInfo = await fetch(config.gateway.host+url.pathname+url.search);
         workflowInfo = await workflowInfo.json()
 
