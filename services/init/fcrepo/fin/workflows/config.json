@@ -20,6 +20,14 @@
       "data" : {
         "gcsSubpath" : "streaming"
       }
+    },
+
+    "client-image-sizes" : {
+      "type" : "gc-workflow",
+      "data" : {
+        "gcsSubpath" : "compressed",
+        "baseUrl" : "{{IMAGE_UTILS_SERVICE_URL}}"
+      }
     }
 
   }
