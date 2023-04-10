@@ -286,8 +286,7 @@ module.exports = async function(path, graph, headers, utils) {
     if( headers.link.workflow ) {
       let iaReaderSupport = headers.link.workflow.find(item => IA_READER_WORKFLOW === item.type);
       if( iaReaderSupport ) {
-        let url = new URL(iaReaderSupport.url);
-        let workflowInfo = await fetch(config.gateway.host+url.pathname+url.search);
+        let workflowInfo = await fetch(getGatewayUrl(iaReaderSupport.url));
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.iaReader = {
@@ -297,8 +296,7 @@ module.exports = async function(path, graph, headers, utils) {
 
       let streamVideoSupport = headers.link.workflow.find(item => STREAMING_VIDEO_WORKFLOW === item.type);
       if( streamVideoSupport ) {
-        let url = new URL(streamVideoSupport.url);
-        let workflowInfo = await fetch(config.gateway.host+url.pathname+url.search);
+        let workflowInfo = await fetch(getGatewayUrl(streamVideoSupport.url));
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.streamingVideo = {
@@ -333,4 +331,14 @@ module.exports = async function(path, graph, headers, utils) {
   delete item._.graphId;
 
   return graph;
+}
+
+function getGatewayUrl(url='') {
+  if( url.startsWith('http') ) {
+    url = new URL(url);
+    return config.gateway.host+url.pathname+url.search;
+  } else if( url.startsWith('/fcrepo/rest') ) {
+    return config.gateway.host+url;
+  }
+  return config.gateway.host+'/fcrepo/rest'+url;
 }
