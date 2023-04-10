@@ -143,7 +143,7 @@ export default function render() {
         type="${item.label}"
         index="${index}"
         value="${item.key}"
-        label-map="${item.valueMap}"
+        .label-map="${item.valueMap}"
         ?checked="${item.active}" 
         @change="${this._toggleFilter}"
         ?disabled="${item.disabled}">
@@ -164,7 +164,7 @@ export default function render() {
         type="${item.label}"
         index="${index}"
         value="${item.key}"
-        label-map="${item.valueMap}"
+        .labelMap="${item.valueMap}"
         ?checked="${item.active}" 
         @change="${this._toggleFilter}"
         ?disabled="${item.disabled}">

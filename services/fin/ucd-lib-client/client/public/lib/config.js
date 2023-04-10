@@ -48,14 +48,14 @@ module.exports = {
   // facets to show on left side
   elasticSearch : {
     facets : {
-      '@graph.publisher.name' : {
+      '@graph.isPartOf.@id' : {
         label : 'Collection',
         type : 'facet',
         valueMap : (value) => {
-          // let collection = APP_CONFIG.collections.find(c => c['@id'] === value);
-          // if( collection && collection.name ) return collection.name;
-          // return value;
-          return 'collection: '+value;
+          if( APP_CONFIG.collectionLabels[value] ) {
+            return 'collection: ' + APP_CONFIG.collectionLabels[value];
+          }
+          return 'collection: ' + value;
         }
       },
       '@graph.fileFormat' : {
