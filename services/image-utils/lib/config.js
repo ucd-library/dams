@@ -32,6 +32,30 @@ config.iaReader = {
   }
 }
 
+config.imageSizes = {
+  outputFormat : 'jpg',
+  sizes : {
+    small : {
+      imageMagick : {
+        resize : Math.floor(IA_BOOK_SIZE/8)+'x',
+        quality : 90,
+      }
+    },
+    medium : {
+      imageMagick : {
+        resize : Math.floor(IA_BOOK_SIZE/2)+'x',
+        quality : 90,
+      }
+    },
+    large : {
+      imageMagick : {
+        resize : IA_BOOK_SIZE+'x',
+        quality : 90,
+      }
+    }
+  }
+}
+
 config.port = env.PORT || 3000;
 
 config.workflow = {

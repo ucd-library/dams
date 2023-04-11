@@ -3,13 +3,7 @@
     "containers" : [
       {
         "bucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
-        "basePath" : "/application/ucd-lib-client/item",
-        "direction" : "fcrepo-to-gcs",
-        "initDataHydration" : true
-      },
-      {
-        "bucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
-        "basePath" : "/application/ucd-lib-client/collection",
+        "basePath" : "/application/ucd-lib-client",
         "direction" : "fcrepo-to-gcs",
         "initDataHydration" : true
       }
@@ -19,6 +13,10 @@
     { 
       "bucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
       "basePath" : "/item"
+    },
+    { 
+      "bucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
+      "basePath" : "/collection"
     }
   ]
 }

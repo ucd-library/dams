@@ -35,17 +35,6 @@ router.post('/init/:workflow/:filename', async (req, res) => {
 
 });
 
-router.get('/:workflowId', async (req, res) => {
-  try {
-    res.json(await model.getWorkflowInfo(req.params.workflowId));
-  } catch(e) {
-    res.status(500).json({
-      error : e.message,
-      stack : e.stack
-    });
-  }
-});
-
 router.delete('/:workflowId', async (req, res) => {
   try {
     res.json(await model.cleanupWorkflow(req.params.workflowId));
@@ -82,6 +71,29 @@ router.get('/ia-reader/getNumPages/:workflowId', async (req, res) => {
     });
   }
 
+});
+
+router.get('/generate-image-sizes/:workflowId', async (req, res) => {
+  try {    
+    let gcsFiles = await model.generateImageSizes(req.params.workflowId);
+    res.json({success: true, gcsFiles});
+  } catch(e) {
+    res.status(500).json({
+      error : e.message,
+      stack : e.stack
+    });
+  }
+});
+
+router.get('/:workflowId', async (req, res) => {
+  try {
+    res.json(await model.getWorkflowInfo(req.params.workflowId));
+  } catch(e) {
+    res.status(500).json({
+      error : e.message,
+      stack : e.stack
+    });
+  }
 });
 
 module.exports = router;

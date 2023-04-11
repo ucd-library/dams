@@ -1,0 +1,19 @@
+# Job Run Integration Docks
+# https://cloud.google.com/run/docs/configuring/containers#yaml
+# https://cloud.google.com/workflows/docs/reference/googleapis/run/v1/namespaces.jobs/create
+# https://cloud.google.com/run/docs/reference/rest/v1/Container#execaction
+
+main:
+    params: [args]
+    steps:
+      - init:
+          assign:
+            - location: us-central1
+            - project_id: digital-ucdavis-edu
+            - job_container: gcr.io/ucdlib-pubreg/dams-image-utils:sandbox
+            - client_email: dams-local-dev
+      - generate_image_sizes:
+          call: http.get
+          args:
+              url: ${args.baseUrl + "/generate-image-sizes/" + args.finWorkflowId}
+          result: images

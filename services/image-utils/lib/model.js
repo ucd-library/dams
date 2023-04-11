@@ -18,7 +18,7 @@ class ImageUtils {
   }
 
   getLocalFile(workflowInfo) {
-    return workflowInfo.data.tmpGcsPath.replace('gs://', this.TMP_DIR);
+    return workflowInfo.data.tmpGcsPath.replace('gs://', this.TMP_DIR+'/');
   }
 
   /**
@@ -49,6 +49,88 @@ class ImageUtils {
     await fs.remove(dir);
 
     return pageCount;
+  }
+
+  /**
+   * @method generateImageSizes
+   * 
+   * @param {*} workflowId 
+   */
+  async generateImageSizes(workflowId) {
+    let workflowInfo = await this.getWorkflowInfo(workflowId);
+
+    let localFile = this.getLocalFile(workflowInfo);
+    let dir = path.parse(localFile).dir;
+
+    await fs.mkdirp(dir);
+
+    let resultFiles = [];
+    let manifest = {}
+
+    try {
+      await gcs.getGcsFileObjectFromPath(workflowInfo.data.tmpGcsPath)
+        .download({
+          destination: localFile
+        })
+
+      manifest.original = {
+        url : '/fcrepo/rest'+workflowInfo.data.finPath,
+        size : await imageMagick.getImageDimensions(localFile)
+      };
+      
+      let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath;
+
+      // compress image to jpeg
+      for( let size in config.imageSizes.sizes ) {
+        let sizeConfig = config.imageSizes.sizes[size];
+        let fileInfo = path.parse(localFile);
+        let dstName = fileInfo.name+'-'+size+'.'+config.imageSizes.outputFormat;
+        let sizeFile = fileInfo.dir+'/'+dstName;
+
+        let files = {
+          input : localFile,
+          output : sizeFile
+        }
+
+        let cmd = imageMagick.prepareCmd(files, sizeConfig.imageMagick);
+        logger.info('Running imagemagick command: '+cmd);
+        let {stdout, stderr} = await exec(cmd);
+        logger.info('Imagemagick command output: '+cmd, {stdout, stderr});
+
+        manifest[size] = {
+          url : '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+'/'+dstName,
+          size : await imageMagick.getImageDimensions(sizeFile)
+        }
+
+        let gcsPath = baseGcsPath+'/'+dstName;
+        resultFiles.push(gcsPath);
+        logger.info('Copying file from '+sizeFile+' to '+gcsPath);
+        
+        let uploadOpts = {
+          contentType : 'image/'+config.imageSizes.outputFormat
+        };
+        await gcs.streamUpload(
+          gcsPath,
+          fs.createReadStream(path.join(sizeFile)),
+          uploadOpts
+        );
+      }
+
+      await gcs.getGcsFileObjectFromPath(baseGcsPath+'/manifest.json')
+        .save(JSON.stringify(manifest), {
+          contentType: 'application/json',
+          metadata: {
+            'fin-bucket-template' : 'BUCKET'
+          }
+        });
+
+      await fs.remove(dir);
+    } catch(e) {
+      await fs.remove(dir);
+      throw e;
+    }
+
+    return resultFiles;
   }
 
   async runToIaReaderPage(workflowId, page, opts={}) {
@@ -305,7 +387,7 @@ class ImageUtils {
         pageData.width = parseInt(pageData.width);
         pageData.height = parseInt(pageData.height);
         pageData.page = parseInt(fileParts.name.split('-').pop());
-        pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/'+file.bucket.name+'/'+workflowInfo.data.gcsSubpath+'/'+fileParts.name+'.jpg';
+        pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+'/'+fileParts.name+'.jpg';
         iaManifest.data.push(pageData);
       }
     }
@@ -323,7 +405,10 @@ class ImageUtils {
 
     await gcs.getGcsFileObjectFromPath(baseGcsPath+'/manifest.json')
       .save(JSON.stringify(iaManifest), {
-        contentType: 'application/json'
+        contentType: 'application/json',
+        metadata: {
+          'fin-bucket-template' : 'BUCKET'
+        }
       });
 
     for( let file of files ) {
