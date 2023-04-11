@@ -41,6 +41,10 @@ return html`
     /* fill: var(--color-aggie-blue-80); */
   }
 
+  img-box ucdlib-icon {
+    fill: var(--color-aggie-blue-80);
+  }
+
 
 </style>
 
