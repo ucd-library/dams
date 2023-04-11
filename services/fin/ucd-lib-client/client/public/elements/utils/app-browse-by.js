@@ -67,22 +67,24 @@ export default class AppBrowseBy extends Mixin(LitElement)
         {label : 'Item Quantity', dir : 'dsc', type: 'count'}
       ];
     }
-    switch (this.label.toLowerCase()) {
-      case 'collection':
-        this.sideImages = config.browseByImages.collectionPage;
-        break;
-      case 'subject':
-        this.sideImages = config.browseByImages.subjectPage;
-        break;
-      case 'creator':
-        this.sideImages = config.browseByImages.creatorPage;
-        break;  
-      case 'format':
-        this.sideImages = config.browseByImages.formatPage;
-        break;
-      default:
-        this.sideImages = [];
-        break;
+
+    let browseByImages = APP_CONFIG.fcAppConfig['/application/ucd-lib-client/images/config.json'];
+    if( browseByImages ) {
+      browseByImages = browseByImages.body.browseByImages;
+      switch (this.label.toLowerCase()) {
+        case 'subject':
+          this.sideImages = browseByImages.subjectPage;
+          break;
+        case 'creator':
+          this.sideImages = browseByImages.creatorPage;
+          break;  
+        case 'format':
+          this.sideImages = browseByImages.formatPage;
+          break;
+        default:
+          this.sideImages = [];
+          break;
+      }  
     }
 
     this._loadResults();
