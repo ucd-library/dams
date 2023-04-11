@@ -65,7 +65,7 @@ class AppCollection extends Mixin(LitElement)
     // this._showAdminPanel();
     // could we check if this.adminRendered is false here to hide the admin section? or possibly recall the showAdmin function?
     if( !this.adminRendered && !this.collectionId ) {
-      this.collectionId = window.location.pathname;
+      // this.collectionId = window.location.pathname;
     } else if( !this.adminRendered && this.collectionId ) {
       this._showAdminPanel();
     }
@@ -79,11 +79,10 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
    async _onAppStateUpdate(e) {
-    if( e.location.path[0] !== 'collection') return;
+    if( e.location.path[0] !== 'collection' && this.collectionId === e.location.fullpath ) return;
 
-    this.collectionId = e.location.fullpath; // ie '/collection/sherry-lehmann'
-    // appStateUpdate already loads collection on route change
-    // this._showAdminPanel();
+    this.collectionId = e.location.fullpath;
+
     await this.CollectionModel.get(this.collectionId);
     await this._parseDisplayData();
     this._createEditor();
@@ -106,11 +105,10 @@ class AppCollection extends Mixin(LitElement)
     this.yearPublished = e.payload.results.yearPublished;
     // this.highlightedItems = e.payload.results.highlightedItems;
     
+
     // TODO pull from app container, otherwise default to most recent 3 items by year published descending    
     let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, 3);
-    debugger;
     if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
-      // itemUrl, title, thumbnailUrl
       this.highlightedItems = highlightedItems.body.results.map(item => {
         return {
           title : item['@graph'][0].name,
@@ -118,13 +116,12 @@ class AppCollection extends Mixin(LitElement)
           itemUrl : item['@graph'][0]['@id']
         };
       });
-      // this.highlightedItems = highlightedItems.body.results;
     }
 
     this._showAdminPanel();
 
     // search highlighted collection items
-    this.RecordModel.searchHighlighted(this.collectionId, true, true);
+    // this.RecordModel.searchHighlighted(this.collectionId, true, true);
   }
 
   /**

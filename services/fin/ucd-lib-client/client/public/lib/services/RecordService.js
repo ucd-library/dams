@@ -99,7 +99,7 @@ class RecordService extends BaseService {
   }
 
   async searchRecentItems(searchDocument = {}) {
-    searchDocument.textFields = config.elasticSearch.textFields.collection;
+    // searchDocument.textFields = config.elasticSearch.textFields.collection;
     return this.request({
       url : this.baseUrl+'?debug=true&single-node=true&compact=true',
       fetchOptions : {
@@ -109,9 +109,9 @@ class RecordService extends BaseService {
         },
         body : JSON.stringify(searchDocument)
       },
-      onLoading : promise => this.store.setSearchLoading(searchDocument, promise),
-      onLoad : result => this.store.setSearchLoaded(searchDocument, result.body),
-      onError : e => this.store.setSearchError(searchDocument, e)
+      onLoading : null,
+      onLoad : null,
+      onError : null
     });
   }
 
