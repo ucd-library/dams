@@ -399,9 +399,9 @@ return html`
 </div>
   
 <ucd-theme-pagination
-  current-page=${this.currentIndex + 1}
+  current-page=${this.currentPage}
   max-pages=${this.paginationTotal}
-  @page-change=${this._onPageClicked}>
+  @page-change=${this._onPaginationChange}>
 </ucd-theme-pagination>
 
 <div ?hidden="${!this.totalOverMaxWindow}" style="text-align: center" class="limit-results">Digital Collections limits results to 

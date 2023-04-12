@@ -45,6 +45,10 @@ export class AppNormalCheckbox extends Mixin(LitElement)
     });
   }
 
+  willUpdate() {
+    this.checked = this.hasAttribute('checked');
+  }
+
   /**
    * @method _realLabel
    * @description render label

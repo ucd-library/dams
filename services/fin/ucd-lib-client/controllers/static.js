@@ -41,6 +41,8 @@ module.exports = async (app) => {
     getConfig : async (req, res, next) => {
       let user = await authUtils.getUserFromRequest(req);
 
+      await appConfig.reload(true)
+
       if( user ) {
         let result = {
           loggedIn : true,

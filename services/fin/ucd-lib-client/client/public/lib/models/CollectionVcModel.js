@@ -21,7 +21,7 @@ class CollectionVcModel extends BaseModel {
     if( e.state === 'loaded' ) {
 
       // translate collection and related nodes/items to ui model
-      const rootNode = e.payload['@graph'][0];
+      const rootNode = e.payload['@graph'].filter(g => g['@id'] === e.payload['@id'])[0];
 
       // e.payload.node.shift();
       // todo this will come from admin application storage pref

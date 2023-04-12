@@ -201,14 +201,14 @@ return html`
 </div>
 
 <div class="body">
-  <div class="side-image ${this.label.toLowerCase() === 'collection' ? 'no-flex' : ''}">
-    <img class="left-image" ?hidden=${this.results.length < 12 || this.label.toLowerCase() === 'collection'} src="${this.leftImgUrl}"/>
+  <div class="side-image ${this.isCollectionPage ? 'no-flex' : ''}">
+    <img class="left-image" ?hidden=${this.results.length < 12 || this.isCollectionPage} src="${this.leftImgUrl}"/>
   </div>
 
 
 
   <div class="results">
-    <div class="table" ?hidden="${this.label.toLowerCase() === 'collection'}">
+    <div class="table" ?hidden="${this.isCollectionPage}">
       <h5>
         <div>${this.label}</div>
         <div>Items</div>
@@ -226,7 +226,7 @@ return html`
 
       <div class="card-grid">
         ${this.collectionResults.map(res => html`
-          <dams-collection-card .collection=${res} data-id="${this.label.toLowerCase() === 'collection' ? res.id : ''}" @click=${this._onCollectionClicked}></dams-collection-card>
+          <dams-collection-card .collection="${res}" data-id="${this.isCollectionPage ? res.id : ''}" @click=${this._onCollectionClicked}></dams-collection-card>
         `)}
       </div>  
 
@@ -242,8 +242,8 @@ return html`
       </ucd-theme-pagination>
     </div>
   </div>
-  <div class="side-image ${this.label.toLowerCase() === 'collection' ? 'no-flex' : ''}">
-    <img class="right-image" ?hidden=${this.results.length < 12 || this.label.toLowerCase() === 'collection'} src="${this.rightImgUrl}"/>
+  <div class="side-image ${this.isCollectionPage ? 'no-flex' : ''}">
+    <img class="right-image" ?hidden=${this.results.length < 12 || this.isCollectionPage} src="${this.rightImgUrl}"/>
   </div>
 </div>
 

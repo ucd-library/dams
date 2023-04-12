@@ -139,10 +139,15 @@ class CollectionModel extends BaseModel {
       let searchDocument = {
         limit: 3,
         sort: [{
-          lastModified: {order : "desc"} 
+          '@graph.datePublished': {order : "desc", "unmapped_type": "date"} 
         }]
       };
-      searchDocument = {limit: 3};
+      // searchDocument = {limit: 3};
+      return this.service.search(searchDocument);
+    }
+
+    getHomepageDefaultCollections() {
+      let searchDocument = {limit: 3};
       return this.service.search(searchDocument);
     }
 

@@ -68,6 +68,11 @@ class AppFacetFilter extends Mixin(LitElement)
       } else if( !this.notified[item.key] && item.active ) {
         this._notifySelected(item.active, item.key);
       }
+      if( APP_CONFIG.collectionLabels[item.key] ) {
+        let valueMap = {};
+        valueMap[item.key] = APP_CONFIG.collectionLabels[item.key];
+        item.valueMap = valueMap;
+      }
     });
 
     if( Object.keys(e.buckets).length > 50 ) {
@@ -143,8 +148,11 @@ class AppFacetFilter extends Mixin(LitElement)
   }
 
   _toggleFilter(e) {
-    if( e.currentTarget.checked ) this.appendFilter(e);
-    else this.removeFilter(e);
+    if( !e.currentTarget.hasAttribute('checked') ) {
+      this.appendFilter(e);
+    } else {
+      this.removeFilter(e);
+    }
   }
 
   appendFilter(e) {

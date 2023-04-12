@@ -24,6 +24,8 @@ export default function render() {
       width: 100vw;
     }
 
+    [hidden] { display: none !important; }
+
     :host > div {
       padding: 0 40px;
     }
@@ -66,6 +68,7 @@ export default function render() {
 
     .image-overlay {
       position: relative;
+      z-index: 450;
     }
 
     .watercolor-bg {
@@ -303,8 +306,13 @@ export default function render() {
       width: 100%;
   } */
 
-    .file-upload-container > * {
+    /* .file-upload-container > * {
       display: block;
+    } */
+
+    .file-upload-container ucdlib-icon {
+      display: inline-block;
+
     }
     
     input[type="file"] {
@@ -313,27 +321,41 @@ export default function render() {
 
     .file-upload-label {
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      background-color: var(--color-aggie-blue-80);
+      color: white;
+      height: 50px;
+      border-radius: 1.5rem;
+      /* padding: 0 1.5rem; */
+      display: inline-block;
+      /* align-items: center;
+      justify-content: center; */
       text-align: center;
-      width: auto;
-      min-width: 10ch;
-      min-height: 2.5em;
-      margin-bottom: 0;
-      padding: 0.625em 1em;
-      border: 1px solid #b0d0ed;
-      font-family: inherit;
-      font-weight: 700;
-      line-height: 1.1;
-      text-decoration: none;
-      --btn-arrow-color: #ffbf00;
-      transition: 0.2s padding ease-out;
-      border-color: transparent;
-      background-color: #022851;
-      color: #fff;
-      padding-top: 0;
-      padding-bottom: 0;
+      font-size: .8rem;
+      font-weight: bold;
+      white-space: nowrap;
+      min-width: 150px;
+    }
+
+    .left-panel {
+      display: flex;
+    }
+
+    .left-panel .file-upload-label ucdlib-icon {
+      height: 50%;
+      position: relative;
+      top: 5%;
+      left: -5%;
+      fill: var(--color-aggie-gold);
+    }
+
+    .left-panel .file-upload-label:hover {
+      background-color: var(--color-aggie-blue);
+    }
+
+    .left-panel  .file-upload-label span {
+      position: relative;
+      top: 20%;
+      right: 20%;
     }
 
     .selected-file {
@@ -341,8 +363,178 @@ export default function render() {
       font-weight: bold;
     }
 
+    .admin-edit .left-panel {
+      position: absolute;
+      left: 3rem;
+      top: 2rem;
+      z-index: 500;
+    }
+
+    .admin-edit .right-panel {
+      position: absolute;
+      right: 3rem;
+      top: 2rem;
+      z-index: 500;
+    }
+
+    .admin-edit .icon-wrapper {
+      height: 50px;
+      width: 50px;
+      background-color: var(--color-aggie-blue-70);
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: .3rem;
+      cursor: pointer;
+    }
+
+    .admin-edit ucdlib-icon {
+      fill: white;
+      width: 50%;
+      height: 50%;
+      margin: auto;
+      padding-top: 0.6rem;      
+    }
+
+    .admin-edit .icon-wrapper.edit {
+      background-color: var(--color-aggie-blue);
+    }
+
+    .admin-edit .icon-wrapper:hover {
+      background-color: var(--color-aggie-blue);
+    }
+
+    .admin-edit .icon-wrapper.edit:hover {
+      background-color: var(--color-aggie-gold);
+    }
+
+    .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
+      fill: var(--color-aggie-blue);
+    }
+
+    .edit-overlay {
+      background: white;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      opacity: .55;
+      z-index: 400;
+    }
+
+    .color-pallette {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 2rem;
+      padding: 0 .6rem;
+      background-color: var(--color-aggie-blue-30);
+      border-radius: 1.5rem;
+    }
+
+    .color-circle {
+      width: 27px;
+      height: 27px;
+      border-radius: 50%;
+      margin: 0 3px;
+      cursor: pointer;
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+    }
+
+    .color-circle:hover {
+      border: 3px solid var(--color-aggie-blue-70);
+    }
+
+    .color-circle[selected] {
+      border: 3px solid var(--color-aggie-blue);
+    }
+
+    .edit-collections-container {
+      z-index: 500;
+      position: relative;
+    }
+
+    .edit-collections-container .collection-item {
+      height: 135px;
+      /* width: 401px; */
+      background-color: var(--color-aggie-blue-30);
+      position: relative;
+      margin: 1rem;
+    }
+
+    .edit-collections-container .collection-item span {
+      display: block;
+      text-align: start;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .edit-collections-container .collection-item input {
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      border: none;
+      height: 2rem;
+      padding: 0 .5rem;
+      box-sizing: border-box;
+      outline: none;
+      font-size: .8rem;
+    }
+
+    .collection-highlights h2, 
+    .collection-highlights .header-dots {
+      position: relative;
+      z-index: 500;
+    }
+
+    .collection-highlights h2 {
+      margin-bottom: 0;
+    }
+    
+
+    /* TODO transitions for admin icons and hovering */
+
+
   </style>
   
+    <div class="edit-overlay" ?hidden="${!this.editMode}">
+    </div>
+    <div class="admin-edit" ?hidden="${!this.isAdmin}">
+      <div class="left-panel">
+        <div class="file-upload-container" ?hidden="${!this.editMode}">            
+          <label for="file-upload" class="file-upload-label">
+            <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
+            <span>New Image</span> 
+          </label>
+          <input id="file-upload" type="file" accept="image/jpeg" @change="${this._onFileChange}" />
+        </div>  
+
+        <div class="color-pallette" ?hidden="${!this.editMode}">
+          <div class="rose color-circle" ?selected="${this.watercolor === 'rose'}" style="background-color: var(--color-rose)" @click="${this._onWatercolorChanged}"></div>
+          <div class="gold color-circle" ?selected="${this.watercolor === 'gold'}" style="background-color: var(--color-aggie-gold)" @click="${this._onWatercolorChanged}"></div>
+          <div class="sage color-circle" ?selected="${this.watercolor === 'sage'}" style="background-color: var(--color-farmers-market)" @click="${this._onWatercolorChanged}"></div>
+          <div class="arboretum color-circle" ?selected="${this.watercolor === 'arboretum'}" style="background-color: var(--color-arboretum)" @click="${this._onWatercolorChanged}"></div>
+          <div class="tahoe color-circle" ?selected="${this.watercolor === 'tahoe'}" style="background-color: var(--color-tahoe)" @click="${this._onWatercolorChanged}"></div>
+          <div class="thiebaud-icing color-circle" ?selected="${this.watercolor === 'thiebaud-icing'}" style="background-color: var(--color-thiebaud-icing)" @click="${this._onWatercolorChanged}"></div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="icon-wrapper" ?hidden="${this.editMode}" @click="${this._onEditClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
+        </div>
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onSaveClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
+        </div>
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onCancelEditClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+        </div>
+      </div>
+    </div>
+
     <div class="title-section">
       <div class="image-overlay">
         <img class="watercolor-bg" src="/images/watercolors/collection-watercolor-${this.watercolor}-back.png" width="100%" alt="watercolor background" />
@@ -352,6 +544,7 @@ export default function render() {
         <img class="watercolor-fg" src="/images/watercolors/collection-watercolor-${this.watercolor}-front.png" width="100%" alt="watercolor foreground" />
       </div>
       <div class="collection-header">
+        
         <h1>${this.title}</h1>
         <h3 ?hidden="${!this.callNumber}">Collection #${this.callNumber}</h3>
         <a href="${this._href}" class="btn--alt btn--round">View ${this.items} items</a>
@@ -374,7 +567,7 @@ export default function render() {
       <div style="margin-bottom: .4rem;">
         <span class="label">Coverage: </span> ${this.yearPublished}
       </div>
-      <div style="margin-bottom: .4rem;">
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.keywords || !this.keywords.length}">
         <span class="label">Subjects: </span> 
         ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="">${item}</a>`)}
       </div>
@@ -384,45 +577,62 @@ export default function render() {
     </div>
 
     <div class="collection-highlights">
-      <h2>Collection Highlights</h2>
+      <h2>Highlights From This Collection</h2>
       ${ SharedHtml.headerDots() }
       
-      <div class="card-trio">
-        ${this.highlightedItems.map((item, index) => html`
-          ${index < 3 ? html`<dams-item-card .data="${item}"></dams-item-card>` : ''}
-        `)}
+      <div class="edit-collections-container" ?hidden="${!this.editMode}">
+        <div class="card-trio">      
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+          </div>
+
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+          </div>
+
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+          </div>
+        </div>
+      
+        <div class="card-trio">      
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+          </div>
+
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+          </div>
+
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+          </div>
+        </div>
+      
       </div>
-      <div class="card-trio">
-        ${this.highlightedItems.map((item, index) => html`
-          ${index >= 3 ? html`<dams-item-card .data="${item}"></dams-item-card>` : ''}
-        `)}
+      <div ?hidden="${this.editMode}">
+        <div class="card-trio">
+          ${this.highlightedItems.map((item, index) => html`
+            ${index < 3 ? html`<dams-item-card .data="${item}"></dams-item-card>` : ''}
+          `)}
+        </div>
+        <div class="card-trio">
+          ${this.highlightedItems.map((item, index) => html`
+            ${index >= 3 ? html`<dams-item-card .data="${item}"></dams-item-card>` : ''}
+          `)}
+        </div>
       </div>
 
-      <a href="" class="btn btn--primary">View all collection items</a>
+      <a href="" class="btn btn--primary view-all-collections">View all collection items</a>
 
     </div>
 
-    <!-- <div class="citation">
-      <div class="cite-graphic">
-        <img src="/images/watercolors/citation-watercolor-800px-square.png" width="100%" alt="cite this collection image" />
-      </div>
-      <div class="cite-collection">
-        <h2>Cite This Collection</h2>
-
-        ${ SharedHtml.headerDots() }
-
-        <p>
-          Loomis, Benjamin Franklin, Thompson, Peter Julian "Jack", Eastman, Jervie Henry, Riesen, John D, Myers, Loomis, Simmons, Mirl H. (1997).
-          Eastman's Originals Collection. Retrieved September 28, 2022, from https://digital.ucdavis.edu/collection/eastman
-        </p>
-
-        
-
-        <a href="" class="btn btn-apa">APA</a>
-        <a href="" class="btn btn-copy">Copy Text</a>
-
-      </div>
-    </div> -->
     <app-citation></app-citation>
 
     <h2 class="admin-heading">Debug ${this.collectionId}</h2>
@@ -436,17 +646,15 @@ export default function render() {
     
     </div>
     
-    <div class="file-upload-container">    
+    <!-- <div class="file-upload-container">    
       <label for="file-upload" class="file-upload-label">
         Upload Featured Image 
       </label>
       <input id="file-upload" type="file" accept="image/jpeg" @change="${this._onFileChange}" />
       <span class="selected-file">
-        <!-- ${this.selectedFilename} -->
       </span>
     </div>
 
-    <a href="" class="btn--alt" style="margin: 0 2rem 2rem 2rem" @click="${this._onSave}">Save</a>
-
+    <a href="" class="btn--alt" style="margin: 0 2rem 2rem 2rem" @click="${this._onSave}">Save</a> -->
 
   `;}
