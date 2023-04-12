@@ -21,6 +21,11 @@ export default function render() {
     position: relative;
     z-index: 500;
   }
+/* 
+  input,
+  textarea {
+    border: none;
+  } */
 
   .icon-wrapper {
     height: 50px;
@@ -41,7 +46,7 @@ export default function render() {
   }
 
   .icon-wrapper.edit {
-    background-color: var(--color-aggie-blue);
+    background-color: var(--color-aggie-blue-80);
   }
 
   .icon-wrapper:hover {
@@ -84,7 +89,8 @@ export default function render() {
     font-weight: bold;
   }
 
-  .content-row {
+  .content-row,
+  .collection-list {
     padding-left: 1rem;
   }
 
@@ -169,15 +175,15 @@ export default function render() {
 </style>
 
 <div class="editor-row-control">
-    <div class="icon-wrapper edit" @click="${this._onUpArrayClicked}">
+    <div class="icon-wrapper edit" @click="${this._onUpArrowClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-arrow-up"></ucdlib-icon>
     </div>
-    <div class="icon-wrapper edit" style="margin-left: .3rem;" @click="${this._onDownArrayClicked}">
+    <div class="icon-wrapper edit" style="margin-left: .3rem;" @click="${this._onDownArrowClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-arrow-down"></ucdlib-icon>
     </div>
     <div class="dots flex-expand"></div>
     <div style="background-color: var(--color-aggie-blue-40); height: 75px">
-        <img src="/images/icons/${this.controlIcons[this.type]}" style="width: 150px" />
+        <ucdlib-icon icon="ucdlib-dams:${this.controlIcons[this.type]}" style="width: 150px; height: 100%;"></ucdlib-icon>
     </div>
     <div class="dots flex-expand"></div>
     <div class="icon-wrapper edit" @click="${this._onTrashClicked}">
@@ -213,16 +219,13 @@ export default function render() {
       <ucd-theme-slim-select @change="${this._collectionSelected}">
         <select>
           <option></option>
-          <option>Eastman</option>
-          <option>Sherry Lehmann</option>
-          <option>Yearbooks</option>
-          <option>Yearworks</option>
+          <!-- options added in js -->
         </select>
       </ucd-theme-slim-select>
     </div>
     <div ?hidden="${this.type !== 'text'}">
       <span class="form-label">Heading</span>
-      <input class="heading-text" type="text">
+      <input class="heading-text" type="text" .value=${this.heading}>
     </div>
   </div>
 
@@ -230,12 +233,9 @@ export default function render() {
     <span class="form-label">Collections</span>
     ${this.collections.map(collection => html`
       <ucd-theme-slim-select @change="${this._collectionCardSelected}">
-        <select>
+        <select class="collections">
           <option></option>
-          <option>Eastman</option>
-          <option>Sherry Lehmann</option>
-          <option>Yearbooks</option>
-          <option>Yearworks</option>
+          <!-- options added in js -->
         </select>
       </ucd-theme-slim-select>
     `)}
@@ -250,7 +250,7 @@ export default function render() {
 
   <div class="content-row" style="padding-top: 2rem;" ?hidden="${this.type === 'cards'}">
     <span class="form-label">Description</span>    
-    <textarea class="description" style="height: 175px; font-size: .9rem"></textarea>
+    <textarea class="description" style="height: 175px; font-size: .9rem" .value="${this.description}" @change="${this._descriptionChanged}"></textarea>
   </div>
   
 

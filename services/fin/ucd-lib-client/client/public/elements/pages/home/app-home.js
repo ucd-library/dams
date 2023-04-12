@@ -61,7 +61,7 @@ class AppHome extends Mixin(LitElement)
     this.textTrio = {};
     this.heroImgOptions = {};
     this.heroImgCurrent = {};
-    this.editMode = false;
+    this.editMode = true; // TODO change to false after dev
     this._injectModel('FcAppConfigModel', 'CollectionModel', 'RecordModel');
   }
 

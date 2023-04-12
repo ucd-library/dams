@@ -29,6 +29,7 @@ return html`
     -webkit-box-sizing: border-box;
     border: 3px solid var(--color-aggie-blue-60); 
     height: 125px;
+    width: 240px;
   }
 
   .img-box:hover {
@@ -36,13 +37,18 @@ return html`
     background-color: var(--color-aggie-gold);
   }
 
-  .img-box img {
-    /* TODO not working */
-    /* fill: var(--color-aggie-blue-80); */
+  .img-box ucdlib-icon {
+    fill: var(--color-aggie-blue-80);
+    width: 100%;
+    height: 100%;
   }
 
-  img-box ucdlib-icon {
-    fill: var(--color-aggie-blue-80);
+  .img-box .content-type-label { 
+    color: var(--color-aggie-blue-80);
+    text-align: center;
+    display: block;
+    padding: 0.5rem;
+    font-weight: bold;
   }
 
 
@@ -50,7 +56,7 @@ return html`
 
 <!-- TODO handle showing panels that exist -->
 
-<admin-content-panel 
+<!-- <admin-content-panel 
     @panel-loaded="${this._updateUiStyles}"
     type="single">
 </admin-content-panel>
@@ -61,29 +67,39 @@ return html`
 <admin-content-panel 
     @panel-loaded="${this._updateUiStyles}"
     type="cards">
-</admin-content-panel>
+</admin-content-panel> -->
+
+${this.panels.map(panel => html`
+  <admin-content-panel 
+    @panel-loaded="${this._updateUiStyles}"
+    @trash-clicked="${this._trashPanel}"
+    @up-arrow-clicked="${this._movePanelUp}"
+    @down-arrow-clicked="${this._movePanelDown}"
+    type="${panel.type}"
+    position="${panel.position}"
+    placement="${panel.placement}"
+    collectionId="${panel.collectionId}"
+    heading="${panel.heading}"
+    description="${panel.description}"
+    .collectionIds="${panel.collectionIds}">
+  </admin-content-panel>
+`)}
+
+
 
 <h2>Add Content:</h2>
 <div style="display: flex; width: 50%; margin: 0 auto; justify-content: space-between">
-
-    <!-- <div style="background-color: var(--color-aggie-blue-40); height: 75px">
-        <img src="/images/icons/" style="width: 150px" />
-    </div>
-    <div class="dots flex-expand"></div>
-    <div class="icon-wrapper edit" @click="${this._onTrashClicked}">
-        <ucdlib-icon icon="ucdlib-dams:fa-trash"></ucdlib-icon>
-    </div> -->
-
-    <div class="img-box">
+    <div class="single img-box" @click="${this._newPanel}">
         <ucdlib-icon icon="ucdlib-dams:dams-admin-collection-single"></ucdlib-icon>
-        <!-- <img src="/images/icons/dams-admin-collection-single.svg" height="100%" /> -->
+        <span class="content-type-label">Collection Single</span>
     </div>
-    <div class="img-box">
-        <img src="/images/icons/dams-admin-text.svg" height="100%" />
+    <div class="cards img-box" @click="${this._newPanel}">
+      <ucdlib-icon icon="ucdlib-dams:dams-admin-collection-cards"></ucdlib-icon>
+      <span class="content-type-label">Collection Cards</span>
     </div>
-    <div class="img-box">
-        <img src="/images/icons/dams-admin-collection-cards.svg" height="100%" />
+    <div class="text img-box" @click="${this._newPanel}">
+      <ucdlib-icon icon="ucdlib-dams:dams-admin-text"></ucdlib-icon>
+      <span class="content-type-label">Text</span>
     </div>
-
 </div>
 `;}

@@ -11,7 +11,35 @@ import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 export class AdminFeaturedCollections extends LitElement {
   static get properties() {
     return {
-    //   record: {type : Object},
+      panels: {type : Array}
+      /*
+        // ie
+        panels : [
+          {
+            position : 1,
+            type : 'single',
+            imagePlacement : 'left', // or 'right'
+            collectionId : '/collection/sherry-lehmann',
+            description : 'This is a description of the collection',
+          },
+          {
+            position : 2,
+            type : 'text',
+            textPlacement : 'centered', // or 'left-aligned', 'split'
+            heading : 'This is a heading',
+            description : 'This is a description of the collection',
+          },
+          {
+            position : 3,
+            type : 'cards',
+            collectionIds : [
+              '/collection/sherry-lehmann',
+              '/collection/uc-davis-archives',
+            ],
+            description : 'This is a description of the collection',
+          }
+        ]
+      */
     };
   }
 
@@ -20,7 +48,7 @@ export class AdminFeaturedCollections extends LitElement {
     this.render = render.bind(this);
     this.active = true;
     
-    // this.record = {};
+    this.panels = [];
   }
 
   /**
@@ -29,9 +57,29 @@ export class AdminFeaturedCollections extends LitElement {
    */
   firstUpdated() {}
 
+  
+  /**
+   * @method _newPanel
+   * @description Add Content panel click handler, creates new panel and adds to panels array
+   * @param {CustomEvent} e 
+   */
+  _newPanel(e) {
+    let type = e.currentTarget.classList[0];
+    this.panels.push({
+      position : this.panels.length,
+      type,
+      placement : type === 'single' ? 'left' : 'centered',
+      collectionId : '',
+      heading : '',
+      description : '',
+      collectionIds : type === 'cards' ? [''] : null,
+    });
+    this.requestUpdate();
+  }
+
   /**
    * @method _updateUiStyles
-   * @description Listener attached to <admin-content-panel> firstUpdated events
+   * @description Listener attached to <admin-content-panel> updated events
    * @param {CustomEvent} e 
    */
   _updateUiStyles(e) {
@@ -64,6 +112,72 @@ export class AdminFeaturedCollections extends LitElement {
         let description = panel.shadowRoot.querySelector('.description');
         description.style.width = selectWidth+'px';   
     });
+  }
+
+  /**
+   * @method _trashPanel
+   * @description Listener attached to <admin-content-panel> trash events, remove panel
+   * @param {CustomEvent} e 
+   */
+  _trashPanel(e) {
+    let position = e.detail.position;
+    this.panels.splice(position, 1);
+
+    // update position of remaining panels
+    this.panels.forEach((panel, i) => {
+      panel.position = i;
+    });
+    this.requestUpdate();
+  }
+
+  /**
+   * @method _movePanelUp
+   * @description Listener attached to <admin-content-panel> arrow events, reposition panel
+   * @param {CustomEvent} e 
+   */
+  _movePanelUp(e) {
+    let position = e.detail.position;
+    if( position === 0 ) return;
+
+    let panel = this.panels.splice(position, 1)[0];
+    panel.placement = e.detail.placement;
+    panel.collectionId = e.detail.collectionId;
+    panel.heading = e.detail.heading;
+    panel.description = e.detail.description;
+    panel.collectionIds = e.detail.collectionIds;
+
+    this.panels.splice(position-1, 0, panel);
+
+    // update position of remaining panels
+    this.panels.forEach((panel, i) => {
+      panel.position = i;
+    });
+    this.requestUpdate();
+  }
+
+  /**
+   * @method _movePanelUp
+   * @description Listener attached to <admin-content-panel> arrow events, reposition panel
+   * @param {CustomEvent} e 
+   */
+  _movePanelDown(e) {
+    let position = e.detail.position;
+    if( position === this.panels.length-1 ) return;
+
+    let panel = this.panels.splice(position, 1)[0];
+    panel.placement = e.detail.placement;
+    panel.collectionId = e.detail.collectionId;
+    panel.heading = e.detail.heading;
+    panel.description = e.detail.description;
+    panel.collectionIds = e.detail.collectionIds;
+    
+    this.panels.splice(position+1, 0, panel);
+
+    // update position of remaining panels
+    this.panels.forEach((panel, i) => {
+      panel.position = i;
+    });
+    this.requestUpdate();
   }
 
 }
