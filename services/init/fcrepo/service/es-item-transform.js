@@ -7,6 +7,7 @@ const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGro
 
 const IA_READER_WORKFLOW = 'book-to-ia-reader';
 const STREAMING_VIDEO_WORKFLOW = 'video-to-stream';
+const COMPRESS_WORKFLOW = 'client-image-sizes';
 
 module.exports = async function(path, graph, headers, utils) {
   let item = {};
@@ -248,7 +249,7 @@ module.exports = async function(path, graph, headers, utils) {
   });
 
   utils.stripFinHost(item);
-  await utils.setImage(item);
+  // await utils.setImage(item);
   await utils.setIndexableContent(item);
 
   utils.setYearFromDate(item);
@@ -290,6 +291,14 @@ module.exports = async function(path, graph, headers, utils) {
         item.clientMedia.streamingVideo = {
           manifest : config.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/playlist.m3u8'
         }
+      }
+
+      let clientImages = headers.link.workflow.find(item => COMPRESS_WORKFLOW === item.type);
+      if( clientImages ) {
+        let workflowInfo = await fetch(getGatewayUrl(clientImages.url));
+        workflowInfo = await workflowInfo.json();
+        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json');
+        item.clientMedia.imageSizes = await manifest.json();
       }
     }
   }
