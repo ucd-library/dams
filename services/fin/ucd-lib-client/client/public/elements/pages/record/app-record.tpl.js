@@ -363,20 +363,20 @@ export default function render() {
       </div>
     </div>
 
-    <div class="metadata-row">
+    <div ?hidden="${!this.date}" class="metadata-row">
       <div class="attr">Date</div>
       <div class="value" id="dateValue">${this.date}</div>
     </div>
 
-    <div class="metadata-row" id="publisher">
+    <div ?hidden="${!this.publisher}" class="metadata-row" id="publisher">
       <div class="attr">Publisher</div>
       <div class="value" id="publisherValue">${this.publisher}</div>
     </div>
 
-    <div class="metadata-row" id="subject">
+    <div ?hidden="${!this.keywords || !this.keywords.length}" class="metadata-row" id="subject">
       <div class="attr">Subjects</div>
       <div class="value" id="subjectValue">
-        ${this.keywords.map((about, index) => html`${index > 0 ? ', ' : ''}<a href="${about['@id']}">${about['name']}</a>`)}
+        ${this.keywords.map((about, index) => html`${index > 0 ? ', ' : ''}<a href="${about['@id']}">${about['name'] || about['@id']}</a>`)}
       </div>
     </div>
 

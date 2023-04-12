@@ -87,7 +87,7 @@ class CollectionService extends BaseService {
   async search(searchDocument = {}) {
     searchDocument.textFields = config.elasticSearch.textFields.collection;
     return this.request({
-      url : this.baseUrl+'?debug=true',
+      url : this.baseUrl+'?debug=true&single-node=true&compact=true',
       fetchOptions : {
         method : 'POST',
         headers : {

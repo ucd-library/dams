@@ -37,7 +37,8 @@ class AppSearchResultsPanel extends Mixin(LitElement)
       showLoading : { type: Boolean },
       errorMsg : { type: Boolean },
       paginationTotal : { type: Number }, // total number for pagination widget, we max out at 10000
-      totalOverMaxWindow : { type: Boolean }
+      totalOverMaxWindow : { type: Boolean },
+      currentPage : { type: Number },
     }
   }
 
@@ -68,6 +69,7 @@ class AppSearchResultsPanel extends Mixin(LitElement)
     this.total = '0';
     this.numPerPage = 1;
     this.currentIndex = 0;
+    this.currentPage = 1;
     this.showCollectionResults = false;
     this.showError = false;
     this.showLoading = false;
@@ -109,7 +111,6 @@ class AppSearchResultsPanel extends Mixin(LitElement)
     this.showError = false;
     clearTimeout(this.showLoadingTimer);
     this.showLoading = false;
-    
 
     requestAnimationFrame(() => {
       this.total = total;
@@ -124,12 +125,13 @@ class AppSearchResultsPanel extends Mixin(LitElement)
 
       this.results = results;
       this.numPerPage = numPerPage;
-      this.paginationTotal = results.length / numPerPage;
-      if( this.paginationTotal < 1 ) this.paginationTotal = 1;
+      this.paginationTotal = Math.ceil(total / numPerPage);
+      // if( this.paginationTotal < 1 ) this.paginationTotal = 1;
 
       this.shadowRoot.querySelector('#numPerPage').value = numPerPage+'';
       this.shadowRoot.querySelector('#numPerPageM').value = numPerPage+'';
       this.currentIndex = currentIndex;
+      this.currentPage = this.currentIndex === 0 ? 1 : this.currentIndex / 10 + 1;
 
       requestAnimationFrame(() => this._resize());
     });
@@ -344,17 +346,6 @@ class AppSearchResultsPanel extends Mixin(LitElement)
     }));
   }
 
-  /**
-   * @method _onPaginationNav
-   * @description bound to scork-pagination `nav` event, dispatch event to parent
-   * alerting to new page 
-   */
-  _onPaginationNav(e) {
-    this.dispatchEvent(new CustomEvent('page-change', {
-      detail : e.detail
-    }));
-  }
-
   _scrollToCollections(e) {
     e.preventDefault();
 
@@ -429,6 +420,24 @@ class AppSearchResultsPanel extends Mixin(LitElement)
     if( location ) {
       this.AppStateModel.setLocation(location);
     }
+  }
+
+  /**
+   * @method _onPaginationChange
+   * @description bound to click events of the pagination element
+   * 
+   * @param {Object} e click|keyup event
+   */
+  _onPaginationChange(e) {
+    // let searchUrlParts = this.AppStateModel.locationElement.location.path;
+    // let query = this.RecordModel.urlToSearchDocument(searchUrlParts.slice(1, searchUrlParts.length));
+    // query.offset = e.detail.page * this.numPerPage - this.numPerPage;
+    // // debugger;
+    // this.RecordModel.search(query, true, true, true);
+    e.detail.startIndex = e.detail.page * 10 - 10;
+    this.dispatchEvent(new CustomEvent('page-change', {
+      detail : e.detail
+    }));
   }
 
 }

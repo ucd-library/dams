@@ -387,7 +387,8 @@ return html`
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: var(--spacing-default) 0;
+    margin: var(--spacing-default) 0 0;
+    padding-bottom: 3rem;
   }
   .splat-stars {
     width: 9rem;
@@ -480,6 +481,67 @@ return html`
   .btn--more-about:hover {
     color: var(--color-aggie-blue-80);
   }
+
+  dams-hero {
+    position: relative;
+    z-index: 450;
+  }
+
+  .edit-overlay {
+    background: white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: .55;
+    z-index: 400;
+  }
+
+  .right-panel {
+    position: absolute;
+    right: 4rem;
+    z-index: 500;
+  }
+
+  .icon-wrapper {
+    height: 50px;
+    width: 50px;
+    background-color: var(--color-aggie-blue-70);
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: .3rem;
+    cursor: pointer;
+  }
+
+  .icon-wrapper ucdlib-icon {
+    fill: white;
+    width: 50%;
+    height: 50%;
+    margin: auto;
+    padding-top: 0.6rem;
+    z-index: 500;
+  }
+
+  .icon-wrapper.edit {
+    background-color: var(--color-aggie-blue);
+  }
+
+  .icon-wrapper:hover {
+    background-color: var(--color-aggie-blue);
+  }
+
+  .icon-wrapper.edit:hover {
+    background-color: var(--color-aggie-gold);
+  }
+
+  .icon-wrapper.edit:hover ucdlib-icon {
+    fill: var(--color-aggie-blue);
+  }
+
+  admin-featured-collections {
+    margin: 4rem 0;
+  }
   
   /*
   .mobile-bar {
@@ -557,8 +619,7 @@ return html`
         <iron-icon icon="fin-icons:search" class="search-icon" slot="button-content"></iron-icon>
       </app-search-box>
       <div class="sub-search">
-        Featured Image: <!--<a href="${this.heroImgCurrent.itemLink}">${this.heroImgCurrent.itemName}</a> | 
-        <a href="${this.heroImgCurrent.collectionLink}">${this.heroImgCurrent.collectionName}</a>-->
+        Featured Image: |
       </div>
     </div>
   </div>
@@ -566,6 +627,7 @@ return html`
 </dams-hero>
 <!-- <img src="/images/defaults/annual-winter-sale1952.jpg"> -->
 
+<div class="edit-overlay" ?hidden="${!this.editMode}"></div>
 <section class="browse-buttons site-frame">
   <div class="priority-links">
     <div class="priority-links__item">
@@ -660,23 +722,28 @@ return html`
   
 
   <div class="card-trio">
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-item-card .collection="${{}}"></dams-item-card>
-
-
-  <!-- TODO figure out where to source the collections -->
   ${this.recentCollections.map((collection) => 
       html`
-      <dams-collection-card .collection="${collection}"></dams-collection-card>
+      <dams-collection-card data-id="${collection['@id']}"></dams-collection-card>
       `
       )}
-      <dams-collection-card .collection="${this.recentCollections[0]}"></dams-collection-card>
   </div>
 </section>
 
 ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
 
   <section class="featured site-frame">
+    <div class="right-panel">
+      <div class="icon-wrapper" ?hidden="${this.editMode}" @click="${this._onEditClicked}">
+        <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
+      </div>
+      <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onSaveClicked}">
+        <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
+      </div>
+      <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onCancelEditClicked}">
+        <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+      </div>
+    </div>
     <h1>Featured <span class="fw-light">Collections</span></h1>
     <div style="text-align:center;">
       <img class="splat-stars" src="/images/watercolors/watercolor-splat-homepage-stars.png">
@@ -684,36 +751,64 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
           overlay-template="stars">
       </dams-watercolor-overlay> -->
     </div>
-    <dams-highlighted-collection .collection="${this.featuredCollections[0]}"></dams-highlighted-collection>
 
-
-    <!-- <div class="featured-group" ?hidden="${!this.showCollectionGroup}"> -->
-    <div class="featured-group">
-      <div class="fg-header">
-        <!-- <h3>${this.textTrio.label}</h3>
-        <div>${this.textTrio.text}</div> -->
-        <h3 class="heading--primary">The Greatest<br>Wine Library</h3>
-        <div>
-          Our wine collections support UC Davis' top-ranked viticulture and enology
-          program and visiting scholors around the world including 30,000 books in 
-          more than 50 languages, rare books and manuscripts, historic records and
-          research data, the papers of leading writers on California wine, and materials in
-          every medium, from vintage wine labels to videos. The featured items below are a 
-          small taste of these extensive collections.
+    <admin-featured-collections ?hidden="${!this.editMode}"></admin-featured-collections>
+    <!-- <div class="featured-collections-editor" ?hidden="${!this.editMode}">
+      
+    
+      <div class="editor-row-control">
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onUpArrayClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-arrow-up"></ucdlib-icon>
+        </div>
+        <div class="icon-wrapper edit" style="margin-left: .3rem;" ?hidden="${!this.editMode}" @click="${this._onDownArrayClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-arrow-down"></ucdlib-icon>
+        </div>
+        <div class="dots flex-expand"></div>
+        <div style="background-color: var(--color-aggie-blue-40); height: 75px">
+          <img src="/images/icons/dams-admin-collection-single.svg" style="width: 150px" />
+        </div>
+        <div class="dots flex-expand"></div>
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onTrashClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-trash"></ucdlib-icon>
         </div>
       </div>
-      <div class="card-trio">
-        ${[1,2,3].map(i => html`
-          ${this.featuredCollectionsCt > i || 1 == 1? html`
-            <dams-collection-card .collection="${this.featuredCollections[i] || {}}"></dams-collection-card>
-          ` : html``}
-        `)}
+
+
+    </div> -->
+  
+    <div class="featured-collections-public" ?hidden="${this.editMode}">
+      <dams-highlighted-collection .collection="${this.featuredCollections[0]}"></dams-highlighted-collection>
+
+      <!-- <div class="featured-group" ?hidden="${!this.showCollectionGroup}"> -->
+      <div class="featured-group">
+        <div class="fg-header">
+          <!-- <h3>${this.textTrio.label}</h3>
+          <div>${this.textTrio.text}</div> -->
+          <h3 class="heading--primary">The Greatest<br>Wine Library</h3>
+          <div>
+            Our wine collections support UC Davis' top-ranked viticulture and enology
+            program and visiting scholors around the world including 30,000 books in 
+            more than 50 languages, rare books and manuscripts, historic records and
+            research data, the papers of leading writers on California wine, and materials in
+            every medium, from vintage wine labels to videos. The featured items below are a 
+            small taste of these extensive collections.
+          </div>
+        </div>
+
+
+        <div class="card-trio">
+          ${this.featuredCollections.map(collection => html`
+            <dams-collection-card data-id="${collection['@id']}"></dams-collection-card>
+          `)}
+        </div>
       </div>
+
+
+      </div>
+
       <div class="featured-more">
-        <a href="/browse/collection" class="btn btn--primary">Browse all collections</a>
-      
+        <a href="/browse/collections" class="btn btn--primary">Browse all collections</a>
       </div>
-    </div>
   </section>
 
   <section class="about-collections">
@@ -728,7 +823,7 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
         to store and manage the digital assets of UC Davis Library, increasing access
         to previously undiscoverable digital assets.
       </p>
-      <a href="/collections" class="btn--more-about btn--alt btn--round">More about this project</a>
+      <a href="/about" class="btn--more-about btn--alt btn--round">More about this project</a>
     </div>
   </section>
 

@@ -18,6 +18,7 @@ import "../../components/cards/dams-collection-card";
 import "../../components/cards/dams-item-card";
 import "../../components/graphics/dams-hero";
 import "../../components/sections/dams-highlighted-collection";
+import "../../components/admin/admin-featured-collections";
 
 import render from './app-home.tpl.js';
 
@@ -44,7 +45,8 @@ class AppHome extends Mixin(LitElement)
       showCollectionGroup: {type: Boolean},
       textTrio: {type: Object},
       heroImgOptions: {type: Object},
-      heroImgCurrent: {type: Object}
+      heroImgCurrent: {type: Object},
+      editMode: {type: Boolean}
     };
   }
 
@@ -59,6 +61,7 @@ class AppHome extends Mixin(LitElement)
     this.textTrio = {};
     this.heroImgOptions = {};
     this.heroImgCurrent = {};
+    this.editMode = false;
     this._injectModel('FcAppConfigModel', 'CollectionModel', 'RecordModel');
   }
 
@@ -68,19 +71,27 @@ class AppHome extends Mixin(LitElement)
    */
   async firstUpdated() {
     // Get featured collections
-    this.featuredCollections = this.FcAppConfigModel.getFeaturedCollections();
-    this.featuredCollectionsCt = this.featuredCollections.length;
-    let groupText = this.FcAppConfigModel.getAppText('hp-trio');
-    if ( groupText ) this.textTrio = groupText;
-    if ( this.featuredCollectionsCt > 1 && groupText ) this.showCollectionGroup = true;
+    // this.featuredCollections = this.FcAppConfigModel.getFeaturedCollections();
+    // this.featuredCollectionsCt = this.featuredCollections.length;
+    // let groupText = this.FcAppConfigModel.getAppText('hp-trio');
+    // if ( groupText ) this.textTrio = groupText;
+    // if ( this.featuredCollectionsCt > 1 && groupText ) this.showCollectionGroup = true;
+    let d = await this.CollectionModel.getHomepageDefaultCollections();
+    if( d.response.ok && d.body.results.length ) {
+      this.featuredCollections = d.body.results;
+      this.featuredCollectionsCt = this.featuredCollections.length;
+    }
 
     // Get recent collections
-    let d = await this.CollectionModel.getRecentCollections();
-    if ( d.response.ok && Array.isArray(APP_CONFIG.collections) ) {
-      d.body.results.forEach(item => {
-        let collectionData = APP_CONFIG.collections.find(c => c['@id'] === item['@id']);
-        if ( collectionData ) this.recentCollections.push(collectionData);
-      });
+    d = await this.CollectionModel.getRecentCollections();
+    // if ( d.response.ok && Array.isArray(APP_CONFIG.collections) ) {
+    //   d.body.results.forEach(item => {
+    //     let collectionData = APP_CONFIG.collections.find(c => c['@id'] === item['@id']);
+    //     if ( collectionData ) this.recentCollections.push(collectionData);
+    //   });
+    // }
+    if( d.response.ok && d.body.results.length ) {
+      this.recentCollections = d.body.results;
     }
 
     // Get hero image options
@@ -115,6 +126,38 @@ class AppHome extends Mixin(LitElement)
     if ( !img ) return;
     this.heroImgCurrent = this.heroImgOptions[img];
 
+  }
+
+  /**
+   * @method _onEditClicked
+   * @description admin ui, edit button click event
+   * 
+   * @param {Object} e 
+   */
+  _onEditClicked(e) {
+    this.editMode = true;
+    console.log('this.editMode', this.editMode);
+  }
+
+  /**
+   * @method _onSaveClicked
+   * @description admin ui, save button click event
+   * 
+   * @param {Object} e 
+   */
+  _onSaveClicked(e) {
+    // TODO save to fcrepo container
+    //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
+  }
+
+  /**
+   * @method _onCancelEditClicked
+   * @description admin ui, cancel editing button click event
+   * 
+   * @param {Object} e 
+   */
+  _onCancelEditClicked(e) {
+    this.editMode = false;
   }
 
   /**

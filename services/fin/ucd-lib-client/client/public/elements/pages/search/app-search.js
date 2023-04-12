@@ -127,7 +127,7 @@ export class AppSearch extends Mixin(LitElement)
 
     let currentIndex = e.searchDocument.offset;
     let payload = e.payload;
-    let total = payload.results.length; // payload.total;
+    let total = payload.total.value;
     this.results = payload.results;
 
     this.shadowRoot.querySelector('#resultsPanel').renderResults(this.results, total, e.searchDocument.limit, currentIndex);
@@ -152,8 +152,8 @@ export class AppSearch extends Mixin(LitElement)
    * @param {Object} e 
    */
   _onPaginationChange(e) {
-    let searchDoc = this._getCurrentSearchDocument();
-    this._setPaging(searchDoc, e.detail.startIndex);
+    let searchDoc = this.RecordModel.getCurrentSearchDocument()
+    this.RecordModel.setPaging(searchDoc, e.detail.startIndex);
     this.RecordModel.setSearchLocation(searchDoc);
   }
 

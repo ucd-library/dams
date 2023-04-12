@@ -53,7 +53,7 @@ class RecordService extends BaseService {
    * 
    * @returns {Promise}
    */
-  search(searchDocument = {}, debug=true, compact=false, singleNode=false, ignoreClientMedia=false) {
+  search(searchDocument = {}, debug=true, compact=true, singleNode=true, ignoreClientMedia=false) {
     if( !searchDocument.textFields ) {
       searchDocument.textFields = config.elasticSearch.textFields.record;
     }
@@ -95,6 +95,23 @@ class RecordService extends BaseService {
         }
       },
       onError : e => this.store.setSearchError(searchDocument, e)
+    });
+  }
+
+  async searchRecentItems(searchDocument = {}) {
+    // searchDocument.textFields = config.elasticSearch.textFields.collection;
+    return this.request({
+      url : this.baseUrl+'?debug=true&single-node=true&compact=true',
+      fetchOptions : {
+        method : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify(searchDocument)
+      },
+      onLoading : null,
+      onLoad : null,
+      onError : null
     });
   }
 

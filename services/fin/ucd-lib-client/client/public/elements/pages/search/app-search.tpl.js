@@ -62,7 +62,7 @@ return html`
       id="resultsPanel" 
       on-toggle-drawer="${this._toggleDrawer}" 
       on-page-size-change="${this._onPageSizeChange}"
-      on-page-change="${this._onPaginationChange}">
+      @page-change="${this._onPaginationChange}">
     </app-search-results-panel>
   </div>
 </div>
