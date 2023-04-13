@@ -197,17 +197,17 @@ export default function render() {
     <div ?hidden="${this.type !== 'single'}">
       <span class="form-label">Feature Image</span>
       <ul class="list--reset">
-        <li><input id="styled-radio1" name="radio" type="radio" class="radio" checked="checked"><label for="styled-radio1">Left</label></li>
-        <li><input id="styled-radio2" name="radio" type="radio" class="radio"><label for="styled-radio2">Right</label></li>
+        <li><input id="styled-radio1" name="radio" type="radio" class="radio" value="left" ?checked="${this.placement === 'left'}"><label for="styled-radio1">Left</label></li>
+        <li><input id="styled-radio2" name="radio" type="radio" class="radio" value="right" ?checked="${this.placement === 'right'}"><label for="styled-radio2">Right</label></li>
       </ul>
     </div>
 
     <div ?hidden="${this.type !== 'text'}">
       <span class="form-label">Text Placement</span>
       <ul class="list--reset">
-        <li><input id="styled-radio3" name="radio" type="radio" class="radio" checked="checked"><label for="styled-radio3">Centered</label></li>
-        <li><input id="styled-radio4" name="radio" type="radio" class="radio"><label for="styled-radio4">Left-aligned</label></li>
-        <li><input id="styled-radio5" name="radio" type="radio" class="radio"><label for="styled-radio5">Split (33/67)</label></li>
+        <li><input id="styled-radio3" name="radio" type="radio" class="radio" value="centered" ?checked="${this.placement === 'centered'}"><label for="styled-radio3">Centered</label></li>
+        <li><input id="styled-radio4" name="radio" type="radio" class="radio" value="left-aligned" ?checked="${this.placement === 'left-aligned'}"><label for="styled-radio4">Left-aligned</label></li>
+        <li><input id="styled-radio5" name="radio" type="radio" class="radio" value="split" ?checked="${this.placement === 'split'}"><label for="styled-radio5">Split (33/67)</label></li>
       </ul>
     </div>
 
@@ -216,7 +216,7 @@ export default function render() {
   <div class="content-row">
   <div ?hidden="${this.type !== 'single'}">
     <span class="form-label">Collection</span>    
-      <ucd-theme-slim-select @change="${this._collectionSelected}">
+      <ucd-theme-slim-select class="single-collection">
         <select>
           <option></option>
           <!-- options added in js -->
@@ -232,7 +232,7 @@ export default function render() {
   <div class="collection-list" ?hidden="${this.type !== 'cards'}">
     <span class="form-label">Collections</span>
     ${this.collections.map(collection => html`
-      <ucd-theme-slim-select @change="${this._collectionCardSelected}">
+      <ucd-theme-slim-select>
         <select class="collections">
           <option></option>
           <!-- options added in js -->
@@ -249,8 +249,8 @@ export default function render() {
   </div>
 
   <div class="content-row" style="padding-top: 2rem;" ?hidden="${this.type === 'cards'}">
-    <span class="form-label">Description</span>    
-    <textarea class="description" style="height: 175px; font-size: .9rem" .value="${this.description}" @change="${this._descriptionChanged}"></textarea>
+    <span class="form-label" style="display: block;">Description</span>    
+    <textarea class="description" style="height: 175px; font-size: .9rem" .value=${this.description} @change="${e => this.description = e.currentTarget.value}"></textarea>
   </div>
   
 

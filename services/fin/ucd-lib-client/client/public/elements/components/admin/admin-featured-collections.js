@@ -139,12 +139,14 @@ export class AdminFeaturedCollections extends LitElement {
     let position = e.detail.position;
     if( position === 0 ) return;
 
+    this._updatePanelsData();
+
     let panel = this.panels.splice(position, 1)[0];
-    panel.placement = e.detail.placement;
-    panel.collectionId = e.detail.collectionId;
-    panel.heading = e.detail.heading;
-    panel.description = e.detail.description;
-    panel.collectionIds = e.detail.collectionIds;
+    // panel.placement = e.detail.placement;
+    // panel.collectionId = e.detail.collectionId;
+    // panel.heading = e.detail.heading;
+    // panel.description = e.detail.description;
+    // panel.collectionIds = e.detail.collectionIds;
 
     this.panels.splice(position-1, 0, panel);
 
@@ -164,13 +166,15 @@ export class AdminFeaturedCollections extends LitElement {
     let position = e.detail.position;
     if( position === this.panels.length-1 ) return;
 
+    this._updatePanelsData();
+
     let panel = this.panels.splice(position, 1)[0];
-    panel.placement = e.detail.placement;
-    panel.collectionId = e.detail.collectionId;
-    panel.heading = e.detail.heading;
-    panel.description = e.detail.description;
-    panel.collectionIds = e.detail.collectionIds;
-    
+    // panel.placement = e.detail.placement;
+    // panel.collectionId = e.detail.collectionId;
+    // panel.heading = e.detail.heading;
+    // panel.description = e.detail.description;
+    // panel.collectionIds = e.detail.collectionIds;
+
     this.panels.splice(position+1, 0, panel);
 
     // update position of remaining panels
@@ -178,6 +182,25 @@ export class AdminFeaturedCollections extends LitElement {
       panel.position = i;
     });
     this.requestUpdate();
+  }
+
+  /**
+   * @method _updatePanelsData
+   * @description loop through panel ui elements and set panels array with currently set data
+   */
+  _updatePanelsData() {
+    let panels = this.shadowRoot.querySelectorAll('admin-content-panel');
+    panels.forEach((panel, i) => {
+      let collectionIds = [];
+      panel.shadowRoot.querySelector('.collection-list > ucd-theme-slim-select').shadowRoot.querySelectorAll('select').forEach(select => {
+        collectionIds.push(select.value.trim());
+      });
+      // this.panels[i].placement = panel.shadowRoot.querySelector('input[type="radio"]:checked').value.trim();
+      this.panels[i].collectionId = panel.shadowRoot.querySelector('ucd-theme-slim-select.single-collection').shadowRoot.querySelector('select').value.trim();
+      this.panels[i].heading = panel.shadowRoot.querySelector('input.heading-text').value.trim();
+      this.panels[i].description = panel.shadowRoot.querySelector('textarea.description').value.trim();
+      this.panels[i].collectionIds = collectionIds;
+    });
   }
 
 }

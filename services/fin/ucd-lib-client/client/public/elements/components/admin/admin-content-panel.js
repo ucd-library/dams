@@ -108,11 +108,11 @@ export class AdminContentPanel extends LitElement {
   _onUpArrowClicked(e) {
     this.dispatchEvent(new CustomEvent('up-arrow-clicked', { detail : {
       position : this.position,
-      placement : this.placement,
-      collectionId : this.collectionId,
-      heading : this.heading,
-      description : this.description,
-      collectionIds : this.collectionIds
+      // placement : this.placement,
+      // collectionId : this.collectionId,
+      // heading : this.heading,
+      // description : this.description,
+      // collectionIds : this.collectionIds
     }}));
     console.log('up arrow, description is ', this.description);
   }
@@ -124,17 +124,37 @@ export class AdminContentPanel extends LitElement {
   _onDownArrowClicked(e) {
     this.dispatchEvent(new CustomEvent('down-arrow-clicked', { detail : {
       position : this.position,
-      placement : this.placement,
-      collectionId : this.collectionId,
-      heading : this.heading,
-      description : this.description,
-      collectionIds : this.collectionIds
+      // placement : this.placement,
+      // collectionId : this.collectionId,
+      // heading : this.heading,
+      // description : this.description,
+      // collectionIds : this.collectionIds
     }}));
     console.log('down arrow, description is ', this.description);
   }
 
-  _descriptionChanged(e) {
+  _onDataChange(e) {
     debugger;
+
+    // TODO a better approach perhaps is just on up/down arrow events and save, 
+    //   to loop through all panels and get data and set to panels array
+    //   then move the panel position up/down if needed, or save
+    //   don't send events on EVERY data change
+    //   could do something like this from the parent component:
+    //   e.currentTarget.shadowRoot.querySelector('input.heading-text').value.trim()
+    //   e.currentTarget.shadowRoot.querySelector('input.heading-text').value.trim()
+    //   e.currentTarget.shadowRoot.querySelector('ucd-theme-slim-select').?
+    //   etc...
+
+
+    // this.shadowRoot.querySelector('textarea.description').value.trim()
+    // this.shadowRoot.querySelector('input.heading-text').value.trim()
+    // this.shadowRoot.querySelector('ucd-theme-slim-select').?
+
+
+    // this.dispatchEvent(new CustomEvent('data-change', { detail : {
+
+
     // TODO this is hacky, plus up/down only sends current data and other panel's data will get wiped.
     //  should we send events for every data input change?
     // this.description = e.currentTarget.value;

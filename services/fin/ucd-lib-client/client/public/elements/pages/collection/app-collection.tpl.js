@@ -537,7 +537,7 @@ export default function render() {
 
     <div class="title-section">
       <div class="image-overlay">
-        <img class="watercolor-bg" src="/images/watercolors/collection-watercolor-${this.watercolor}-back.png" width="100%" alt="watercolor background" />
+        <img class="watercolor-bg" src="/images/watercolors/collection-watercolor-${this.watercolor}-back-white.jpg" width="100%" alt="watercolor background" />
 
         <!-- <img class="featured-image" src="${this.thumbnailUrl}" width="45%" alt="collection featured image" /> -->
         <div class="featured-image" style="background-image:url(${this.thumbnailUrl})"></div>
