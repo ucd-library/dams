@@ -116,6 +116,8 @@ class ImageUtils {
         );
       }
 
+      // TODO: setting metadata here doesn't seem to work.  Need to test.
+      // Possibly need to use the setMetadata() method, however below is in documentation :(
       await gcs.getGcsFileObjectFromPath(baseGcsPath+'/manifest.json')
         .save(JSON.stringify(manifest), {
           contentType: 'application/json',

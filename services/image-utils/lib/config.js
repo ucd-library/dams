@@ -37,7 +37,7 @@ config.imageSizes = {
   sizes : {
     small : {
       imageMagick : {
-        resize : Math.floor(IA_BOOK_SIZE/8)+'x',
+        resize : Math.floor(IA_BOOK_SIZE/4)+'x',
         quality : 90,
       }
     },
