@@ -12,7 +12,7 @@ class ItemsModel extends FinEsDataModel {
     this.schema = schema;
     this.transformService = 'es-item-transform';
 
-    this.COMPRESS_TYPES = ['image/jpeg', 'image/png', 'image/tiff'];
+    this.COMPRESS_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/tiff', 'image/tif'];
     this.COMPRESSED_WORKFLOW = 'client-image-sizes';
   }
 
@@ -39,6 +39,10 @@ class ItemsModel extends FinEsDataModel {
     await super.update(jsonld, index);
 
     if( !jsonld['@graph'] ) return;
+
+    if( !this.activemq ) {
+      await this.connect();
+    }
 
     let reindex = [];
     for( let node of jsonld['@graph'] ) {

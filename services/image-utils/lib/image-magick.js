@@ -2,6 +2,9 @@ const exec = require('./exec.js');
 const config = require('./config.js');
 const path = require('path');
 
+// ptiff
+// convert input.tif  -define tiff:tile-geometry=256x256 -compress jpeg 'ptif:output.tif'
+
 class ImageMagickWrapper {
 
   constructor() {
