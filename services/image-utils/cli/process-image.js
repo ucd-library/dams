@@ -6,12 +6,7 @@ if( page === undefined ) {
   page = process.env.CLOUD_RUN_TASK_INDEX;
 }
 
-let opts = {
-  keepTmpFiles : false
-}
-
-console.log(node, file, worflowId, page, opts);
-model.runToIaReaderPage(worflowId, page, opts)
+model.processImage(worflowId, page)
   .then(() => {
     console.log('done');
     process.exit(0);

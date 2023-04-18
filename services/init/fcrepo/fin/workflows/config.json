@@ -7,10 +7,11 @@
 
   "definitions" : {
 
-    "book-to-ia-reader" : {
+    "pdf-image-products" : {
       "type" : "gc-workflow",
       "data" : {
-        "gcsSubpath" : "ia",
+        "gcsSubpath" : "images",
+        "jobContainer" : "{{IMAGE_UTILS_SERVICE_CONTAINER}}",
         "baseUrl" : "{{IMAGE_UTILS_SERVICE_URL}}"
       }
     },
@@ -18,15 +19,16 @@
     "video-to-stream" : {
       "type" : "gc-workflow",
       "data" : {
-        "gcsSubpath" : "streaming"
+        "gcsSubpath" : "streaming",
+        "jobContainer" : "{{IMAGE_UTILS_SERVICE_CONTAINER}}"
       }
     },
 
-    "client-image-sizes" : {
+    "image-products" : {
       "type" : "gc-workflow",
       "data" : {
-        "gcsSubpath" : "compressed",
-        "baseUrl" : "{{IMAGE_UTILS_SERVICE_URL}}"
+        "gcsSubpath" : "images",
+        "jobContainer" : "{{IMAGE_UTILS_SERVICE_CONTAINER}}"
       }
     }
 

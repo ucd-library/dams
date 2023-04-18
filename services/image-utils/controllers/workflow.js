@@ -60,7 +60,7 @@ router.delete('/:workflowId', async (req, res) => {
 
 // });
 
-router.get('/ia-reader/getNumPages/:workflowId', async (req, res) => {
+router.get('/pdf/getNumPages/:workflowId', async (req, res) => {
   try {    
     let pageCount = await model.getNumPagesService(req.params.workflowId);
     res.json({success: true, pageCount});
@@ -73,9 +73,21 @@ router.get('/ia-reader/getNumPages/:workflowId', async (req, res) => {
 
 });
 
-router.get('/generate-image-sizes/:workflowId', async (req, res) => {
+router.get('/process-image/:workflowId', async (req, res) => {
   try {    
-    let gcsFiles = await model.generateImageSizes(req.params.workflowId);
+    let gcsFiles = await model.processImage(req.params.workflowId);
+    res.json({success: true, gcsFiles});
+  } catch(e) {
+    res.status(500).json({
+      error : e.message,
+      stack : e.stack
+    });
+  }
+});
+
+router.get('/process-image/:workflowId/:page', async (req, res) => {
+  try {    
+    let gcsFiles = await model.processImage(req.params.workflowId, req.params.page);
     res.json({success: true, gcsFiles});
   } catch(e) {
     res.status(500).json({

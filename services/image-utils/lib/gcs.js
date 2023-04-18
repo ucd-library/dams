@@ -39,15 +39,20 @@ class GcsWrapper {
    * @method listFiles
    * @description list files in a gcs folder
    */
-  listFiles(gcsPath) {
+  listFiles(gcsPath, opts={}) {
     let bucket = gcsPath.split('/')[2];
     let folder = gcsPath.split('/').slice(3).join('/');
 
-    return storage.bucket(bucket).getFiles({
+    let query = {
       prefix: folder+'/',
-      delimiter: '/',
       autoPaginate: false
-    });
+    };
+
+    if( !opts.subfolders ) {
+      query.delimiter = '/';
+    }
+
+    return storage.bucket(bucket).getFiles(query);
   }
 
   /**

@@ -10,7 +10,7 @@ function rootDjvu(imageDim) {
   xml.att('width', imageDim.width);
   xml.att('type', 'image/x.djvu');
 
-  xml.ele('PARAM', {name: 'DPI', value: config.iaReader.imageMagick.density})
+  xml.ele('PARAM', {name: 'DPI', value: config.ocr.imageMagick.density})
   const mainColumn = xml.ele('HIDDENTEXT').ele('PAGECOLUMN');
   return {xml, mainColumn};
 }

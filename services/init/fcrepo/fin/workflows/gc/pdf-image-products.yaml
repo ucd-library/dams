@@ -10,12 +10,11 @@ main:
           assign:
             - location: us-central1
             - project_id: digital-ucdavis-edu
-            - job_container: gcr.io/ucdlib-pubreg/dams-image-utils:sandbox
             - client_email: dams-local-dev
       - get_pages:
           call: http.get
           args:
-              url: ${args.baseUrl + "/ia-reader/getNumPages/" + args.finWorkflowId}
+              url: ${args.baseUrl + "/pdf/getNumPages/" + args.finWorkflowId}
           result: pdf_info
       - set_parallelism:
           assign:
@@ -27,7 +26,7 @@ main:
                 - set_max_parallelism:
                     assign:
                       - parallelism: 50
-      - setup_ocr_job:
+      - setup_process_image_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
               location: ${location}
@@ -40,7 +39,7 @@ main:
                           cloud.googleapis.com/location: ${location}
                           project: dams
                           fin-workflow-name: ${args.gcWorkflowName}
-                          workflow-step: ocr
+                          workflow-step: process-image
                       annotations:
                           run.googleapis.com/launch-stage: ALPHA
                   kind: "Job"
@@ -52,7 +51,7 @@ main:
                               template:
                                   spec:
                                       containers:
-                                          - image: ${job_container}
+                                          - image: ${args.jobContainer}
                                             resources:
                                                 requests:
                                                     memory: "2Gi"
@@ -61,18 +60,18 @@ main:
                                                     memory: "2Gi"
                                                     cpu: "1000m"
                                             command: "node"
-                                            args: ${["cli/book-to-ia-reader.js", args.finWorkflowId]}
+                                            args: ${["cli/process-image.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
                                       timeoutSeconds: 300
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
-      - ocr_page:
+      - process_image:
           call: googleapis.run.v1.namespaces.jobs.run
           args:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
               location: ${location}
           result: job_execution
-      - setup_ocr_finalize_job:
+      - setup_pdf_finalize_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
               location: ${location}
@@ -95,7 +94,7 @@ main:
                               template:
                                   spec:
                                       containers:
-                                          - image: ${job_container}
+                                          - image: ${args.jobContainer}
                                             resources:
                                                 requests:
                                                     memory: "2Gi"
@@ -104,17 +103,12 @@ main:
                                                     memory: "2Gi"
                                                     cpu: "1000m"
                                             command: "node"
-                                            args: ${["cli/finalize-ia-reader.js", args.finWorkflowId]}
+                                            args: ${["cli/finalize-pdf.js", args.finWorkflowId]}
                                       timeoutSeconds: 300
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
-      - finalize_ocr:
+      - finalize_pdf:
           call: googleapis.run.v1.namespaces.jobs.run
           args:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId + "-finalize"}
               location: ${location}
           result: job_execution
-
-  # - cleanup:
-  #   call: http.delete
-  #   args:
-  #     url: ${args.baseUrl}/${args.workflowId}
