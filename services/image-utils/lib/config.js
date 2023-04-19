@@ -5,7 +5,7 @@ const IA_BOOK_SIZE = 1024;
 const env = process.env;
 
 config.ocr = {
-
+  outputFormat : 'jpg',
   imageMagick : {
     density : 300,
     alpha : 'remove',
@@ -33,31 +33,31 @@ config.ocr = {
 // }
 
 config.imageSizes = {
-  outputFormat : 'jpg',
   sizes : {
     small : {
+      outputFormat : 'jpg',
       imageMagick : {
         resize : Math.floor(IA_BOOK_SIZE/4)+'x',
         quality : 90,
-        deskew : config.ocr.imageMagick.deskew,
         alpha : config.ocr.imageMagick.alpha
       }
     },
     medium : {
+      outputFormat : 'jpg',
       imageMagick : {
         resize : Math.floor(IA_BOOK_SIZE/2)+'x',
         quality : 90,
-        deskew : config.ocr.imageMagick.deskew,
         alpha : config.ocr.imageMagick.alpha
       }
     },
     large : {
       ocrScale : OCR_TO_IA_BOOK_SCALE,
+      outputFormat : 'jpg',
       imageMagick : {
         resize : IA_BOOK_SIZE+'x',
-        density : config.ocr.imageMagick.density,
-        alpha : config.ocr.imageMagick.alpha,
         deskew : config.ocr.imageMagick.deskew,
+        fill : config.ocr.imageMagick.fill,
+        alpha : config.ocr.imageMagick.alpha,
         quality : 90,
       }
     },
@@ -67,9 +67,10 @@ config.imageSizes = {
       outputFormat : 'tif',
       imageMagick : {
         define : 'tiff:tile-geometry=256x256',
-        compress : 'jpeg',
-        resize : '4096x',
-        quality : 100
+        compress : 'JPEG',
+        alpha : 'remove',
+        resize : '3072x',
+        quality : 90
       }
     }
   }

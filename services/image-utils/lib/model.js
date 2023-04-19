@@ -323,6 +323,7 @@ class ImageUtils {
    */
   async generateImageSizes(localFile, page, workflowInfo, opts) {
     let manifest = {};
+    let isPdf = localFile.match(/\.pdf$/);
 
     try {
 
@@ -332,19 +333,9 @@ class ImageUtils {
       for( let size in config.imageSizes.sizes ) {
         if( size === 'tiled' ) continue;
         let sizeConfig = config.imageSizes.sizes[size];
-        let fileInfo = path.parse(localFile);
-        let dstName = size+'.'+config.imageSizes.outputFormat;
-        let sizeFile = fileInfo.dir+'/'+dstName;
-
-        let files = {
-          input : page ? localFile+'['+page.replace(/\//g, '')+']' : localFile,
-          output : sizeFile
-        }
-
-        let cmd = imageMagick.prepareCmd(files, sizeConfig.imageMagick);
-        logger.info('Running imagemagick command: '+cmd);
-        let {stdout, stderr} = await exec(cmd);
-        logger.info('Imagemagick command output: '+cmd, {stdout, stderr});
+        let dstName = size+'.'+sizeConfig.outputFormat;
+        
+        let sizeFile = await this.runImageMagickCommand(localFile, page, size, sizeConfig);
 
         manifest[size] = {
           url : '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+page+'/'+dstName,
@@ -355,7 +346,7 @@ class ImageUtils {
         logger.info('Copying file from '+sizeFile+' to '+gcsPath);
         
         let uploadOpts = {
-          contentType : 'image/'+config.imageSizes.outputFormat
+          contentType : 'image/'+sizeConfig.outputFormat
         };
         await gcs.streamUpload(
           gcsPath,
@@ -373,16 +364,18 @@ class ImageUtils {
 
   async generateOcrFile(localFile, page, workflowInfo, ocrScale, opts={}) {
     logger.info('Generating OCR Ready Image for: '+localFile);
-    let ocrImage = await imageMagick.ocrReadyImage(localFile, page.replace(/\//g, ''));
-    let ocrImageDim = await imageMagick.getImageDimensions(ocrImage.output);
+
+    let ocrImage = await this.runImageMagickCommand(localFile, page, 'ocr', config.ocr);
+    // let ocrImage = await imageMagick.ocrReadyImage(localFile, page.replace(/\//g, ''));
+    let ocrImageDim = await imageMagick.getImageDimensions(ocrImage);
   
-    logger.info('Running OCR for: '+ocrImage.output);
-    let ocrResult = await ocr.ocr({filepath: ocrImage.output, output: 'hocr'});
+    logger.info('Running OCR for: '+ocrImage);
+    let ocrResult = await ocr.ocr({filepath: ocrImage, output: 'hocr'});
 
     let djvuFile = await hocrToDjvu(ocrResult.result, ocrScale, ocrImageDim);
 
     await fs.unlink(ocrResult.result);
-    await fs.unlink(ocrImage.output);
+    await fs.unlink(ocrImage);
 
     // keep the ocr img file as is, if we are uploading all files.
     // this is only for debugging
@@ -411,20 +404,10 @@ class ImageUtils {
 
     if( stats.size < config.imageSizes.sizes.tiled.minSize ) return;
 
-    let fileInfo = path.parse(localFile);
     let dstName = 'tiled.'+config.imageSizes.sizes.tiled.outputFormat;
-    let sizeFile = fileInfo.dir+'/'+dstName;
     let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath+page
 
-    let files = {
-      input : page ? localFile+'['+page.replace(/\//g, '')+']' : localFile,
-      output : config.imageSizes.sizes.tiled.output+sizeFile
-    }
-
-    let cmd = imageMagick.prepareCmd(files, config.imageSizes.sizes.tiled.imageMagick);
-    logger.info('Running imagemagick command: '+cmd);
-    let {stdout, stderr} = await exec(cmd);
-    logger.info('Imagemagick command output: '+cmd, {stdout, stderr});
+    let sizeFile = await this.runImageMagickCommand(localFile, page, 'tiled', config.imageSizes.sizes.tiled);
 
     let gcsPath = baseGcsPath+'/'+dstName;
     logger.info('Copying file from '+sizeFile+' to '+gcsPath);
@@ -526,6 +509,56 @@ class ImageUtils {
     }
 
     return file;
+  }
+
+  /**
+   * @method runImageMagickCommand
+   * @description Run the imageMagick command for the given size.  This hides the fact that
+   * pdfs are handled differently than images
+   * 
+   * @param {String} localFile file to convert 
+   * @param {Number} page optional.  if pdf 
+   * @param {String} outputBaseName base name for output file 
+   * @param {Object} sizeConfig size configuration 
+   * @returns {Promise}
+   */
+  async runImageMagickCommand(localFile, page, outputBaseName, sizeConfig) {
+    let isPdf = localFile.match(/\.pdf$/);
+    let sizeFile;
+
+    if( isPdf ) {
+      let opts = {
+        outputFormat : sizeConfig.outputFormat,
+        output : sizeConfig.output,
+        outputBaseName : outputBaseName
+      };
+
+      let width = -1;
+      for( let key in sizeConfig.imageMagick ) {
+        if( key === 'resize' ) {
+          width = parseInt(sizeConfig.imageMagick[key].replace('x', ''));
+          continue;
+        }
+        opts[key] = sizeConfig.imageMagick[key];
+      }
+
+      sizeFile = await imageMagick.pdfPageToTiff(localFile, page, width, opts);
+    } else {
+      let fileInfo = path.parse(localFile);
+      sizeFile = path.join(fileInfo.dir, outputBaseName+'.'+sizeConfig.outputFormat);
+
+      let files = {
+        input : sizeConfig.output ? sizeConfig.output+localFile : localFile,
+        output : sizeFile
+      }
+
+      let cmd = imageMagick.prepareCmd(files, sizeConfig.imageMagick);
+      logger.info('Running imagemagick command: '+cmd);
+      let {stdout, stderr} = await exec(cmd);
+      logger.info('Imagemagick command output: '+cmd, {stdout, stderr});
+    }
+
+    return sizeFile;
   }
 
 }

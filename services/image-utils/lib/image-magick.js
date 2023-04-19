@@ -1,6 +1,7 @@
 const exec = require('./exec.js');
 const config = require('./config.js');
 const path = require('path');
+const fs = require('fs-extra');
 
 // ptiff
 // convert input.tif  -define tiff:tile-geometry=256x256 -compress jpeg 'ptif:output.tif'
@@ -106,7 +107,11 @@ class ImageMagickWrapper {
   // convert to ptiff
   // convert tmp.tif -define tiff:tile-geometry=256x256 -compress JPEG 'ptif:output.tif'
 
-  async getImageDimensions(file) {
+  async getImageDimensions(file, page) {
+    if( page !== undefined ) {
+      file = file+'['+page+']';
+    }
+
     let {stdout, stderr} = await exec(`identify -format "%wx%h " ${file}`);
     let sizes = stdout.trim().split(' ').map(size => {
       let [width, height] = size.split('x');
@@ -117,6 +122,74 @@ class ImageMagickWrapper {
     }
     return sizes;
   }
+
+  async getPxPerInch(file, page) {
+    if( page !== undefined ) {
+      file = file+'['+page+']';
+    }
+
+    let {stdout, stderr} = await exec(`identify -units PixelsPerInch -format '%[fx:int(resolution.x)]' ${file}`);
+    return parseInt(stdout.trim());
+  }
+
+  getNewDensity(originalDensity, originalWidth, newWidth) {
+    let newDensity = Math.round((newWidth/originalWidth) * originalDensity);
+    if( newDensity < originalDensity ) return originalDensity;
+    return newDensity;
+  }
+
+  /**
+   * @method pdfPageToTiff
+   * @description convert a single page of a pdf to a image.  Extract the page from the pdf, correctly,
+   * is hard.  This hacky process seems to work where we scale the requested width and density based
+   * on the original pdf dimensions and density.
+   * 
+   * @param {String} file pdf file 
+   * @param {Number} page page number 
+   * @param {Number} width image width 
+   * @param {Object} additonalOpts key/value pairs of ImageMagick options 
+   * @returns {String} output file location
+   */
+  async pdfPageToTiff(file, page, width=1000, additonalOpts={}) {
+    if( !additonalOpts.outputFormat ) throw new Error('outputFormat is required');
+    if( typeof page === 'string' ) {
+      page = parseInt(page.replace(/\//g, ''));
+    }
+
+    let outputBaseName = additonalOpts.outputBaseName || path.parse(file).name;
+
+    let outputFile = path.join(path.parse(file).dir, outputBaseName+'-'+page+'.'+additonalOpts.outputFormat);
+    let output = additonalOpts.output || '';
+
+    let density = additonalOpts.density || 72;
+
+    delete additonalOpts.output;
+    delete additonalOpts.outputBaseName;
+    delete additonalOpts.outputFormat;
+    delete additonalOpts.density;
+    delete additonalOpts.resize;
+
+    let opts = [];
+    for( let opt in additonalOpts ) {
+      opts.push('-'+opt+' '+additonalOpts[opt]);
+    }
+    opts = opts.join(' ');
+
+    let pdfPageDensity = await this.getPxPerInch(file, page);
+    let dimensions = await this.getImageDimensions(file, page);
+    let newDensity = this.getNewDensity(pdfPageDensity, dimensions.width, width);
+
+    // first make a tiff
+    let tmpTiff = path.join(path.parse(file).dir, outputBaseName+'-'+page+'-tmp.tif');
+    await exec(`convert -density ${newDensity} ${file}[${page}] -resize ${width}x ${tmpTiff}`);
+
+    // now convert to output file from tiff
+    await exec(`convert -density ${density} ${tmpTiff} -density ${density} ${opts} ${output}${outputFile}`);
+    await fs.unlink(tmpTiff);
+    
+    return outputFile;
+  }
+
 }
 
 module.exports = new ImageMagickWrapper();
