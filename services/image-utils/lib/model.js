@@ -253,7 +253,7 @@ class ImageUtils {
 
     let manifest = {};
 
-    if( page !== undefined || page !== null ) {
+    if( page !== undefined && page !== null ) {
       manifest.page = parseInt(page);
       page = '/'+page;
     } else {
@@ -299,12 +299,12 @@ class ImageUtils {
       // Possibly need to use the setMetadata() method, however below is in documentation :(
 
       await gcs.getGcsFileObjectFromPath(baseGcsPath+page+'/manifest.json')
-      .save(JSON.stringify(manifest), {
-        contentType: 'application/json',
-        metadata: {
-          'fin-bucket-template' : 'BUCKET'
-        }
-      });
+        .save(JSON.stringify(manifest), {
+          contentType: 'application/json',
+          metadata: {
+            'fin-bucket-template' : 'BUCKET'
+          }
+        });
     } catch(e) {
       logger.error('process image failed', e);
     }
@@ -402,7 +402,10 @@ class ImageUtils {
   async generateTiledImage(localFile, page, workflowInfo, opts={}) {
     let stats = fs.statSync(localFile);
 
-    if( stats.size < config.imageSizes.sizes.tiled.minSize ) return;
+    if( stats.size < config.imageSizes.sizes.tiled.minSize ) {
+      logger.info('Skipping tiled image generation for '+localFile+' because it is too small.');
+      return;
+    }
 
     let dstName = 'tiled.'+config.imageSizes.sizes.tiled.outputFormat;
     let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath+page
@@ -548,8 +551,8 @@ class ImageUtils {
       sizeFile = path.join(fileInfo.dir, outputBaseName+'.'+sizeConfig.outputFormat);
 
       let files = {
-        input : sizeConfig.output ? sizeConfig.output+localFile : localFile,
-        output : sizeFile
+        input : localFile,
+        output : sizeConfig.output ? sizeConfig.output+sizeFile : sizeFile
       }
 
       let cmd = imageMagick.prepareCmd(files, sizeConfig.imageMagick);

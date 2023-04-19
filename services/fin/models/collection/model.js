@@ -1,6 +1,7 @@
 const {dataModels, RDF_URIS} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
+const workflowUtils = require('../workflows.js');
 
 class CollectionsModel extends FinEsDataModel {
 
@@ -41,7 +42,12 @@ class CollectionsModel extends FinEsDataModel {
       }
     }
 
-    return super.update(jsonld, index);
+    await super.update(jsonld, index);
+
+    if( !jsonld['@graph'] ) return;
+
+    let node = jsonld['@graph'][0];
+    await workflowUtils.autoTriggerWorkflow(node);    
   }
 
   /**

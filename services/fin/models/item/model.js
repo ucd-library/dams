@@ -1,9 +1,8 @@
-const {dataModels, ActiveMqClient, logger, keycloak, config} = require('@ucd-lib/fin-service-utils');
-const api = require('@ucd-lib/fin-api')
+const {dataModels, ActiveMqClient} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 const {ActiveMqStompClient} = ActiveMqClient;
-const fetch = require('node-fetch');
+const workflowUtils = require('../workflows.js');
 
 class ItemsModel extends FinEsDataModel {
 
@@ -67,48 +66,8 @@ class ItemsModel extends FinEsDataModel {
       );
     }
 
-    // check if this graph is an image but doesn't have the clientMedia.compressed property.
-    // if so, we need need to kick off the workflow for this image
     let node = jsonld['@graph'][0];
-    await this.triggerCompressedImageWorkflow(node);
-  }
-
-  async triggerCompressedImageWorkflow(node) {
-    if( node.clientMedia && node.clientMedia.imageSizes ) return;
-    if( !node.fileFormat ) return;
-    if( !this.COMPRESS_TYPES.includes(node.fileFormat) ) return;
-
-    // make sure the workflow has not already run!!
-    let response = await api.get({
-      path : node['@id']+'/svc:workflow',
-      host : config.gateway.host,
-      jwt : await keycloak.getServiceAccountToken()
-    });
-
-    let hasRunCheck = JSON.parse(response.data.body);
-    for( let workflow of hasRunCheck ) {
-      if( workflow.name === this.COMPRESSED_WORKFLOW ) {
-        Logger.error(`Workflow ${this.COMPRESSED_WORKFLOW} has already been run on ${node['@id']}. Something is wrong with the item transform!!`);
-        return;
-      }
-    }
-
-    logger.info('Triggering compressed image workflow for '+node['@id']);
-
-    response = await api.post({
-      path : node['@id']+'/svc:workflow/'+this.COMPRESSED_WORKFLOW,
-      host : config.gateway.host,
-      headers : {
-        'Content-Type' : 'application/json'
-      },
-      body : JSON.stringify({gracefulReload: true}),
-      jwt : await keycloak.getServiceAccountToken()
-    })
-
-    if( response.last.statusCode >= 400 ) {
-      logger.error('Error triggering compressed image workflow for '+node['@id'], response.last.statusCode, response.last.body);
-      throw new Error('Error triggering compressed image workflow for '+node['@id']+" "+response.last.statusCode+" "+response.last.body)
-    }
+    await workflowUtils.autoTriggerWorkflow(node);
   }
 
   async getFiles(id, files=[]) {

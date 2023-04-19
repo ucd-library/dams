@@ -60,7 +60,7 @@ main:
                                                     memory: "2Gi"
                                                     cpu: "1000m"
                                             command: "node"
-                                            args: ${["cli/process-image.js", args.finWorkflowId]}
+                                            args: ${["cli/process-pdf.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
                                       timeoutSeconds: 300
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
