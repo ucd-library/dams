@@ -10,7 +10,7 @@ function rootDjvu(imageDim) {
   xml.att('width', imageDim.width);
   xml.att('type', 'image/x.djvu');
 
-  xml.ele('PARAM', {name: 'DPI', value: config.iaReader.imageMagick.density})
+  xml.ele('PARAM', {name: 'DPI', value: config.ocr.imageMagick.density})
   const mainColumn = xml.ele('HIDDENTEXT').ele('PAGECOLUMN');
   return {xml, mainColumn};
 }
@@ -41,16 +41,24 @@ function run(hocrFile, scaleFactor=1, imageDim={}) {
 
       for( let div of result.html.body ) {
         let page = div.div[0];
+        if( !page.div ) continue;
 
         page.div.forEach(carea => {
+          if( !carea.p ) return;
           
           let xmlRegion = mainColumn.ele('REGION');
           carea.p.forEach(par => {
+            if( !par.span ) return;
+
             let xmlParagraph = xmlRegion.ele('PARAGRAPH');
             par.span.forEach(line => {
+              if( !line.span ) return;
+
               let xmlLine = xmlParagraph.ele('LINE');
               line.span.forEach(word => {
-                
+                if( !word.$ ) return;
+                if( !word.$.title ) return;
+
                 let meta = word.$.title
                   .replace('bbox', '')
                   .split(';')

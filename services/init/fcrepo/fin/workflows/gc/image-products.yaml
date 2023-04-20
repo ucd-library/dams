@@ -1,3 +1,7 @@
+# Job Run Integration Docks
+# https://cloud.google.com/run/docs/configuring/containers#yaml
+# https://cloud.google.com/workflows/docs/reference/googleapis/run/v1/namespaces.jobs/create
+# https://cloud.google.com/run/docs/reference/rest/v1/Container#execaction
 
 main:
     params: [args]
@@ -6,7 +10,8 @@ main:
           assign:
             - location: us-central1
             - project_id: digital-ucdavis-edu
-      - setup_video_job:
+            - client_email: dams-local-dev
+      - setup_process_image_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
               location: ${location}
@@ -19,7 +24,7 @@ main:
                           cloud.googleapis.com/location: ${location}
                           project: dams
                           fin-workflow-name: ${args.gcWorkflowName}
-                          workflow-step: streaming-video
+                          workflow-step: process-image
                       annotations:
                           run.googleapis.com/launch-stage: ALPHA
                   kind: "Job"
@@ -32,17 +37,18 @@ main:
                                           - image: ${args.jobContainer}
                                             resources:
                                                 requests:
-                                                    memory: "8Gi"
-                                                    cpu: "2000m"
+                                                    memory: "2Gi"
+                                                    cpu: "1000m"
                                                 limits:
-                                                    memory: "8Gi"
-                                                    cpu: "2000m"
+                                                    memory: "2Gi"
+                                                    cpu: "1000m"
                                             command: "node"
-                                            args: ${["cli/video-to-stream.js", args.finWorkflowId]}
-                                      timeoutSeconds: 1800
-                                      serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
+                                            args: ${["cli/process-image.js", args.finWorkflowId]}
+                                            # imagePullPolicy: "Always"
+                                      timeoutSeconds: 300
+                                      serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
-      - convert_video:
+      - process_image:
           call: googleapis.run.v1.namespaces.jobs.run
           args:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}

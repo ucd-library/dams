@@ -23,6 +23,7 @@ class ImageUtils {
 
   /**
    * @method getNumPagesService
+   * @description
    * 
    * @param {*} workflowId 
    */
@@ -52,87 +53,15 @@ class ImageUtils {
   }
 
   /**
-   * @method generateImageSizes
+   * @method getNumPdfPages
+   * @description wrapper around pdfinfo to get number of pages in a pdf
    * 
-   * @param {*} workflowId 
+   * @param {String} file path to pdf file 
+   * @returns {Promise}
    */
-  async generateImageSizes(workflowId) {
-    let workflowInfo = await this.getWorkflowInfo(workflowId);
-
-    let localFile = this.getLocalFile(workflowInfo);
-    let dir = path.parse(localFile).dir;
-
-    await fs.mkdirp(dir);
-
-    let resultFiles = [];
-    let manifest = {}
-
-    try {
-      await gcs.getGcsFileObjectFromPath(workflowInfo.data.tmpGcsPath)
-        .download({
-          destination: localFile
-        })
-
-      manifest.original = {
-        url : '/fcrepo/rest'+workflowInfo.data.finPath,
-        size : await imageMagick.getImageDimensions(localFile)
-      };
-      
-      let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath;
-
-      // compress image to jpeg
-      for( let size in config.imageSizes.sizes ) {
-        let sizeConfig = config.imageSizes.sizes[size];
-        let fileInfo = path.parse(localFile);
-        let dstName = fileInfo.name+'-'+size+'.'+config.imageSizes.outputFormat;
-        let sizeFile = fileInfo.dir+'/'+dstName;
-
-        let files = {
-          input : localFile,
-          output : sizeFile
-        }
-
-        let cmd = imageMagick.prepareCmd(files, sizeConfig.imageMagick);
-        logger.info('Running imagemagick command: '+cmd);
-        let {stdout, stderr} = await exec(cmd);
-        logger.info('Imagemagick command output: '+cmd, {stdout, stderr});
-
-        manifest[size] = {
-          url : '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+'/'+dstName,
-          size : await imageMagick.getImageDimensions(sizeFile)
-        }
-
-        let gcsPath = baseGcsPath+'/'+dstName;
-        resultFiles.push(gcsPath);
-        logger.info('Copying file from '+sizeFile+' to '+gcsPath);
-        
-        let uploadOpts = {
-          contentType : 'image/'+config.imageSizes.outputFormat
-        };
-        await gcs.streamUpload(
-          gcsPath,
-          fs.createReadStream(path.join(sizeFile)),
-          uploadOpts
-        );
-      }
-
-      // TODO: setting metadata here doesn't seem to work.  Need to test.
-      // Possibly need to use the setMetadata() method, however below is in documentation :(
-      await gcs.getGcsFileObjectFromPath(baseGcsPath+'/manifest.json')
-        .save(JSON.stringify(manifest), {
-          contentType: 'application/json',
-          metadata: {
-            'fin-bucket-template' : 'BUCKET'
-          }
-        });
-
-      await fs.remove(dir);
-    } catch(e) {
-      await fs.remove(dir);
-      throw e;
-    }
-
-    return resultFiles;
+  async getNumPdfPages(file) {
+    let {stdout, stderr} = await exec(`pdfinfo ${file} | awk '/^Pages:/ {print $2}'`);
+    return parseInt(stdout.trim());
   }
 
   async runToIaReaderPage(workflowId, page, opts={}) {
@@ -286,17 +215,7 @@ class ImageUtils {
     return JSON.parse(workflowInfo);
   }
 
-  /**
-   * @method getNumPdfPages
-   * @description wrapper around pdfinfo to get number of pages in a pdf
-   * 
-   * @param {String} file path to pdf file 
-   * @returns {Promise}
-   */
-  async getNumPdfPages(file) {
-    let {stdout, stderr} = await exec(`pdfinfo ${file} | awk '/^Pages:/ {print $2}'`);
-    return parseInt(stdout.trim());
-  }
+
 
   async getNumImgListPages(file, workflowInfo={}) {
     if( !workflowInfo.data ) workflowInfo.data = {};
@@ -326,82 +245,241 @@ class ImageUtils {
   }
 
 
-  async imageToIaReader(file, page, opts={}) {
-    let localFile = await this.toLocalFile(file);
+  async processImage(workflowId, page) {
+    let workflowInfo = await this.getWorkflowInfo(workflowId);
+    let opts = workflowInfo.data.options || {};
+    
+    let baseGcsPath = 'gs://'+path.join(workflowInfo.data.gcsBucket, workflowInfo.data.finPath, workflowInfo.data.gcsSubpath);    
 
-    logger.info('Generating OCR Ready Image for: '+localFile);
-    let ocrImage = await imageMagick.ocrReadyImage(localFile, page);
+    let manifest = {};
 
-    logger.info('Generating IA Reader Image for: '+localFile);
-    let aiImage = await imageMagick.iaReaderImage(localFile, page);
-    let aiImageDim = await imageMagick.getImageDimensions(aiImage.output);
-
-    let iaImageInfo = path.parse(aiImage.output);
-    await fs.writeFileSync(
-      path.join(iaImageInfo.dir, iaImageInfo.name+'.json'), 
-      JSON.stringify(aiImageDim)
-    );
-
-    logger.info('Running OCR for: '+ocrImage.output);
-    let ocrResult = await ocr.ocr({filepath: ocrImage.output, output: 'hocr'});
-
-    await hocrToDjvu(ocrResult.result, config.iaReader.ocrScale, aiImageDim);
-
-    if( opts.keepTmpFiles !== true ) {
-      await fs.unlink(ocrResult.result);
-      await fs.unlink(ocrImage.output);
+    if( page !== undefined && page !== null ) {
+      manifest.page = parseInt(page);
+      page = '/'+page;
+    } else {
+      page = '';
     }
+
+    let localFile = this.getLocalFile(workflowInfo);
+    let dir = path.parse(localFile).dir;
+
+    try {
+      
+      // let sourceName = path.parse(localFile).name;
+
+      await fs.mkdirp(dir);
+      await gcs.getGcsFileObjectFromPath(workflowInfo.data.tmpGcsPath)
+        .download({
+          destination: localFile
+        });
+
+      if( !localFile.match(/\.pdf$/) ) {
+        manifest.original = {
+          url : '/fcrepo/rest'+workflowInfo.data.finPath,
+          size : await imageMagick.getImageDimensions(localFile)
+        }
+      }
+
+      let sizesManifest = await this.generateImageSizes(localFile, page, workflowInfo, opts);
+
+      // let people know which file we are using for ocr size
+      let ocrManifest = await this.generateOcrFile(localFile, page, workflowInfo, config.imageSizes.sizes.large.ocrScale, opts);
+      ocrManifest.ocr.size = sizesManifest.large.size;
+      ocrManifest.ocr.imageSize = 'large';
+
+      let tiledManifest;
+      if( page === '' || page === '/0' ) {
+        tiledManifest = await this.generateTiledImage(localFile, page, workflowInfo, opts);
+      }
+      if( !tiledManifest ) tiledManifest = {};
+
+      manifest = Object.assign(manifest, sizesManifest, ocrManifest, tiledManifest);
+
+      // TODO: setting metadata here doesn't seem to work.  Need to test.
+      // Possibly need to use the setMetadata() method, however below is in documentation :(
+
+      await gcs.getGcsFileObjectFromPath(baseGcsPath+page+'/manifest.json')
+        .save(JSON.stringify(manifest), {
+          contentType: 'application/json',
+          metadata: {
+            'fin-bucket-template' : 'BUCKET'
+          }
+        });
+    } catch(e) {
+      logger.error('process image failed', e);
+    }
+
+    // cleanup
+    await fs.remove(dir);
+
 
     logger.info('ImageUtils.imageToIaReader() complete');
   }
 
-  async finalizeAiReader(workflowId) {
-    let workflowInfo = await this.getWorkflowInfo(workflowId);
+  /**
+   * @method generateImageSizes
+   * 
+   * @param {*} workflowId 
+   */
+  async generateImageSizes(localFile, page, workflowInfo, opts) {
+    let manifest = {};
+    let isPdf = localFile.match(/\.pdf$/);
 
-    let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath;
-    let files = await gcs.listFiles('gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath);
-    files = files[0];
+    try {
 
-    let iaManifest = {
-      data : [],
-      hashes : {}
-    };
+      let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath+page;
 
-    for( let file of files ) {
-      let fileParts = path.parse(file.name);
-      iaManifest.hashes[fileParts.base] = file.metadata.md5Hash;
+      // compress image to jpeg
+      for( let size in config.imageSizes.sizes ) {
+        if( size === 'tiled' ) continue;
+        let sizeConfig = config.imageSizes.sizes[size];
+        let dstName = size+'.'+sizeConfig.outputFormat;
+        
+        let sizeFile = await this.runImageMagickCommand(localFile, page, size, sizeConfig);
+
+        manifest[size] = {
+          url : '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+page+'/'+dstName,
+          size : await imageMagick.getImageDimensions(sizeFile)
+        }
+
+        let gcsPath = baseGcsPath+'/'+dstName;
+        logger.info('Copying file from '+sizeFile+' to '+gcsPath);
+        
+        let uploadOpts = {
+          contentType : 'image/'+sizeConfig.outputFormat
+        };
+        await gcs.streamUpload(
+          gcsPath,
+          fs.createReadStream(path.join(sizeFile)),
+          uploadOpts
+        );
+      }
+    } catch(e) {
+      logger.error('Error generating image sizes: '+e);
+      throw e;
     }
 
-    for( let file of files ) {
-      let fileParts = path.parse(file.name);
-      if( fileParts.base === 'manifest.json' ) continue;
+    return manifest;
+  }
 
-      if( fileParts.ext === '.json' ) {
-        let t = (await gcs.readFileToMemory(baseGcsPath+'/'+fileParts.base)).toString('utf-8');
-        let pageData = JSON.parse(t);
+  async generateOcrFile(localFile, page, workflowInfo, ocrScale, opts={}) {
+    logger.info('Generating OCR Ready Image for: '+localFile);
 
-        // lookup the md5 hashes for file
-        pageData.md5Hashes = {
-          jpg : iaManifest.hashes[fileParts.name+'.jpg'],
-          djvu : iaManifest.hashes[fileParts.name+'.djvu']
-        };
+    let ocrImage = await this.runImageMagickCommand(localFile, page, 'ocr', config.ocr);
+    // let ocrImage = await imageMagick.ocrReadyImage(localFile, page.replace(/\//g, ''));
+    let ocrImageDim = await imageMagick.getImageDimensions(ocrImage);
+  
+    logger.info('Running OCR for: '+ocrImage);
+    let ocrResult = await ocr.ocr({filepath: ocrImage, output: 'hocr'});
 
-        pageData.width = parseInt(pageData.width);
-        pageData.height = parseInt(pageData.height);
-        pageData.page = parseInt(fileParts.name.split('-').pop());
-        pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+'/'+fileParts.name+'.jpg';
-        iaManifest.data.push(pageData);
+    let djvuFile = await hocrToDjvu(ocrResult.result, ocrScale, ocrImageDim);
+
+    await fs.unlink(ocrResult.result);
+    await fs.unlink(ocrImage);
+
+    // keep the ocr img file as is, if we are uploading all files.
+    // this is only for debugging
+
+    let gcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath+page+'/ocr.djvu';
+
+    logger.info('Copying file from '+djvuFile+' to '+gcsPath);
+    let uploadOpts = {contentType : 'text/xml'};
+    await gcs.streamUpload(
+      gcsPath,
+      fs.createReadStream(djvuFile),
+      uploadOpts
+    );
+
+    logger.info('ImageUtils.ocrFile() complete');
+
+    return {
+      ocr : {
+        url : '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+page+'/ocr.djvu',
       }
     }
+  }
 
-    delete iaManifest.hashes;
+  async generateTiledImage(localFile, page, workflowInfo, opts={}) {
+    let stats = fs.statSync(localFile);
 
-    if( iaManifest.data.length === 0 ) {
-      console.log('No page files found.  Aborting');
+    if( stats.size < config.imageSizes.sizes.tiled.minSize ) {
+      logger.info('Skipping tiled image generation for '+localFile+' because it is too small.');
       return;
     }
 
-    iaManifest.data.sort((a,b) => {
+    let dstName = 'tiled.'+config.imageSizes.sizes.tiled.outputFormat;
+    let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath+page
+
+    let sizeFile = await this.runImageMagickCommand(localFile, page, 'tiled', config.imageSizes.sizes.tiled);
+
+    let gcsPath = baseGcsPath+'/'+dstName;
+    logger.info('Copying file from '+sizeFile+' to '+gcsPath);
+    
+    let uploadOpts = {
+      contentType : 'image/'+config.imageSizes.sizes.tiled.outputFormat
+    };
+    await gcs.streamUpload(
+      gcsPath,
+      fs.createReadStream(path.join(sizeFile)),
+      uploadOpts
+    );
+
+    return {
+      tiled : {
+        url : '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+page+'/'+dstName,
+        iiif : '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:iiif/'+workflowInfo.data.gcsSubpath+page+'/'+dstName,
+        size : await imageMagick.getImageDimensions(sizeFile)
+      }
+    }
+  }
+
+  async finalizePdf(workflowId) {
+    let workflowInfo = await this.getWorkflowInfo(workflowId);
+    let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath;
+
+    let files = await gcs.listFiles(baseGcsPath, {subfolders: true});
+    files = files[0];
+  
+    let iaManifest = {
+      pages : []
+    };
+
+    // for( let file of files ) {
+    //   let fileParts = path.parse(file.name);
+    //   iaManifest.hashes[fileParts.base] = file.metadata.md5Hash;
+    // }
+    let re = new RegExp('images\/([0-9]+)\/manifest.json');
+    for( let file of files ) {
+      let fileParts = path.parse(file.name);
+      if( !re.test(file.name) ) continue;
+      if( fileParts.base !== 'manifest.json' ) continue;
+
+      logger.info('concating gs://'+file.metadata.bucket+'/'+file.name);
+
+      let t = (await gcs.readFileToMemory('gs://'+file.metadata.bucket+'/'+file.name)).toString('utf-8');
+      let pageData = JSON.parse(t);
+
+      // lookup the md5 hashes for file
+      // pageData.md5Hashes = {
+      //   jpg : iaManifest.hashes[fileParts.name+'.jpg'],
+      //   djvu : iaManifest.hashes[fileParts.name+'.djvu']
+      // };
+
+      // pageData.width = parseInt(pageData.width);
+      // pageData.height = parseInt(pageData.height);
+      // pageData.page = parseInt(fileParts.name.split('-').pop());
+      // pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+'/'+fileParts.name+'.jpg';
+      iaManifest.pages.push(pageData);
+    }
+
+    // delete iaManifest.hashes;
+
+    if( iaManifest.pages.length === 0 ) {
+      logger.warn('No page files found.  Aborting');
+      return;
+    }
+
+    iaManifest.pages.sort((a,b) => {
       return a.page - b.page;
     });
 
@@ -413,14 +491,14 @@ class ImageUtils {
         }
       });
 
-    for( let file of files ) {
-      let fileParts = path.parse(file.name);
-      if( fileParts.base === 'manifest.json' ) continue;
+    // for( let file of files ) {
+    //   let fileParts = path.parse(file.name);
+    //   if( fileParts.base === 'manifest.json' ) continue;
 
-      if( fileParts.ext === '.json' ) {
-        await file.delete();
-      }
-    }
+    //   if( fileParts.ext === '.json' ) {
+    //     await file.delete();
+    //   }
+    // }
   }
 
   /**
@@ -437,6 +515,56 @@ class ImageUtils {
     }
 
     return file;
+  }
+
+  /**
+   * @method runImageMagickCommand
+   * @description Run the imageMagick command for the given size.  This hides the fact that
+   * pdfs are handled differently than images
+   * 
+   * @param {String} localFile file to convert 
+   * @param {Number} page optional.  if pdf 
+   * @param {String} outputBaseName base name for output file 
+   * @param {Object} sizeConfig size configuration 
+   * @returns {Promise}
+   */
+  async runImageMagickCommand(localFile, page, outputBaseName, sizeConfig) {
+    let isPdf = localFile.match(/\.pdf$/);
+    let sizeFile;
+
+    if( isPdf ) {
+      let opts = {
+        outputFormat : sizeConfig.outputFormat,
+        output : sizeConfig.output,
+        outputBaseName : outputBaseName
+      };
+
+      let width = -1;
+      for( let key in sizeConfig.imageMagick ) {
+        if( key === 'resize' ) {
+          width = parseInt(sizeConfig.imageMagick[key].replace('x', ''));
+          continue;
+        }
+        opts[key] = sizeConfig.imageMagick[key];
+      }
+
+      sizeFile = await imageMagick.pdfPageToTiff(localFile, page, width, opts);
+    } else {
+      let fileInfo = path.parse(localFile);
+      sizeFile = path.join(fileInfo.dir, outputBaseName+'.'+sizeConfig.outputFormat);
+
+      let files = {
+        input : localFile,
+        output : sizeConfig.output ? sizeConfig.output+sizeFile : sizeFile
+      }
+
+      let cmd = imageMagick.prepareCmd(files, sizeConfig.imageMagick);
+      logger.info('Running imagemagick command: '+cmd);
+      let {stdout, stderr} = await exec(cmd);
+      logger.info('Imagemagick command output: '+cmd, {stdout, stderr});
+    }
+
+    return sizeFile;
   }
 
 }
