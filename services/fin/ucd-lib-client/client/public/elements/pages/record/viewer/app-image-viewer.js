@@ -63,7 +63,8 @@ export default class AppImageViewer extends Mixin(LitElement)
     if ( this.media.hasPart && this.media.hasPart.length > 0 ) {
       this.media.image = this.media.hasPart[0].image;
     }
-
+    this.loading = true;
+    /*
     if ( this.media.image.width < this.height) this.height = this.media.image.width;
     let url = this.MediaModel.getImgUrl(this.media.image.url, '', this.height);
     let r = 600 / this.media.image.height;
@@ -87,6 +88,25 @@ export default class AppImageViewer extends Mixin(LitElement)
 
     this.shadowRoot.querySelector('#img').style.maxWidth = w + 'px';
     this.shadowRoot.querySelector('#img').src = url;
+    */
+
+    if( this.media.clientMedia?.imageSizes ) {
+      let srcset = `
+        ${this.media.clientMedia.imageSizes.small.url} ${this.media.clientMedia.imageSizes.small.size.width}w,
+        ${this.media.clientMedia.imageSizes.medium.url} ${this.media.clientMedia.imageSizes.medium.size.width}w,
+        ${this.media.clientMedia.imageSizes.large.url} ${this.media.clientMedia.imageSizes.large.size.width}w,
+        ${this.media.clientMedia.imageSizes.original.url} ${this.media.clientMedia.imageSizes.original.size.width}w
+      `;
+
+      let sizes = '600px';
+
+      // add to img
+      this.shadowRoot.querySelector('#img').srcset = srcset;
+      this.shadowRoot.querySelector('#img').sizes = sizes;
+      this.shadowRoot.querySelector('#img').style.height = '600px';
+    }
+    this.loading = false;
+
   }
 }
 

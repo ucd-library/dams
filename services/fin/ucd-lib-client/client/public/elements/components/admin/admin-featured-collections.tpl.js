@@ -51,23 +51,7 @@ return html`
     font-weight: bold;
   }
 
-
 </style>
-
-<!-- TODO handle showing panels that exist -->
-
-<!-- <admin-content-panel 
-    @panel-loaded="${this._updateUiStyles}"
-    type="single">
-</admin-content-panel>
-<admin-content-panel 
-    @panel-loaded="${this._updateUiStyles}"
-    type="text">
-</admin-content-panel>
-<admin-content-panel 
-    @panel-loaded="${this._updateUiStyles}"
-    type="cards">
-</admin-content-panel> -->
 
 ${this.panels.map(panel => html`
   <admin-content-panel 
@@ -84,8 +68,6 @@ ${this.panels.map(panel => html`
     .collectionIds="${panel.collectionIds}">
   </admin-content-panel>
 `)}
-
-
 
 <h2>Add Content:</h2>
 <div style="display: flex; width: 50%; margin: 0 auto; justify-content: space-between">

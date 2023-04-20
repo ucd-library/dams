@@ -49,8 +49,9 @@ class RecordModel extends ElasticSearchModel {
     if( result.id !== this.currentRecordId ) {
       this.currentRecordId = result.id;
       AppStateModel.setSelectedRecord(result.payload);
+
       // if( result.payload ) {
-        AppStateModel.setSelectedRecordMedia(Object.values(result.payload.index).filter(r => r.image && parseInt(r.position) === 1)[0]);
+      AppStateModel.setSelectedRecordMedia(Object.values(result.payload.index).filter(r => r.clientMedia && r.clientMedia.imageSizes && parseInt(r.position) === 1)[0]);
       // }
       //
       // result.payload.index[result.payload.clientMedia.id]

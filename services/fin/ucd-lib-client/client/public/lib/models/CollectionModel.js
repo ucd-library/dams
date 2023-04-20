@@ -97,32 +97,6 @@ class CollectionModel extends BaseModel {
     }
 
     /**
-     * @method getDisplayData
-     * @description load a records display data by id
-     * 
-     * @param {String} id record id
-     * 
-     * @returns {Promise} resolves to record
-     */
-    async getDisplayData(id) {
-      return await this.service.getDisplayData(id);
-    }
-
-    /**
-     * @method saveDisplayData
-     * @description load a records display data by id
-     * 
-     * @param {String} id record id
-     * @param {Array} displayData record id
-     * 
-     * @returns {Promise} resolves to record
-     */
-    async saveDisplayData(id, displayData) {
-      return await this.service.saveDisplayData(id, displayData);
-    }
-  
-
-    /**
      * @method getSelectedCollection
      * @description get the selected collection
      */

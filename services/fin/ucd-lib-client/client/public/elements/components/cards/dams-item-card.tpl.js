@@ -128,7 +128,7 @@ return html`
   .media-type__icon {
     width: 1.4rem;
   }
-/* 
+  /* 
   .media-type__icon image {
     fill: red;
   } */

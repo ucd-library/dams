@@ -415,6 +415,7 @@ class AppSearchResultsPanel extends Mixin(LitElement)
    * @param {Object} e click|keyup event
    */
   _onRecordClicked(e) {
+    e.preventDefault();
     if( e.type === 'keyup' && e.which !== 13 ) return;
     const location = e.target.dataset.itemid;
     if( location ) {

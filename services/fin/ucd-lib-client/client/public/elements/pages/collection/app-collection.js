@@ -54,7 +54,7 @@ class AppCollection extends Mixin(LitElement)
     this.isAdmin = false;
     this.editMode = false;
 
-    this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'CollectionVcModel');
+    this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'CollectionVcModel', 'FcAppConfigModel');
   }
 
   async firstUpdated() {
@@ -160,9 +160,20 @@ class AppCollection extends Mixin(LitElement)
    * 
    * @param {Object} e 
    */
-  _onSaveClicked(e) {
+  async _onSaveClicked(e) {
     // TODO save to fcrepo container
     //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
+    debugger;
+    console.log(JSON.stringify(this.displayData))
+
+
+    // TODO still 400 bad requests depending on content, and when accepted it wipes out all the references to 
+    //  other resources in fcrepo
+
+    let res = await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData);
+    console.dir(res)
+
+    // TODO close admin ui
   }
 
   /**
@@ -183,6 +194,26 @@ class AppCollection extends Mixin(LitElement)
    */
   _onWatercolorChanged(e) {
     this.watercolor = e.target.classList[0];
+    /*
+    let savedWatercolor = this.displayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
+    if( savedWatercolor ) {
+      savedWatercolor['http://schema.org/css'][0]['@value'] = this.watercolor;
+      savedWatercolor['@id'] = savedWatercolor['@id'].split('#')[0] + '#' + this.watercolor;
+    } else {
+      // TODO handle creating graph to save to app container
+    }
+    */
+    
+    let savedWatercolor = this.displayData['graph'].filter(g => g['@id'].indexOf('/application/#') > -1)[0];
+    if( savedWatercolor ) {
+      savedWatercolor.css = this.watercolor;
+      savedWatercolor['@id'] = savedWatercolor['@id'].split('#')[0] + '#' + this.watercolor;
+    } else {
+      // TODO handle creating graph to save to app container
+
+    }
+    
+
   }
 
   /**
@@ -215,39 +246,36 @@ class AppCollection extends Mixin(LitElement)
   }
 
   /**
-   * @description _parseDisplayData, get application container data to set collection specific display data (colors, highlighted items, etc)
+   * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
-    let displayData = await this.CollectionModel.getDisplayData(this.collectionId);
+
+    /*
+    let displayData = await this.FcAppConfigModel.getCollectionAppData(this.collectionId);
     if( displayData && displayData.body ) {
       this.displayData = JSON.parse(displayData.body);
-      this.displayData.forEach(data => {
-        if( data['http://digital.library.ucdavis.edu/schema/featured-image'] ) {
-          this.thumbnailUrl = data['http://digital.library.ucdavis.edu/schema/featured-image'][0]['@id'];
-        }
-        if( data['http://digital.library.ucdavis.edu/schema/watercolor'] ) {
-          this.watercolor = data['http://digital.library.ucdavis.edu/schema/watercolor'][0]['@value'];
-        }
-
-        if( data['@id'].indexOf('#featured-items') > -1 ) {
-          this.highlightedItems = [];
-          data['http://schema.org/url'].forEach(item => {
-            this.highlightedItems.push({ '@id' : item['@id'] });
-          });
-        }
-      });
-
-      this.highlightedItems.forEach(item => {
-        let matchedItem = this.displayData.filter(d => d['@id'] === item['@id'])[0];
-        if( matchedItem ) {
-          item['title'] = matchedItem['http://schema.org/description'][0]['@value'];
-          item['thumbnailUrl'] = matchedItem['http://schema.org/image'][0]['@id'];
-          item['itemUrl'] = '/item' + matchedItem['@id'].split('/item')[1];
-        }
-      });
-    } else {
-      this.displayData = [];
+      debugger;
+      let watercolor = this.displayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
+      if( watercolor ) {
+        this.watercolor = watercolor['http://schema.org/css'][0]['@value']
+      }
     }
+    */
+    
+    this.displayData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${this.collectionId}${this.collectionId.replace('/collection', '')}.jsonld.json`]
+    if( this.displayData ) {
+      // watercolor
+      let watercolor = this.displayData['graph'].filter(g => g['@id'].indexOf('/application/#') > -1)[0];
+      if( watercolor ) {
+        this.watercolor = watercolor.css;
+      }
+      // TODO
+      // featured items
+      // featured image
+    } else {
+      // TODO make object to post to fcrepo?
+    }
+    
   }
 
   /**

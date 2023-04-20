@@ -41,6 +41,9 @@ class SearchVcModel extends BaseModel {
           collectionId = { '@id' : result.root.isPartOf['@id'] };
         }
 
+        debugger;
+        // TODO how to get clientMedia.imageSizes in /item/all endpoint, seems to only come from /item/someRecordId/..
+
         if( collectionId && !matchedCollections.find(c => c['@id'] ===  collectionId['@id'])) {
           matchedCollections.push({
             '@id' : collectionId['@id'],

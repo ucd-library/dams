@@ -19,7 +19,6 @@ export class AdminContentPanel extends LitElement {
       description : { type : String },
       collectionIds : { type : Array },
       controlIcon : { type : Object },
-      collections : { type : Array },
       sortedCollectionsList : { type : Array }      
     };
   }
@@ -36,15 +35,14 @@ export class AdminContentPanel extends LitElement {
     this.collectionId = '';
     this.heading = '';
     this.description = '';
-    this.collectionIds = [];
 
     this.controlIcons = {
       single : 'dams-admin-collection-single',
       text : 'dams-admin-text',
       cards : 'dams-admin-collection-cards'
     };
-    this.collections = [{ id : '42', 'name' : 'Test Collection' }];
-    this.sortedCollectionsList = [];
+    this.collectionIds = [{ position : 0, selected : '' }];
+    this.sortedCollectionsList = Object.entries(APP_CONFIG.collectionLabels).sort((a,b) => (a[1] < b[1]) ? -1 : 1);
   }
 
   /**
@@ -53,21 +51,17 @@ export class AdminContentPanel extends LitElement {
    */
   firstUpdated() {
     this.dispatchEvent(new CustomEvent('panel-loaded'));
-
-    // append collection list to dropdowns before parent 'panel-loaded' event fires
-    this.sortedCollectionsList = Object.entries(APP_CONFIG.collectionLabels).sort((a,b) => (a[1] < b[1]) ? -1 : 1);
-    let slimSelects = this.shadowRoot.querySelectorAll('ucd-theme-slim-select');
-    if( slimSelects ) {
-      slimSelects.forEach(slimSelect => {
-        this.sortedCollectionsList.forEach(collection => {
-          let option = document.createElement('option');
-          option.value = collection[0];
-          option.innerText = collection[1];
-          slimSelect.shadowRoot.querySelector('select').appendChild(option);  
-        });  
-      });
-    }
+    
+    // build option lists here instead of using an array map in the template because
+    //  the style overrides get messed up as the component renders after changes
+    // this._updateCollectionOptions();
+    // this._updateCollectionListOptions();
   }
+
+  // willUpdate() {
+  //   debugger
+  //   this.sortedCollectionsList = Object.entries(APP_CONFIG.collectionLabels).sort((a,b) => (a[1] < b[1]) ? -1 : 1);
+  // }
 
   /**
    * @method updated
@@ -75,8 +69,84 @@ export class AdminContentPanel extends LitElement {
    */
   updated() {
     if( this.isDirty ) {
+      console.log('panel-loaded event called on panel ', this.position)
       this.isDirty = false;
-      this.dispatchEvent(new CustomEvent('panel-loaded'));
+      // this.dispatchEvent(new CustomEvent('panel-loaded'));
+      // this._updateCollectionOptions();
+      // this._updateCollectionListOptions();
+
+      this._reset();
+    }
+  }
+
+  _reset() {
+    // TODO this kinda works, but still the dropdowns don't get updated with the correct styling
+    if( this.type === 'single' ) {
+      this.collectionIds = [];
+      this.heading = '';
+    } else if( this.type === 'text' ) {
+      this.collectionId = '';
+      this.collectionIds = [];
+    } else if( this.type === 'cards' ) {
+      this.heading = '';
+      this.description = '';
+      this.placement = '';
+    }
+    this.dispatchEvent(new CustomEvent('panel-loaded'));
+  }
+
+  /**
+   * @method _updateCollectionOptions
+   * @description build collection dropdown options
+   */
+  _updateCollectionOptions() {
+    let slimSelects = this.shadowRoot.querySelectorAll('ucd-theme-slim-select.single-collection');
+    if( slimSelects ) {
+      slimSelects.forEach(slimSelect => {
+        slimSelect.shadowRoot.querySelectorAll('select > option').forEach(option => {
+          option.remove();
+        });
+        slimSelect.shadowRoot.querySelector('select').appendChild(document.createElement('option'));
+
+        this.sortedCollectionsList.forEach(collection => {
+          let option = document.createElement('option');
+          option.value = collection[0];
+          option.innerText = collection[1];
+          if( collection[0] === this.collectionId ) { 
+            option.selected = true;
+          }
+          slimSelect.shadowRoot.querySelector('select').appendChild(option);  
+        });
+      });
+    }
+  }
+
+  /**
+   * @method _updateCollectionListOptions
+   * @description build collection dropdown options for each collection list panel
+   */
+  _updateCollectionListOptions() {
+    let slimSelects = this.shadowRoot.querySelectorAll('ucd-theme-slim-select.list');
+    if( slimSelects ) {
+      slimSelects.forEach(slimSelect => {
+        slimSelect.shadowRoot.querySelectorAll('select > option').forEach(option => {
+          option.remove();
+        });
+        slimSelect.shadowRoot.querySelector('select').appendChild(document.createElement('option'));
+
+        let position = slimSelect.dataset.position;
+        let matchedCollection = this.collectionIds.filter(c => c.position === parseInt(position))[0];
+
+        this.sortedCollectionsList.forEach(collection => {
+          let option = document.createElement('option');
+          option.value = collection[0];
+          option.innerText = collection[1];
+          if( matchedCollection && collection[0] === matchedCollection.selected ) { 
+            option.selected = true;
+          }
+          slimSelect.shadowRoot.querySelector('select').appendChild(option);  
+        });
+      });
     }
   }
 
@@ -85,10 +155,24 @@ export class AdminContentPanel extends LitElement {
    * @description Add Collection button press event, add collection dropdown to ui
    */
   _addCollection() {
-    console.log('in add collection woot');
-    this.collections.push({ id : '42', 'name' : 'Test Collection' });
+    this.collectionIds.push({ position : this.collectionIds.length, selected : '' });
     this.isDirty = true;
     this.requestUpdate();
+  }
+
+  /**
+   * @method _onCollectionListChange
+   * @description collection dropdown value change, save to collectionIds data array
+   */
+  _onCollectionListChange(e) {
+    let position = e.currentTarget.dataset.position;
+    let selected = e.detail.value;
+    let match = this.collectionIds.filter(c => c.position === parseInt(position))[0];
+    if( match ) {
+      match.selected = selected;
+    //   this.isDirty = true;
+    //   this.requestUpdate();
+    }
   }
 
   /**
@@ -99,6 +183,7 @@ export class AdminContentPanel extends LitElement {
     this.dispatchEvent(new CustomEvent('trash-clicked', { detail : {
       position : this.position
     }}));
+    // this.isDirty = true;
   }
 
   /**
@@ -107,14 +192,11 @@ export class AdminContentPanel extends LitElement {
    */
   _onUpArrowClicked(e) {
     this.dispatchEvent(new CustomEvent('up-arrow-clicked', { detail : {
-      position : this.position,
-      // placement : this.placement,
-      // collectionId : this.collectionId,
-      // heading : this.heading,
-      // description : this.description,
-      // collectionIds : this.collectionIds
+      position : this.position
     }}));
-    console.log('up arrow, description is ', this.description);
+    this.isDirty = true;
+    this.sortedCollectionsList = [...Object.entries(APP_CONFIG.collectionLabels).sort((a,b) => (a[1] < b[1]) ? -1 : 1)]
+    this.requestUpdate();
   }
 
   /**
@@ -123,41 +205,11 @@ export class AdminContentPanel extends LitElement {
    */
   _onDownArrowClicked(e) {
     this.dispatchEvent(new CustomEvent('down-arrow-clicked', { detail : {
-      position : this.position,
-      // placement : this.placement,
-      // collectionId : this.collectionId,
-      // heading : this.heading,
-      // description : this.description,
-      // collectionIds : this.collectionIds
+      position : this.position
     }}));
-    console.log('down arrow, description is ', this.description);
-  }
-
-  _onDataChange(e) {
-    debugger;
-
-    // TODO a better approach perhaps is just on up/down arrow events and save, 
-    //   to loop through all panels and get data and set to panels array
-    //   then move the panel position up/down if needed, or save
-    //   don't send events on EVERY data change
-    //   could do something like this from the parent component:
-    //   e.currentTarget.shadowRoot.querySelector('input.heading-text').value.trim()
-    //   e.currentTarget.shadowRoot.querySelector('input.heading-text').value.trim()
-    //   e.currentTarget.shadowRoot.querySelector('ucd-theme-slim-select').?
-    //   etc...
-
-
-    // this.shadowRoot.querySelector('textarea.description').value.trim()
-    // this.shadowRoot.querySelector('input.heading-text').value.trim()
-    // this.shadowRoot.querySelector('ucd-theme-slim-select').?
-
-
-    // this.dispatchEvent(new CustomEvent('data-change', { detail : {
-
-
-    // TODO this is hacky, plus up/down only sends current data and other panel's data will get wiped.
-    //  should we send events for every data input change?
-    // this.description = e.currentTarget.value;
+    this.isDirty = true;
+    this.sortedCollectionsList = [...Object.entries(APP_CONFIG.collectionLabels).sort((a,b) => (a[1] < b[1]) ? -1 : 1)]
+    this.requestUpdate();
   }
 
 }

@@ -21,7 +21,7 @@ class RecordService extends BaseService {
 
   get(id) {
     return this.request({
-      url : `${this.baseUrl}${id.replace(/^\/item/, '')}?root=true`,
+      url : `${this.baseUrl}${id.replace(/^\/item/, '')}?compact=true`,
       checkCached : () => this.store.getRecord(id),
       onLoading : request => this.store.setRecordLoading(id, request),
       onLoad : result => {

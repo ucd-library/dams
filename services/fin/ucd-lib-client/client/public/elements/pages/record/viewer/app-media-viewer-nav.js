@@ -265,17 +265,19 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
     // this.mediaList = utils.organizeMediaList(this.mediaList);
 
     this.thumbnails = this.mediaList.map(media => {
+      if( !media ) return null;
+
       let {fileType, iconType} = this._getFileAndIconType(media);
 
       if( this.isLightbox && fileType !== 'image' ) {
         return null;
       }
 
-      let thumbnailUrl = media.thumbnailUrl;
-      if( thumbnailUrl && !thumbnailUrl.match(/\/svc:iiif\//) ) {
-        thumbnailUrl += '/svc:iiif/full/,50/0/default.jpg';
-      }
-
+      let thumbnailUrl = media.clientMedia.imageSizes.small.url;
+      // if( thumbnailUrl && !thumbnailUrl.match(/\/svc:iiif\//) ) {
+      //   thumbnailUrl += '/svc:iiif/full/,50/0/default.jpg';
+      // }
+      
       let thumbnail = {
         id: media['@id'],
         icon: iconType,

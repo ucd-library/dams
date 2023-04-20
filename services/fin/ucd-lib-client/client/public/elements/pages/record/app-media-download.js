@@ -61,34 +61,54 @@ export default class AppMediaDownload extends Mixin(LitElement)
     // let vcRecord = this.RecordVcModel.translateMedia(record);
 
     this.rootRecord = record;
-
+    let sources = [];
+    
     // find out if the number of download options is greater than 1
-    let sourceCount = 42;
-    for( let type in record.media ) {
-      for( let media of record.media[type] ) {
-        if( type === 'imageList' ) {
-          record.media.imageList.forEach(list => {
-            sourceCount += list.hasPart.length;
-          });
-        } else {
-          sourceCount += this._getDownloadSources(media, true).length;
-        }
+    sources = this._getDownloadSources(record);
+    // for( let type in record.media ) {
+    //   for( let media of record.media[type] ) {
+    //     if( type === 'imageList' ) {
+    //       record.media.imageList.forEach(list => {
+    //         sourceCount += list.hasPart.length;
+    //       });
+    //     } else {
+    //       sourceCount += this._getDownloadSources(media, true).length;
+    //     }
         
-        if( sourceCount > 1 ) break;
-      }
-      if( sourceCount > 1 ) break;
-    }
+    //     if( sourceCount > 1 ) break;
+    //   }
+    //   if( sourceCount > 1 ) break;
+    // }
 
-    this.hasMultipleDownloadMedia = (sourceCount > 1);
+    this.hasMultipleDownloadMedia = (sources.length > 1);
     if( this.hasMultipleDownloadMedia ) {
       this.shadowRoot.querySelector('#single').checked = true;
       this.shadowRoot.querySelector('#fullset').checked = false;
     }
 
     this.fullSetSelected = false;
+
+    // TODO build downloadOptions option dom, like _onSelectedRecordMediaUpdate() does
+    if ( sources.length === 0 ) {
+      this.selectedMediaHasSources = false;
+      return;
+    }
+
+    this.selectedMediaHasSources = true;
+    this.fullSetCount = this._getAllNativeDownloadSources().length;
+
+    this.allSources = sources;
+    this.downloadOptions = sources;
+    this.shadowRoot.querySelector('#downloadOptions').innerHTML = sources
+      .map((item, index) => `<option value="${index}" ${index === 0 ? 'selected' : ''}>${item.label}</option>`)
+      .join()
+    this.shadowRoot.querySelector('#downloadOptions').value = '0';
+
+    this._setDownloadHref(sources[0]);
   }
 
   _onSelectedRecordMediaUpdate(media) {
+    /*()
     this.showImageFormats = false;
     this.fullSetSelected = false;
 
@@ -110,12 +130,36 @@ export default class AppMediaDownload extends Mixin(LitElement)
     this.shadowRoot.querySelector('#downloadOptions').value = '0';
 
     this._setDownloadHref(sources[0]);
+    */
   }
 
   _getDownloadSources(record, nativeImageOnly=false) {
     let sources = [];
     if( !record ) return sources;
 
+    debugger;
+    record.clientMedia.mediaGroups.forEach(mediaGroup => {
+      mediaGroup.downloads.forEach(media => {
+        let mediaType = utils.getMediaType(media);
+        debugger;
+        if (mediaType === 'VideoObject') {
+          sources = sources.concat(this._getVideoSources(media));
+        } else if (mediaType === 'AudioObject') {
+          sources = sources.concat(this._getAudioSources(media));
+        } else if (mediaType === 'ImageObject' ) {
+          this.showImageFormats = true;
+          sources = sources.concat(this._getImageSources(media, true));
+          this._renderImgFormats(media, null, 'FR');
+        } else if (mediaType === 'ImageList' ) {
+          (media.hasPart || []).forEach(img => {
+            sources = sources.concat(this._getImageSources(img, nativeImageOnly));
+          });
+        }
+      });
+    });
+
+
+    /*
     if( record.clientMediaDownload ) {
       if( Array.isArray(record.clientMediaDownload) ) {
         if( record.clientMediaDownload.length ) {
@@ -132,28 +176,29 @@ export default class AppMediaDownload extends Mixin(LitElement)
       sources = sources.concat(this._getAudioSources(record));
     } else if (utils.getMediaType(record) === 'ImageObject' ) {
       this.showImageFormats = true;
-      sources = sources.concat(this._getImageSources(record, nativeImageOnly));
+      sources = sources.concat(this._getImageSources(record, true));
       this._renderImgFormats(record, null, 'FR');
     } else if (utils.getMediaType(record) === 'ImageList' ) {
       (record.hasPart || []).forEach(img => {
         sources = sources.concat(this._getImageSources(img, nativeImageOnly));
       });
     }
-
+    */
     return sources;
   }
 
   _setDownloadHref(source) {
-    let href = source.src;
-    if( source.type === 'image' ) {
-      let format = this.shadowRoot.querySelector('#format').value;
-      if( source.originalFormat !== format || source.imageType !== 'FR' ) {
-        href += source.service+format;
-      }
-    }
+    debugger;
+    // let href = source.src;
+    // if( source.type === 'image' ) {
+    //   let format = this.shadowRoot.querySelector('#format').value;
+    //   if( source.originalFormat !== format || source.imageType !== 'FR' ) {
+    //     href += source.service+format;
+    //   }
+    // }
 
     this.sourceType = source.type; // stored for analytics
-    this.href = href;
+    this.href = source.src;
   }
 
   /**
@@ -170,16 +215,20 @@ export default class AppMediaDownload extends Mixin(LitElement)
     let format = this._getImageFormat(imageRecord);
 
     if( nativeImageOnly ) {
+      let width = Math.floor(imageRecord.clientMedia?.imageSizes?.original?.size?.width || imageRecord.image.width || 0);
+      let height = Math.floor(imageRecord.clientMedia?.imageSizes?.original?.size?.height || imageRecord.image.height || 0);
+      
       return [{
         record : imageRecord,
         type : 'image',
         src :  config.fcrepoBasePath+imageRecord['@id'],
         originalFormat : format,
         filename : imageRecord.filename || imageRecord.name,
-        label : imageRecord.filename || imageRecord.name
+        label : 'Full Resolution '+ width && height ? width+' x '+height+' px' : ''
       }]
     }
 
+    // TODO remove iiif stuff below, need to test with imagelists though, make sure zip works with sources array
     let sources = [];
     for( let size of config.imageDownload.sizes ) {
       let width = Math.floor(imageRecord.image.width * size.ratio);
@@ -281,17 +330,20 @@ export default class AppMediaDownload extends Mixin(LitElement)
     let originalFormat = this._getImageFormat(imageRecord);
     if( !selectedFormat ) selectedFormat = originalFormat;
 
-    let formats = config.imageDownload.formats.slice(0);
-    if( formats.indexOf(originalFormat) === -1 && selectedSize === 'FR' ) {
-      formats.push(originalFormat);
-    }
+    // let formats = config.imageDownload.formats.slice(0);
+    // if( formats.indexOf(originalFormat) === -1 && selectedSize === 'FR' ) {
+    
+    let formats = [];
+    formats.push(originalFormat);
+    // }
 
     this.formats = formats;
     this.shadowRoot.querySelector('#format').innerHTML = '';
 
+    debugger;
     this.formats.forEach(format => {
       let option = document.createElement('option');
-      option.innerHTML = format + ((format === originalFormat && selectedSize === 'FR') ? ' (native)' : '');
+      option.innerHTML = format; // + ((format === originalFormat && selectedSize === 'FR') ? ' (native)' : '');
       option.value = format;
 
       if (format === selectedFormat) {

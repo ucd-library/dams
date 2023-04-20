@@ -47,7 +47,7 @@ class CollectionVcModel extends BaseModel {
         id : e.payload['@id'],
         description : rootNode.description,
         title : rootNode.name,
-        thumbnailUrl : rootNode.image.url,
+        thumbnailUrl : '', // TODO change to new clientMedia structure once it's built.. rootNode.image.url,
         keywords : rootNode.keywords || [],
         callNumber,
         count : rootNode.itemCount,

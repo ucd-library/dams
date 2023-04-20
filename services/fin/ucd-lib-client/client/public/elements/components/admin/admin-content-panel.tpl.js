@@ -111,8 +111,9 @@ export default function render() {
   .list--reset, 
   ucd-theme-slim-select,
   .description,
-  .heading-text { 
-    margin-top: .3rem;
+  .heading-text,
+  .single-collection { 
+    margin-top: .5rem;
   }
 
   .add-collection-container {
@@ -197,45 +198,56 @@ export default function render() {
     <div ?hidden="${this.type !== 'single'}">
       <span class="form-label">Feature Image</span>
       <ul class="list--reset">
-        <li><input id="styled-radio1" name="radio" type="radio" class="radio" value="left" ?checked="${this.placement === 'left'}"><label for="styled-radio1">Left</label></li>
-        <li><input id="styled-radio2" name="radio" type="radio" class="radio" value="right" ?checked="${this.placement === 'right'}"><label for="styled-radio2">Right</label></li>
+        <li><input id="placement-left" name="radio" type="radio" class="radio" value="left" ?checked="${this.placement === 'left'}" @change="${e => this.placement = e.currentTarget.value}"><label for="placement-left">Left</label></li>
+        <li><input id="placement-right" name="radio" type="radio" class="radio" value="right" ?checked="${this.placement === 'right'}" @change="${e => this.placement = e.currentTarget.value}"><label for="placement-right">Right</label></li>
       </ul>
     </div>
 
     <div ?hidden="${this.type !== 'text'}">
       <span class="form-label">Text Placement</span>
       <ul class="list--reset">
-        <li><input id="styled-radio3" name="radio" type="radio" class="radio" value="centered" ?checked="${this.placement === 'centered'}"><label for="styled-radio3">Centered</label></li>
-        <li><input id="styled-radio4" name="radio" type="radio" class="radio" value="left-aligned" ?checked="${this.placement === 'left-aligned'}"><label for="styled-radio4">Left-aligned</label></li>
-        <li><input id="styled-radio5" name="radio" type="radio" class="radio" value="split" ?checked="${this.placement === 'split'}"><label for="styled-radio5">Split (33/67)</label></li>
+        <li><input id="placement-centered" name="radio" type="radio" class="radio" value="centered" ?checked="${this.placement === 'centered'}" @change="${e => this.placement = e.currentTarget.value}"><label for="placement-centered">Centered</label></li>
+        <li><input id="placement-left-aligned" name="radio" type="radio" class="radio" value="left-aligned" ?checked="${this.placement === 'left-aligned'}" @change="${e => this.placement = e.currentTarget.value}"><label for="placement-left-aligned">Left-aligned</label></li>
+        <li><input id="placement-split" name="radio" type="radio" class="radio" value="split" ?checked="${this.placement === 'split'}" @change="${e => this.placement = e.currentTarget.value}"><label for="placement-split">Split (33/67)</label></li>
       </ul>
     </div>
 
   </fieldset>
 
   <div class="content-row">
-  <div ?hidden="${this.type !== 'single'}">
-    <span class="form-label">Collection</span>    
-      <ucd-theme-slim-select class="single-collection">
+    <div ?hidden="${this.type !== 'single'}">
+      <span class="form-label">Collection</span>    
+      <ucd-theme-slim-select 
+        class="single-collection" 
+        @change="${e => this.collectionId = e.detail.value}">
         <select>
           <option></option>
-          <!-- options added in js -->
+          ${this.sortedCollectionsList.map(sc => html`
+            <option .value=${sc[0]} ?selected=${this.collectionId === sc[0]}>${sc[1]}</option>
+          `)}
         </select>
       </ucd-theme-slim-select>
     </div>
     <div ?hidden="${this.type !== 'text'}">
       <span class="form-label">Heading</span>
-      <input class="heading-text" type="text" .value=${this.heading}>
+      <input 
+        class="heading-text" 
+        type="text" 
+        .value=${this.heading} 
+        @change="${e => this.heading = e.currentTarget.value}">
     </div>
   </div>
 
   <div class="collection-list" ?hidden="${this.type !== 'cards'}">
     <span class="form-label">Collections</span>
-    ${this.collections.map(collection => html`
-      <ucd-theme-slim-select>
+    ${this.collectionIds.map(c => html`
+      <ucd-theme-slim-select 
+        @change="${this._onCollectionListChange}" 
+        data-position="${c.position}"
+        class="list">
         <select class="collections">
           <option></option>
-          <!-- options added in js -->
+          <!-- options list built from js -->
         </select>
       </ucd-theme-slim-select>
     `)}
@@ -250,7 +262,12 @@ export default function render() {
 
   <div class="content-row" style="padding-top: 2rem;" ?hidden="${this.type === 'cards'}">
     <span class="form-label" style="display: block;">Description</span>    
-    <textarea class="description" style="height: 175px; font-size: .9rem" .value=${this.description} @change="${e => this.description = e.currentTarget.value}"></textarea>
+    <textarea 
+      class="description" 
+      style="height: 175px; font-size: .9rem" 
+      .value=${this.description} 
+      @change="${e => this.description = e.currentTarget.value}">
+    </textarea>
   </div>
   
 

@@ -49,14 +49,28 @@ export class AdminFeaturedCollections extends LitElement {
     this.active = true;
     
     this.panels = [];
+    // this.isDirty = false;
   }
 
   /**
-   * @method firstUpdated
+   * @method updated
    * @description Lit lifecycle method
    */
-  firstUpdated() {}
-
+  updated() {
+    this._updateUiStyles(null, true);
+    // if( this.isDirty ) {
+    //   this.isDirty = false;
+      // this._updateUiStyles(null, true);
+    
+      // requestUpdate on child panels
+      // let panels = this.shadowRoot.querySelectorAll('admin-content-panel');
+      // if( panels.length ) {
+      //   panels.forEach(panel => {
+      //     panel.requestUpdate();
+      //   });
+      // }
+    // }
+  }
   
   /**
    * @method _newPanel
@@ -72,7 +86,7 @@ export class AdminFeaturedCollections extends LitElement {
       collectionId : '',
       heading : '',
       description : '',
-      collectionIds : type === 'cards' ? [''] : null,
+      collectionIds : [{ position : 0, selected : '' }]
     });
     this.requestUpdate();
   }
@@ -81,37 +95,55 @@ export class AdminFeaturedCollections extends LitElement {
    * @method _updateUiStyles
    * @description Listener attached to <admin-content-panel> updated events
    * @param {CustomEvent} e 
+   * @param {Boolean} allPanels set to true to refresh all admin panels
    */
-  _updateUiStyles(e) {
-    let panel = e.currentTarget;
-    if( !panel ) return;
+  _updateUiStyles(e, allPanels=false) {
+    let panel = e ? e.currentTarget : null;
+    if( !panel && !allPanels ) return;
 
     // TODO hack overriding styles of slim select, should we update the brand component to allow custom styles instead?
     let selects = [];
-    selects.push(...panel.shadowRoot.querySelectorAll('ucd-theme-slim-select'));
-    if( !selects ) return;
+    let panels = [];
+    if( allPanels ) {
+      panels = this.shadowRoot.querySelectorAll('admin-content-panel');
+      if( panels.length ) {
+        panels.forEach(p => {
+          selects.push(...p.shadowRoot.querySelectorAll('ucd-theme-slim-select'));
+        });
+      }
+    } else {
+      selects.push(...panel.shadowRoot.querySelectorAll('ucd-theme-slim-select'));
+    }
+    if( !selects.length ) return;
 
     selects.forEach(select => {
-        let ssMain = select.shadowRoot.querySelector('.ss-main');
-        if( ssMain ) {
-            ssMain.style.borderColor = 'var(--color-aggie-gold)';
-        }
-    
-        let ssSingle = select.shadowRoot.querySelector('.ss-single-selected');
-        if( ssSingle ) {
-            ssSingle.style.border = 'none';
-            ssSingle.style.height = '49px';
-            ssSingle.style.paddingLeft = '1rem';
-            ssSingle.style.backgroundColor = 'var(--color-aggie-gold-20)';
-            ssSingle.style.fontWeight = 'bold';
-            ssSingle.style.color = 'var(--color-aggie-blue)';
-        }
-    
-        // make description text area same width (-padding etc) as select input
-        let selectWidth = select.offsetWidth - 30;
-        let description = panel.shadowRoot.querySelector('.description');
-        description.style.width = selectWidth+'px';   
+      let ssMain = select.shadowRoot.querySelector('.ss-main');
+      if( ssMain ) {
+        ssMain.style.borderColor = 'var(--color-aggie-gold)';
+      }
+  
+      let ssSingle = select.shadowRoot.querySelector('.ss-single-selected');
+      if( ssSingle ) {
+        ssSingle.style.border = 'none';
+        ssSingle.style.height = '49px';
+        ssSingle.style.paddingLeft = '1rem';
+        ssSingle.style.backgroundColor = 'var(--color-aggie-gold-20)';
+        ssSingle.style.fontWeight = 'bold';
+        ssSingle.style.color = 'var(--color-aggie-blue)';
+      }
+  
+      // make description text area same width (-padding etc) as select input
+      let selectWidth = select.offsetWidth - 30;
+      // let description = panel.shadowRoot.querySelector('.description');
+      // description.style.width = selectWidth+'px';   
     });
+
+    // if( allPanels ) {
+    //   panels.forEach(p => {
+    //     p._updateCollectionOptions();
+    //     p._updateCollectionListOptions();
+    //   });
+    // }
   }
 
   /**
@@ -154,7 +186,9 @@ export class AdminFeaturedCollections extends LitElement {
     this.panels.forEach((panel, i) => {
       panel.position = i;
     });
+    // this.isDirty = true;
     this.requestUpdate();
+    console.log('this.panels moveUp', this.panels);
   }
 
   /**
@@ -181,7 +215,9 @@ export class AdminFeaturedCollections extends LitElement {
     this.panels.forEach((panel, i) => {
       panel.position = i;
     });
+    // this.isDirty = true;
     this.requestUpdate();
+    console.log('this.panels moveDown', this.panels);
   }
 
   /**
@@ -191,16 +227,19 @@ export class AdminFeaturedCollections extends LitElement {
   _updatePanelsData() {
     let panels = this.shadowRoot.querySelectorAll('admin-content-panel');
     panels.forEach((panel, i) => {
-      let collectionIds = [];
-      panel.shadowRoot.querySelector('.collection-list > ucd-theme-slim-select').shadowRoot.querySelectorAll('select').forEach(select => {
-        collectionIds.push(select.value.trim());
-      });
-      // this.panels[i].placement = panel.shadowRoot.querySelector('input[type="radio"]:checked').value.trim();
-      this.panels[i].collectionId = panel.shadowRoot.querySelector('ucd-theme-slim-select.single-collection').shadowRoot.querySelector('select').value.trim();
-      this.panels[i].heading = panel.shadowRoot.querySelector('input.heading-text').value.trim();
-      this.panels[i].description = panel.shadowRoot.querySelector('textarea.description').value.trim();
-      this.panels[i].collectionIds = collectionIds;
+      let match = this.panels.filter(p => p.position === panel.position)[0];
+      if( match ) {
+        match.placement = panel.placement;
+        match.collectionId = panel.collectionId;
+        match.heading = panel.heading;
+        match.description = panel.description;
+        match.collectionIds = panel.collectionIds;
+        debugger;
+        // panel._updateCollectionOptions();
+        // panel._updateCollectionListOptions();
+      }
     });
+    this.panels = [...this.panels];
   }
 
 }

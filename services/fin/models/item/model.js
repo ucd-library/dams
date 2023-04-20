@@ -40,6 +40,10 @@ class ItemsModel extends FinEsDataModel {
 
     if( !jsonld['@graph'] ) return;
 
+    if( !this.activemq ) {
+      await this.connect();
+    }
+
     let reindex = [];
     for( let node of jsonld['@graph'] ) {
       if( !node.isPartOf ) continue;
