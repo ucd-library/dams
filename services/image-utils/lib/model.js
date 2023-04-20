@@ -435,11 +435,11 @@ class ImageUtils {
 
   async finalizePdf(workflowId) {
     let workflowInfo = await this.getWorkflowInfo(workflowId);
-
     let baseGcsPath = 'gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath;
-    let files = await gcs.listFiles('gs://'+workflowInfo.data.gcsBucket+workflowInfo.data.finPath+'/'+workflowInfo.data.gcsSubpath);
-    files = files[0];
 
+    let files = await gcs.listFiles(baseGcsPath, {subfolders: true});
+    files = files[0];
+  
     let iaManifest = {
       pages : []
     };
@@ -448,12 +448,15 @@ class ImageUtils {
     //   let fileParts = path.parse(file.name);
     //   iaManifest.hashes[fileParts.base] = file.metadata.md5Hash;
     // }
-
+    let re = new RegExp('images\/([0-9]+)\/manifest.json');
     for( let file of files ) {
       let fileParts = path.parse(file.name);
+      if( !re.test(file.name) ) continue;
       if( fileParts.base !== 'manifest.json' ) continue;
 
-      let t = (await gcs.readFileToMemory(baseGcsPath+'/'+fileParts.base)).toString('utf-8');
+      logger.info('concating gs://'+file.metadata.bucket+'/'+file.name);
+
+      let t = (await gcs.readFileToMemory('gs://'+file.metadata.bucket+'/'+file.name)).toString('utf-8');
       let pageData = JSON.parse(t);
 
       // lookup the md5 hashes for file
@@ -465,18 +468,18 @@ class ImageUtils {
       // pageData.width = parseInt(pageData.width);
       // pageData.height = parseInt(pageData.height);
       // pageData.page = parseInt(fileParts.name.split('-').pop());
-      pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+'/'+fileParts.name+'.jpg';
+      // pageData.path = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+'/'+fileParts.name+'.jpg';
       iaManifest.pages.push(pageData);
     }
 
     // delete iaManifest.hashes;
 
-    if( iaManifest.data.length === 0 ) {
-      console.log('No page files found.  Aborting');
+    if( iaManifest.pages.length === 0 ) {
+      logger.warn('No page files found.  Aborting');
       return;
     }
 
-    iaManifest.data.sort((a,b) => {
+    iaManifest.pages.sort((a,b) => {
       return a.page - b.page;
     });
 

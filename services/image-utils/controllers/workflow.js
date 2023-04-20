@@ -73,6 +73,19 @@ router.get('/pdf/getNumPages/:workflowId', async (req, res) => {
 
 });
 
+router.get('/pdf/finalize/:workflowId', async (req, res) => {
+  try {    
+    await model.finalizePdf(req.params.workflowId);
+    res.json({success: true});
+  } catch(e) {
+    res.status(500).json({
+      error : e.message,
+      stack : e.stack
+    });
+  }
+
+});
+
 router.get('/process-image/:workflowId', async (req, res) => {
   try {    
     let gcsFiles = await model.processImage(req.params.workflowId);
