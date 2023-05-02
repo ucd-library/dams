@@ -10,9 +10,6 @@ class ItemsModel extends FinEsDataModel {
     super('item');
     this.schema = schema;
     this.transformService = 'es-item-transform';
-
-    this.COMPRESS_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/tiff', 'image/tif'];
-    this.COMPRESSED_WORKFLOW = 'client-image-sizes';
   }
 
   connect() {

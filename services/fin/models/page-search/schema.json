@@ -7,23 +7,24 @@
       "type" : "keyword"
     },
 
-    "bookId" : {
+    "@graph.@id" : {
       "type" : "keyword"
     },
 
-    "archivalGroup" : {
+    "@graph.identifier" : {
       "type" : "keyword"
     },
 
-    "page" : {
+    "@graph.position" : {
       "type" : "integer"
     },
 
-    "content" : {
-      "type" : "text"
+    "@graph.content" : {
+      "type" : "text",
+      "analyzer" : "djvu_xml"
     },
 
-    "_.updated" : {
+    "@graph._.updated" : {
       "type" : "date"
     },
 

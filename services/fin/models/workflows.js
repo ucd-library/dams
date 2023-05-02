@@ -7,11 +7,17 @@ class WorkflowUtils {
     this.AUTO_WORKFLOWS = {
       'pdf-image-products' : {
         mimeTypes : ['application/pdf'],
-        property : 'images'
+        property : 'images',
+        pageSearch : {
+          multiPage : true
+        }
       },
       'image-products' : {
         mimeTypes : ['image/jpeg', 'image/png', 'image/tiff'],
-        property: 'images'
+        property: 'images',
+        pageSearch : {
+          multiPage : false
+        }
       },
       'video-to-stream' : {
         mimeTypes : ['video/mp4', 'video/quicktime'],

@@ -1,0 +1,120 @@
+const {config, RDF_URIS, gc} = require('@ucd-lib/fin-service-utils');
+const fetch = require('node-fetch');
+const {gcs} = gc;
+
+const PDF_IMAGE_PRODUCTS = 'pdf-image-products';
+const IMAGE_PRODUCTS = 'image-products';
+
+module.exports = async function(path, graph, headers, utils) {
+
+  let archivalGroup = '';
+  let manifest = null;
+  let manifestHash = null;
+  let item = {};
+
+  let container = utils.get(path, graph);
+  utils.init(item, container);  
+  utils.stripFinHost(item);
+  utils.stripFinHost(headers);
+
+  utils.ns({
+    "ebucore" : "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+    "schema": "http://schema.org/"
+  });
+
+  await utils.add({
+    attr : 'name',
+    value : ['schema', 'name']
+  });
+
+  await utils.add({
+    attr : 'fileFormat',
+    value : ['ebucore', 'hasMimeType']
+  });
+
+  await utils.add({
+    attr : 'position',
+    value : ['schema', 'position']
+  });
+
+  await utils.add({
+    attr : 'publisher',
+    value : ['schema', 'publisher'],
+    type : 'id'
+  });
+
+  await utils.add({
+    attr : 'isPartOf',
+    value : ['schema', 'isPartOf'],
+    type : 'id'
+  });
+
+  await utils.add({
+    attr : 'hasPart',
+    value : ['schema', 'hasPart'],
+    type : 'id'
+  });
+
+  await utils.add({
+    attr : 'filename',
+    value : ['ebucore', 'filename']
+  });
+
+  if( headers.link ) {
+    if( headers.link['archival-group'] ) {
+      archivalGroup = headers.link['archival-group'].map(item => item.url)[0];
+    } else if( headers.link.type && 
+      headers.link.type.find(item => item.rel === 'type' && item.url === RDF_URIS.TYPES.ARCHIVAL_GROUP) ) {
+      archivalGroup = item['@id'];
+    }
+
+    // check for completed ia reader workflow
+    if( headers.link.workflow ) {
+      let pdf = headers.link.workflow.find(item => PDF_IMAGE_PRODUCTS === item.type);
+      let image = headers.link.workflow.find(item => IMAGE_PRODUCTS === item.type);
+
+      if( pdf ) {
+        let workflowInfo = await fetch(getGatewayUrl(pdf.url));
+        workflowInfo = await workflowInfo.json();
+
+        manifest = config.gateway.host+config.fcrepo.root+item['@id'] + '/svc:gcs/' + workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
+
+        manifestHash = await gcs.getGcsFileMetadata('gs://'+workflowInfo.data.gcsBucket+item['@id']+'/'+workflowInfo.data.gcsSubpath+'/manifest.json');
+        if( manifestHash ) {
+          manifestHash = manifestHash.md5Hash;
+        }
+      } else if ( image ) {
+        let workflowInfo = await fetch(getGatewayUrl(image.url));
+        workflowInfo = await workflowInfo.json();
+
+        manifest = config.gateway.host+config.fcrepo.root+item['@id'] + '/svc:gcs/' + workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
+
+        manifestHash = await gcs.getGcsFileMetadata('gs://'+workflowInfo.data.gcsBucket+item['@id']+'/'+workflowInfo.data.gcsSubpath+'/manifest.json');
+        if( manifestHash ) {
+          manifestHash = manifestHash.md5Hash;
+        }
+      }
+    }
+  }
+
+  if( !manifest ) {
+    throw new Error('container does not have image manifest: '+path);
+  }
+
+  item.manifest = manifest;
+
+  return {
+    '@id' : archivalGroup,
+    '@graph' : [item]
+  }
+}
+
+function getGatewayUrl(url='') {
+  if( url.startsWith('http') ) {
+    url = new URL(url);
+    return config.gateway.host+url.pathname+url.search;
+  } else if( url.startsWith('/fcrepo/rest') ) {
+    return config.gateway.host+url;
+  }
+  return config.gateway.host+'/fcrepo/rest'+url;
+}
