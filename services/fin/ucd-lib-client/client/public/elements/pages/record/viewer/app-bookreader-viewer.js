@@ -35,7 +35,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   }
 
   willUpdate(e) {
-    if( this.bookData.data ) {
+    if( this.bookData?.pages ) {
       this._renderBookReader();
     }
   }
@@ -121,17 +121,19 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   }
 
   _renderBookReaderAsync() {
-    if( this.iaInitialized || !this.bookData.data ) return;
+    if( this.iaInitialized || !this.bookData.pages ) return;
     this.iaInitialized = true;
     let data = [];
 
-    let djvuPath = this.bookData.data[0].path;
-    djvuPath = djvuPath.substr(0, djvuPath.lastIndexOf('-')); // remove page number and ext
+    let djvuPath = this.bookData.pages[0].ocr.url;
+    djvuPath = djvuPath.split('/');
+    djvuPath = djvuPath.splice(0, djvuPath.length - 2).join('/'); // remove page number and extension    
 
-    this.bookData.data.forEach(bd => {
+    this.bookData.pages.forEach(bd => {
       data.push([{
-        width: bd.width, height: bd.height,
-        uri: bd.path
+        width: bd[bd.ocr.imageSize].size.width, 
+        height: bd[bd.ocr.imageSize].size.height,
+        uri: bd[bd.ocr.imageSize].url
       }])
     })
 
@@ -148,13 +150,13 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
       metadata: [
         {label: 'Title', value: 'Open Library BookReader Presentation'},
         {label: 'Author', value: 'Internet Archive'},
-        {label: 'Demo Info', value: 'This demo shows how one could use BookReader with their own content.'},
+        // {label: 'Demo Info', value: 'This demo shows how one could use BookReader with their own content.'},
       ],
 
       plugins: {
         textSelection: {
           enabled: true,
-          singlePageDjvuXmlUrl: djvuPath + '-{{pageIndex}}.djvu'
+          singlePageDjvuXmlUrl: djvuPath + '/{{pageIndex}}/ocr.djvu'
         },
       },
 

@@ -540,7 +540,7 @@ return html`
   }
 
   admin-featured-collections {
-    margin: 4rem 0;
+    padding: 4rem 0;
   }
   
   /*
@@ -627,7 +627,7 @@ return html`
 </dams-hero>
 <!-- <img src="/images/defaults/annual-winter-sale1952.jpg"> -->
 
-<div class="edit-overlay" ?hidden="${!this.editMode}"></div>
+<div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}"></div>
 <section class="browse-buttons site-frame">
   <div class="priority-links">
     <div class="priority-links__item">
@@ -734,13 +734,13 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
 
   <section class="featured site-frame">
     <div class="right-panel">
-      <div class="icon-wrapper" ?hidden="${this.editMode}" @click="${this._onEditClicked}">
+      <div class="icon-wrapper" ?hidden="${this.editMode || !this.isUiAdmin}" @click="${this._onEditClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
       </div>
-      <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onSaveClicked}">
+      <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onSaveClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
       </div>
-      <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onCancelEditClicked}">
+      <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onCancelEditClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
       </div>
     </div>
@@ -752,7 +752,7 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
       </dams-watercolor-overlay> -->
     </div>
 
-    <admin-featured-collections ?hidden="${!this.editMode}"></admin-featured-collections>
+    <admin-featured-collections ?hidden="${!this.editMode || !this.isUiAdmin}"></admin-featured-collections>
     <!-- <div class="featured-collections-editor" ?hidden="${!this.editMode}">
       
     
@@ -775,36 +775,38 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
 
 
     </div> -->
-  
-    <div class="featured-collections-public" ?hidden="${this.editMode}">
-      <dams-highlighted-collection .collection="${this.featuredCollections[0]}"></dams-highlighted-collection>
 
-      <!-- <div class="featured-group" ?hidden="${!this.showCollectionGroup}"> -->
-      <div class="featured-group">
-        <div class="fg-header">
-          <!-- <h3>${this.textTrio.label}</h3>
-          <div>${this.textTrio.text}</div> -->
-          <h3 class="heading--primary">The Greatest<br>Wine Library</h3>
-          <div>
-            Our wine collections support UC Davis' top-ranked viticulture and enology
-            program and visiting scholors around the world including 30,000 books in 
-            more than 50 languages, rare books and manuscripts, historic records and
-            research data, the papers of leading writers on California wine, and materials in
-            every medium, from vintage wine labels to videos. The featured items below are a 
-            small taste of these extensive collections.
+    <div class="featured-collections-public" ?hidden="${this.editMode}">
+      ${this.displayData.map((data) => html`
+
+        ${data.type === 'single' ? html`
+          <dams-highlighted-collection 
+            collection-id="${data.collectionId}"
+            collection-desc="${data.description}"
+            ?image-right="${data.placement === 'right'}">
+          </dams-highlighted-collection>
+        ` : ''}
+
+        ${data.type === 'text' ? html`
+        <div class="featured-group">
+          <div class="fg-header ${data.placement}"> <!-- TODO style based on placement class -->
+            <h3 class="heading--primary">${data.heading}</h3>
+            <div>
+              ${data.description}
+            </div>
           </div>
         </div>
+        ` : ''}
 
+        ${data.type === 'cards' ? html`
+          <div class="card-trio">
+            ${data.collectionIds.map(collection => html`
+              <dams-collection-card data-id="${collection.selected}"></dams-collection-card>
+            `)}
+          </div>
+        ` : ''}
 
-        <div class="card-trio">
-          ${this.featuredCollections.map(collection => html`
-            <dams-collection-card data-id="${collection['@id']}"></dams-collection-card>
-          `)}
-        </div>
-      </div>
-
-
-      </div>
+      `)}
 
       <div class="featured-more">
         <a href="/browse/collections" class="btn btn--primary">Browse all collections</a>

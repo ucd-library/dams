@@ -8,7 +8,8 @@ import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
  * @class AdminFeaturedCollections
  * @description admin UI for customizing featured collections on the homepage
  */
-export class AdminFeaturedCollections extends LitElement {
+export class AdminFeaturedCollections extends Mixin(LitElement)
+  .with(LitCorkUtils) {
   static get properties() {
     return {
       panels: {type : Array}
@@ -50,6 +51,22 @@ export class AdminFeaturedCollections extends LitElement {
     
     this.panels = [];
     // this.isDirty = false;
+    this._injectModel('FcAppConfigModel');
+  }
+
+  /**
+   * @method firstUpdated
+   * @description Lit lifecycle method called when element is first updated
+   */
+  async firstUpdated() {
+    // get any saved featured collections
+    let displayData = APP_CONFIG.fcAppConfig['/application/ucd-lib-client/featured-collections/config.json'];
+    if( displayData && displayData.body && Array.isArray(displayData.body) ) this.panels = displayData.body;
+    if( !displayData ) {
+      displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
+      if( displayData && displayData.body ) this.panels = JSON.parse(displayData.body);
+    }
+    console.log('panels', this.panels);
   }
 
   /**
@@ -86,9 +103,12 @@ export class AdminFeaturedCollections extends LitElement {
       collectionId : '',
       heading : '',
       description : '',
-      collectionIds : [{ position : 0, selected : '' }]
+      collectionIds : type === 'cards' ? [{ position : 0, selected : '' }] : []
     });
     this.requestUpdate();
+    requestAnimationFrame(() => {
+      this._updateUiStyles(null, true);
+    });    
   }
 
   /**
@@ -160,6 +180,9 @@ export class AdminFeaturedCollections extends LitElement {
       panel.position = i;
     });
     this.requestUpdate();
+    requestAnimationFrame(() => {
+      this._updateUiStyles(null, true);
+    });
   }
 
   /**
@@ -174,11 +197,6 @@ export class AdminFeaturedCollections extends LitElement {
     this._updatePanelsData();
 
     let panel = this.panels.splice(position, 1)[0];
-    // panel.placement = e.detail.placement;
-    // panel.collectionId = e.detail.collectionId;
-    // panel.heading = e.detail.heading;
-    // panel.description = e.detail.description;
-    // panel.collectionIds = e.detail.collectionIds;
 
     this.panels.splice(position-1, 0, panel);
 
@@ -189,6 +207,9 @@ export class AdminFeaturedCollections extends LitElement {
     // this.isDirty = true;
     this.requestUpdate();
     console.log('this.panels moveUp', this.panels);
+    requestAnimationFrame(() => {
+      this._updateUiStyles(null, true);
+    });
   }
 
   /**
@@ -203,11 +224,6 @@ export class AdminFeaturedCollections extends LitElement {
     this._updatePanelsData();
 
     let panel = this.panels.splice(position, 1)[0];
-    // panel.placement = e.detail.placement;
-    // panel.collectionId = e.detail.collectionId;
-    // panel.heading = e.detail.heading;
-    // panel.description = e.detail.description;
-    // panel.collectionIds = e.detail.collectionIds;
 
     this.panels.splice(position+1, 0, panel);
 
@@ -218,6 +234,9 @@ export class AdminFeaturedCollections extends LitElement {
     // this.isDirty = true;
     this.requestUpdate();
     console.log('this.panels moveDown', this.panels);
+    requestAnimationFrame(() => {
+      this._updateUiStyles(null, true);
+    });
   }
 
   /**
@@ -229,17 +248,21 @@ export class AdminFeaturedCollections extends LitElement {
     panels.forEach((panel, i) => {
       let match = this.panels.filter(p => p.position === panel.position)[0];
       if( match ) {
-        match.placement = panel.placement;
-        match.collectionId = panel.collectionId;
-        match.heading = panel.heading;
-        match.description = panel.description;
-        match.collectionIds = panel.collectionIds;
-        debugger;
+        match.placement = panel.type !== 'cards' ? panel.placement : '';
+        match.collectionId = panel.type === 'single' ? panel.collectionId : '';
+        match.heading = panel.type === 'text' ? panel.heading : '';
+        match.description = panel.type !== 'cards' ? panel.description : '';
+        match.collectionIds = panel.type === 'cards' ? panel.collectionIds : [];
+
         // panel._updateCollectionOptions();
         // panel._updateCollectionListOptions();
+        panel.isDirty = true;
       }
     });
     this.panels = [...this.panels];
+    requestAnimationFrame(() => {
+      this._updateUiStyles(null, true);
+    });
   }
 
 }

@@ -11,7 +11,6 @@ class FcAppConfigService extends BaseService {
     this.baseUrl = '/fcrepo/rest/application/ucd-lib-client';
   }
 
-  // this can come from APP_CONFIG.fcAppConfig
   getCollectionAppData(id) {
     return this.request({
       url : `${this.baseUrl}${id}${id.replace('/collection','')}.jsonld.json`,
@@ -29,14 +28,24 @@ class FcAppConfigService extends BaseService {
     });
   }
 
-  saveCollectionDisplayData(id, displayData) {
+  async saveCollectionDisplayData(id, displayData, featuredImage) {    
+    if( featuredImage ) {
+      await fetch(`${this.baseUrl}${id}/featuredImage.jpg`, {
+        method : 'PUT',
+        headers : {
+            'Content-Type' : 'image/jpg',
+        },
+        body: featuredImage,
+        duplex: 'half'
+      }); 
+    }
+    
     return this.request({
       url : `${this.baseUrl}${id}${id.replace('/collection','')}.jsonld.json`,
       fetchOptions : {
         method : 'PUT',
         headers : {
-          'Accept' : 'application/ld+json',
-          'Prefer' : 'handling=lenient'
+          'Content-Type' : 'application/ld+json'
         },
         body : JSON.stringify(displayData)
       },
@@ -47,18 +56,27 @@ class FcAppConfigService extends BaseService {
     });
   }
 
-  saveCollectionFeaturedImage(id, displayData) {
-    // TODO post binary data
-    return;
+  getFeaturedCollectionAppData() {
     return this.request({
-      url : '/fcrepo/rest/application/ucd-lib-client'+id,
+      url : `${this.baseUrl}/featured-collections/config.json`,
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    });
+  }
+
+  async saveFeaturedCollectionDisplayData(displayData) {
+    return this.request({
+      url : `${this.baseUrl}/featured-collections/config.json`,
       fetchOptions : {
         method : 'PUT',
         headers : {
-          'Accept' : 'application/ld+json',
-          'Prefer' : 'handling=lenient'
+          'Accept' : 'application/json',
+          // 'Prefer' : 'handling=lenient',
+          'Content-Type' : 'application/json'
         },
-        body : '{' + JSON.stringify(displayData) + '}'
+        body : JSON.stringify(displayData)
       },
       checkCached : () => null,
       onLoading : null,

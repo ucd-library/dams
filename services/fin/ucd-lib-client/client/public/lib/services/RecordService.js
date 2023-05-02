@@ -83,14 +83,15 @@ class RecordService extends BaseService {
         if( result.body.results ) {
           result.body.results = result.body.results.map(record => {
             let rg = new RecordGraph(record);
-            if( !ignoreClientMedia ) {
-              rg.clientMedia = new ClientMedia(record.id, record);
-            }
+            // debugger;
+            // if( !ignoreClientMedia ) {
+              rg.clientMedia = new ClientMedia(record['@id'], record);
+            // }
             return rg;
           });
-          if( !ignoreClientMedia ) {
+          // if( !ignoreClientMedia ) {
             result.body.results.map(item => item.getChildren(item.root));
-          }
+          // }
           this.store.setSearchLoaded(searchDocument, result.body);
         }
       },

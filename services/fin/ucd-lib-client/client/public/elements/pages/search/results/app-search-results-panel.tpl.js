@@ -287,7 +287,7 @@ return html`
 </style>
 
 <div class="header">
-  <div style="flex: .2" class="photo-stack"><ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:photo-stack"></ucdlib-icon></div>
+  <div style="flex: .2" class="photo-stack"><ucdlib-icon style="cursor: auto;" class="vertical-link__image" icon="ucdlib-dams:photo-stack"></ucdlib-icon></div>
   <div style="flex: 3"><span style="font-weight: bold">${this.total} item results</span><span ?hidden="${this.results.length === 0}"> from <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collections</a></span></div>  
 
   <div style="flex: .5"></div>  

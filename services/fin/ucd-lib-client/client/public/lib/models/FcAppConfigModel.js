@@ -127,7 +127,6 @@ class FcAppConfigModel extends BaseModel {
       .find(item => item['@type'].includes(this.TYPES.APPLICATION_CONTAINER));
   }
 
-  // this can come from APP_CONFIG.fcAppConfig, but different structure
   /**
      * @method getCollectionAppData
      * @description load a collections application container display data by id
@@ -146,78 +145,35 @@ class FcAppConfigModel extends BaseModel {
    * 
    * @param {String} id collection id
    * @param {Array} displayData record id
+   * @param {Object} file featured image file object
    * 
    * @returns {Promise} resolves to record
    */
-  async saveCollectionDisplayData(id, displayData) {
-    // TEMP test
-    let tempDisplayData = `
-    {
-      "@context" : {
-        "@vocab" : "http://schema.org/",
-        "@base" : "info:fedora/application/collection",
-        "fedora" : "http://fedora.info/definitions/v4/repository#",
-        "ldp" : "www.w3.org/ns/ldp#",
-        "schema" : "http://schema.org/",
-        "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
-        "xsd" : "http://www.w3.org/2001/XMLSchema#",
-        "collection" : {
-          "@type" : "@id",
-          "@id" : "ucdlib:collection"
-        },
-        "watercolors" : {
-          "@type" : "@id",
-          "@id" : "ucdlib:watercolors"
-        },
-        "foreground" : {
-          "@type" : "xsd:text",
-          "@id" : "ucdlib:foreground"
-        },
-        "background" : {
-          "@type" : "xsd:text",
-          "@id" : "ucdlib:background"
-        },
-        "ldp:membershipResource" : {
-          "@type" : "@id"
-        },
-        "ldp:hasMemberRelation" : {
-          "@type" : "@id"
-        }
-      },
-      "@id" : "collection/sherry-lehmann",
-      "watercolors" : [
-        {
-          "@id" : "info:fedora/application/#tahoe",
-          "css" : "tahoe",
-          "foreground" : "",
-          "background" : ""
-        }
-      ],
-      "name" : "Sherry Lehmann Collection",
-      "thumbnailUrl" : {
-          "@id" : "info:fedora/application/ucd-lib-client/collection/sherry-lehmann/featuredImage.jpg"
-      },
-      "exampleOfWork" : [
-        {
-          "@id" : "/item/ark:/87287/bla",
-          "position" : 1,
-          "image" : "/item/ark:/87287/d7dw8t/image",
-          "description" : "From 1973: Wine List Proudly P..."
-        },
-        {
-          "@id" : "/item/ark:/87287/d7gd3q",
-          "position" : 2
-        },
-            {
-          "@id" : "/item/ark:/87287/foo",
-          "position" : 3
-        }
-      ]
-    }
-    `;
-    return await this.service.saveCollectionDisplayData(id, displayData);
+  async saveCollectionDisplayData(id, displayData, featuredImage) {
+    return await this.service.saveCollectionDisplayData(id, displayData, featuredImage);
   }
 
+  /**
+     * @method getFeaturedCollectionAppData
+     * @description load landing page featured collections application container display data
+     * 
+     * @returns {Promise} resolves to a json object
+     */
+  async getFeaturedCollectionAppData() {
+    return await this.service.getFeaturedCollectionAppData();
+  }
+
+  /**
+   * @method saveFeaturedCollectionAppData
+   * @description save landing page featured collections application container display data
+   * 
+   * @param {Array} displayData json data
+   * 
+   * @returns {Promise} resolves to record
+   */
+  async saveFeaturedCollectionAppData(displayData) {
+    return await this.service.saveFeaturedCollectionDisplayData(displayData);
+  }
 
 }
 

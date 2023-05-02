@@ -76,14 +76,25 @@ export default class AppMediaViewer extends Mixin(LitElement)
         this.bagOfFilesImage = '';
       }
 
-      if( mediaGroup.display.clientMedia && mediaGroup.display.clientMedia.iaReader ) {
+      // TODO hack to test for specific item, but should change to use app container config?
+      let renderAsBr = false; // mediaGroup.display.hasPart && mediaGroup.display.encodesCreativeWork && mediaGroup.display.encodesCreativeWork['@id'] === '/item/ark:/87287/d7k06n';
+
+      if( renderAsBr || ( mediaGroup.display.clientMedia && mediaGroup.display.clientMedia.pdf ) ) {
         mediaType = 'bookreader';
         this.isBookReader = true;
-        let brData = await this.RecordModel.getIaBookManifest(mediaGroup.display.clientMedia.iaReader.manifest);
+        let brData;
+        if( renderAsBr && !mediaGroup.display?.clientMedia?.pdf?.manifest ) {
+          this.bookData = utils.buildIaReaderPages(mediaGroup.display.hasPart, e.selectedRecord?.clientMedia?.index);
+        } else {
+          brData = await this.RecordModel.getIaBookManifest(mediaGroup.display.clientMedia.pdf.manifest);
+        }
+
         if( brData && brData.body ) {
           this.mediaType = 'bookreader';
           this.bookData = typeof brData.body === 'string' ? JSON.parse(brData.body) : brData.body;
         }
+      } else {
+        this.isBookReader = false;
       }
 
       this.mediaType = mediaType;

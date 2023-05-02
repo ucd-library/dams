@@ -433,7 +433,6 @@ class AppSearchResultsPanel extends Mixin(LitElement)
     // let searchUrlParts = this.AppStateModel.locationElement.location.path;
     // let query = this.RecordModel.urlToSearchDocument(searchUrlParts.slice(1, searchUrlParts.length));
     // query.offset = e.detail.page * this.numPerPage - this.numPerPage;
-    // // debugger;
     // this.RecordModel.search(query, true, true, true);
     e.detail.startIndex = e.detail.page * 10 - 10;
     this.dispatchEvent(new CustomEvent('page-change', {

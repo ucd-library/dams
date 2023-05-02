@@ -86,6 +86,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
   _onAppStateUpdate(e) {
     if( e.mediaViewerNavLeftMostThumbnail === undefined ) return;
     if( e.mediaViewerNavLeftMostThumbnail === this.leftMostThumbnail ) return;
+    
     this.leftMostThumbnail = e.mediaViewerNavLeftMostThumbnail;
     this._resize();
   }
@@ -222,7 +223,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
 
     let lastThumb = this.leftMostThumbnail + this.thumbnailsPerFrame;
     this.thumbnails.forEach((thumbnail, index) => {
-      // thumbnail.disabled = (index < this.leftMostThumbnail || index >= lastThumb);
+      thumbnail.disabled = (index < this.leftMostThumbnail || index >= lastThumb);
     });
   }
 
@@ -233,7 +234,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
    * @param {Object} record selected record
    */
   _onSelectedRecordUpdate(record) {
-    this.leftMostThumbnail = 0;
+    // this.leftMostThumbnail = 0;    
     if( !record ) {
       this.singleImage = true;
       return;
@@ -273,7 +274,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
         return null;
       }
 
-      let thumbnailUrl = media.clientMedia.imageSizes.small.url;
+      let thumbnailUrl = media.clientMedia?.images?.small?.url;
       // if( thumbnailUrl && !thumbnailUrl.match(/\/svc:iiif\//) ) {
       //   thumbnailUrl += '/svc:iiif/full/,50/0/default.jpg';
       // }
@@ -297,7 +298,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement)
     this.singleImage = (this.thumbnails.length !== 0 && this.thumbnails.length > 1) ? false : true;
     this._resize();
 
-    this.AppStateModel.set({mediaViewerNavLeftMostThumbnail: 0});
+    // this.AppStateModel.set({mediaViewerNavLeftMostThumbnail: 0});
   }
 
   /**

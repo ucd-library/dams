@@ -8,6 +8,8 @@ import jsonStyles from 'json-formatter-js/dist/json-formatter.css';
 import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
 import buttonsCss from "@ucd-lib/theme-sass/2_base_class/_buttons.css";
 import headingsCss from "@ucd-lib/theme-sass/2_base_class/_headings.css";
+import formsHtmlCss from "@ucd-lib/theme-sass/1_base_html/_forms.css";
+import formsCss from "@ucd-lib/theme-sass/2_base_class/_forms.css";
 
 export default function render() { 
   return html`
@@ -17,6 +19,9 @@ export default function render() {
     ${buttonsCss}
     ${headingsCss}
     ${unsafeCSS(jsonStyles)}
+    ${formsHtmlCss}
+    ${formsCss}
+
     :host {
       display: block;
       position: relative;
@@ -457,6 +462,10 @@ export default function render() {
     }
 
     .edit-collections-container .collection-item {
+      position: relative;
+    }
+
+    .edit-collections-container .collection-item {
       height: 135px;
       /* width: 401px; */
       background-color: var(--color-aggie-blue-30);
@@ -478,10 +487,12 @@ export default function render() {
       right: 1rem;
       border: none;
       height: 2rem;
-      padding: 0 .5rem;
+      /* padding: 0 .5rem; */
       box-sizing: border-box;
       outline: none;
       font-size: .8rem;
+
+      width: auto;
     }
 
     .collection-highlights h2, 
@@ -493,6 +504,30 @@ export default function render() {
     .collection-highlights h2 {
       margin-bottom: 0;
     }
+
+    .edit-collections-container > fieldset {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .edit-collections-container > fieldset span {
+      font-weight: bold;
+    }
+
+    .list--reset {
+      display: inline-block;
+    }
+
+    .list--reset > li {
+      display: inline-block;
+      padding-right: .5rem;
+    }
+
+    .radio label:before {
+     top: 5px;
+     left: -1px;
+    }
     
 
     /* TODO transitions for admin icons and hovering */
@@ -500,11 +535,11 @@ export default function render() {
 
   </style>
   
-    <div class="edit-overlay" ?hidden="${!this.editMode}">
+    <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
     </div>
-    <div class="admin-edit" ?hidden="${!this.isAdmin}">
+    <div class="admin-edit" ?hidden="${!this.isUiAdmin}">
       <div class="left-panel">
-        <div class="file-upload-container" ?hidden="${!this.editMode}">            
+        <div class="file-upload-container" ?hidden="${!this.editMode || !this.isUiAdmin}">            
           <label for="file-upload" class="file-upload-label">
             <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
             <span>New Image</span> 
@@ -512,7 +547,7 @@ export default function render() {
           <input id="file-upload" type="file" accept="image/jpeg" @change="${this._onFileChange}" />
         </div>  
 
-        <div class="color-pallette" ?hidden="${!this.editMode}">
+        <div class="color-pallette" ?hidden="${!this.editMode || !this.isUiAdmin}">
           <div class="rose color-circle" ?selected="${this.watercolor === 'rose'}" style="background-color: var(--color-rose)" @click="${this._onWatercolorChanged}"></div>
           <div class="gold color-circle" ?selected="${this.watercolor === 'gold'}" style="background-color: var(--color-aggie-gold)" @click="${this._onWatercolorChanged}"></div>
           <div class="sage color-circle" ?selected="${this.watercolor === 'sage'}" style="background-color: var(--color-farmers-market)" @click="${this._onWatercolorChanged}"></div>
@@ -523,13 +558,13 @@ export default function render() {
       </div>
 
       <div class="right-panel">
-        <div class="icon-wrapper" ?hidden="${this.editMode}" @click="${this._onEditClicked}">
+        <div class="icon-wrapper" ?hidden="${this.editMode || !this.isUiAdmin}" @click="${this._onEditClicked}">
           <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
         </div>
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onSaveClicked}">
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onSaveClicked}">
           <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
         </div>
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onCancelEditClicked}">
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onCancelEditClicked}">
           <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
         </div>
       </div>
@@ -580,38 +615,50 @@ export default function render() {
       <h2>Highlights From This Collection</h2>
       ${ SharedHtml.headerDots() }
       
-      <div class="edit-collections-container" ?hidden="${!this.editMode}">
-        <div class="card-trio">      
+      <div class="edit-collections-container" ?hidden="${!this.editMode || !this.isUiAdmin}">
+
+      <fieldset class="radio">      
+        <div>
+          <span class="form-label">Item Display</span>
+          <ul class="list--reset">
+            <li><input id="six" name="radio" type="radio" class="radio" value="6" ?checked="${this.itemDisplayCount === 6}" @change="${this._onItemDisplayChange}"><label for="six">6 (recommended)</label></li>
+            <li><input id="three" name="radio" type="radio" class="radio" value="3" ?checked="${this.itemDisplayCount === 3}" @change="${this._onItemDisplayChange}"><label for="three">3</label></li>
+            <li><input id="zero" name="radio" type="radio" class="radio" value="0" ?checked="${this.itemDisplayCount === 0}" @change="${this._onItemDisplayChange}"><label for="zero">0</label></li>
+          </ul>
+        </div>
+      </fieldset>
+
+        <div class="card-trio" ?hidden="${this.itemDisplayCount === 0}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+            <input class="item-1 item-ark-input" type="text" .value="${this.savedItems[0] ? '/item'+this.savedItems[0]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+            <input class="item-2 item-ark-input" type="text" .value="${this.savedItems[1] ? '/item'+this.savedItems[1]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+            <input class="item-3 item-ark-input" type="text" .value="${this.savedItems[2] ? '/item'+this.savedItems[2]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
           </div>
         </div>
       
-        <div class="card-trio">      
+        <div class="card-trio" ?hidden="${this.itemDisplayCount !== 6}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+            <input class="item-4 item-ark-input" type="text" .value="${this.savedItems[3] ? '/item'+this.savedItems[3]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+            <input class="item-5 item-ark-input" type="text" .value="${this.savedItems[4] ? '/item'+this.savedItems[4]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-ark-input" type="text" placeholder="ark:/..." />
+            <input class="item-6 item-ark-input" type="text" .value="${this.savedItems[5] ? '/item'+this.savedItems[5]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
           </div>
         </div>
       
@@ -619,12 +666,26 @@ export default function render() {
       <div ?hidden="${this.editMode}">
         <div class="card-trio">
           ${this.highlightedItems.map((item, index) => html`
-            ${index < 3 ? html`<dams-item-card .data="${item}"></dams-item-card>` : ''}
+            ${index < 3 ? html`<dams-item-card .data="${
+                {title : item.description,
+                thumbnailUrl : item.image,
+                itemUrl : item['@id']}
+            }"></dams-item-card>` : ''}
+          `)}
+          ${this.savedItems.map((item, index) => html`
+            ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
         </div>
         <div class="card-trio">
           ${this.highlightedItems.map((item, index) => html`
-            ${index >= 3 ? html`<dams-item-card .data="${item}"></dams-item-card>` : ''}
+            ${index >= 3 ? html`<dams-item-card .data="${
+              {title : item.description,
+              thumbnailUrl : item.image,
+              itemUrl : item['@id']}
+            }"></dams-item-card>` : ''}
+          `)}
+          ${this.savedItems.map((item, index) => html`
+            ${index >= 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
         </div>
       </div>

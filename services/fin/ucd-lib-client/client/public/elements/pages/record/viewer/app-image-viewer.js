@@ -33,12 +33,11 @@ export default class AppImageViewer extends Mixin(LitElement)
 
   async firstUpdated() {
     let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
-    if( selectedRecordMedia ) this._onSelectedRecordMediaUpdate(selectedRecordMedia);
+    if( selectedRecordMedia ) this._onSelectedRecordMediaUpdate(selectedRecordMedia, true);
   }
 
   _onAppStateUpdate(e) {
-    // TODO change to use clientMedia instead of selectedrecord root node?
-    if( e.selectedRecord.index[e.location.pathname] !== e.selectedRecordMedia ) {
+    if( e.selectedRecord && ( !e.selectedRecordMedia || e.selectedRecord.index[e.location.pathname]['@id'] !== e.selectedRecordMedia['@id'] ) ) {
       let selectedRecordMedia = e.selectedRecord.index[e.location.pathname];
       this._onSelectedRecordMediaUpdate(selectedRecordMedia);
     }
@@ -55,6 +54,7 @@ export default class AppImageViewer extends Mixin(LitElement)
     let getMediaType = utils.getMediaType(media);
     if (getMediaType !== 'ImageList' && getMediaType !== 'ImageObject') return;
 
+    if( media['@id'] !== this.AppStateModel.locationElement.location.pathname && this.AppStateModel.locationElement.location.pathname.indexOf('/media/images/') >= 0 ) return;
     this.media = media;
     this._renderImg();
   }
@@ -64,38 +64,14 @@ export default class AppImageViewer extends Mixin(LitElement)
       this.media.image = this.media.hasPart[0].image;
     }
     this.loading = true;
-    /*
-    if ( this.media.image.width < this.height) this.height = this.media.image.width;
-    let url = this.MediaModel.getImgUrl(this.media.image.url, '', this.height);
-    let r = 600 / this.media.image.height;
-    let w = this.media.image.width * r;
-
-    let eleWidth = this.offsetWidth-20;
-    if ( eleWidth < 1 ) eleWidth = 1;
-
-    let startHeight = Math.ceil(eleWidth > w ? this.height : ((eleWidth/w)*this.height));
-
-    let img = new Image();
-    this.loading = true;
-    
-    this.shadowRoot.querySelector('#loading').style.height = startHeight+'px';
-    
-    img.onload = () => {
-      this.loading = false;
-      this.shadowRoot.querySelector('#img').style.maxHeight = '600px';
-    };
-    img.src = url;
-
-    this.shadowRoot.querySelector('#img').style.maxWidth = w + 'px';
-    this.shadowRoot.querySelector('#img').src = url;
-    */
-
-    if( this.media.clientMedia?.imageSizes ) {
+   
+    if( this.media.clientMedia?.images ) {
+      console.log('this.media.clientMedia.images.small.url', this.media.clientMedia.images.small.url)
       let srcset = `
-        ${this.media.clientMedia.imageSizes.small.url} ${this.media.clientMedia.imageSizes.small.size.width}w,
-        ${this.media.clientMedia.imageSizes.medium.url} ${this.media.clientMedia.imageSizes.medium.size.width}w,
-        ${this.media.clientMedia.imageSizes.large.url} ${this.media.clientMedia.imageSizes.large.size.width}w,
-        ${this.media.clientMedia.imageSizes.original.url} ${this.media.clientMedia.imageSizes.original.size.width}w
+        ${this.media.clientMedia.images.small.url} ${this.media.clientMedia.images.small.size.width}w,
+        ${this.media.clientMedia.images.medium.url} ${this.media.clientMedia.images.medium.size.width}w,
+        ${this.media.clientMedia.images.large.url} ${this.media.clientMedia.images.large.size.width}w,
+        ${this.media.clientMedia.images.original.url} ${this.media.clientMedia.images.original.size.width}w
       `;
 
       let sizes = '600px';

@@ -121,7 +121,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( e.location.page !== 'browse' ) return;
     if( e.location.path.length < 2 ) return;
     if( e.location.path[1] !== this.id ) return; // the page
-
+    
+    this.isCollectionPage = this.label.toLowerCase() === 'collection';
     this._loadResults(e);
   }
 

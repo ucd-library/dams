@@ -46,7 +46,9 @@ class AppHome extends Mixin(LitElement)
       textTrio: {type: Object},
       heroImgOptions: {type: Object},
       heroImgCurrent: {type: Object},
-      editMode: {type: Boolean}
+      editMode: {type: Boolean},
+      displayData: {type: Array},
+      isUiAdmin: {type: Boolean}
     };
   }
 
@@ -61,7 +63,9 @@ class AppHome extends Mixin(LitElement)
     this.textTrio = {};
     this.heroImgOptions = {};
     this.heroImgCurrent = {};
-    this.editMode = true; // TODO change to false after dev
+    this.displayData = [];
+    this.editMode = false;
+    this.isUiAdmin = false;
     this._injectModel('FcAppConfigModel', 'CollectionModel', 'RecordModel');
   }
 
@@ -70,7 +74,19 @@ class AppHome extends Mixin(LitElement)
    * @description Lit lifecycle method called when element is first updated
    */
   async firstUpdated() {
+    this.isUiAdmin = (APP_CONFIG.user?.loggedIn && APP_CONFIG.user?.roles?.includes('ui-admin'));
+
     // Get featured collections
+    let displayData = APP_CONFIG.fcAppConfig['/application/ucd-lib-client/featured-collections/config.json'];
+    if( displayData && displayData.body && Array.isArray(displayData.body) ) this.displayData = displayData.body;
+    if( !displayData ) {
+      displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
+      if( displayData && displayData.body ) this.displayData = JSON.parse(displayData.body);
+    }
+
+    console.log('displayData', this.displayData);
+
+
     // this.featuredCollections = this.FcAppConfigModel.getFeaturedCollections();
     // this.featuredCollectionsCt = this.featuredCollections.length;
     // let groupText = this.FcAppConfigModel.getAppText('hp-trio');
@@ -135,6 +151,7 @@ class AppHome extends Mixin(LitElement)
    * @param {Object} e 
    */
   _onEditClicked(e) {
+    if( !this.isUiAdmin ) return;
     this.editMode = true;
     console.log('this.editMode', this.editMode);
   }
@@ -145,9 +162,18 @@ class AppHome extends Mixin(LitElement)
    * 
    * @param {Object} e 
    */
-  _onSaveClicked(e) {
-    // TODO save to fcrepo container
+  async _onSaveClicked(e) {
+    if( !this.isUiAdmin ) return;
+    // save to fcrepo container
     //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
+    let adminPanel = this.shadowRoot.querySelector('admin-featured-collections');
+    if( adminPanel ) {
+      adminPanel._updatePanelsData();
+      this.displayData = adminPanel.panels;
+    }
+    await this.FcAppConfigModel.saveFeaturedCollectionAppData(this.displayData);
+    this.editMode = false;
+    console.log('this.displayData', this.displayData)
   }
 
   /**
@@ -157,6 +183,7 @@ class AppHome extends Mixin(LitElement)
    * @param {Object} e 
    */
   _onCancelEditClicked(e) {
+    if( !this.isUiAdmin ) return;
     this.editMode = false;
   }
 

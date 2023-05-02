@@ -123,7 +123,6 @@ class AppRecord extends Mixin(LitElement)
     this.collectionName = this.record.collectionName;
     this.date = this.record.date;
     this.publisher = this.record.publisher;
-    debugger;
     this.keywords = this.record.keywords || [];
     this.callNumber = this.record.callNumber;
     this.collectionImg = this.record.collectionImg;
@@ -280,12 +279,14 @@ class AppRecord extends Mixin(LitElement)
       // pull image with position 1
       this.arkDoi = [
         location.pathname.split('/media')[0],
-        record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].clientMedia?.imageSizes?.original?.url.replace('/fcrepo/rest', ''),
+        record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].clientMedia?.images?.original?.url.replace('/fcrepo/rest', ''),
       ];
   
       this.fedoraLinks = [
         '/fcrepo/rest' + location.pathname.split('/media')[0],
-        '/fcrepo/rest' + location.pathname.split('/media')[0],record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].image['@id'] + '/fcr:metadata',
+        '/fcrepo/rest' + location.pathname.split('/media')[0] 
+        // TODO second link should point to an image or pdf, which one in the record graph though?
+        // location.pathname.split('/media')[0],record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].image['@id'] + '/fcr:metadata',
       ]; 
   
     } else {

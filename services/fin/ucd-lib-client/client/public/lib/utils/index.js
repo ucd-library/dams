@@ -155,6 +155,31 @@ class Utils {
     });
   }
 
+  buildIaReaderPages(hasParts, clientMediaIndex) {
+    let pages = [];
+    hasParts.forEach((part, index) => {
+      let record = clientMediaIndex[part['@id']];
+
+      // TODO some of the index graphs don't have clientMedia, so some pages missing
+      if( !record.clientMedia ) {
+        console.error('no clientMedia images for ', record);
+        return;
+      }
+      let page = record.clientMedia.images;
+      page.page = parseInt(record.position)
+      pages.push(page);
+    });
+
+    pages.sort((a, b) => {
+      if(a.page > b.page) return 1;
+      if(a.page < b.page) return -1;
+      return 1;
+    });
+    console.log('pages', pages);
+
+    return { pages };
+  }
+
 }
 
 module.exports = new Utils();

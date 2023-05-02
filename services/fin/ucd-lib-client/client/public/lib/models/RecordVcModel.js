@@ -29,17 +29,13 @@ class RecordVcModel extends BaseModel {
         });  
       }
 
-      // send back clientMedia.imageSizes graph record
-      // let collectionImg = e.root.image['@id'];
-      // if( collectionImg ) collectionImg = e.data['@graph'].filter(r => r['@id'] === collectionImg)[0];
-      let collectionImg = e.clientMedia?.mediaGroups[0]?.display?.clientMedia?.imageSizes?.small?.url;
-
-      // TODO hack, should we pull collectionImg from app container? for now just random image if not found
-      if( !collectionImg ) {
-        // TODO fix to check e.root.clientMedia instead of .image, however sometimes .clientMedia doesn't get added even though 
-        //  it is in fuseki
-
-        // collectionImg = e.data['@graph'].filter(r => r.filename && r.filename.indexOf(e.root.image['@id'].split('.').pop()) > 0)[0];
+      // imagelists
+      let collectionImg = e.clientMedia.graph.filter(g => parseInt(g.position) === 1 && g.clientMedia)[0];
+      if( collectionImg ) {
+        collectionImg = collectionImg.clientMedia.images?.medium?.url;
+      } else {
+        // single image / pdf / video
+        collectionImg = e.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium?.url;
       }
 
       // TODO temp remove oac isPartOf records
@@ -51,7 +47,6 @@ class RecordVcModel extends BaseModel {
         });  
       }
 
-      debugger;
       // translate collection and related nodes/items to ui model
       const item = {
         '@id' : e.root['@id'],

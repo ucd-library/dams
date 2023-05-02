@@ -20,6 +20,7 @@ export default function render() {
     display: block;
     position: relative;
     z-index: 500;
+    padding-bottom: 5rem;
   }
 /* 
   input,
@@ -240,14 +241,24 @@ export default function render() {
 
   <div class="collection-list" ?hidden="${this.type !== 'cards'}">
     <span class="form-label">Collections</span>
-    ${this.collectionIds.map(c => html`
+    ${this.collectionIds.map((c, index) => html`
       <ucd-theme-slim-select 
         @change="${this._onCollectionListChange}" 
         data-position="${c.position}"
-        class="list">
+        class="list"
+        .options="${{
+          settings: {
+            openPosition: 'up'
+          }
+        }}">
+        <!-- <select class="collections">
+          <option></option>
+        </select> -->
         <select class="collections">
           <option></option>
-          <!-- options list built from js -->
+          ${this.sortedCollectionsList.map(sc => html`
+            <option .value=${sc[0]} ?selected="${this.collectionIds[index].selected === sc[0]}">${sc[1]}</option>
+          `)}
         </select>
       </ucd-theme-slim-select>
     `)}

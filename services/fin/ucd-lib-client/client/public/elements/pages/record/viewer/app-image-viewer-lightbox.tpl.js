@@ -1,12 +1,14 @@
 import { html } from 'lit';
 
 import { sharedStyles } from '../../../styles/shared-styles';
+import leafletCss from "leaflet/dist/leaflet.css";
 
 export default function render() { 
   return html`
 
 <style include="shared-styles">
   ${sharedStyles}
+  ${leafletCss}
 
   [hidden] {
     display: none;

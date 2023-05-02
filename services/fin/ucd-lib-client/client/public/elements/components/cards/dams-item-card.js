@@ -13,11 +13,15 @@ import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
  * @prop {Number} itemCt - The total number of items in the items.
  * @prop {String} href - Link to the item landing page.
  */
-export default class DamsItemCard extends LitElement {
+export default class DamsItemCard extends Mixin(LitElement)
+  .with(LitCorkUtils) {
 
   static get properties() {
     return {
+      id: {type: String, attribute: 'data-itemid'},
       data : { type : Object },
+      // itemUrl : { type : String },
+      // thumbnailUrl : { type : String },
       truncatedTitle : { type : String }
     };
   }
@@ -26,16 +30,21 @@ export default class DamsItemCard extends LitElement {
     super();
     this.render = render.bind(this);
 
+    this.id = "";
     this.data = {};
     this.truncatedTitle = '';
+    // this.itemUrl = "";
+    // this.thumbnailUrl = "";
+
+    this._injectModel('RecordModel', 'RecordVcModel');
   }
 
   /**
-   * @method updated
+   * @method willUpdate
    * @description Lit lifecycle method called when element is updated.
    * @param {Map} props - Properties that have changed.
    */
-  updated(props) {
+  willUpdate(props) {
     // if ( props.has('item') && this.item['@id'] ) {
     //   if ( this.item.associatedMedia ) {
     //     this.imgSrc = this.item.thumbnailUrl ? this.item.thumbnailUrl : this.item.associatedMedia.thumbnailUrl;
@@ -49,13 +58,45 @@ export default class DamsItemCard extends LitElement {
     //     this.href = this.item['@id'];
     //   }
     // }
+    if( ( this.id && Object.keys(this.data).length === 0 ) || this.id !== this.data.itemUrl ) { 
+      this._getItem(this.id);
+    }
 
-    // truncate title if longer than 1 line
+    this._truncateTitle();
+  }
+
+  async _getItem(id) {
+    let res = await this.RecordModel.get(id);
+    debugger;
+    if( res.state !== 'loaded') return;
+    res = this.RecordVcModel.translate(res.payload);
+    this.data.title = res.name;
+    this.data.itemUrl = res['@id'];
+    this.data.thumbnailUrl = res.collectionImg;
+    // this.itemUrl = res['@id'];
+    // this.thumbnailUrl = res.collectionImg;
+    this._truncateTitle();
+  }
+
+  // _onRecordUpdate(e) {
+  //   if ( e.state !== 'loaded' || e.payload.root.id !== this.id ) return;
+
+  //   let vcRecord = this.RecordVcModel.translate(e.payload);
+  //   debugger;
+  //   this.data.title = vcRecord.name;
+  //   this.data.itemUrl = this.id;
+  //   this.data.thumbnailUrl = vcRecord.collectionImg;
+  //   this.itemUrl = this.id;
+  //   this.thumbnailUrl = vcRecord.collectionImg;
+  //   this._truncateTitle();
+  // }
+
+  _truncateTitle() {
     if( this.data && this.data.title && this.data.title.length > 38 ) {
       this.truncatedTitle = this.data.title.substring(0, 34) + '...';
     } else if( this.data && this.data.title ) {
       this.truncatedTitle = this.data.title;
-    }
+    }    
   }
 }
 
