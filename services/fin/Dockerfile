@@ -28,6 +28,10 @@ RUN npm run build
 RUN npm run dist
 
 # Models 
+WORKDIR ${FIN_SERVICE_ROOT}/models
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package.json .
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package-lock.json .
+RUN npm install
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models ${FIN_SERVICE_ROOT}/models
 
 WORKDIR ${FIN_SERVICE_ROOT}
