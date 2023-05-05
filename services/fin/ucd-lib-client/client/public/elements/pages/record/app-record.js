@@ -33,6 +33,7 @@ class AppRecord extends Mixin(LitElement)
       arkDoi : {type: Array},
       fedoraLinks : {type: Array},
       // citations : {type: Array}
+      citationRoot : {type: Object}
     }
   }
 
@@ -59,6 +60,7 @@ class AppRecord extends Mixin(LitElement)
     this.arkDoi = [];
     this.fedoraLinks = [];
     // this.citations = [];
+    this.citationRoot = {};
 
     this._injectModel('AppStateModel', 'RecordModel', 'CollectionModel', 'RecordVcModel');
   }
@@ -126,8 +128,13 @@ class AppRecord extends Mixin(LitElement)
     this.keywords = this.record.keywords || [];
     this.callNumber = this.record.callNumber;
     this.collectionImg = this.record.collectionImg;
+    this.citationRoot = this.record.root;
+    console.log('this.citationRoot', this.citationRoot)
 
     this._updateLinks(this.AppStateModel.locationElement.location, record);
+
+    // let citation = this.shadowRoot.querySelector('app-citation');
+    // if( citation ) citation.requestUpdate();
 
     // if( this.AppStateModel.locationElement.location.pathname.split('/media').length < 2 ) {
     //   // pull image with position 1

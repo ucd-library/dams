@@ -54,7 +54,7 @@ export default class AppImageViewer extends Mixin(LitElement)
     let getMediaType = utils.getMediaType(media);
     if (getMediaType !== 'ImageList' && getMediaType !== 'ImageObject') return;
 
-    if( media['@id'] !== this.AppStateModel.locationElement.location.pathname && this.AppStateModel.locationElement.location.pathname.indexOf('/media/images/') >= 0 ) return;
+    if( this.media['@id'] !== this.AppStateModel.locationElement.location.pathname && this.AppStateModel.locationElement.location.pathname.indexOf('/media/images/') >= 0 ) return;
     this.media = media;
     this._renderImg();
   }
@@ -66,7 +66,6 @@ export default class AppImageViewer extends Mixin(LitElement)
     this.loading = true;
    
     if( this.media.clientMedia?.images ) {
-      console.log('this.media.clientMedia.images.small.url', this.media.clientMedia.images.small.url)
       let srcset = `
         ${this.media.clientMedia.images.small.url} ${this.media.clientMedia.images.small.size.width}w,
         ${this.media.clientMedia.images.medium.url} ${this.media.clientMedia.images.medium.size.width}w,

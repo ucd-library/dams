@@ -33,9 +33,12 @@ class RecordVcModel extends BaseModel {
       let collectionImg = e.clientMedia.graph.filter(g => parseInt(g.position) === 1 && g.clientMedia)[0];
       if( collectionImg ) {
         collectionImg = collectionImg.clientMedia.images?.medium?.url;
-      } else {
-        // single image / pdf / video
+      } else if ( e.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium?.url ) {
+        // pdf / video
         collectionImg = e.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium?.url;
+      } else if (e.clientMedia.mediaGroups[0]?.display?.fileFormat) {
+        // single image
+        collectionImg = '/fcrepo/rest'+e.clientMedia.mediaGroups[0].display.id;
       }
 
       // TODO temp remove oac isPartOf records
@@ -45,6 +48,13 @@ class RecordVcModel extends BaseModel {
         e.root.isPartOf.forEach(ipo => {
           if( !ipo['@id'].includes('oac.cdlib.org') ) collectionId = ipo['@id'];
         });  
+      }
+
+      let keywords = [];
+      if( e.root.about && Array.isArray(e.root.about) ) { 
+        keywords = e.root.about;
+      } else if( e.root.about ) {
+        keywords = [e.root.about];
       }
 
       // translate collection and related nodes/items to ui model
@@ -58,7 +68,7 @@ class RecordVcModel extends BaseModel {
         clientMedia : e.clientMedia,
         date : e.root.yearPublished,
         publisher : e.root.publisher?.name,
-        keywords : Array.isArray(e.root.about) ? e.root.about : [e.root.about] || [],
+        keywords,
         callNumber,
         arkDoi : ['?'],
         fedoraLinks : ['?'],

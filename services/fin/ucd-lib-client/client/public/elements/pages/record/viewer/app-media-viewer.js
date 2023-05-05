@@ -79,7 +79,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       // TODO hack to test for specific item, but should change to use app container config?
       let renderAsBr = false; // mediaGroup.display.hasPart && mediaGroup.display.encodesCreativeWork && mediaGroup.display.encodesCreativeWork['@id'] === '/item/ark:/87287/d7k06n';
 
-      if( renderAsBr || ( mediaGroup.display.clientMedia && mediaGroup.display.clientMedia.pdf ) ) {
+      if( renderAsBr || ( mediaGroup.display?.clientMedia && mediaGroup.display?.clientMedia.pdf ) ) {
         mediaType = 'bookreader';
         this.isBookReader = true;
         let brData;

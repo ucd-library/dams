@@ -1,6 +1,6 @@
-import { html } from 'lit';
+import { html } from "lit";
 
-import SharedHtml from '../../utils/shared-html';
+import SharedHtml from "../../utils/shared-html";
 import { sharedStyles } from "../../styles/shared-styles";
 import priorityLinksCss from "@ucd-lib/theme-sass/4_component/_priority-links.css";
 import iconsCss from "@ucd-lib/theme-sass/4_component/_icons.css";
@@ -12,8 +12,8 @@ import headingsCss from "@ucd-lib/theme-sass/2_base_class/_headings.css";
 import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
 import buttonsCss from "@ucd-lib/theme-sass/2_base_class/_buttons.css";
 
-export default function render() { 
-return html`
+export default function render() {
+  return html`
 <style>
   ${sharedStyles}
   ${priorityLinksCss}
@@ -43,7 +43,7 @@ return html`
 
   .about-link-icon {
     position: absolute;
-    z-index: 5;    
+    z-index: 5;
     top: 25px;
     right: 25px;
   }
@@ -52,19 +52,19 @@ return html`
     height: 30px;
     width: 30px;
   }
-  .container {    
+  .container {
     padding: 25px 10px;
     background: white;
   }
 
   .search-box {
     z-index: 5;
-    color: var(--inverse-text-color);    
+    color: var(--inverse-text-color);
   }
 
   .search-box .main {
     padding: 20px;
-    background-color: rgba(0, 38, 85, .8);    
+    background-color: rgba(0, 38, 85, .8);
   }
 
   .search-box .main h1 {
@@ -72,7 +72,7 @@ return html`
     line-height: 2.0rem;
   }
 
-  .search-box .footer {  
+  .search-box .footer {
     padding: 10px 20px;
     color: white;
     font-size: 0.8rem;
@@ -159,7 +159,7 @@ return html`
     text-align: center;
     background-color: var(--color-aggie-blue-40);
   }
-  
+
   .featured-grid-container {
     display: grid;
     grid-template-columns: 40% 60%;
@@ -170,7 +170,7 @@ return html`
     padding: 20px;
     font-size: 30px;
     text-align:left;
-    
+
   }
   .about-grid-container {
     display: grid;
@@ -181,7 +181,7 @@ return html`
   .about-grid-item {
     padding: 20px;
     font-size: 30px;
-    
+
   }
   .collection-grid-container {
     display: grid;
@@ -210,10 +210,14 @@ return html`
     height: 35rem;
     background-color: var(--color-aggie-blue-80);
     background-image: url(/images/watercolors/watercolor-background-ucd-blue-20opacity.png);
-    background-position: center;
-    padding: 2rem 0 2rem;
+    /* background-position: center;
+    padding: 2rem 0 2rem; */
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center top;
+    /* background-attachment: fixed; */
   }
-  
+
   /* STYLES BELOW ARE ACTUALLY USED. NEED TO AUDIT ANYTHING ABOVE */
   [hidden] {
     display: none;
@@ -283,7 +287,7 @@ return html`
     justify-content: center;
     flex-flow: row wrap;
     padding-top: 40px;
-    padding-bottom: 4rem;
+    /* padding-bottom: 4rem; */
     background-color: var(--color-white);
   }
   .browse-buttons > div {
@@ -295,11 +299,6 @@ return html`
   .browse-buttons app-icons {
     margin: 0 10px;
   }
-  /*
-  .browse-buttons .vertical-link__figure:hover {
-    color: var(--color-aggie-gold);
-  }
-  */
   .browse-buttons .vertical-link__title {
     color: var(--color-aggie-blue);
     text-transform: capitalize;
@@ -312,7 +311,7 @@ return html`
     background-color: var(--color-white);
     margin-bottom: 0.75rem;
   }
-  
+
   .browse-buttons .vertical-link--circle .vertical-link__figure:hover {
     background-color: var(--color-aggie-gold);
   }
@@ -322,10 +321,6 @@ return html`
     }
   }
 
-  /* .vertical-link--circle .vertical-link__figure {
-    width: 5rem;
-    height: 5rem;  
-  } */
   .recent{
     background-color: var(--color-white);
   }
@@ -341,22 +336,13 @@ return html`
     padding: 0;
     line-height: 1.2;
   }
-  .card-2-4 {
-    width: 75%;
-    margin: 0 auto;
-  }
-  .card-2,
-  .card-2-4,
-  .card-trio,
-  .card-5-plus {
+
+  .card-trio {
     display: grid;
     grid-template-columns: auto;
     grid-gap: var(--spacing-sm);
   }
-  .card-2 dams-collection-card,
-  .card-2-4 dams-collection-card,
-  .card-trio dams-collection-card,
-  .card-5-plus dams-collection-card {
+  .card-trio dams-collection-card {
     margin-bottom: var(--spacing-default);
   }
   .featured {
@@ -403,25 +389,40 @@ return html`
     padding-bottom: 2rem;
   }
 
-  @media (min-width: 480px) {
+
+  @media (max-width: 767px) {
+    /* mobile */
     .featured-group .card-trio {
       margin-right: var(--spacing-sm);
       margin-left: var(--spacing-sm);
     }
-  }
-  @media (min-width: 767px) {
-    .hero-top {
-      margin-top: 40px;
+    .about-collections {
+      display: block;
+      height: auto;
     }
-    .card-2,
-    .card-2-4 {
+    .tree-illustration {
+      text-align: center;
+      padding-top: 2rem;
+    }
+    .about-collections .tree-illustration img {
+      float: none;
+      padding: none;
+    }
+    .about-content {
+      padding: 0 2rem 2rem 2rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    /* tablet */
+    .card-trio {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .card-trio,
-    .card-5-plus {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    .card-trio.three-total dams-collection-card:nth-child(1) {
+      grid-column: 1 / span 2;
     }
-    
+
     .fg-header {
       grid-template-columns: 37% 55%;
       padding: 1rem 0;
@@ -434,6 +435,17 @@ return html`
       text-align: center;
     }
   }
+
+  @media (min-width: 991px) {
+    /* desktop */
+    .card-trio {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .card-trio.three-total dams-collection-card:nth-child(1) {
+      grid-column: auto;
+    }
+  }
+
   .featured-more a.btn--primary {
     color: var(--color-aggie-blue);
     padding-top: 0;
@@ -442,6 +454,7 @@ return html`
 
   .tree-illustration {
     /* padding: 3rem; */
+    margin: auto;
   }
 
   .tree-illustration img {
@@ -460,8 +473,8 @@ return html`
   }
 
   .about-content {
-    /* flex-grow: 3; */
     padding-right: 2rem;
+    margin: auto;
   }
 
   .about-content h1,
@@ -484,7 +497,7 @@ return html`
 
   dams-hero {
     position: relative;
-    z-index: 450;
+    z-index: 1000;
   }
 
   .edit-overlay {
@@ -542,14 +555,14 @@ return html`
   admin-featured-collections {
     padding: 4rem 0;
   }
-  
+
   /*
   .mobile-bar {
     display: flex;
     align-items: center;
     overflow: hidden;
     min-height: 3.25rem;
-    background-color: #022851; /* var(--color-aggie-blue); 
+    background-color: #022851; /* var(--color-aggie-blue);
   }
 
   .mobile-bar__nav-toggle {
@@ -557,7 +570,7 @@ return html`
     display: flex;
     flex-shrink: 0;
     margin-right: 1rem;
-    background-color: #13639e; /* var(--color-aggie-blue-80); 
+    background-color: #13639e; /* var(--color-aggie-blue-80);
   }
   */
 
@@ -583,11 +596,36 @@ return html`
     .hero-top {
       display: none;
     }
+    ucd-theme-header {
+      position: relative;
+      top: -19px;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+    .hero-main .sub-heading {
+      font-size: 1.2rem;
+      font-weight: 200;
+    }
+  }
+
+  @media (max-width: 767px) {
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+    .hero-main .sub-heading {
+      font-size: 1.2rem;
+      font-weight: 200;
+    }
   }
 
 </style>
 
-<dams-hero .srcOptions="${Object.keys(this.heroImgOptions)}" @src-change="${this._onHeroChange}">
+<dams-hero .srcOptions="${Object.keys(this.heroImgOptions)}" @src-change="${
+    this._onHeroChange
+  }">
   <div class="hero-content">
 
     <ucd-theme-header>
@@ -602,7 +640,7 @@ return html`
       <div class="hero-top-left"><a href="https://ucdavis.edu"><img src="/images/logos/ucdavis_logo_gold.png"></a></div>
       <div class="hero-top-right">
         <a href="/browse">Browse</a>
-        <span class="dot"></span>  
+        <span class="dot"></span>
         <a href="/about">About</a>
         <span class="dot"></span>
         <a href="#">FAQ</a>
@@ -612,9 +650,9 @@ return html`
     <div class="hero-main site-frame">
       <h1 class="color-light">Digital Collections</h1>
       <div class="sub-heading h4 color-light">Explore digitized items from the <a href="">UC Davis Library</a> collections.</div>
-      <app-search-box 
-        id="searchBox" 
-        @search="${this._onSearch}" 
+      <app-search-box
+        id="searchBox"
+        @search="${this._onSearch}"
         placeholder="search">
         <iron-icon icon="fin-icons:search" class="search-icon" slot="button-content"></iron-icon>
       </app-search-box>
@@ -623,9 +661,8 @@ return html`
       </div>
     </div>
   </div>
-  
+
 </dams-hero>
-<!-- <img src="/images/defaults/annual-winter-sale1952.jpg"> -->
 
 <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}"></div>
 <section class="browse-buttons site-frame">
@@ -674,93 +711,69 @@ return html`
 
 </section>
 
-<!-- <section class="recent site-frame" ?hidden="${this.recentCollections.length === 0}"> -->
-<section class="recent site-frame">
-  <h1>Recently Digitized<br><span class="fw-light">Collections</span></h1> 
-  ${ SharedHtml.headerDots() } 
-
-
-
-  <!-- TODO assign classes based on this.recentCollections.length -->
-  <!--
-  <h2>Layout 2 or 4</h2>
-  <div class="card-2-4">
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-
-  </div>
-  
-  <h2>Layout exactly 3</h2>-->
-
-  <!-- <div class="card-trio">
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>  
-  </div> -->
-
-  <!-- TODO show/hide previous card-trio based on screen resolution -->
-  <!--
-  <div>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <div class="card-2">
-      <dams-collection-card .collection="${{}}"></dams-collection-card>
-      <dams-collection-card .collection="${{}}"></dams-collection-card>  
-    </div>
-  </div>
-  
-  <h2>Layout 5+</h2>
-  <div class="card-5-plus">
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>  
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-    <dams-collection-card .collection="${{}}"></dams-collection-card>
-  </div>
-  -->
-  
-
-  <div class="card-trio">
-  ${this.recentCollections.map((collection) => 
+<section class="recent site-frame" ?hidden="${
+    this.recentCollections.length === 0
+  }">
+  <h1>Recently Digitized<br><span class="fw-light">Collections</span></h1>
+  ${SharedHtml.headerDots()}
+  <div class="card-trio ${
+    this.recentCollections.length === 3 ? "three-total" : ""
+  }">
+  ${this.recentCollections.map(
+    (collection) =>
       html`
-      <dams-collection-card data-id="${collection['@id']}"></dams-collection-card>
+        <dams-collection-card
+          data-id="${collection["@id"]}"
+        ></dams-collection-card>
       `
-      )}
+  )}
   </div>
 </section>
 
-${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
+${
+  this.featuredCollectionsCt > 0 || 1 == 1
+    ? html`
 
   <section class="featured site-frame">
     <div class="right-panel">
-      <div class="icon-wrapper" ?hidden="${this.editMode || !this.isUiAdmin}" @click="${this._onEditClicked}">
+      <div class="icon-wrapper" ?hidden="${
+        this.editMode || !this.isUiAdmin
+      }" @click="${this._onEditClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
       </div>
-      <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onSaveClicked}">
+      <div class="icon-wrapper edit" ?hidden="${
+        !this.editMode || !this.isUiAdmin
+      }" @click="${this._onSaveClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
       </div>
-      <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onCancelEditClicked}">
+      <div class="icon-wrapper edit" ?hidden="${
+        !this.editMode || !this.isUiAdmin
+      }" @click="${this._onCancelEditClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
       </div>
     </div>
     <h1>Featured <span class="fw-light">Collections</span></h1>
     <div style="text-align:center;">
       <img class="splat-stars" src="/images/watercolors/watercolor-splat-homepage-stars.png">
-      <!-- <dams-watercolor-overlay 
+      <!-- <dams-watercolor-overlay
           overlay-template="stars">
       </dams-watercolor-overlay> -->
     </div>
 
-    <admin-featured-collections ?hidden="${!this.editMode || !this.isUiAdmin}"></admin-featured-collections>
+    <admin-featured-collections ?hidden="${
+      !this.editMode || !this.isUiAdmin
+    }"></admin-featured-collections>
     <!-- <div class="featured-collections-editor" ?hidden="${!this.editMode}">
-      
-    
+
+
       <div class="editor-row-control">
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onUpArrayClicked}">
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${
+        this._onUpArrayClicked
+      }">
           <ucdlib-icon icon="ucdlib-dams:fa-arrow-up"></ucdlib-icon>
         </div>
-        <div class="icon-wrapper edit" style="margin-left: .3rem;" ?hidden="${!this.editMode}" @click="${this._onDownArrayClicked}">
+        <div class="icon-wrapper edit" style="margin-left: .3rem;" ?hidden="${!this
+          .editMode}" @click="${this._onDownArrayClicked}">
           <ucdlib-icon icon="ucdlib-dams:fa-arrow-down"></ucdlib-icon>
         </div>
         <div class="dots flex-expand"></div>
@@ -768,7 +781,9 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
           <img src="/images/icons/dams-admin-collection-single.svg" style="width: 150px" />
         </div>
         <div class="dots flex-expand"></div>
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${this._onTrashClicked}">
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${
+        this._onTrashClicked
+      }">
           <ucdlib-icon icon="ucdlib-dams:fa-trash"></ucdlib-icon>
         </div>
       </div>
@@ -777,36 +792,48 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
     </div> -->
 
     <div class="featured-collections-public" ?hidden="${this.editMode}">
-      ${this.displayData.map((data) => html`
-
-        ${data.type === 'single' ? html`
-          <dams-highlighted-collection 
-            collection-id="${data.collectionId}"
-            collection-desc="${data.description}"
-            ?image-right="${data.placement === 'right'}">
-          </dams-highlighted-collection>
-        ` : ''}
-
-        ${data.type === 'text' ? html`
-        <div class="featured-group">
-          <div class="fg-header ${data.placement}"> <!-- TODO style based on placement class -->
-            <h3 class="heading--primary">${data.heading}</h3>
-            <div>
-              ${data.description}
-            </div>
-          </div>
-        </div>
-        ` : ''}
-
-        ${data.type === 'cards' ? html`
-          <div class="card-trio">
-            ${data.collectionIds.map(collection => html`
-              <dams-collection-card data-id="${collection.selected}"></dams-collection-card>
-            `)}
-          </div>
-        ` : ''}
-
-      `)}
+      ${this.displayData.map(
+        (data) => html`
+          ${data.type === "single"
+            ? html`
+                <dams-highlighted-collection
+                  collection-id="${data.collectionId}"
+                  collection-desc="${data.description}"
+                  ?image-right="${data.placement === "right"}"
+                >
+                </dams-highlighted-collection>
+              `
+            : ""}
+          ${data.type === "text"
+            ? html`
+                <div class="featured-group">
+                  <div class="fg-header ${data.placement}">
+                    <!-- TODO style based on placement class -->
+                    <h3 class="heading--primary">${data.heading}</h3>
+                    <div>${data.description}</div>
+                  </div>
+                </div>
+              `
+            : ""}
+          ${data.type === "cards"
+            ? html`
+                <div
+                  class="card-trio ${data.collectionIds.length === 3
+                    ? "three-total"
+                    : ""}"
+                >
+                  ${data.collectionIds.map(
+                    (collection) => html`
+                      <dams-collection-card
+                        data-id="${collection.selected}"
+                      ></dams-collection-card>
+                    `
+                  )}
+                </div>
+              `
+            : ""}
+        `
+      )}
 
       <div class="featured-more">
         <a href="/browse/collections" class="btn btn--primary">Browse all collections</a>
@@ -818,10 +845,10 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
       <img src="/images/tree-bike-illustration.png" width="80%" />
     </div>
     <div class="about-content">
-      <h1>About<br><span class="fw-light">Digital Collections</span></h1> 
-      ${ SharedHtml.headerDots() }
+      <h1>About<br><span class="fw-light">Digital Collections</span></h1>
+      ${SharedHtml.headerDots()}
       <p>
-        The UC Davis Digital Collections is a locally developed repository designed 
+        The UC Davis Digital Collections is a locally developed repository designed
         to store and manage the digital assets of UC Davis Library, increasing access
         to previously undiscoverable digital assets.
       </p>
@@ -829,6 +856,9 @@ ${this.featuredCollectionsCt > 0 || 1 == 1 ? html`
     </div>
   </section>
 
-` : html``}
+`
+    : html``
+}
 
-`;}
+`;
+}

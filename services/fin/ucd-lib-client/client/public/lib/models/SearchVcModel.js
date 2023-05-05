@@ -32,14 +32,12 @@ class SearchVcModel extends BaseModel {
         //   collectionItemsCount += media.hasPart ? media.hasPart.length : 0;
         // });
 
-
         // TODO media isn't working consistently on search results page, some records still have .image
         //  others have errors in result.clientMedia.mediaGroups[0]?.display?.clientMedia?.images related to workflow not existing
-        // imagelists
-        debugger;
         let thumbnailUrl = result.clientMedia.graph.filter(g => parseInt(g.position) === 1 && g.clientMedia)[0];
         if( thumbnailUrl ) {
-          thumbnailUrl = collectionImg.clientMedia.images?.medium?.url;
+        // imagelists
+          thumbnailUrl = thumbnailUrl.clientMedia.images?.medium?.url;
         } else {
           // single image / pdf / video
           thumbnailUrl = result.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium?.url;

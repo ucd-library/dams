@@ -1,39 +1,38 @@
 import { LitElement } from "lit";
 
-import render from "./app-range-slider.tpl.js"
+import render from "./app-range-slider.tpl.js";
 
-export default class AppRangeSlider extends Mixin(LitElement)
-.with(LitCorkUtils) {
-
-
+export default class AppRangeSlider extends Mixin(LitElement).with(
+  LitCorkUtils
+) {
   static get properties() {
     return {
       // absolute min/max values for slider
-      absMinValue : { type : Number, attribute : 'abs-min-value' }, // observer : '_renderAsync' },
-      absMaxValue : { type : Number, attribute : 'abs-max-value' }, // observer : '_renderAsync' },
+      absMinValue: { type: Number, attribute: "abs-min-value" }, // observer : '_renderAsync' },
+      absMaxValue: { type: Number, attribute: "abs-max-value" }, // observer : '_renderAsync' },
 
       // current min/max values for slider (where the btns are)
-      minValue : { type : Number, attribute : 'min-value' }, // observer : '_renderAsync' },
-      maxValue : { type : Number, attribute : 'max-value' }, // observer : '_renderAsync' },
+      minValue: { type: Number, attribute: "min-value" }, // observer : '_renderAsync' },
+      maxValue: { type: Number, attribute: "max-value" }, // observer : '_renderAsync' },
 
       // labels for slide btns
-      minValueLabel : { type : String },
-      maxValueLabel : { type : String },
+      minValueLabel: { type: String },
+      maxValueLabel: { type: String },
 
       // current widget size info
       // used so we don't have to ask the DOM on each render
-      width : { type : Number },
-      height : { type : Number },
-      btnHeight : { type : Number },
+      width: { type: Number },
+      height: { type: Number },
+      btnHeight: { type: Number },
 
       // string that indicate type of move
-      moving : { type : String },
+      moving: { type: String },
 
       // different moving flags for binding UI element classes
-      movingMin : { type : Boolean },
-      movingMax : { type : Boolean },
-      isMoving : { type : Boolean }
-    }
+      movingMin: { type: Boolean },
+      movingMax: { type: Boolean },
+      isMoving: { type: Boolean },
+    };
   }
 
   constructor() {
@@ -44,21 +43,22 @@ export default class AppRangeSlider extends Mixin(LitElement)
     this.absMaxValue = 100;
     this.minValue = 10;
     this.maxValue = 90;
-    this.minValueLabel = '';
-    this.maxValueLabel = '';
+    this.minValueLabel = "";
+    this.maxValueLabel = "";
     this.width = 1;
     this.height = 50;
     this.btnHeight = 1;
-    this.moving = '';
+    this.moving = "";
     this.movingMin = false;
     this.movingMax = false;
     this.isMoving = false;
+    this.hasRendered = false;
 
     this._windowResizeListener = this._onResize.bind(this);
     this._windowMouseListener = this._onMoveStop.bind(this);
 
-    this.addEventListener('mousemove', (e) => this._onMove(e));
-    this.addEventListener('touchmove', (e) => this._onMove(e));
+    this.addEventListener("mousemove", (e) => this._onMove(e));
+    this.addEventListener("touchmove", (e) => this._onMove(e));
   }
 
   /**
@@ -68,11 +68,11 @@ export default class AppRangeSlider extends Mixin(LitElement)
   connectedCallback() {
     super.connectedCallback();
 
-    window.addEventListener('resize', this._windowResizeListener);
-    window.addEventListener('mouseup', this._windowMouseListener);
-    window.addEventListener('mouseout', this._windowMouseListener);
-    window.addEventListener('touchend', this._windowMouseListener);
-    window.addEventListener('touchcancel', this._windowMouseListener);
+    window.addEventListener("resize", this._windowResizeListener);
+    window.addEventListener("mouseup", this._windowMouseListener);
+    window.addEventListener("mouseout", this._windowMouseListener);
+    window.addEventListener("touchend", this._windowMouseListener);
+    window.addEventListener("touchcancel", this._windowMouseListener);
   }
 
   /**
@@ -81,18 +81,21 @@ export default class AppRangeSlider extends Mixin(LitElement)
    */
   disconnectedCallback() {
     super.disconnectedCallback();
-    window.removeEventListener('resize', this._windowResizeListener);
-    window.removeEventListener('mouseup', this._windowMouseListener);
-    window.removeEventListener('mouseout', this._windowMouseListener);
-    window.removeEventListener('touchend', this._windowMouseListener);
-    window.removeEventListener('touchcancel', this._windowMouseListener);
+    window.removeEventListener("resize", this._windowResizeListener);
+    window.removeEventListener("mouseup", this._windowMouseListener);
+    window.removeEventListener("mouseout", this._windowMouseListener);
+    window.removeEventListener("touchend", this._windowMouseListener);
+    window.removeEventListener("touchcancel", this._windowMouseListener);
   }
 
-  willUpdate() {
-    requestAnimationFrame(() => {
-      this._onResize();
-      this._renderAsync();
-    });
+  willUpdate(e) {
+    if (!this.hasRendered) {
+      requestAnimationFrame(() => {
+        this._onResize();
+        this._renderAsync();
+      });
+      this.hasRendered = true;
+    }
   }
 
   /**
@@ -105,8 +108,8 @@ export default class AppRangeSlider extends Mixin(LitElement)
     this.width = this.offsetWidth || 1;
     this.height = this.offsetHeight;
     this.left = this.offsetLeft;
-    let lowNumberBtn = this.shadowRoot.querySelector('#lowNumberBtn');
-    if( lowNumberBtn ) {
+    let lowNumberBtn = this.shadowRoot.querySelector("#lowNumberBtn");
+    if (lowNumberBtn) {
       this.height = 50;
       this.btnHeight = 25;
       this._render();
@@ -117,9 +120,9 @@ export default class AppRangeSlider extends Mixin(LitElement)
    * @method _valueToPx
    * @description given a number line value, return px location relative
    * to the widget
-   * 
+   *
    * @param {Number} value number line value
-   * 
+   *
    * @returns {Number} px location
    */
   _valueToPx(value) {
@@ -132,9 +135,9 @@ export default class AppRangeSlider extends Mixin(LitElement)
   /**
    * @method _pxToValue
    * @description given a px location, return number line value
-   * 
+   *
    * @param {Number} px location
-   * 
+   *
    * @returns {Number} value
    */
   _pxToValue(px) {
@@ -144,7 +147,7 @@ export default class AppRangeSlider extends Mixin(LitElement)
   }
 
   _renderAsync() {
-    if( this.renderTimer ) {
+    if (this.renderTimer) {
       clearTimeout(this.renderTimer);
     }
 
@@ -160,35 +163,46 @@ export default class AppRangeSlider extends Mixin(LitElement)
    * labels and lines bases on current min/max values.
    */
   _render() {
-    let hh = this.height * 0.60;
+    let hh = this.height * 0.6;
 
     // set line heights
-    this.shadowRoot.querySelector('#numberLine').style.top = hh+'px';
-    this.shadowRoot.querySelector('#fillLine').style.top = hh+'px';
+    this.shadowRoot.querySelector("#numberLine").style.top = hh + "px";
+    this.shadowRoot.querySelector("#fillLine").style.top = hh + "px";
 
     // set btn heights
     let hBtnHeight = this.btnHeight / 2;
-    this.shadowRoot.querySelector('#lowNumberBtn').style.top = (hh - hBtnHeight) +'px';
-    this.shadowRoot.querySelector('#highNumberBtn').style.top = (hh - hBtnHeight) +'px';
+    this.shadowRoot.querySelector("#lowNumberBtn").style.top =
+      hh - hBtnHeight + "px";
+    this.shadowRoot.querySelector("#highNumberBtn").style.top =
+      hh - hBtnHeight + "px";
 
-    this.shadowRoot.querySelector('#lowNumberLabel').style.top = (hh - hBtnHeight - 22) +'px';
-    this.shadowRoot.querySelector('#highNumberLabel').style.top = (hh - hBtnHeight - 22) +'px';
+    this.shadowRoot.querySelector("#lowNumberLabel").style.top =
+      hh - hBtnHeight - 22 + "px";
+    this.shadowRoot.querySelector("#highNumberLabel").style.top =
+      hh - hBtnHeight - 22 + "px";
 
     // set btn left
-    let lv = ( this.minValue < this.absMinValue ) ? this.absMinValue : this.minValue;
-    let uv = ( this.maxValue > this.absMaxValue ) ? this.absMaxValue : this.maxValue;
+    let lv =
+      this.minValue < this.absMinValue ? this.absMinValue : this.minValue;
+    let uv =
+      this.maxValue > this.absMaxValue ? this.absMaxValue : this.maxValue;
 
     let minPxValue = this._valueToPx(lv);
     let maxPxValue = this._valueToPx(uv);
 
-    this.shadowRoot.querySelector('#lowNumberBtn').style.left = (minPxValue - hBtnHeight)  + 'px';
-    this.shadowRoot.querySelector('#highNumberBtn').style.left = (maxPxValue - hBtnHeight) + 'px';
+    this.shadowRoot.querySelector("#lowNumberBtn").style.left =
+      minPxValue - hBtnHeight + "px";
+    this.shadowRoot.querySelector("#highNumberBtn").style.left =
+      maxPxValue - hBtnHeight + "px";
 
-    this.shadowRoot.querySelector('#lowNumberLabel').style.left = (minPxValue - hBtnHeight) + 'px';
-    this.shadowRoot.querySelector('#highNumberLabel').style.left = (maxPxValue - hBtnHeight) + 'px';
-    
-    this.shadowRoot.querySelector('#fillLine').style.left = minPxValue +'px';
-    this.shadowRoot.querySelector('#fillLine').style.width = (maxPxValue - minPxValue)  +'px';
+    this.shadowRoot.querySelector("#lowNumberLabel").style.left =
+      minPxValue - hBtnHeight + "px";
+    this.shadowRoot.querySelector("#highNumberLabel").style.left =
+      maxPxValue - hBtnHeight + "px";
+
+    this.shadowRoot.querySelector("#fillLine").style.left = minPxValue + "px";
+    this.shadowRoot.querySelector("#fillLine").style.width =
+      maxPxValue - minPxValue + "px";
 
     this.minValueLabel = this.minValue;
     this.maxValueLabel = this.maxValue;
@@ -198,23 +212,23 @@ export default class AppRangeSlider extends Mixin(LitElement)
    * @method _onMoveStart
    * @description bound to btns and center line.  Fired when the user mouses
    * down on element indicating a move is starting
-   * 
-   * @param {MouseEvent} e 
+   *
+   * @param {MouseEvent} e
    */
   _onMoveStart(e) {
-    this.moving = e.currentTarget.getAttribute('prop');
-    
-    if( this.moving === 'range' ) {
+    this.moving = e.currentTarget.getAttribute("prop");
+
+    if (this.moving === "range") {
       this.startRange = {
-        min : e.currentTarget.offsetLeft,
-        max : e.currentTarget.offsetLeft + e.currentTarget.offsetWidth,
-        left :  e.pageX - this.left
-      }
+        min: e.currentTarget.offsetLeft,
+        max: e.currentTarget.offsetLeft + e.currentTarget.offsetWidth,
+        left: e.pageX - this.left,
+      };
     }
 
     this.isMoving = true;
-    this.movingMin = (this.moving === 'max') ? false : true;
-    this.movingMax = (this.moving === 'min') ? false : true;
+    this.movingMin = this.moving === "max" ? false : true;
+    this.movingMax = this.moving === "min" ? false : true;
   }
 
   /**
@@ -222,44 +236,45 @@ export default class AppRangeSlider extends Mixin(LitElement)
    * @description bound to mousemove event on this element.  Update min/max
    * values based on type of move that is happening ie min, max or range.  Does
    * nothing if we are not moving.
-   * 
-   * @param {MouseEvent} e 
+   *
+   * @param {MouseEvent} e
    */
   _onMove(e) {
-    if( !this.moving ) return;
+    if (!this.moving) return;
     e.preventDefault();
 
     // handle both mouse and touch event
     let left;
-    if( e.type === 'touchmove' ) {
-      if( !e.changedTouches.length ) return;
+    if (e.type === "touchmove") {
+      if (!e.changedTouches.length) return;
       left = e.changedTouches[0].pageX - this.left;
     } else {
       left = e.pageX - this.left;
     }
-    
-    if( this.moving === 'min' ) {
+
+    if (this.moving === "min") {
       this.minValue = this._pxToValue(left);
-    } else if( this.moving === 'max' ) {
+    } else if (this.moving === "max") {
       this.maxValue = this._pxToValue(left);
-    } else if( this.moving === 'range' ) {
+    } else if (this.moving === "range") {
       let diff = this.startRange.left - left;
 
       this.minValue = this._pxToValue(this.startRange.min - diff);
       this.maxValue = this._pxToValue(this.startRange.max - diff);
     }
-    
-    if( this.minValue < this.absMinValue ) {
+
+    if (this.minValue < this.absMinValue) {
       this.minValue = this.absMinValue;
     }
-    if( this.maxValue > this.absMaxValue ) {
+    if (this.maxValue > this.absMaxValue) {
       this.maxValue = this.absMaxValue;
     }
 
-    if( this.minValue > this.maxValue ) {
-      if( this.moving === 'min' ) this.minValue = this.maxValue;
+    if (this.minValue > this.maxValue) {
+      if (this.moving === "min") this.minValue = this.maxValue;
       else this.maxValue = this.minValue;
     }
+    this.hasRendered = false;
   }
 
   /**
@@ -268,23 +283,23 @@ export default class AppRangeSlider extends Mixin(LitElement)
    * this to the window as a catch all.  Resets all moving flags
    */
   _onMoveStop() {
-    if( !this.moving ) return;
+    if (!this.moving) return;
 
-    this.moving = '';
+    this.moving = "";
     this.movingMin = false;
     this.movingMax = false;
     this.isMoving = false;
 
     this.dispatchEvent(
-      new CustomEvent('range-value-change', {
+      new CustomEvent("range-value-change", {
         detail: {
-          min : this.minValue,
-          max : this.maxValue
-        }
+          min: this.minValue,
+          max: this.maxValue,
+        },
       })
     );
+    this.hasRendered = false;
   }
-
 }
 
-customElements.define('app-range-slider', AppRangeSlider);
+customElements.define("app-range-slider", AppRangeSlider);

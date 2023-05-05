@@ -666,11 +666,7 @@ export default function render() {
       <div ?hidden="${this.editMode}">
         <div class="card-trio">
           ${this.highlightedItems.map((item, index) => html`
-            ${index < 3 ? html`<dams-item-card .data="${
-                {title : item.description,
-                thumbnailUrl : item.image,
-                itemUrl : item['@id']}
-            }"></dams-item-card>` : ''}
+            ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
           ${this.savedItems.map((item, index) => html`
             ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
@@ -678,11 +674,7 @@ export default function render() {
         </div>
         <div class="card-trio">
           ${this.highlightedItems.map((item, index) => html`
-            ${index >= 3 ? html`<dams-item-card .data="${
-              {title : item.description,
-              thumbnailUrl : item.image,
-              itemUrl : item['@id']}
-            }"></dams-item-card>` : ''}
+            ${index >= 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
           ${this.savedItems.map((item, index) => html`
             ${index >= 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}

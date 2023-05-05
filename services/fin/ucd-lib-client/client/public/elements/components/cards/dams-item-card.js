@@ -1,28 +1,26 @@
-import { LitElement } from 'lit';
+import { LitElement } from "lit";
 import render from "./dams-item-card.tpl.js";
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 
 /**
  * @class DamsItemCard
  * @description UI component class for displaying a item preview card
- * 
- * @prop {Object} item - An object describing a DAMS item. 
+ *
+ * @prop {Object} item - An object describing a DAMS item.
  * If used, element will set all subsequent properties with data from items object.
  * @prop {String} imgSrc - The item thumbnail src.
  * @prop {String} cardTitle - The title of the item.
  * @prop {Number} itemCt - The total number of items in the items.
  * @prop {String} href - Link to the item landing page.
  */
-export default class DamsItemCard extends Mixin(LitElement)
-  .with(LitCorkUtils) {
-
+export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
     return {
-      id: {type: String, attribute: 'data-itemid'},
-      data : { type : Object },
-      // itemUrl : { type : String },
-      // thumbnailUrl : { type : String },
-      truncatedTitle : { type : String }
+      id: { type: String, attribute: "data-itemid" },
+      data: { type: Object },
+      itemUrl: { type: String },
+      thumbnailUrl: { type: String },
+      truncatedTitle: { type: String },
     };
   }
 
@@ -32,11 +30,11 @@ export default class DamsItemCard extends Mixin(LitElement)
 
     this.id = "";
     this.data = {};
-    this.truncatedTitle = '';
-    // this.itemUrl = "";
-    // this.thumbnailUrl = "";
+    this.truncatedTitle = "";
+    this.itemUrl = "";
+    this.thumbnailUrl = "";
 
-    this._injectModel('RecordModel', 'RecordVcModel');
+    this._injectModel("RecordModel", "RecordVcModel");
   }
 
   /**
@@ -58,7 +56,10 @@ export default class DamsItemCard extends Mixin(LitElement)
     //     this.href = this.item['@id'];
     //   }
     // }
-    if( ( this.id && Object.keys(this.data).length === 0 ) || this.id !== this.data.itemUrl ) { 
+    if (
+      (this.id && Object.keys(this.data).length === 0) ||
+      this.id !== this.data.itemUrl
+    ) {
       this._getItem(this.id);
     }
 
@@ -67,14 +68,14 @@ export default class DamsItemCard extends Mixin(LitElement)
 
   async _getItem(id) {
     let res = await this.RecordModel.get(id);
-    debugger;
-    if( res.state !== 'loaded') return;
+
+    if (res.state !== "loaded") return;
     res = this.RecordVcModel.translate(res.payload);
     this.data.title = res.name;
-    this.data.itemUrl = res['@id'];
+    this.data.itemUrl = res["@id"];
     this.data.thumbnailUrl = res.collectionImg;
-    // this.itemUrl = res['@id'];
-    // this.thumbnailUrl = res.collectionImg;
+    this.itemUrl = res["@id"];
+    this.thumbnailUrl = res.collectionImg;
     this._truncateTitle();
   }
 
@@ -92,12 +93,12 @@ export default class DamsItemCard extends Mixin(LitElement)
   // }
 
   _truncateTitle() {
-    if( this.data && this.data.title && this.data.title.length > 38 ) {
-      this.truncatedTitle = this.data.title.substring(0, 34) + '...';
-    } else if( this.data && this.data.title ) {
+    if (this.data && this.data.title && this.data.title.length > 38) {
+      this.truncatedTitle = this.data.title.substring(0, 34) + "...";
+    } else if (this.data && this.data.title) {
       this.truncatedTitle = this.data.title;
-    }    
+    }
   }
 }
 
-customElements.define('dams-item-card', DamsItemCard);
+customElements.define("dams-item-card", DamsItemCard);
