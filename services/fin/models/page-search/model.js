@@ -141,8 +141,7 @@ class PageSearch extends FinEsDataModel {
 
                     for( let re of matchWords ) {
                       if( re.test(word._) ) {
-                        words.push(this.transformIaMatch(word, pageData))
-                        return;
+                        words.push(this.transformIaMatch(word, line, pageData))
                       }
                     }
 
@@ -158,13 +157,19 @@ class PageSearch extends FinEsDataModel {
     });
   }
 
-  transformIaMatch(word, pageData) {
+  transformIaMatch(word, line, pageData) {
+    let text = line.WORD.map(item => {
+      if( !item._ ) return '';
+      if( item._ === word._ ) return `{{{${item._}}}}`;
+      return item._;
+    }).join(' ');
+
     let [top, right, bottom, left] = word.$.coords
       .split(',')
       .map(item => parseInt(item));
 
     return {
-      text : `{{{${word._}}}}`,
+      text,
       par : [{
         l : left,
         t : top,
@@ -380,7 +385,7 @@ class PageSearch extends FinEsDataModel {
 
     analysis.char_filter.djvu_xml = {
       type: 'pattern_replace',
-      pattern: '</?WORD.*?>',
+      pattern: '<[^>]*>',
       replacement: '',
       flags: 'CASE_INSENSITIVE'
     }
@@ -395,9 +400,10 @@ class PageSearch extends FinEsDataModel {
     }
 
     analysis.analyzer.djvu_xml = {
-      tokenizer: 'xml',
-      // char_filter: ['djvu_xml'],
-      filter: ['lowercase', 'djvu_xml']
+      // tokenizer: 'xml',
+      type : 'stop',
+      char_filter: ['djvu_xml'],
+      filter: ['lowercase', 'stop']
     }
       
     return indexConfig;
