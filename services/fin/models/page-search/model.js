@@ -380,7 +380,7 @@ class PageSearch extends FinEsDataModel {
 
     analysis.char_filter.djvu_xml = {
       type: 'pattern_replace',
-      pattern: '</?WORD.*>',
+      pattern: '</?WORD.*?>',
       replacement: '',
       flags: 'CASE_INSENSITIVE'
     }
@@ -396,7 +396,7 @@ class PageSearch extends FinEsDataModel {
 
     analysis.analyzer.djvu_xml = {
       tokenizer: 'xml',
-      char_filter: ['djvu_xml'],
+      // char_filter: ['djvu_xml'],
       filter: ['lowercase', 'djvu_xml']
     }
       
