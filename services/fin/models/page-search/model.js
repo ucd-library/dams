@@ -79,32 +79,12 @@ class PageSearch extends FinEsDataModel {
       },
     };
 
-    console.log(
-      JSON.stringify(
-        {
-          from: 0,
-          size: searchDocument.limit || 100,
-          sort: searchDocument.sort || "_score",
-          query,
-          highlight: {
-            fields: {
-              "@graph.content": {},
-            },
-          },
-        },
-        null,
-        2
-      )
-    );
-    console.log(index);
-
     let results = await this.esSearch(
       {
         from: 0,
         size: searchDocument.limit || 100,
         sort: searchDocument.sort || "_score",
         query,
-        explain: true,
         highlight: {
           fields: {
             "@graph.content": {},
@@ -114,8 +94,6 @@ class PageSearch extends FinEsDataModel {
       {},
       index
     );
-    console.log(results.hits.hits);
-    console.log(JSON.stringify(results, null, 2));
 
     return results.hits.hits.map((item) => {
       item._source.highlight = item.highlight;
@@ -422,7 +400,7 @@ class PageSearch extends FinEsDataModel {
 
     analysis.char_filter.djvu_xml = {
       type: "pattern_replace",
-      pattern: "</?WORD.*>",
+      pattern: "</?WORD.*?>",
       replacement: "",
       flags: "CASE_INSENSITIVE",
     };
@@ -446,7 +424,7 @@ class PageSearch extends FinEsDataModel {
 
     analysis.analyzer.djvu_xml = {
       tokenizer: "xml",
-      char_filter: ["djvu_xml"],
+      // char_filter: ['djvu_xml'],
       filter: ["lowercase", "djvu_xml"],
     };
 
