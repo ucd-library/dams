@@ -54,3 +54,16 @@ main:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
               location: ${location}
           result: job_execution
+      - check_job_status:
+          switch:
+            - condition: ${job_execution.spec.taskCount != job_execution.status.succeededCount}
+              next: end
+            - condition: ${job_execution.spec.taskCount == job_execution.status.succeededCount}
+              next: job_succeeded
+      - job_succeeded:
+          call: googleapis.run.v1.namespaces.jobs.delete
+          args:
+              name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
+              location: ${location}
+          result: job_execution
+      
