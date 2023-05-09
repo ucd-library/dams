@@ -2,13 +2,20 @@ import { LitElement } from "lit";
 import "@polymer/paper-spinner/paper-spinner-lite";
 
 import "@internetarchive/bookreader/src/BookReader.js";
-import BookReader from "@internetarchive/bookreader/src/plugins/plugin.text_selection.js";
 
 // TODO - fix this, docs say search modifies mobile nav so that plugin needs to be loaded first. but is that true?
-// import mobileNav from "@internetarchive/bookreader/src/plugins/plugin.mobile_nav.js";
+// import "@internetarchive/bookreader/src/plugins/plugin.mobile_nav.js";
 
 // this just adds functionality to BookReader.prototype
 import "@internetarchive/bookreader/src/plugins/search/plugin.search.js";
+
+import BookReader from "@internetarchive/bookreader/src/plugins/plugin.text_selection.js";
+
+/*
+ * bookreader forces https and not allowing ports, going to submit IA pr to fix, for now override
+ */
+import bookreaderPatch from "./bookreader.patch-search.js";
+bookreaderPatch(BookReader);
 
 import render from "./app-bookreader-viewer.tpl.js";
 
@@ -38,6 +45,11 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     this.height = 634;
     this.onePage = false;
     this.fullscreen = false;
+
+    window.addEventListener(
+      "BookReader:SearchCallback",
+      this._onSearchResultsChange.bind(this)
+    );
   }
 
   willUpdate(e) {
@@ -171,14 +183,49 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
           enabled: true,
           singlePageDjvuXmlUrl: djvuPath + "/{{pageIndex}}/ocr.djvu",
         },
+        // search: {
+        //   enabled: true,
+        //   server: "test42",
+        //   searchInsideUrl: "/bla",
+        // },
       },
+
+      showToolbar: false,
+      server: window.location.host,
+      searchInsideUrl: "/api/page-search/ia", // TODO port is stripped from 'server' path in BR code, remove :3000 in production
 
       ui: "full", // embed, full (responsive)
     };
 
     this.br = new BookReader(options);
-    debugger;
+
     this.br.init();
+  }
+
+  // _searchSuccessCallback(data) {
+  //   console.log(data);
+  // }
+
+  // _searchErrorCallback(data) {
+  //   console.log(data);
+  // }
+
+  _onSearchResultsChange(e) {
+    debugger;
+    let results = e.detail?.props?.results;
+    // this.shadowRoot.querySelector('.search-pagination')
+    let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
+    if (nav) {
+      nav.searchResults = results.matches.length;
+    }
+  }
+
+  search(queryTerm) {
+    this.br.bookId = "/item/ark:/87293/d3tq5rj7p/media/Agricola_1912.pdf";
+    this.br.search(queryTerm, {
+      // success: this._searchSuccessCallback,
+      // error: this._searchErrorCallback,
+    });
   }
 }
 
