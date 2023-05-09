@@ -1,41 +1,59 @@
-import { LitElement } from "lit"
-import "@polymer/paper-spinner/paper-spinner-lite"
+import { LitElement } from "lit";
+import "@polymer/paper-spinner/paper-spinner-lite";
 
-import '@internetarchive/bookreader/src/BookReader.js';
-import BookReader from '@internetarchive/bookreader/src/plugins/plugin.text_selection.js';
+import "@internetarchive/bookreader/src/BookReader.js";
 
-import render from "./app-bookreader-viewer.tpl.js"
+// TODO - fix this, docs say search modifies mobile nav so that plugin needs to be loaded first. but is that true?
+// import "@internetarchive/bookreader/src/plugins/plugin.mobile_nav.js";
+
+// this just adds functionality to BookReader.prototype
+import "@internetarchive/bookreader/src/plugins/search/plugin.search.js";
+
+import BookReader from "@internetarchive/bookreader/src/plugins/plugin.text_selection.js";
+
+/*
+ * bookreader forces https and not allowing ports, going to submit IA pr to fix, for now override
+ */
+import bookreaderPatch from "./bookreader.patch-search.js";
+bookreaderPatch(BookReader);
+
+import render from "./app-bookreader-viewer.tpl.js";
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
-import '../../../utils/app-icons';
+import "../../../utils/app-icons";
 
-export default class AppBookReaderViewer extends Mixin(LitElement)
-  .with(LitCorkUtils) {
-  
+export default class AppBookReaderViewer extends Mixin(LitElement).with(
+  LitCorkUtils
+) {
   static get properties() {
     return {
-      loading: { type : Boolean },
-      height : { type : Number },
-      fullscreen : { type : Boolean },
-      bookData : { type : Object }
-    }
+      loading: { type: Boolean },
+      height: { type: Number },
+      fullscreen: { type: Boolean },
+      bookData: { type: Object },
+    };
   }
 
   constructor() {
     super();
     this.active = true;
     this.render = render.bind(this);
-    this._injectModel('AppStateModel', 'MediaModel');
+    this._injectModel("AppStateModel", "MediaModel");
 
     this.bookData = {};
     this.loading = false;
     this.height = 634;
     this.onePage = false;
     this.fullscreen = false;
+
+    window.addEventListener(
+      "BookReader:SearchCallback",
+      this._onSearchResultsChange.bind(this)
+    );
   }
 
   willUpdate(e) {
-    if( this.bookData.data ) {
+    if (this.bookData?.pages) {
       this._renderBookReader();
     }
   }
@@ -44,20 +62,20 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     requestAnimationFrame(() => {
       this._renderBookReaderAsync();
       this._movePrevNext();
-      
-      let slider = this.shadowRoot.querySelector('.BRpager');
-      $(slider).on( 
-        'slidechange', 
-        this._updateCurrentPageLabel.bind(this)
-      );
 
-      window.addEventListener(`BookReader:1PageViewSelected`, this._singlePageLoad.bind(this));
+      let slider = this.shadowRoot.querySelector(".BRpager");
+      $(slider).on("slidechange", this._updateCurrentPageLabel.bind(this));
+
+      window.addEventListener(
+        `BookReader:1PageViewSelected`,
+        this._singlePageLoad.bind(this)
+      );
     });
   }
 
   _singlePageLoad(e) {
     setTimeout(() => {
-      if( !this.zoomed ) {
+      if (!this.zoomed) {
         // this is annoying, but the ia-bookmarks.js > setBREventListeners() has a timeout of 100ms on render, if no timeout used here it tries to zoom before rendering
         this.br.zoom(1);
         this.br.zoom(1);
@@ -71,7 +89,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
         this.br.resize();
         this.zoomed = true;
       }
-
     }, 25);
   }
 
@@ -80,12 +97,14 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     //  the slider is baked into the BR code pretty heavily with animations and the dom structure
     //  moving it out of the nav bar breaks functionility, and creating our own slider doesn't play nicely
     //  instead we'll just hide all the other native nav, and restyle the BR slider (jquery ui slider)
-    let prevButton = this.shadowRoot.querySelector('#prev');
-    let nextButton = this.shadowRoot.querySelector('#next');
-    let currentPage = this.shadowRoot.querySelector('.BRcurrentpage');
+    let prevButton = this.shadowRoot.querySelector("#prev");
+    let nextButton = this.shadowRoot.querySelector("#next");
+    let currentPage = this.shadowRoot.querySelector(".BRcurrentpage");
 
     // remove parentheses from label (it's updated async so can't simply replace innerHTML, hide instead)
-    let currentPageOverride = this.shadowRoot.querySelector('.BRcurrentpage-override');
+    let currentPageOverride = this.shadowRoot.querySelector(
+      ".BRcurrentpage-override"
+    );
     this._updateCurrentPageLabel();
 
     currentPage.parentElement.prepend(prevButton);
@@ -102,69 +121,112 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   }
 
   _updateCurrentPageLabel() {
-    let currentPage = this.shadowRoot.querySelector('.BRcurrentpage');
-    let currentPageOverride = this.shadowRoot.querySelector('.BRcurrentpage-override');
-    currentPageOverride.innerHTML = currentPage.innerHTML.replace('(', '').replace(')', '');
+    let currentPage = this.shadowRoot.querySelector(".BRcurrentpage");
+    let currentPageOverride = this.shadowRoot.querySelector(
+      ".BRcurrentpage-override"
+    );
+    currentPageOverride.innerHTML = currentPage.innerHTML
+      .replace("(", "")
+      .replace(")", "");
   }
 
-  _toggleBookView() {   
+  _toggleBookView() {
     this.onePage = !this.onePage;
     this.br.switchMode(this.onePage ? 1 : 2);
   }
 
-  _zoomIn(e, amount=1) {
+  _zoomIn(e, amount = 1) {
     this.br.zoom(amount);
   }
 
-  _zoomOut(e, amount=-1) {
+  _zoomOut(e, amount = -1) {
     this.br.zoom(amount);
   }
 
   _renderBookReaderAsync() {
-    if( this.iaInitialized || !this.bookData.data ) return;
+    if (this.iaInitialized || !this.bookData.pages) return;
     this.iaInitialized = true;
     let data = [];
 
-    let djvuPath = this.bookData.data[0].path;
-    djvuPath = djvuPath.substr(0, djvuPath.lastIndexOf('-')); // remove page number and ext
+    let djvuPath = this.bookData.pages[0].ocr.url;
+    djvuPath = djvuPath.split("/");
+    djvuPath = djvuPath.splice(0, djvuPath.length - 2).join("/"); // remove page number and extension
 
-    this.bookData.data.forEach(bd => {
-      data.push([{
-        width: bd.width, height: bd.height,
-        uri: bd.path
-      }])
-    })
+    this.bookData.pages.forEach((bd) => {
+      data.push([
+        {
+          width: bd[bd.ocr.imageSize].size.width,
+          height: bd[bd.ocr.imageSize].size.height,
+          uri: bd[bd.ocr.imageSize].url,
+        },
+      ]);
+    });
 
     let options = {
-      el: this.shadowRoot.querySelector('#BookReader'),
+      el: this.shadowRoot.querySelector("#BookReader"),
       data,
 
-      bookTitle: 'BookReader Presentation',
+      bookTitle: "BookReader Presentation",
 
       // thumbnail is optional, but it is used in the info dialog
       thumbnail: data[0].uri,
 
       // Metadata is optional, but it is used in the info dialog
       metadata: [
-        {label: 'Title', value: 'Open Library BookReader Presentation'},
-        {label: 'Author', value: 'Internet Archive'},
-        {label: 'Demo Info', value: 'This demo shows how one could use BookReader with their own content.'},
+        { label: "Title", value: "Open Library BookReader Presentation" },
+        { label: "Author", value: "Internet Archive" },
+        // {label: 'Demo Info', value: 'This demo shows how one could use BookReader with their own content.'},
       ],
 
       plugins: {
         textSelection: {
           enabled: true,
-          singlePageDjvuXmlUrl: djvuPath + '-{{pageIndex}}.djvu'
+          singlePageDjvuXmlUrl: djvuPath + "/{{pageIndex}}/ocr.djvu",
         },
+        // search: {
+        //   enabled: true,
+        //   server: "test42",
+        //   searchInsideUrl: "/bla",
+        // },
       },
 
-      ui: 'full', // embed, full (responsive)
+      showToolbar: false,
+      server: window.location.host,
+      searchInsideUrl: "/api/page-search/ia", // TODO port is stripped from 'server' path in BR code, remove :3000 in production
 
+      ui: "full", // embed, full (responsive)
     };
 
     this.br = new BookReader(options);
+
     this.br.init();
+  }
+
+  // _searchSuccessCallback(data) {
+  //   console.log(data);
+  // }
+
+  // _searchErrorCallback(data) {
+  //   console.log(data);
+  // }
+
+  _onSearchResultsChange(e) {
+    debugger;
+    let results = e.detail?.props?.results;
+    // this.shadowRoot.querySelector('.search-pagination')
+    let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
+    if (nav) {
+      nav.searchResults = results.matches.length;
+    }
+  }
+
+  search(queryTerm) {
+    this.br.bookId = "/item/ark:/87293/d3tq5rj7p/media/Agricola_1912.pdf";
+    this.br.search(queryTerm, {
+      // success: this._searchSuccessCallback,
+      // error: this._searchErrorCallback,
+    });
   }
 }
 
-customElements.define('app-bookreader-viewer', AppBookReaderViewer);
+customElements.define("app-bookreader-viewer", AppBookReaderViewer);

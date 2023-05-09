@@ -401,5 +401,5 @@ export default function render() {
 
   </div>
 
-  <app-citation .record="${this.record.root}"></app-citation>
+  <app-citation .record="${this.citationRoot}"></app-citation>
 `;}

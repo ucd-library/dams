@@ -1,20 +1,20 @@
 import { LitElement } from "lit";
-import "../../../utils/app-range-slider"
-import render from "./app-range-filter.tpl.js"
+import "../../../utils/app-range-slider";
+import render from "./app-range-filter.tpl.js";
 
-export default class AppRangeFilter extends Mixin(LitElement)
-  .with(LitCorkUtils) {
-
+export default class AppRangeFilter extends Mixin(LitElement).with(
+  LitCorkUtils
+) {
   static get properties() {
     return {
-      label : { type : String },
-      filter : { type : String },
-      absMinValue : { type : Number },
-      absMaxValue : { type : Number },
-      minValue : { type : Number },
-      maxValue : { type : Number },
-      showUnknown : { type : Boolean }
-    }
+      label: { type: String },
+      filter: { type: String },
+      absMinValue: { type: Number },
+      absMaxValue: { type: Number },
+      minValue: { type: Number },
+      maxValue: { type: Number },
+      showUnknown: { type: Boolean },
+    };
   }
 
   constructor() {
@@ -22,15 +22,15 @@ export default class AppRangeFilter extends Mixin(LitElement)
     this.render = render.bind(this);
     this.active = true;
 
-    this.label = '';
-    this.filter = '';
+    this.label = "";
+    this.filter = "";
     this.absMinValue = -1;
     this.absMaxValue = -1;
     this.minValue = -1;
     this.maxValue = Number.MAX_VALUE;
     this.showUnknown = false;
 
-    this._injectModel('AppStateModel', 'RecordModel', 'CollectionModel');
+    this._injectModel("AppStateModel", "RecordModel", "CollectionModel");
   }
 
   // connectedCallback() {
@@ -42,10 +42,10 @@ export default class AppRangeFilter extends Mixin(LitElement)
   }
 
   resize() {
-    this.shadowRoot.querySelector('#slider')._onResize();
+    this.shadowRoot.querySelector("#slider")._onResize();
 
     setTimeout(() => {
-      this.shadowRoot.querySelector('#slider')._onResize();
+      this.shadowRoot.querySelector("#slider")._onResize();
     }, 100);
   }
 
@@ -56,8 +56,7 @@ export default class AppRangeFilter extends Mixin(LitElement)
    * we don't actually need a filter on.
    */
   _isDefaultState() {
-    if( !this._isFilterApplied() ) {
-      
+    if (!this._isFilterApplied()) {
       let searchDoc = this.RecordModel.getCurrentSearchDocument();
       this._removeRangeFilter(searchDoc, this.filter);
       this.RecordModel.setSearchLocation(searchDoc);
@@ -75,8 +74,8 @@ export default class AppRangeFilter extends Mixin(LitElement)
     this.minValue = e.detail.min;
     this.maxValue = e.detail.max;
 
-    this.shadowRoot.querySelector('#minValueInput').value = this.minValue;
-    this.shadowRoot.querySelector('#maxValueInput').value = this.maxValue;
+    this.shadowRoot.querySelector("#minValueInput").value = this.minValue;
+    this.shadowRoot.querySelector("#maxValueInput").value = this.maxValue;
 
     this._onRangeNullChange();
   }
@@ -89,15 +88,15 @@ export default class AppRangeFilter extends Mixin(LitElement)
   _onRangeNullChange() {
     let value = {
       gte: this.minValue,
-      lte: this.maxValue
-    }
+      lte: this.maxValue,
+    };
 
-    if( this.shadowRoot.querySelector('#unknown').checked ) {
+    if (this.shadowRoot.querySelector("#unknown").checked) {
       value.includeNull = true;
     }
 
     // remove filter and return
-    if( this._isDefaultState() ) return;
+    if (this._isDefaultState()) return;
 
     let searchDoc = this.RecordModel.getCurrentSearchDocument();
     this.RecordModel.setPaging(searchDoc, 0);
@@ -110,18 +109,18 @@ export default class AppRangeFilter extends Mixin(LitElement)
    * @description bound to min/max number inputs.
    */
   _onInputChange() {
-    let min = this.shadowRoot.querySelector('#minValueInput').value;
-    let max = this.shadowRoot.querySelector('#maxValueInput').value;
+    let min = this.shadowRoot.querySelector("#minValueInput").value;
+    let max = this.shadowRoot.querySelector("#maxValueInput").value;
 
-    if( min < this.absMinValue ) {
-      this.shadowRoot.querySelector('#minValueInput').value = this.absMinValue;
+    if (min < this.absMinValue) {
+      this.shadowRoot.querySelector("#minValueInput").value = this.absMinValue;
       min = this.absMinValue;
     }
-    if( max > this.absMaxValue ) {
-      this.shadowRoot.querySelector('#maxValueInput').value = this.absMaxValue;
+    if (max > this.absMaxValue) {
+      this.shadowRoot.querySelector("#maxValueInput").value = this.absMaxValue;
       max = this.absMaxValue;
     }
-    if( min > max ) min = max;
+    if (min > max) min = max;
 
     this.minValue = min;
     this.maxValue = max;
@@ -132,22 +131,22 @@ export default class AppRangeFilter extends Mixin(LitElement)
   /**
    * @method _onSelectedCollectionUpdate
    * @description from CollectionInterface, called whenever selected collection updates
-   * 
+   *
    * @param {Object} e
    */
   _onSelectedCollectionUpdate(e) {
-    this.selectedCollection = e ? e['@id'] : '';
+    this.selectedCollection = e ? e["@id"] : "";
     this._renderFilters();
   }
 
   /**
    * @method _onRecordSearchUpdate
    * @description from RecordInterface
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
   _onRecordSearchUpdate(e) {
-    if( e.state !== 'loaded' ) return;
+    if (e.state !== "loaded") return;
 
     this.currentFilters = e.searchDocument.filters || {};
     this._renderFilters();
@@ -157,19 +156,19 @@ export default class AppRangeFilter extends Mixin(LitElement)
    * @method _renderFilters
    * @description called after a collection is selected or a filter set updates.
    * make sure range filter is set correctly.
-   * 
+   *
    */
   async _renderFilters() {
-    if( !this.currentFilters ) return;
+    if (!this.currentFilters) return;
 
     // grab default aggregations for collection
     let cid = this.selectedCollection;
     let result = await this.RecordModel.defaultSearch(this.selectedCollection);
-    if( cid !== this.selectedCollection ) return; // make sure we haven't updated
+    if (cid !== this.selectedCollection) return; // make sure we haven't updated
     this.default = result;
 
     let rangeFilter = this.default.payload.aggregations.ranges[this.filter];
-    if( rangeFilter ) {
+    if (rangeFilter) {
       this.absMinValue = rangeFilter.min;
       this.absMaxValue = rangeFilter.max;
     } else {
@@ -179,24 +178,32 @@ export default class AppRangeFilter extends Mixin(LitElement)
     this._show(true);
 
     // make sure any current values are set correctly
-    if( this.minValue < this.absMinValue || !this.currentFilters[this.filter] ) {
+    if (this.minValue < this.absMinValue || !this.currentFilters[this.filter]) {
       this.minValue = this.absMinValue;
-      this.shadowRoot.querySelector('#minValueInput').value = this.minValue;
+      this.shadowRoot.querySelector("#minValueInput").value = this.minValue;
     }
-    if( this.maxValue > this.absMaxValue || !this.currentFilters[this.filter] ) {
+    if (this.maxValue > this.absMaxValue || !this.currentFilters[this.filter]) {
       this.maxValue = this.absMaxValue;
-      this.shadowRoot.querySelector('#maxValueInput').value = this.maxValue;
+      this.shadowRoot.querySelector("#maxValueInput").value = this.maxValue;
     }
 
     // now set the current filters from search
-    if( this.currentFilters[this.filter] ) {
+    if (this.currentFilters[this.filter]) {
       let value = this.currentFilters[this.filter].value;
 
       this.minValue = value.gte;
       this.maxValue = value.lte;
-      this.shadowRoot.querySelector('#minValueInput').value = this.minValue;
-      this.shadowRoot.querySelector('#maxValueInput').value = this.maxValue;
-      this.shadowRoot.querySelector('#unknown').checked = value.includeNull ? true : false;
+      this.shadowRoot.querySelector("#minValueInput").value = this.minValue;
+      this.shadowRoot.querySelector("#maxValueInput").value = this.maxValue;
+      this.shadowRoot.querySelector("#unknown").checked = value.includeNull
+        ? true
+        : false;
+    }
+
+    // to trigger slider rerender when filters are removed
+    let rangeSlider = this.shadowRoot.querySelector("app-range-slider");
+    if (rangeSlider) {
+      rangeSlider.hasRendered = false;
     }
 
     this._notifySelected();
@@ -205,13 +212,15 @@ export default class AppRangeFilter extends Mixin(LitElement)
   /**
    * @method _isFilterApplied
    * @description is there currenlty a filter set
-   * 
+   *
    * @return {Boolean}
    */
   _isFilterApplied() {
-    if( this.minValue === this.absMinValue &&
+    if (
+      this.minValue === this.absMinValue &&
       this.maxValue === this.absMaxValue &&
-      this.shadowRoot.querySelector('#unknown').checked === true ) {
+      this.shadowRoot.querySelector("#unknown").checked === true
+    ) {
       return false;
     }
     return true;
@@ -223,24 +232,26 @@ export default class AppRangeFilter extends Mixin(LitElement)
    */
   _notifySelected() {
     let selected = false;
-    let key = '';
+    let key = "";
 
-    if( this.minValue !== this.absMinValue || 
-        this.maxValue !== this.absMaxValue ||
-        !this.shadowRoot.querySelector('#unknown').checked ) {
+    if (
+      this.minValue !== this.absMinValue ||
+      this.maxValue !== this.absMaxValue ||
+      !this.shadowRoot.querySelector("#unknown").checked
+    ) {
       selected = true;
     }
 
-    if( selected ) {
-      key = this.minValue+' to '+this.maxValue;
+    if (selected) {
+      key = this.minValue + " to " + this.maxValue;
     }
 
     this.dispatchEvent(
       new CustomEvent(`set-selected`, {
         detail: {
           selected,
-          label: key
-        }
+          label: key,
+        },
       })
     );
   }
@@ -248,13 +259,13 @@ export default class AppRangeFilter extends Mixin(LitElement)
   /**
    * @method _show
    * @description notify parent to hide/show filter
-   * 
+   *
    * @param {Boolean} show should the parent hide or show filter
    */
   _show(show) {
     this.dispatchEvent(
-      new CustomEvent('update-visibility', {
-        detail: {show}
+      new CustomEvent("update-visibility", {
+        detail: { show },
       })
     );
   }
@@ -266,11 +277,10 @@ export default class AppRangeFilter extends Mixin(LitElement)
   reset() {
     this.minValue = this.absMinValue;
     this.maxValue = this.absMaxValue;
-    this.shadowRoot.querySelector('#unknown').checked = true;
-    
+    this.shadowRoot.querySelector("#unknown").checked = true;
+
     this._onRangeNullChange();
   }
-
 
   /**
    * @method onParentFilterClicked
@@ -280,7 +290,6 @@ export default class AppRangeFilter extends Mixin(LitElement)
   onParentFilterClicked() {
     this.reset();
   }
-
 }
 
-customElements.define('app-range-filter', AppRangeFilter);
+customElements.define("app-range-filter", AppRangeFilter);

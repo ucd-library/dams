@@ -128,7 +128,7 @@ return html`
   .media-type__icon {
     width: 1.4rem;
   }
-/* 
+  /* 
   .media-type__icon image {
     fill: red;
   } */
@@ -153,9 +153,9 @@ return html`
 </div> -->
 
 
-<a href="${this.data.itemUrl}" class="marketing-highlight category-brand--secondary u-space-mb o-box">
+<a href="${this.itemUrl}" class="marketing-highlight category-brand--secondary u-space-mb o-box">
   <div class="marketing-highlight__image">
-    <div class="aspect--4x3 u-background-image" role="img" aria-label="" style="background-image:url(${this.data.thumbnailUrl});"></div>
+    <div class="aspect--4x3 u-background-image" role="img" aria-label="" style="background-image:url(${this.thumbnailUrl});"></div>
     <div class="media-type">
       <img class="media-type__icon" src="/images/icons/item-stack-blank.svg">
       <!-- <svg class="media-type__icon">

@@ -13,6 +13,7 @@ export class Citation extends LitElement {
       // count : {type : String},
       // choices: { type : Array },
       record: {type : Object},
+      recordId: {type : String},
       citations : {type : Array},
       selectedCitation : {type : Object}
     };
@@ -24,14 +25,16 @@ export class Citation extends LitElement {
     this.active = true;
     
     this.record = {};
+    this.recordId = '';
     this.citations = [];
     this.selectedCitation = {};
     
   }
 
   async updated() {
-    if( !this.record || this.citations.length ) return;
+    if( !this.record || ( this.citations.length && this.recordId === this.record['@id']) ) return;
 
+    this.recordId = this.record['@id'];
     let newCitations = [];
 
     newCitations.push({

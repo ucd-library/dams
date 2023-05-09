@@ -1,4 +1,6 @@
 const {BaseModel} = require('@ucd-lib/cork-app-utils');
+const FcAppConfigStore = require('../stores/FcAppConfigStore');
+const FcAppConfigService = require('../services/FcAppConfigService');
 
 /**
  * @class FcAppConfigModel
@@ -10,6 +12,9 @@ class FcAppConfigModel extends BaseModel {
   
   constructor() {
     super();
+
+    this.store = FcAppConfigStore;
+    this.service = FcAppConfigService;
     
     this.TYPES = {
       APPLICATION_CONTAINER : 'http://digital.ucdavis.edu/schema#ApplicationContainer'
@@ -120,6 +125,54 @@ class FcAppConfigModel extends BaseModel {
   getApplicationContainer() {
     return APP_CONFIG.fcAppConfig
       .find(item => item['@type'].includes(this.TYPES.APPLICATION_CONTAINER));
+  }
+
+  /**
+     * @method getCollectionAppData
+     * @description load a collections application container display data by id
+     * 
+     * @param {String} id collection id
+     * 
+     * @returns {Promise} resolves to a jsonld graph
+     */
+  async getCollectionAppData(id) {
+    return await this.service.getCollectionAppData(id);
+  }
+
+  /**
+   * @method saveCollectionDisplayData
+   * @description save a collections display data
+   * 
+   * @param {String} id collection id
+   * @param {Array} displayData record id
+   * @param {Object} file featured image file object
+   * 
+   * @returns {Promise} resolves to record
+   */
+  async saveCollectionDisplayData(id, displayData, featuredImage) {
+    return await this.service.saveCollectionDisplayData(id, displayData, featuredImage);
+  }
+
+  /**
+     * @method getFeaturedCollectionAppData
+     * @description load landing page featured collections application container display data
+     * 
+     * @returns {Promise} resolves to a json object
+     */
+  async getFeaturedCollectionAppData() {
+    return await this.service.getFeaturedCollectionAppData();
+  }
+
+  /**
+   * @method saveFeaturedCollectionAppData
+   * @description save landing page featured collections application container display data
+   * 
+   * @param {Array} displayData json data
+   * 
+   * @returns {Promise} resolves to record
+   */
+  async saveFeaturedCollectionAppData(displayData) {
+    return await this.service.saveFeaturedCollectionDisplayData(displayData);
   }
 
 }

@@ -32,6 +32,17 @@ class SearchVcModel extends BaseModel {
         //   collectionItemsCount += media.hasPart ? media.hasPart.length : 0;
         // });
 
+        // TODO media isn't working consistently on search results page, some records still have .image
+        //  others have errors in result.clientMedia.mediaGroups[0]?.display?.clientMedia?.images related to workflow not existing
+        let thumbnailUrl = result.clientMedia.graph.filter(g => parseInt(g.position) === 1 && g.clientMedia)[0];
+        if( thumbnailUrl ) {
+        // imagelists
+          thumbnailUrl = thumbnailUrl.clientMedia.images?.medium?.url;
+        } else {
+          // single image / pdf / video
+          thumbnailUrl = result.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium?.url;
+        }
+
         // TODO could belong to multiple collections.. which should be listed? or collectionIds as array type?
         // also this index0 sometimes is oac and not /collection/*
         let collectionId;
@@ -46,7 +57,7 @@ class SearchVcModel extends BaseModel {
             '@id' : collectionId['@id'],
             title : result.root.publisher ? result.root.publisher.name : '',
             name : result.root.publisher ? result.root.publisher.name : '',
-            thumbnailUrl : result.root.thumbnailUrl,
+            thumbnailUrl,
             recordCount : result.root.itemCount
           });
         }

@@ -103,7 +103,7 @@ class AppSearchHeader extends Mixin(LitElement)
     if( this.lastQuery === query ) return;
     this.lastQuery = query;
 
-    this.RecordModel.search(query, true, true, true);
+    this.RecordModel.search(query, true, false, true);
   }
 
   /**

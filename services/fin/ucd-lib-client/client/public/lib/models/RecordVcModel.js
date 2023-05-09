@@ -28,18 +28,47 @@ class RecordVcModel extends BaseModel {
           if( match ) callNumber = match[0];
         });  
       }
+
+      // imagelists
+      let collectionImg = e.clientMedia.graph.filter(g => parseInt(g.position) === 1 && g.clientMedia)[0];
+      if( collectionImg ) {
+        collectionImg = collectionImg.clientMedia.images?.medium?.url;
+      } else if ( e.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium?.url ) {
+        // pdf / video
+        collectionImg = e.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium?.url;
+      } else if (e.clientMedia.mediaGroups[0]?.display?.fileFormat) {
+        // single image
+        collectionImg = '/fcrepo/rest'+e.clientMedia.mediaGroups[0].display.id;
+      }
+
+      // TODO temp remove oac isPartOf records
+      let collectionId;
+      if( e.root.isPartOf ) {
+        if( !Array.isArray(e.root.isPartOf) ) e.root.isPartOf = [e.root.isPartOf];
+        e.root.isPartOf.forEach(ipo => {
+          if( !ipo['@id'].includes('oac.cdlib.org') ) collectionId = ipo['@id'];
+        });  
+      }
+
+      let keywords = [];
+      if( e.root.about && Array.isArray(e.root.about) ) { 
+        keywords = e.root.about;
+      } else if( e.root.about ) {
+        keywords = [e.root.about];
+      }
+
       // translate collection and related nodes/items to ui model
       const item = {
         '@id' : e.root['@id'],
         name : e.root.name,
-        collectionId : !e.root.isPartOf ? '' : e.root.isPartOf['@id'] || e.root.isPartOf[0]['@id'],
+        collectionId,
         collectionName : e.root.creator?.name,
         collectionItemsCount : 42,
-        collectionImg : e.root.image?.url,
+        collectionImg,
         clientMedia : e.clientMedia,
         date : e.root.yearPublished,
         publisher : e.root.publisher?.name,
-        keywords : Array.isArray(e.root.about) ? e.root.about : e.root.about || [],
+        keywords,
         callNumber,
         arkDoi : ['?'],
         fedoraLinks : ['?'],

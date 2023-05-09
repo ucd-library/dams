@@ -19,7 +19,7 @@ class ClientMedia {
       if( node['@id'] == id ) this.root = node;
     }
 
-    if( !this.root ) {
+    if( !this.root && graph.length ) {
       throw new Error('Root '+id+' not found in graph');
     }
 
@@ -191,6 +191,7 @@ class ClientMedia {
    * @returns {String}
    */
   getMediaType(node) {
+    if( !node ) return '';
     let type = definition.MEDIA_TYPES.find(type => node['@type'].includes(type)) || '';
     return type.split(/(#|\/)/).pop();
   }
@@ -205,6 +206,8 @@ class ClientMedia {
    * @returns {String}
    */
   getDisplayType(node) {
+    if( !node ) return '';
+    let parts;
     let mediaType = this.getMediaType(node);
     if( mediaType ) {
       let displayType = mediaType.replace(/(object|streaming)/ig, '').toLowerCase();

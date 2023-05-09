@@ -104,27 +104,28 @@ return html`
 
   @media (min-width: 1601px) {
 
+
   }
 </style>  
-<div class="${ classMap(this.getContainerClasses()) }">
+<div class="container${this.imageRight ? ' image-right' : ''}">
 
   <div class="img-flex">
     <div class="img-container">
-      <!-- ${this._imgSrc ? html`
+      ${this._imgSrc ? html`
         <img src="${this._imgSrc}">
-      ` : html``} -->
-      <img src="/images/eastman-demo.jpeg">
+      ` : html``}
+      <!-- <img src="/images/eastman-demo.jpeg"> -->
     </div>
   </div>
 
-  <!-- <div class="text-container">
+  <div class="text-container">
     <div class="title" role="heading" aria-level="2">${this._collectionTitle}</div>
     <div class="subtitle">${this._itemCt} item${this._itemCt === 1 ? "" : "s"}</div>
     <div class="description">${this._collectionDesc}</div>
     <a href="${this._href}" class="btn--alt btn--round">Explore this collection</a>
-  </div> -->
+  </div>
 
-  <div class="text-container">
+  <!-- <div class="text-container">
     <h3 class="heading--primary">Eastman's Originals</h3>
     <div class="subtitle">13,258 items</div>
     <div class="description">
@@ -133,7 +134,7 @@ return html`
       and commmunity buildings and activities from circa 1890 - 1960.
     </div>
     <a href="${this._href}" class="btn--alt btn--round">Explore this collection</a>
-  </div>
+  </div> -->
 
 </div>
 `;}

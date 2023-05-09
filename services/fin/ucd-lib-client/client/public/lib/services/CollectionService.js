@@ -13,7 +13,7 @@ class CollectionService extends BaseService {
 
   get(id) {
     return this.request({
-      url : `${this.baseUrl}${id.replace('/collection', '')}?root=true`,
+      url : `${this.baseUrl}${id.replace('/collection', '')}`, // TODO add back? but we need image for collection cards ?compact=true`,
       checkCached : () => this.store.getCollection(id),
       onLoading : request => this.store.setCollectionLoading(request),
       onLoad : result => this.store.setCollectionLoaded(result.body),

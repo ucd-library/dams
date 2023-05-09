@@ -22,9 +22,9 @@ return html`
     justify-content: center;
   }
 
-  img {
+  /* img {
     width: 100%;
-  }
+  } */
 
   .layout {
     text-align: center;

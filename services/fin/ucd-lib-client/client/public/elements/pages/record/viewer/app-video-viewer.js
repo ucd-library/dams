@@ -54,11 +54,13 @@ export default class AppVideoViewer extends Mixin(LitElement)
       this._stop();
     }
 
+    if( !e.selectedRecord ) return;
+
     this.fullPath = e.location.fullpath;
 
     // TODO change to support multiple media groups
     this._onSelectedRecordMediaUpdate(
-      e.selectedRecord.clientMedia.mediaGroups[0]?.display
+      e.selectedRecord.clientMedia?.mediaGroups[0]?.display
     );
   }
 

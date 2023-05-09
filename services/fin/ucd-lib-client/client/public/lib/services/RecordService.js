@@ -21,7 +21,7 @@ class RecordService extends BaseService {
 
   get(id) {
     return this.request({
-      url : `${this.baseUrl}${id.replace(/^\/item/, '')}?root=true`,
+      url : `${this.baseUrl}${id.replace(/^\/item/, '')}?compact=true`,
       checkCached : () => this.store.getRecord(id),
       onLoading : request => this.store.setRecordLoading(id, request),
       onLoad : result => {
@@ -83,14 +83,15 @@ class RecordService extends BaseService {
         if( result.body.results ) {
           result.body.results = result.body.results.map(record => {
             let rg = new RecordGraph(record);
-            if( !ignoreClientMedia ) {
-              rg.clientMedia = new ClientMedia(record.id, record);
-            }
+            // debugger;
+            // if( !ignoreClientMedia ) {
+              rg.clientMedia = new ClientMedia(record['@id'], record);
+            // }
             return rg;
           });
-          if( !ignoreClientMedia ) {
+          // if( !ignoreClientMedia ) {
             result.body.results.map(item => item.getChildren(item.root));
-          }
+          // }
           this.store.setSearchLoaded(searchDocument, result.body);
         }
       },
