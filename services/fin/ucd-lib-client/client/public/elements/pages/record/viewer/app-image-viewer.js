@@ -39,11 +39,17 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
   _onAppStateUpdate(e) {
     if (
-      !e.selectedRecordMedia ||
-      e.selectedRecord?.index[e.location.pathname]["@id"] !==
-        e.selectedRecordMedia["@id"]
+      e.selectedRecord &&
+      (!e.selectedRecordMedia ||
+        e.selectedRecord?.index[e.location.pathname]["@id"] !==
+          e.selectedRecordMedia["@id"])
     ) {
-      let selectedRecordMedia = e.selectedRecord.index[e.location.pathname];
+      // todo find position 1
+      let selectedRecordMedia = e.selectedRecord.clientMedia.graph.filter(
+        (g) => parseInt(g.position) === 1 && g.clientMedia
+      )[0];
+      if (!selectedRecordMedia)
+        selectedRecordMedia = e.selectedRecord.index[e.location.pathname];
       this._onSelectedRecordMediaUpdate(selectedRecordMedia);
     }
   }
@@ -62,9 +68,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     if (
       this.media["@id"] !==
         this.AppStateModel.locationElement.location.pathname &&
-      this.AppStateModel.locationElement.location.pathname.indexOf(
-        "/media/images/"
-      ) < 0
+      media.id.indexOf("/media/images/") < 0
     )
       return;
     this.media = media;
