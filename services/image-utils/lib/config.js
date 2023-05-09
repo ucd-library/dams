@@ -62,7 +62,7 @@ config.imageSizes = {
       }
     },
     tiled : {
-      minSize : 1000 * 1000 * 10, // 10mb
+      minSize : 1000 * 1000 * 2, // 2mb
       output : 'ptif:',
       outputFormat : 'tif',
       imageMagick : {

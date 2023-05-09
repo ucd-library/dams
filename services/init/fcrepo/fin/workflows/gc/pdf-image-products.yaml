@@ -71,6 +71,18 @@ main:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
               location: ${location}
           result: job_execution
+      - check_image_job_status:
+          switch:
+            - condition: ${job_execution.spec.taskCount != job_execution.status.succeededCount}
+              next: end
+            - condition: ${job_execution.spec.taskCount == job_execution.status.succeededCount}
+              next: image_job_succeeded
+      - image_job_succeeded:
+          call: googleapis.run.v1.namespaces.jobs.delete
+          args:
+              name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
+              location: ${location}
+          result: job_execution
       - setup_pdf_finalize_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
@@ -112,3 +124,16 @@ main:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId + "-finalize"}
               location: ${location}
           result: job_execution
+      - check_finalize_job_status:
+          switch:
+            - condition: ${job_execution.spec.taskCount != job_execution.status.succeededCount}
+              next: end
+            - condition: ${job_execution.spec.taskCount == job_execution.status.succeededCount}
+              next: finalize_job_succeeded
+      - finalize_job_succeeded:
+          call: googleapis.run.v1.namespaces.jobs.delete
+          args:
+              name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId + "-finalize"}
+              location: ${location}
+          result: job_execution
+      

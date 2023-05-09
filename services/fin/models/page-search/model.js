@@ -65,17 +65,23 @@ class PageSearch extends FinEsDataModel {
     let id = searchDocument.id;
     let query = {
       bool: {
-        should: [
-          { term: { "@graph.identifier": id } },
-          { term: { "@graph.@id": id } },
-          { term: { "@id": id } },
-        ],
-        must: {
-          multi_match: {
-            query: searchDocument.text,
-            fields: "@graph.content",
+        must: [
+          {
+            multi_match: {
+              query: searchDocument.text,
+              fields: "@graph.content",
+            },
           },
-        },
+          {
+            bool: {
+              should: [
+                { term: { "@graph.identifier": id } },
+                { term: { "@graph.@id": id } },
+                { term: { "@id": id } },
+              ],
+            },
+          },
+        ],
       },
     };
 
@@ -140,7 +146,7 @@ class PageSearch extends FinEsDataModel {
         let pageData = {
           width: parseInt(result?.OBJECT?.$?.width),
           height: parseInt(result?.OBJECT?.$?.height),
-          page: parseInt(node.position),
+          page: parseInt(node.position) - 1,
         };
 
         result?.OBJECT?.HIDDENTEXT?.forEach((item) => {
@@ -175,7 +181,7 @@ class PageSearch extends FinEsDataModel {
       return item._;
     }).join(" ");
 
-    let [top, right, bottom, left] = word.$.coords
+    let [left, bottom, right, top] = word.$.coords
       .split(",")
       .map((item) => parseInt(item));
 
