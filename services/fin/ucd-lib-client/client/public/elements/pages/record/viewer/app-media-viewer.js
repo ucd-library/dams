@@ -26,6 +26,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
       brFullscreen: { type: Boolean },
       brSearchOpen: { type: Boolean },
       bookData: { type: Object },
+      bookItemId: { type: String },
       isBookReader: { type: Boolean },
       searchResults: { type: Array },
       searchResultsCount: { type: Number },
@@ -43,6 +44,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
     this.brFullscreen = false;
     this.brSearchOpen = false;
     this.bookData = {};
+    this.bookItemId = "";
     this.isBookReader = false;
     this.searchResults = [];
     this.searchResultsCount = 0;
@@ -107,6 +109,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
           mediaGroup.display.clientMedia.pdf.manifest
         );
       }
+      this.bookItemId = mediaGroup.display["@id"];
 
       if (brData && brData.body) {
         this.mediaType = "bookreader";

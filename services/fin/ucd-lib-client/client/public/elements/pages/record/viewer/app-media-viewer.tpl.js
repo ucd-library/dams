@@ -89,6 +89,7 @@ export default function render() {
           id="bookreader"
           .fullscreen="${this.brFullscreen}"
           .bookData="${this.bookData}"
+          bookItemId="${this.bookItemId}"
         ></app-bookreader-viewer>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>

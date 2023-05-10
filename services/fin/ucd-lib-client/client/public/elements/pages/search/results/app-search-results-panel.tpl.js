@@ -452,6 +452,7 @@ export default function render() {
                 class="item"
                 data-itemid="${res.id}"
                 @click=${this._onRecordClicked}
+                @rendered=${this._onGridItemRendered}
               ></app-search-grid-result>
             `
           )}

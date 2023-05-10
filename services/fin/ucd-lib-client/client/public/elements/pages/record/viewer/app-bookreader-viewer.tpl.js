@@ -200,6 +200,10 @@ export default function render() {
       .BRfloat .BRchapter > div {
         bottom: calc(100% + 17px);
       }
+
+      .BRprogresspopup {
+        display: none;
+      }
     </style>
     <!--
 <div id="loading" ?hidden="${!this.loading}">

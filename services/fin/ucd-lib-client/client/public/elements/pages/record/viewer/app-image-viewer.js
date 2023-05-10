@@ -71,6 +71,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       media.id.indexOf("/media/images/") < 0
     )
       return;
+    this.loading = true;
     this.media = media;
     this._renderImg();
   }
@@ -79,7 +80,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     if (this.media.hasPart && this.media.hasPart.length > 0) {
       this.media.image = this.media.hasPart[0].image;
     }
-    this.loading = true;
 
     if (this.media.clientMedia?.images) {
       let srcset = `
@@ -96,7 +96,9 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.shadowRoot.querySelector("#img").sizes = sizes;
       this.shadowRoot.querySelector("#img").style.height = "600px";
     }
-    this.loading = false;
+    requestAnimationFrame(() => {
+      this.loading = false;
+    });
   }
 }
 
