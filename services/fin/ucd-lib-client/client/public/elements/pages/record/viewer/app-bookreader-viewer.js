@@ -31,6 +31,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
       height: { type: Number },
       fullscreen: { type: Boolean },
       bookData: { type: Object },
+      bookItemId: { type: String },
     };
   }
 
@@ -41,6 +42,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     this._injectModel("AppStateModel", "MediaModel");
 
     this.bookData = {};
+    this.bookItemId = "";
     this.loading = false;
     this.height = 634;
     this.onePage = false;
@@ -183,16 +185,11 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
           enabled: true,
           singlePageDjvuXmlUrl: djvuPath + "/{{pageIndex}}/ocr.djvu",
         },
-        // search: {
-        //   enabled: true,
-        //   server: "test42",
-        //   searchInsideUrl: "/bla",
-        // },
       },
 
       showToolbar: false,
       server: window.location.host,
-      searchInsideUrl: "/api/page-search/ia", // TODO port is stripped from 'server' path in BR code, remove :3000 in production
+      searchInsideUrl: "/api/page-search/ia",
 
       ui: "full", // embed, full (responsive)
     };
@@ -201,14 +198,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
 
     this.br.init();
   }
-
-  // _searchSuccessCallback(data) {
-  //   console.log(data);
-  // }
-
-  // _searchErrorCallback(data) {
-  //   console.log(data);
-  // }
 
   _onSearchResultsChange(e) {
     debugger;
@@ -221,11 +210,8 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
   }
 
   search(queryTerm) {
-    this.br.bookId = "/item/ark:/87293/d3tq5rj7p/media/Agricola_1912.pdf";
-    this.br.search(queryTerm, {
-      // success: this._searchSuccessCallback,
-      // error: this._searchErrorCallback,
-    });
+    this.br.bookId = this.bookItemId;
+    this.br.search(queryTerm);
   }
 }
 

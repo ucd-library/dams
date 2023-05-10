@@ -1,60 +1,112 @@
-import { LitElement } from 'lit';
+import { LitElement } from "lit";
 // import AppSearchResult from "./app-search-result"
-import render from "./app-search-grid-result.tpl.js"
+import render from "./app-search-grid-result.tpl.js";
 
-export class AppSearchGridResult extends Mixin(LitElement)
-  .with(LitCorkUtils) {
+/**
+ * @class AppSearchGridResult
+ * @description UI component class for displaying a item preview card
+ *
+ * @prop {String} id - Item id
+ * If used, element will query the RecordModel for the item data.
+ * @prop {Object} data - Data object containing item information
+ * @prop {String} itemUrl - Url to item
+ * @prop {String} thumbnailUrl - Thumbnail url
+ * @prop {String} truncatedTitle - Titles over 38 characters will be truncated to fit a single line
+ */
+export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
+  static get properties() {
+    return {
+      id: { type: String, attribute: "data-itemid" },
+      data: { type: Object },
+      itemUrl: { type: String },
+      thumbnailUrl: { type: String },
+      truncatedTitle: { type: String },
+      bounds: { type: Array },
+      imageHeight: { type: Number },
+    };
+  }
 
-    static get properties() {
-      return {
-        data : { type : Object },
-        imgHeight : { type : Number }
-      }
+  constructor() {
+    super();
+    this.active = true;
+    this.render = render.bind(this);
+
+    this.id = "";
+    this.data = {};
+    this.truncatedTitle = "";
+    this.itemUrl = "";
+    this.thumbnailUrl = "";
+    this.hasRendered = false;
+    this.bounds = [];
+    this.imageHeight = 0;
+
+    this._injectModel("RecordModel", "RecordVcModel");
+  }
+
+  /**
+   * @method firstUpdated
+   * @description Lit lifecycle method called when element is updated.
+   * @param {Map} props - Properties that have changed.
+   */
+  firstUpdated(props) {
+    if (
+      (this.id && Object.keys(this.data).length === 0) ||
+      this.id !== this.data.itemUrl
+    ) {
+      this._getItem(this.id);
     }
+  }
 
-    constructor() {
-      super();
-      this.active = true;
-      this.render = render.bind(this);
+  /**
+   * @method _loadImage
+   * @description preload image and set bounds to image dimensions
+   *
+   * @param {String} url url of image to load
+   *
+   * @returns {Promise} resolves when image is loaded and bounds array has been set
+   */
+  _loadImage(url) {
+    return new Promise((resolve, reject) => {
+      var img = new Image();
 
-      this.data = {};
+      img.onload = () => {
+        let res = [img.naturalHeight, img.naturalWidth];
+        this.bounds = [[0, 0], res];
+        resolve();
+      };
 
-      this._injectModel('AppStateModel', 'MediaModel');      
-    }
+      img.src = url;
+    });
+  }
 
-    /**
-     * @method _onAppStateUpdate
-     * @description on the App update, the state is determined and by checking
-     * the location
-     * 
-     * @param {Object} e 
-     */
-    _onAppStateUpdate(e) {
-      this._updateThumbnailProps();
-    }
+  /**
+   * @method _getItem
+   * @description Fetches item data from RecordModel
+   * @param {String} id - Item id to fetch
+   */
+  async _getItem(id) {
+    let res = await this.RecordModel.get(id);
 
-    _updateThumbnailProps() {
-      let imgWidth = 250;    
-      let img = this.data.image;
-      if( img ) {
-        let ratio = img.height / img.width;
-        this.imgHeight = Math.floor(imgWidth * ratio);
-        // this.imgUrl = this._getImgUrl(img.url, null, this.imgHeight);
-        this.imgUrl = this.MediaModel.getImgUrl(img.url, null, this.imgHeight);
-  
-        // if( img.colorPalette ) {
-          // this.imgThumbail = img.colorPalette;
-        // } else {
-        //   this.imgThumbail = '';
-        // }
-        
-        this.isImage = true;
-      } else {
-        this.imgUrl = '';
-        this.isImage = false;
-      }
-    }
+    if (res.state !== "loaded") return;
+    res = this.RecordVcModel.translate(res.payload);
+    this.data.title = res.name;
+    this.data.itemUrl = res["@id"];
+    this.data.thumbnailUrl = res.collectionImg;
+    this.itemUrl = res["@id"];
+    this.thumbnailUrl = res.collectionImg;
+    this.title = res.name;
+    await this._loadImage(this.thumbnailUrl);
+    debugger;
 
+    let img = this.shadowRoot.querySelector("#img");
+    let width = img.width || 1;
+    let imageHeight = this.bounds[1][0];
+    let imageWidth = this.bounds[1][1];
+    let ratio = imageHeight / imageWidth;
+    let height = width * ratio;
+    this.imageHeight = height;
+    this.dispatchEvent(new CustomEvent("rendered", { detail: this }));
+  }
 }
 
-customElements.define('app-search-grid-result', AppSearchGridResult);
+customElements.define("app-search-grid-result", AppSearchGridResult);
