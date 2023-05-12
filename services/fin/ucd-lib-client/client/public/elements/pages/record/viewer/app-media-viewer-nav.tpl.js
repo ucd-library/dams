@@ -237,6 +237,30 @@ export default function render() {
         top: 25%;
         left: 1%;
       }
+
+      .br-search-non-fs div {
+        display: inline-block;
+      }
+
+      .br-search-non-fs div.zoom {
+        background-color: var(--color-aggie-gold);
+        border-radius: 50%;
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        margin-left: 25px;
+        margin-top: 12.5px;
+      }
+
+      .br-search-non-fs div.zoom {
+        cursor: pointer;
+      }
+
+      .br-search-non-fs ucdlib-icon {
+        height: 50px;
+        margin: auto;
+        fill: var(--color-aggie-blue);
+      }
     </style>
 
     <div
@@ -244,17 +268,55 @@ export default function render() {
         ? "fullscreen"
         : ""}"
     >
-      <div id="navLeft" ?hidden="${this.singleImage}">
+      <div id="navLeft">
         <ucdlib-icon
           icon="ucdlib-dams:fa-chevron-left"
           tabindex="0"
           icon="chevron-left"
           alt="Page thumbnails left"
           ?disabled="${!this.showNavLeft}"
-          ?hidden="${!this.showNavLeft}"
+          ?hidden="${!this.showNavLeft || this.singleImage}"
           @click="${this._pageLeft}"
         >
         </ucdlib-icon>
+        <div
+          class="br-search-non-fs"
+          style="min-width: 300px;"
+          ?hidden="${this.brFullscreen || !this.isBookReader}"
+        >
+          <div class="zoom" @click="${this._onSearchToggled}">
+            <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
+          </div>
+          <div
+            class="search-pagination"
+            ?hidden="${this.searchResultsCount === 0}"
+          >
+            <div
+              id="search-prev"
+              style="padding-left: .5rem; width: 40px;"
+              @click="${this._prevSearchResult}"
+            >
+              <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
+            </div>
+
+            <span
+              class="search-results"
+              style="position: relative;
+                bottom: 1rem;
+                font-size: .9rem;
+                font-weight: bold;"
+              >${this.selectedResult} / ${this.searchResultsCount}</span
+            >
+
+            <div
+              id="search-next"
+              style="padding-right: .5rem; width: 40px;"
+              @click="${this._nextSearchResult}"
+            >
+              <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader}">
@@ -383,12 +445,15 @@ export default function render() {
           <app-share-btn></app-share-btn>
         </div>
 
-        <!-- this is moved next to the bookreader slider in app-media-viewer -->
+        <!-- this is moved next to the bookreader slider in app-media-viewer in full screen -->
         <div class="br-search" ?hidden="${!this.brFullscreen}">
           <div class="zoom" @click="${this._onSearchToggled}">
             <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
           </div>
-          <div class="search-pagination" ?hidden="${!this.brSearch}">
+          <div
+            class="search-pagination"
+            ?hidden="${this.searchResultsCount === 0}"
+          >
             <div
               id="search-prev"
               style="padding-left: .5rem; width: 40px;"
@@ -403,7 +468,7 @@ export default function render() {
                 bottom: 1rem;
                 font-size: .9rem;
                 font-weight: bold;"
-              >${this.selectedResult} / ${this.searchResults}</span
+              >${this.selectedResult} / ${this.searchResultsCount}</span
             >
 
             <div
@@ -460,7 +525,6 @@ export default function render() {
         style="white-space: nowrap"
         ?hidden="${!this.isLightbox}"
       >
-        <!-- functionality not built yet for text search of images -->
         <div
           class="${this.searchingText ? "text-search" : ""}"
           style="display: none;"

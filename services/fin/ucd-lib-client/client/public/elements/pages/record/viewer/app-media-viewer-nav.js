@@ -32,7 +32,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       searchingText: { type: Boolean },
       brSearch: { type: Boolean },
       selectedResult: { type: Number },
-      searchResults: { type: Number },
+      searchResults: { type: Array },
+      searchResultsCount: { type: Number },
     };
   }
 
@@ -62,8 +63,9 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.showOpenLightbox = false;
     this.searchingText = false;
     this.brSearch = false;
-    this.selectedResult = 0;
-    this.searchResults = 0;
+    this.selectedResult = 1;
+    this.searchResults = [];
+    this.searchResultsCount = 0;
 
     window.addEventListener("resize", () => this._resize());
     window.addEventListener("touchend", (e) => this._onTouchEnd(e));
@@ -72,6 +74,21 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
     this._injectModel("AppStateModel", "MediaModel", "RecordVcModel");
+
+    window.addEventListener(
+      "BookReader:pageChanged",
+      this._onBRPageChange.bind(this)
+    );
+
+    window.addEventListener(
+      "BookReader:SearchCallback",
+      this._onSearchResultsChange.bind(this)
+    );
+
+    window.addEventListener(
+      "BookReader:SearchCallbackEmpty",
+      this._onSearchResultsEmpty.bind(this)
+    );
   }
 
   connectedCallback() {
@@ -226,11 +243,36 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
   }
 
   _prevSearchResult(e) {
-    debugger;
+    if (this.selectedResult === 1) return;
+    this.selectedResult = this.selectedResult - 1;
+    this.dispatchEvent(
+      new CustomEvent("br-change-search-result", {
+        detail: {
+          selectedResult: this.selectedResult,
+        },
+      })
+    );
   }
 
   _nextSearchResult(e) {
-    debugger;
+    if (this.selectedResult === this.searchResultsCount) return;
+    this.selectedResult = this.selectedResult + 1;
+    this.dispatchEvent(
+      new CustomEvent("br-change-search-result", {
+        detail: {
+          selectedResult: this.selectedResult,
+        },
+      })
+    );
+  }
+
+  _onSearchResultsChange(e) {
+    let results = e.detail?.props?.results;
+    this.searchResultsCount = results.matches.length;
+  }
+
+  _onSearchResultsEmpty(e) {
+    this.searchResultsCount = 0;
   }
 
   _showingLastThumbFrame() {
@@ -507,6 +549,32 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    */
   _onSearchToggled(e) {
     this.dispatchEvent(new CustomEvent("br-search-toggle"));
+  }
+
+  _onBRPageChange(e) {
+    // TODO similar logic for calulating current page needs to be called when single vs double page is toggled
+    // also when search term changes, the current search result selected needs to be recalculated based on currently viewed page
+    if (!this.searchResults.length) return;
+    let singlePageDiff = this.singleImage ? 1 : 0;
+    let pageIndex = e.detail.props.currentIndex();
+
+    // check if page has a matched search term
+    let matchedSearchResult = this.searchResults.findIndex(
+      (r) => r.par[0].page === pageIndex + singlePageDiff
+    );
+    if (matchedSearchResult === -1) {
+      // loop over this.searchResults to determine the closest page that is less that pageIndex
+      this.searchResults.forEach((result, index) => {
+        if (result.par[0].page < pageIndex + singlePageDiff) {
+          matchedSearchResult = index;
+        }
+      });
+    }
+
+    if (!matchedSearchResult || matchedSearchResult < 0)
+      matchedSearchResult = 0;
+
+    this.selectedResult = matchedSearchResult + 1;
   }
 }
 

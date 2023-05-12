@@ -204,6 +204,33 @@ export default function render() {
       .BRprogresspopup {
         display: none;
       }
+
+      .BookReader .searchHiliteLayer rect,
+      .BRmobileMenu .searchHiliteLayer rect,
+      .BRfloat .searchHiliteLayer rect {
+        stroke: var(--color-redbud);
+        stroke-width: 3;
+        fill: #f555b140;
+        fill-opacity: 0.6;
+      }
+
+      .BookReader .searchHiliteLayer rect,
+      .BRmobileMenu .searchHiliteLayer rect,
+      .BRfloat .searchHiliteLayer rect {
+        animation: none;
+      }
+
+      .BookReader .BRquery b,
+      .BRmobileMenu .BRquery b,
+      .BRfloat .BRquery b {
+        color: var(--color-thiebaud-icing);
+        font-weight: bold;
+        background-color: none;
+      }
+
+      #BookReader .BRcontainer {
+        padding-bottom: 1rem;
+      }
     </style>
     <!--
 <div id="loading" ?hidden="${!this.loading}">

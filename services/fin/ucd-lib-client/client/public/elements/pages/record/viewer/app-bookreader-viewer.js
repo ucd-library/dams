@@ -12,9 +12,10 @@ import "@internetarchive/bookreader/src/plugins/search/plugin.search.js";
 import BookReader from "@internetarchive/bookreader/src/plugins/plugin.text_selection.js";
 
 /*
- * bookreader forces https and not allowing ports, going to submit IA pr to fix, for now override
+ * bookreader forces https and not allowing ports, and we need an event emited when slider search results are clicked.
+ * submitting IA pr to fix, for now overriding 2 prototype functions
  */
-import bookreaderPatch from "./bookreader.patch-search.js";
+import bookreaderPatch from "./app-bookreader.patch-search.js";
 bookreaderPatch(BookReader);
 
 import render from "./app-bookreader-viewer.tpl.js";
@@ -51,6 +52,11 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     window.addEventListener(
       "BookReader:SearchCallback",
       this._onSearchResultsChange.bind(this)
+    );
+
+    window.addEventListener(
+      "BookReader:SearchCallbackEmpty",
+      this._onSearchResultsEmpty.bind(this)
     );
   }
 
@@ -138,6 +144,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
   }
 
   _zoomIn(e, amount = 1) {
+    debugger;
     this.br.zoom(amount);
   }
 
@@ -200,18 +207,36 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
   }
 
   _onSearchResultsChange(e) {
-    debugger;
     let results = e.detail?.props?.results;
     // this.shadowRoot.querySelector('.search-pagination')
     let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
+    debugger;
     if (nav) {
-      nav.searchResults = results.matches.length;
+      nav.searchResultsCount = results.matches.length;
+    }
+  }
+
+  _onSearchResultsEmpty(e) {
+    let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
+    if (nav) {
+      nav.searchResultsCount = 0;
     }
   }
 
   search(queryTerm) {
     this.br.bookId = this.bookItemId;
     this.br.search(queryTerm);
+  }
+
+  onSearchResultClick(e) {
+    let matchIndex = parseInt(
+      e.currentTarget?.attributes["data-match-index"]?.value || 0
+    );
+    this.br._searchPluginGoToResult(matchIndex);
+  }
+
+  onSearchPrevNext(matchIndex) {
+    this.br._searchPluginGoToResult(matchIndex, false);
   }
 }
 
