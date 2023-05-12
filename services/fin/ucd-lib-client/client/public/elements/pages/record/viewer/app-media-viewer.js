@@ -282,6 +282,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
         this.shadowRoot.querySelector(".wrapper").append(mediaNav);
       }
 
+      brView.br.twoPage.autofit = true;
       brView.br.resize();
     }
   }

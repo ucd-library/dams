@@ -198,6 +198,17 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
       server: window.location.host,
       searchInsideUrl: "/api/page-search/ia",
 
+      // controls zoom levels
+      reductionFactors: [
+        { reduce: 3000, autofit: null },
+        { reduce: 3500, autofit: null },
+        { reduce: 4500, autofit: null },
+        { reduce: 5500, autofit: null },
+        { reduce: 7000, autofit: null },
+        { reduce: 8500, autofit: null },
+        { reduce: 10000, autofit: "auto" },
+      ],
+
       ui: "full", // embed, full (responsive)
     };
 
