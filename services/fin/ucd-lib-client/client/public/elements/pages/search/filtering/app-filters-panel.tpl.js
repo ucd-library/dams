@@ -97,57 +97,124 @@ export default function render() {
           display: block;
         }
       }
+
+
+
+      /* MOBILE LAYOUT */
+
+      .heading {
+        background-color: var(--color-aggie-blue-80);
+        padding: 0 1rem;
+        height: 61.75px;
+      }
+      .heading h5 {
+        color: white;
+        display: inline-block;
+        margin: 0.8rem 0;
+        font-weight: 600;
+      }
+      .heading .collapse {
+        display: inline-block;
+        float: right;
+        cursor: pointer;
+        width: 60px;
+        height: 60px;
+      }
+
+      .heading ucdlib-icon {
+        fill: var(--color-aggie-gold);
+        float: right;
+        padding-top: 0.9rem;
+      }
+      :host {
+        box-shadow: 0px 3px 6px #00000029;
+
+      }
+
+      .overflow {
+        overflow-y: auto;
+        height: calc(100vh - 100px);
+
+      }
+
+
     </style>
 
-    <!-- <div class="title" ?hidden="${this.collectionMode}" >FILTERS</div> -->
+    <div class="heading">
+      <h5>Filters</h5>
+      <div class="collapse" @click="${this._collapseFilters}">
+        <ucdlib-icon
+          icon="ucdlib-dams:fa-xmark"
+          tabindex="0"
+          icon="fa-xmark"
+          alt="Collapse filters"
+        >
+        </ucdlib-icon>
+      </div>
+    </div>
 
-    <!-- <div class="outer-drawer-toggle" ?spacer="${!this
-      .collectionMode}" on-click="_fireToggleDrawer">
+      <!-- <div class="title" ?hidden="${
+        this.collectionMode
+      }" >FILTERS</div> -->
+
+      <!-- <div class="outer-drawer-toggle" ?spacer="${!this
+        .collectionMode}" on-click="_fireToggleDrawer">
     <button class="drawer-toggle">
       <span><span ?hidden="${!this.collectionMode}">Info / </span>Filters</span>
       <iron-icon icon="fin-icons:close"></iron-icon>
     </button>
   </div> -->
-    <div class="thumbnail-root" ?hidden="${!this.collectionMode}">
-      <div
-        class="thumbnail"
-        style="background-image: url('${this.selectedCollection.thumbnailUrl}')"
-      ></div>
-      <!-- <div class="thumbnail" style="background-image: url('${this
-        .selectedCollection.thumbnail}')"></div>  -->
-    </div>
-
-    <app-tabs
-      .tabs="${this.tabs}"
-      selected="${this.selectedTab}"
-      ?hidden="${!this.collectionMode}"
-    >
-    </app-tabs>
-
-    <iron-pages
-      selected="${this.selectedTab}"
-      attr-for-selected="id"
-      selected-attribute="showing"
-    >
-      <div id="filters">
-        <!-- <div ?hidden="${!this
-          .collectionMode}" class="label">Collection</div>
-      <div ?hidden="${!this.collectionMode}" class="collection-filter">
-        <app-facet-checkbox
-          type="collection"
-          value="${this.selectedCollection.name}"
-          checked="${this.collectionMode}"
-          on-click="_removeCollectionFilter">
-        </app-facet-checkbox>
-      </div> -->
-
-        ${this.facetFilters.map(
-          (item, index) => html`
-            <app-filter-panel .filter="${item}"></app-filter-panel>
-          `
-        )}
+      <div class="thumbnail-root" ?hidden="${!this.collectionMode}">
+        <div
+          class="thumbnail"
+          style="background-image: url('${
+            this.selectedCollection.thumbnailUrl
+          }')"
+        ></div>
+        <!-- <div class="thumbnail" style="background-image: url('${
+          this.selectedCollection.thumbnail
+        }')"></div>  -->
       </div>
-      <app-collection-info-panel id="info"></app-collection-info-panel>
-    </iron-pages>
+
+      <app-tabs
+        .tabs="${this.tabs}"
+        selected="${this.selectedTab}"
+        ?hidden="${!this.collectionMode}"
+      >
+      </app-tabs>
+
+
+      <div class="overflow">
+        <iron-pages
+          selected="${this.selectedTab}"
+          attr-for-selected="id"
+          selected-attribute="showing"
+        >
+          <div id="filters">
+            <!-- <div ?hidden="${!this
+              .collectionMode}" class="label">Collection</div>
+        <div ?hidden="${!this.collectionMode}" class="collection-filter">
+          <app-facet-checkbox
+            type="collection"
+            value="${this.selectedCollection.name}"
+            checked="${this.collectionMode}"
+            on-click="_removeCollectionFilter">
+          </app-facet-checkbox>
+        </div> -->
+
+            ${this.facetFilters.map(
+              (item, index) => html`
+                <app-filter-panel .filter="${item}"></app-filter-panel>
+              `
+            )}
+          </div>
+          <app-collection-info-panel id="info"></app-collection-info-panel>
+        </iron-pages>
+
+      </div>
+
+
+
+    </div>
   `;
 }

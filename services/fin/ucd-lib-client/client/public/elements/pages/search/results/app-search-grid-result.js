@@ -96,7 +96,6 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.thumbnailUrl = res.collectionImg;
     this.title = res.name;
     await this._loadImage(this.thumbnailUrl);
-    debugger;
 
     let img = this.shadowRoot.querySelector("#img");
     let width = img.width || 1;

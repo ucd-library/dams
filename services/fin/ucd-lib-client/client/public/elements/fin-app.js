@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html } from "lit";
 import render from "./fin-app.tpl.js";
 
 import "@ucd-lib/fin-icons";
@@ -10,7 +10,7 @@ import "@ucd-lib/cork-app-utils";
 import "./styles/shared-styles";
 
 // main library
-import '../lib';
+import "../lib";
 
 // app elements
 import "./pages/search/app-search-header";
@@ -22,23 +22,21 @@ import "./components/site/ucdlib-site-footer-column";
 import "./utils/app-header-colorbar";
 import "./components/graphics/dams-watercolor-overlay";
 
-export class FinApp extends Mixin(LitElement)
-  .with(LitCorkUtils) {  
-
+export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
     return {
-      page : {type: String},
-      appRoutes : {type: Array},
-      showSearchHeader : {type: Boolean},
-      showBreadcrumb : {type : Boolean},
-      drawerOpen : {type : Boolean},
-      localBuildTime : {type: String},
-      appVersion : {type: String},
-      clientTag : {type: String},
-      clientHash : {type: String},
-      coreTag : {type: String},
-      coreHash : {type: String},
-      showVersion : {type: Boolean}
+      page: { type: String },
+      appRoutes: { type: Array },
+      showSearchHeader: { type: Boolean },
+      showBreadcrumb: { type: Boolean },
+      drawerOpen: { type: Boolean },
+      localBuildTime: { type: String },
+      appVersion: { type: String },
+      clientTag: { type: String },
+      clientHash: { type: String },
+      coreTag: { type: String },
+      coreHash: { type: String },
+      showVersion: { type: Boolean },
     };
   }
 
@@ -46,21 +44,29 @@ export class FinApp extends Mixin(LitElement)
     super();
     this.active = true;
     this.render = render.bind(this);
-    this.SEARCH_HEADER_PAGES = ['about', 'item', 'search', 'collections', 'collection', 'components', 'browse'];
-    this.BREADCRUMB_PAGES = ['item', 'search', 'collections'];
+    this.SEARCH_HEADER_PAGES = [
+      "about",
+      "item",
+      "search",
+      "collections",
+      "collection",
+      "components",
+      "browse",
+    ];
+    this.BREADCRUMB_PAGES = ["item", "search", "collections"];
 
     this.loadedPages = {};
 
-    this.page = 'loading';
+    this.page = "loading";
     this.appRoutes = APP_CONFIG.appRoutes;
     this.showSearchHeader = false;
     this.showBreadcrumb = false;
     this.drawerOpen = false;
 
     // App Version variables
-    this.showVersion = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH !== 'main';
+    this.showVersion = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH !== "main";
 
-    this.appVersion = APP_CONFIG.env.APP_VERSION;    
+    this.appVersion = APP_CONFIG.env.APP_VERSION;
     this.buildNum = APP_CONFIG.env.BUILD_NUM;
     this.clientEnv = APP_CONFIG.env.CLIENT_ENV;
     this.finAppVersion = APP_CONFIG.env.FIN_APP_VERSION;
@@ -75,18 +81,25 @@ export class FinApp extends Mixin(LitElement)
     this.damsRepoSha = APP_CONFIG.env.UCD_DAMS_REPO_SHA;
     this.damsRepoTag = APP_CONFIG.env.UCD_DAMS_REPO_TAG;
 
-    if( APP_CONFIG.env.BUILD_TIME ) {
-      this.localBuildTime = new Date(APP_CONFIG.env.BUILD_TIME).toISOString().replace('T', ' ');
+    if (APP_CONFIG.env.BUILD_TIME) {
+      this.localBuildTime = new Date(APP_CONFIG.env.BUILD_TIME)
+        .toISOString()
+        .replace("T", " ");
     } else {
-      this.localBuildTime = 'Not set';
+      this.localBuildTime = "Not set";
     }
-    
-    this._injectModel('AppStateModel', 'AuthModel', 'CollectionModel', 'RecordModel');
+
+    this._injectModel(
+      "AppStateModel",
+      "AuthModel",
+      "CollectionModel",
+      "RecordModel"
+    );
   }
 
   ready() {
-    let loadingEle = document.querySelector('#loading');
-    if( loadingEle ) document.body.removeChild(loadingEle);
+    let loadingEle = document.querySelector("#loading");
+    if (loadingEle) document.body.removeChild(loadingEle);
 
     super.ready();
 
@@ -101,7 +114,7 @@ export class FinApp extends Mixin(LitElement)
   async _onAppStateUpdate(e) {
     this.drawerOpen = e.filtersDrawerOpen ? true : false;
 
-    if( e.location.page === this.page ) return;
+    if (e.location.page === this.page) return;
 
     this.showBreadcrumb = this.BREADCRUMB_PAGES.includes(e.location.page);
     this.showSearchHeader = this.SEARCH_HEADER_PAGES.includes(e.location.page);
@@ -109,17 +122,16 @@ export class FinApp extends Mixin(LitElement)
     this.appState = e;
     window.scrollTo(0, 0);
     let page = e.location.page;
-    if( !this.loadedPages[page] ) {
-      this.page = 'loading';
+    if (!this.loadedPages[page]) {
+      this.page = "loading";
       this.loadedPages[page] = this.loadPage(page);
     }
     await this.loadedPages[page];
 
     // handle browse by pages
-    if( page === 'browse' && e.location.path.length > 1 ) {
+    if (page === "browse" && e.location.path.length > 1) {
       page = e.location.path[1];
     }
-
 
     this.page = page;
   }
@@ -127,46 +139,61 @@ export class FinApp extends Mixin(LitElement)
   /**
    * @method loadPage
    * @description code splitting done here.  dynamic import a page based on route
-   * 
+   *
    * @param {String} page page to load
    * @returns {String} import()
    */
   loadPage(page) {
-    if( page === 'home' ) {
-      return import(/* webpackChunkName: "page-home" */ "./pages/home/app-home");
-    } else if( page === 'search' ) {
-      return import(/* webpackChunkName: "page-search" */ "./pages/search/app-search");
-    } else if( page === 'item' ) {
-      return import(/* webpackChunkName: "page-record" */ "./pages/record/app-record");
-    } else if( page === 'browse' ) {
-      return import(/* webpackChunkName: "page-browse" */ "./pages/browse/app-browse");
-    } else if( page === 'about' ) {
-      return import(/* webpackChunkName: "page-about" */ "./pages/about/app-about");
-    }  else if( page === 'collections' ) {
-      return import(/* webpackChunkName: "page-collections" */ "./pages/collections/app-collections");
-    }  else if( page === 'collection' ) {
-      return import(/* webpackChunkName: "page-collections" */ "./pages/collection/app-collection");
-    }  else if( page === 'components' ) {
-      return import(/* webpackChunkName: "page-components" */ "./pages/components/app-components");
+    if (page === "home") {
+      return import(
+        /* webpackChunkName: "page-home" */ "./pages/home/app-home"
+      );
+    } else if (page === "search") {
+      return import(
+        /* webpackChunkName: "page-search" */ "./pages/search/app-search"
+      );
+    } else if (page === "item") {
+      return import(
+        /* webpackChunkName: "page-record" */ "./pages/record/app-record"
+      );
+    } else if (page === "browse") {
+      return import(
+        /* webpackChunkName: "page-browse" */ "./pages/browse/app-browse"
+      );
+    } else if (page === "about") {
+      return import(
+        /* webpackChunkName: "page-about" */ "./pages/about/app-about"
+      );
+    } else if (page === "collections") {
+      return import(
+        /* webpackChunkName: "page-collections" */ "./pages/collections/app-collections"
+      );
+    } else if (page === "collection") {
+      return import(
+        /* webpackChunkName: "page-collections" */ "./pages/collection/app-collection"
+      );
+    } else if (page === "components") {
+      return import(
+        /* webpackChunkName: "page-components" */ "./pages/components/app-components"
+      );
     }
     return page;
   }
 
   /**
    * @method _toggleDrawer
-   * @description toggles the drawer state.  Listens to 
+   * @description toggles the drawer state.  Listens to
    * toggle-drawer event from app-search-results-panel
    */
   _toggleDrawer() {
-    this.AppStateModel.set({filtersDrawerOpen: !this.drawerOpen});
+    this.AppStateModel.set({ filtersDrawerOpen: !this.drawerOpen });
   }
-
 
   /**
    * @method _onRecordSearchUpdate
    * @description RecordInterface, fired when search document updates.
    * used to set the window url
-   * 
+   *
    */
   // _onRecordSearchUpdate(e) {
   //   if( this.appState.location.path[0] === 'collection' ) return;
@@ -177,8 +204,15 @@ export class FinApp extends Mixin(LitElement)
   //   } else {
   //     this._setWindowLocation('/search/'+path);
   //   }
-    
+
   // }
+
+  _expandSearchFilters(e) {
+    let appSearch = this.shadowRoot.querySelector("app-search");
+    if (appSearch) {
+      appSearch.expandFilters();
+    }
+  }
 }
 
-customElements.define('fin-app', FinApp);
+customElements.define("fin-app", FinApp);

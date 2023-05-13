@@ -226,6 +226,7 @@ export default function render() {
         class="search-side-panel ${this.brFullscreen
           ? "fullscreen"
           : ""} ${!this.brSearchOpen ? "off-canvas--left" : ""}"
+        ?hidden="${!this.isBookReader}"
       >
         <div>
           <div style="padding: 1rem;">

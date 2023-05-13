@@ -1,155 +1,206 @@
-import { html } from 'lit';
+import { html } from "lit";
 
 export default function render() {
-return html`
-<style>
-  app-auth-header {
-    margin-left: 10px;
-  }
-  
-  fin-search-box {
-    display: inline-block;
-    width: 100%;
-    box-sizing: border-box;
-    max-width: 525px;
-  }
+  return html`
+    <style>
+      app-auth-header {
+        margin-left: 10px;
+      }
 
-  .layout {
-    width: 100%;
-    align-items: center;
-  }
-  
-  h2 {
-    margin: 0;
-    white-space: nowrap;
-  }
-  h2 a {
-    color: var(--default-secondary-color);
-    text-decoration: none;
-  }
-  h2 a:visited {
-    color: var(--default-secondary-color);
-    text-decoration: none;
-  }
+      fin-search-box {
+        display: inline-block;
+        width: 100%;
+        box-sizing: border-box;
+        max-width: 525px;
+      }
 
-  img {
-    height: 50px;
-  }
+      .layout {
+        width: 100%;
+        align-items: center;
+      }
 
-  .logo, h2 {
-    padding-right: 20px;
-    display: none;
-  }
+      h2 {
+        margin: 0;
+        white-space: nowrap;
+      }
+      h2 a {
+        color: var(--default-secondary-color);
+        text-decoration: none;
+      }
+      h2 a:visited {
+        color: var(--default-secondary-color);
+        text-decoration: none;
+      }
 
-  .filler {
-    flex: .25;
-    display: none;
-  }
+      img {
+        height: 50px;
+      }
 
-  .logo-sm {
-    margin-right: 10px;
-  }
+      .logo,
+      h2 {
+        padding-right: 20px;
+        display: none;
+      }
 
-  iron-icon.search-icon {
-    color: var(--default-primary-color);
-  }
+      .filler {
+        flex: 0.25;
+        display: none;
+      }
 
-  @media( min-width: 700px ) {
-    .logo {
-      display: block;
-    }
-    .logo-sm {
-      display: none;
-    }
-  }
+      .logo-sm {
+        margin-right: 10px;
+      }
 
-  @media( min-width: 815px ) {
-    h2 {
-      display: block;
-    }
-  }
+      iron-icon.search-icon {
+        color: var(--default-primary-color);
+      }
 
-  @media( min-width: 1100px ) {
-    .filler {
-      display: block;
-    }
-  }
-  #options {
-    height: 150px;
-    background-color:white;
-    width: 100%;
-    padding: 2rem 4rem;
-    vertical-align: middle;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+      @media (min-width: 700px) {
+        .logo {
+          display: block;
+        }
+        .logo-sm {
+          display: none;
+        }
+      }
 
-  #option{
-    display: inline-block;
-  }
+      @media (min-width: 815px) {
+        h2 {
+          display: block;
+        }
+      }
 
-  .searchContainer{
-    padding: 1rem 0;
-    display: flex;
-    justify-content: center;
-    background-color: var(--color-aggie-blue-30);
-  }
-  #filter-box{
-    width:100%;
-    text-align:center;
-    align-items:center;
-    background-color: var(--color-aggie-blue-30);
-    padding-bottom: 1rem;
-  }
-  .site-name-search {
-    display: none;
-  }
-  @media( max-width: 754px ) {
-   .searchContainer {
-      padding-top: 1rem;
-    }
-    .site-name-search {
-      display: block;
-      text-align: center;
-      margin-bottom: 1rem;
-      padding-top: 2rem;
-    }
-    app-search-box {
-      width: 80%;
-      margin: 0 auto;
-    }
-  }
-  @media( max-width: 450px ) {
-    app-search-box {
-      width: 60%;
-      margin: 0 auto;
-    }
-  }
-</style>
+      @media (min-width: 1100px) {
+        .filler {
+          display: block;
+        }
+      }
+      #options {
+        height: 150px;
+        background-color: white;
+        width: 100%;
+        padding: 2rem 4rem;
+        vertical-align: middle;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-<div class="layout">
-  <app-nav-bar id="foo" choices="${this.navBarChoices}"></app-nav-bar> 
-</div>
+      #option {
+        display: inline-block;
+      }
 
-<div class="searchContainer">
-  <div style="margin: 1rem auto 0;">
-    <h2 class="site-name-search">Digital Collections</h2>
-    <app-search-box 
-      id="searchBox" 
-      @search="${this._onSearch}" 
-      on-browse="${this._onBrowse}"
-      placeholder="search digital collections">
-      <!-- <button class="search-icon" slot="button-content"></button> -->
-      <!-- <iron-icon icon="fin-icons:search" class="search-icon" slot="button-content"></iron-icon> -->
-    </app-search-box>
-  </div>
-  <br />
-</div>
+      .searchContainer {
+        padding: 1rem 0;
+        display: flex;
+        justify-content: center;
+        background-color: var(--color-aggie-blue-30);
+      }
+      #filter-box {
+        width: 100%;
+        text-align: center;
+        align-items: center;
+        background-color: var(--color-aggie-blue-30);
+        padding-bottom: 1rem;
+      }
+      .site-name-search {
+        display: none;
+      }
+      @media (max-width: 754px) {
+        .searchContainer {
+          padding-top: 1rem;
+        }
+        .site-name-search {
+          display: block;
+          text-align: center;
+          margin-bottom: 1rem;
+          padding-top: 2rem;
+        }
+        app-search-box {
+          width: 80%;
+          margin: 0 auto;
+        }
+      }
+      @media (max-width: 450px) {
+        app-search-box {
+          width: 60%;
+          margin: 0 auto;
+        }
+      }
 
-<div id="filter-box">
-  <app-top-active-filters></app-top-active-filters>
-</div>
+      .add-filter {
+        width: 150px;
+        height: 52px;
+        background-color: var(--color-aggie-blue-80);
+        color: white;
+        border-radius: 35px;
+        cursor: pointer;
+        margin: 0 auto;
+        display: flex;
+      }
+      .add-filter:hover {
+        background-color: var(--color-aggie-blue);
+      }
 
-`;}
+      .add-filter .add {
+        width: 50px;
+        height: 50px;
+        /* display: inline-block; */
+      }
+
+      .add-filter p {
+        margin: auto;
+        padding-top: 0.7rem;
+        font-size: 0.85rem;
+        font-weight: bold;
+      }
+
+      .add-filter ucdlib-icon {
+        fill: var(--color-aggie-gold);
+        padding-top: 0.7rem;
+        padding-left: 0.8rem;
+      }
+    </style>
+
+    <div class="layout">
+      <app-nav-bar id="foo" choices="${this.navBarChoices}"></app-nav-bar>
+    </div>
+
+    <div class="searchContainer">
+      <div style="margin: 1rem auto 0;">
+        <h2 class="site-name-search">Digital Collections</h2>
+        <app-search-box
+          id="searchBox"
+          @search="${this._onSearch}"
+          on-browse="${this._onBrowse}"
+          placeholder="search digital collections"
+        >
+          <!-- <button class="search-icon" slot="button-content"></button> -->
+          <!-- <iron-icon icon="fin-icons:search" class="search-icon" slot="button-content"></iron-icon> -->
+        </app-search-box>
+      </div>
+      <br />
+    </div>
+
+    <div id="filter-box">
+      <app-top-active-filters></app-top-active-filters>
+      <div style="padding: 1rem;">
+        <div class="add-filter" @click="${this._onExpandFilters}">
+          <div class="add">
+            <ucdlib-icon
+              icon="ucdlib-dams:fa-plus"
+              tabindex="0"
+              icon="fa-plus"
+              alt="Add filter"
+            >
+            </ucdlib-icon>
+          </div>
+          <div>
+            <p>Add Filter</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}

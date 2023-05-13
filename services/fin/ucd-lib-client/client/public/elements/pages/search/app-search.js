@@ -14,6 +14,7 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
       firstLoad: { type: Boolean },
       appState: { type: Object },
       wideFiltersPanel: { type: Boolean },
+      filtersCollapsed: { type: Boolean },
     };
   }
 
@@ -28,6 +29,7 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
     this.firstLoad = true;
     this.appState = {};
     this.wideFiltersPanel = false;
+    this.filtersCollapsed = false;
 
     this._injectModel(
       "AppStateModel",
@@ -188,6 +190,14 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
         this.$.resultsPanel._resizeAsync();
       });
     }, 300);
+  }
+
+  _onCollapseFilters(e) {
+    this.filtersCollapsed = true;
+  }
+
+  expandFilters() {
+    this.filtersCollapsed = false;
   }
 }
 
