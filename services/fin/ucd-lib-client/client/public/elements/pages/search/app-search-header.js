@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html } from "lit";
 import render from "./app-search-header.tpl.js";
 
 import "../../auth/app-auth-header";
@@ -9,13 +9,11 @@ import "../../components/nav-bar";
 import "../../components/filterButton";
 import "./filtering/app-top-active-filters";
 
-class AppSearchHeader extends Mixin(LitElement)
-      .with(LitCorkUtils) {
-
+class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
     return {
-      selectedCollection : {type: String},
-      navBarChoices : {type: Array}
+      selectedCollection: { type: String },
+      navBarChoices: { type: Array },
     };
   }
 
@@ -24,27 +22,28 @@ class AppSearchHeader extends Mixin(LitElement)
     this.active = true;
     this.render = render.bind(this);
 
-    this.selectedCollection = '';
+    this.selectedCollection = "";
     this.navBarChoices = [
-      { text: 'Browse', 
+      {
+        text: "Browse",
         dropdown: [
-          {text: 'Collection', href: '/collections'},
-          {text: 'Items', href: '/search'},
-          {text: 'Creators', href: '/browse/search'},
-          {text: 'Subjects', href: '/browse/subject'},
-          {text: 'Format', href: '/browse/format'}
-        ]
+          { text: "Collection", href: "/collections" },
+          { text: "Items", href: "/search" },
+          { text: "Creators", href: "/browse/search" },
+          { text: "Subjects", href: "/browse/subject" },
+          { text: "Format", href: "/browse/format" },
+        ],
       },
-      {text: 'About', href: '/about'},
-      {text: 'FAQ', href: '/faq'}
+      { text: "About", href: "/about" },
+      { text: "FAQ", href: "/faq" },
     ];
     // this.EventBus.on('search-controller-update', e => this._onSearchControllerUpdate(e));
-    this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel');
+    this._injectModel("AppStateModel", "CollectionModel", "RecordModel");
   }
   /**
    * @method willUpdate
    * @description Lit lifestyle function, called before render
-   * 
+   *
    */
   async willUpdate() {
     this._setCollections(await this.CollectionModel.overview());
@@ -52,16 +51,22 @@ class AppSearchHeader extends Mixin(LitElement)
 
   /**
    * @description AppStateInterface, fired when state updates
-   * @param {*} e 
+   * @param {*} e
    */
-   _onAppStateUpdate(e) {
+  _onAppStateUpdate(e) {
     this.drawerOpen = e.filtersDrawerOpen ? true : false;
     this.appState = e;
-    if( e.location.path[0] !== 'search' ) {
-      this.shadowRoot.querySelector('app-top-active-filters').style.display = 'none';
+    if (e.location.path[0] !== "search") {
+      this.shadowRoot.querySelector("app-top-active-filters").style.display =
+        "none";
+      this.shadowRoot.querySelector(".add-filter-container").style.display =
+        "none";
       return;
-    } 
-    this.shadowRoot.querySelector('app-top-active-filters').style.display = 'block';
+    }
+    this.shadowRoot.querySelector("app-top-active-filters").style.display =
+      "block";
+    this.shadowRoot.querySelector(".add-filter-container").style.display =
+      "block";
     this._searchFromAppState();
   }
 
@@ -71,7 +76,7 @@ class AppSearchHeader extends Mixin(LitElement)
    * or if state update event is from popup state (forward, back button hit)
    */
   _searchFromAppState() {
-    if( !this.drawerOpen || window.innerWidth > 975 ) {
+    if (!this.drawerOpen || window.innerWidth > 975) {
       window.scrollTo(0, 0);
     }
 
@@ -80,27 +85,36 @@ class AppSearchHeader extends Mixin(LitElement)
     let searchUrlParts = this.appState.location.path;
     let query;
 
-    if( searchUrlParts[0] === 'collection' ) {
+    if (searchUrlParts[0] === "collection") {
       // query = this._urlToSearchDocument(['', encodeURIComponent(JSON.stringify([
-      query = this.RecordModel.urlToSearchDocument(['', encodeURIComponent(JSON.stringify([
-        // ["isPartOf.@id","or",`/collection/${searchUrlParts[1]}`]
-        ["collectionId","or",`/collection/${searchUrlParts[1]}`]
-      ])),'', '10']);
+      query = this.RecordModel.urlToSearchDocument([
+        "",
+        encodeURIComponent(
+          JSON.stringify([
+            // ["isPartOf.@id","or",`/collection/${searchUrlParts[1]}`]
+            ["collectionId", "or", `/collection/${searchUrlParts[1]}`],
+          ])
+        ),
+        "",
+        "10",
+      ]);
 
-      if( this.lastQuery === query ) return;
+      if (this.lastQuery === query) return;
       this.lastQuery = query;
 
       // this._searchRecords(query, false);
       this.RecordModel.search(query, false);
       return;
-    } else if( searchUrlParts[0] === 'search' && searchUrlParts.length > 1 ) {
+    } else if (searchUrlParts[0] === "search" && searchUrlParts.length > 1) {
       // query = this._urlToSearchDocument(searchUrlParts.slice(1, searchUrlParts.length));
-      query = this.RecordModel.urlToSearchDocument(searchUrlParts.slice(1, searchUrlParts.length));
+      query = this.RecordModel.urlToSearchDocument(
+        searchUrlParts.slice(1, searchUrlParts.length)
+      );
     } else {
       query = this.RecordModel.emptySearchDocument();
     }
 
-    if( this.lastQuery === query ) return;
+    if (this.lastQuery === query) return;
     this.lastQuery = query;
 
     this.RecordModel.search(query, true, false, true);
@@ -108,37 +122,36 @@ class AppSearchHeader extends Mixin(LitElement)
 
   /**
    * @method _setCollections
-   * @description when the element is ready, the collection model is called 
+   * @description when the element is ready, the collection model is called
    * for the collection list.  this renders is.
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
   _setCollections(e) {
     let overview = e.payload;
 
     let browse = {};
-    overview.forEach(item => {
-      browse[item['@id']] = item.name;
+    overview.forEach((item) => {
+      browse[item["@id"]] = item.name;
     });
-
   }
 
   /**
    * @method _onBrowse
    * @description bound to fin-search-box `browse` event.  Called when user
    * selects a specific collection to browse
-   * 
-   * @param {Object} e 
-   * 
+   *
+   * @param {Object} e
+   *
    * @returns {String} Window Location
-   * 
+   *
    */
   _onBrowse(e) {
     let id = e.detail;
 
-    this.$.searchBox.browseValue = 'Browse';
+    this.$.searchBox.browseValue = "Browse";
 
-    if( !id || id === 'Browse' ) {
+    if (!id || id === "Browse") {
       return this.RecordModel.setSearchLocation(this._getEmptySearchDocument());
     }
 
@@ -150,13 +163,13 @@ class AppSearchHeader extends Mixin(LitElement)
    * @method _onSearch
    * @description bound to fin-search-box `search` event.  called when user
    * hits enter or clicked the search icon.  start a text search
-   * 
+   *
    * @param {Object} e
    */
   _onSearch(e) {
     // let searchDoc = this._getCurrentSearchDocument();
     let searchDoc = this.RecordModel.getCurrentSearchDocument();
-    
+
     // this._setPaging(searchDoc, 0);
     this.RecordModel.setPaging(searchDoc, 0);
 
@@ -169,15 +182,16 @@ class AppSearchHeader extends Mixin(LitElement)
   /**
    * @method _onEsSearchUpdate
    * @description from RecordInterface, called when search state updates
-   * 
-   * @param {*} e 
+   *
+   * @param {*} e
    */
   _onRecordSearchUpdate(e) {
-    const searchBox = this.shadowRoot.querySelector('#searchBox');
+    const searchBox = this.shadowRoot.querySelector("#searchBox");
     try {
-      searchBox.shadowRoot.querySelector('#input').value = e.searchDocument.text || '';
-    } catch(e) {
-      searchBox.shadowRoot.querySelector('#input').value = '';
+      searchBox.shadowRoot.querySelector("#input").value =
+        e.searchDocument.text || "";
+    } catch (e) {
+      searchBox.shadowRoot.querySelector("#input").value = "";
     }
   }
 
@@ -185,12 +199,15 @@ class AppSearchHeader extends Mixin(LitElement)
    * @method _onSelectedCollectionUpdate
    * @description from CollectionInterface, called when a collection is selected.
    * This is done by setting a collection filter.
-   * 
-   * @param {Object} selected currently selected collection 
+   *
+   * @param {Object} selected currently selected collection
    */
   _onSelectedCollectionUpdate(selected) {
     this.selectedCollection = selected;
   }
 
+  _onExpandFilters(e) {
+    this.dispatchEvent(new CustomEvent("expand-search-filters"));
+  }
 }
-customElements.define('app-search-header', AppSearchHeader);
+customElements.define("app-search-header", AppSearchHeader);
