@@ -29,7 +29,7 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
     this.firstLoad = true;
     this.appState = {};
     this.wideFiltersPanel = false;
-    this.filtersCollapsed = false;
+    this.filtersCollapsed = true;
 
     this._injectModel(
       "AppStateModel",

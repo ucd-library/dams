@@ -30,6 +30,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       mediaList: { type: Array },
       showOpenLightbox: { type: Boolean },
       searchingText: { type: Boolean },
+      searching: { type: Boolean },
       brSearch: { type: Boolean },
       selectedResult: { type: Number },
       searchResults: { type: Array },
@@ -63,6 +64,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.showOpenLightbox = false;
     this.searchingText = false;
     this.brSearch = false;
+    this.searching = false;
     this.selectedResult = 1;
     this.searchResults = [];
     this.searchResultsCount = 0;
@@ -104,6 +106,11 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
         await this.AppStateModel.getSelectedRecordMedia();
       if (selectedRecordMedia)
         this._onSelectedRecordMediaUpdate(selectedRecordMedia);
+    }
+
+    // also set brSinglePage if width is less than 801px
+    if (window.innerWidth < 801) {
+      this.brSinglePage = true;
     }
   }
 
@@ -548,6 +555,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @description show/hide search panel
    */
   _onSearchToggled(e) {
+    this.searching = !this.searching;
     this.dispatchEvent(new CustomEvent("br-search-toggle"));
   }
 

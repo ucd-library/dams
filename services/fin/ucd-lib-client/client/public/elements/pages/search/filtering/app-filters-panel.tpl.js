@@ -126,17 +126,24 @@ export default function render() {
         float: right;
         padding-top: 0.9rem;
       }
-      :host {
-        box-shadow: 0px 3px 6px #00000029;
-
-      }
 
       .overflow {
         overflow-y: auto;
         height: calc(100vh - 100px);
-
       }
 
+      .heading {
+        display: none;
+      }
+
+      @media (max-width: 767px) {
+        .heading {
+          display: block;
+        }
+        :host {
+          box-shadow: 0px 3px 6px #00000029;
+        }
+      }
 
     </style>
 

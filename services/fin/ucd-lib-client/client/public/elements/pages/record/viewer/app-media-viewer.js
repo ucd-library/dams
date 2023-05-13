@@ -295,6 +295,18 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
    */
   _onToggleBRSearch(e) {
     this.brSearchOpen = !this.brSearchOpen;
+    let brNav = this.shadowRoot
+      .querySelector("app-bookreader-viewer")
+      ?.shadowRoot.querySelector("app-media-viewer-nav");
+    if (brNav) {
+      // nav elements are moved into the bookreader viewer in full screen mode
+      brNav.searching = this.brSearchOpen;
+    } else {
+      brNav = this.shadowRoot.querySelector("app-media-viewer-nav");
+      if (brNav) {
+        brNav.searching = this.brSearchOpen;
+      }
+    }
   }
 
   /**

@@ -108,7 +108,7 @@ export default function render() {
         width: 350px;
         height: 570px;
         background: var(--color-aggie-gold-40);
-        z-index: 1000;
+        z-index: 500;
         border-radius: 0 30px 30px 0;
         box-shadow: 0px 3px 6px #00000029;
         transition: all 0.3s;

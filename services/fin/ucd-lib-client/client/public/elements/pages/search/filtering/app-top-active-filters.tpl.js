@@ -26,8 +26,9 @@ export default function render() {
       .rm-btn {
         font-weight: bold;
         text-transform: lowercase;
-        display: inline;
+        display: inline-block;
         margin-right: 12px;
+        margin-top: 15px;
         cursor: pointer;
         font-size: 0.85rem;
         padding: 0.85rem;

@@ -161,6 +161,15 @@ export default function render() {
         padding-top: 0.7rem;
         padding-left: 0.8rem;
       }
+
+      .add-filter {
+        display: none;
+      }
+      @media (max-width: 767px) {
+        .add-filter {
+          display: flex;
+        }
+      }
     </style>
 
     <div class="layout">
@@ -185,7 +194,7 @@ export default function render() {
 
     <div id="filter-box">
       <app-top-active-filters></app-top-active-filters>
-      <div style="padding: 1rem;">
+      <div class="add-filter-container" style="padding: 1rem;">
         <div class="add-filter" @click="${this._onExpandFilters}">
           <div class="add">
             <ucdlib-icon

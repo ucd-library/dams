@@ -66,6 +66,12 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     }
   }
 
+  firstUpdated(e) {
+    if (window.innerWidth < 801) {
+      this.onePage = true;
+    }
+  }
+
   _renderBookReader() {
     requestAnimationFrame(() => {
       this._renderBookReaderAsync();
@@ -144,7 +150,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
   }
 
   _zoomIn(e, amount = 1) {
-    debugger;
     this.br.zoom(amount);
   }
 
@@ -221,7 +226,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     let results = e.detail?.props?.results;
     // this.shadowRoot.querySelector('.search-pagination')
     let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
-    debugger;
     if (nav) {
       nav.searchResultsCount = results.matches.length;
     }

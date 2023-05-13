@@ -5,6 +5,7 @@ export default function render() {
     <style include="shared-styles">
       :host {
         display: block;
+        overflow: hidden;
       }
       .search-container {
         background-color: var(--super-light-background-color);
@@ -68,14 +69,17 @@ export default function render() {
       @media (max-width: 767px) {
         /* mobile */
         app-filters-panel {
-          position: absolute;
+          z-index: 1000;
+          width: 90vw;
+          transition: all 0.3s;
+
+          /* prevent scrolling? */
+          position: fixed;
+          overflow-y: scroll;
           top: 0;
           left: 0;
           bottom: 0;
-          z-index: 1000;
-          width: 90vw;
-          /* prevent scrolling? */
-          transition: all 0.3s;
+          right: 0;
         }
 
         app-filters-panel.off-canvas--left {
@@ -102,6 +106,7 @@ export default function render() {
           class="filters-panel ${this.filtersCollapsed
             ? "off-canvas--left"
             : ""}"
+          aria-hidden="${this.filtersCollapsed}"
           ${this.wideFiltersPanel ? "wide" : ""}
           @selected-tab-changed="${this._onFiltersTabUpdate}"
           @collapse-filters="${this._onCollapseFilters}"

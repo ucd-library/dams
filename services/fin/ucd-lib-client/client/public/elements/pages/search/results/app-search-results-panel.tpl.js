@@ -166,26 +166,6 @@ export default function render() {
         color: var(--light-background-color);
       }
 
-      /* .header {
-        display: none;
-      } */
-
-      /* .mobile-header {
-        padding-top: 15px;
-        margin-bottom: 10px;
-      }
-
-      .mobile-header .row2 {
-        display: flex;
-        align-items: center;
-        margin-right: 10px;
-      }
-
-      .mobile-header .row2-right {
-        display: flex;
-        align-items: center;
-      } */
-
       .collections {
         text-align: center;
       }
@@ -201,15 +181,6 @@ export default function render() {
         flex: 33.33%;
         max-width: 383px;
       }
-
-      /*
-  .mosaic {
-    display: grid;
-    grid-gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
-    grid-auto-rows: 20px;
-  }
-  */
 
       ucdlib-icon {
         height: 40px;
@@ -251,10 +222,6 @@ export default function render() {
         transition: top 500ms ease-out, left 500ms ease-out;
       }
 
-      /* app-search-grid-result {
-    width: 33%;
-  } */
-
       .selected-layout {
         box-shadow: inset -2px 0 0 var(--color-aggie-gold),
           inset 0 -2px 0 var(--color-aggie-gold),
@@ -275,14 +242,12 @@ export default function render() {
         padding: 5px;
       }
 
-      @media (max-width: 400px) {
-        /* .mobile-header .row2 {
-          flex-direction: column;
-          justify-content: center;
+      @media (max-width: 545px) {
+        .grid dams-item-card {
+          flex: 100%;
+          padding: 1rem;
+          max-width: 85vw;
         }
-        .mobile-header .row2 .total {
-          padding: 8px 0 5px 0;
-        } */
       }
 
       @media (min-width: 975px) {
@@ -293,142 +258,99 @@ export default function render() {
           display: none;
         } */
       }
+
+      @media (max-width: 1182px) {
+        .truncated-text {
+          display: none;
+        }
+      }
+
+      @media (max-width: 1130px) {
+        /* TODO stack pagination ABOVE result count/link */
+        .header {
+          flex-direction: column-reverse;
+          align-items: inherit;
+        }
+
+        .header-results {
+          /* padding-top: 1rem; */
+        }
+
+        .header-pagination {
+          padding-bottom: 1rem;
+        }
+        .header-pagination .filler {
+          flex: 3;
+        }
+      }
     </style>
 
     <div class="header">
-      <div style="flex: .2" class="photo-stack">
-        <ucdlib-icon
-          style="cursor: auto;"
-          class="vertical-link__image"
-          icon="ucdlib-dams:photo-stack"
-        ></ucdlib-icon>
-      </div>
-      <div style="flex: 3">
-        <span style="font-weight: bold">${this.total} item results</span
-        ><span ?hidden="${this.results.length === 0}">
-          from
-          <a href="" @click="${this._scrollToCollections}"
-            >${this.totalCollections} collections</a
-          ></span
-        >
-      </div>
-
-      <div style="flex: .5"></div>
-
-      <span style="flex: .5; text-align: right; padding-right: 1rem;"
-        >Display:</span
-      >
-      <div style="flex: .2">
-        <ucdlib-icon
-          icon="ucdlib-dams:result-display-grid"
-          @click="${this._onLayoutToggle}"
-          type="grid"
-          class="grid-layout-icon selected-layout"
-        ></ucdlib-icon>
-      </div>
-      <div style="flex: .2">
-        <ucdlib-icon
-          icon="ucdlib-dams:result-display-mosaic"
-          @click="${this._onLayoutToggle}"
-          type="mosaic"
-          class="mosaic-layout-icon"
-        ></ucdlib-icon>
-      </div>
-      <div style="flex: .2">
-        <ucdlib-icon
-          icon="ucdlib-dams:result-display-list"
-          @click="${this._onLayoutToggle}"
-          type="list"
-          class="list-layout-icon"
-        ></ucdlib-icon>
-      </div>
-
-      <select
-        id="numPerPage"
-        @change="${this._onPageSizeChange}"
-        style="flex: .05"
-      >
-        <option value="50">50</option>
-        <option value="20">20</option>
-        <option value="10" selected>10</option>
-      </select>
-      <div style="margin: 0 10px; font-size: .9rem">items per page</div>
-    </div>
-
-    <!-- <div class="mobile-header">
-      <div>
-        <div style="display:inline-block">
-          <button class="drawer-toggle" on-click="_onToggleDrawer">
-            <span>Info / Filters</span>
-            <iron-icon icon="add"></iron-icon>
-          </button>
+      <div class="header-results" style="flex: 2.25; display: flex;">
+        <div style="flex: .25" class="photo-stack">
+          <ucdlib-icon
+            style="cursor: auto;"
+            class="vertical-link__image"
+            icon="ucdlib-dams:photo-stack"
+          ></ucdlib-icon>
+        </div>
+        <div style="flex: 2; margin: auto;">
+          <span style="font-weight: bold"
+            >${this.total} item<span class="truncated-text"> result</span
+            >s</span
+          ><span ?hidden="${this.results.length === 0}">
+            from
+            <a href="" @click="${this._scrollToCollections}"
+              >${this.totalCollections} collections</a
+            ></span
+          >
         </div>
       </div>
 
-      <div class="row2">
-        <span style="margin: auto 5px">Display:</span>
-        <ucdlib-icon
-          icon="ucdlib-dams:result-display-grid"
-          @click="${this._onLayoutToggle}"
-          type="grid"
-          class="grid-layout-icon selected-layout"
-        ></ucdlib-icon>
-        <ucdlib-icon
-          icon="ucdlib-dams:result-display-mosaic"
-          @click="${this._onLayoutToggle}"
-          type="mosaic"
-          class="mosaic-layout-icon"
-        ></ucdlib-icon>
-        <ucdlib-icon
-          icon="ucdlib-dams:result-display-list"
-          @click="${this._onLayoutToggle}"
-          type="list"
-          class="list-layout-icon"
-        ></ucdlib-icon>
+      <div
+        class="header-pagination"
+        style="flex: 3; display: flex; justify-content: end"
+      >
+        <span style="text-align: right; margin: auto 0; padding-right: .5rem"
+          >Display:</span
+        >
+        <div>
+          <ucdlib-icon
+            icon="ucdlib-dams:result-display-grid"
+            @click="${this._onLayoutToggle}"
+            type="grid"
+            class="grid-layout-icon selected-layout"
+          ></ucdlib-icon>
+        </div>
+        <div>
+          <ucdlib-icon
+            icon="ucdlib-dams:result-display-mosaic"
+            @click="${this._onLayoutToggle}"
+            type="mosaic"
+            class="mosaic-layout-icon"
+          ></ucdlib-icon>
+        </div>
+        <div>
+          <ucdlib-icon
+            icon="ucdlib-dams:result-display-list"
+            @click="${this._onLayoutToggle}"
+            type="list"
+            class="list-layout-icon"
+          ></ucdlib-icon>
+        </div>
 
-        <select id="numPerPageM" on-change="_onPageSizeChange">
+        <div class="filler"></div>
+
+        <select id="numPerPage" @change="${this._onPageSizeChange}">
           <option value="50">50</option>
           <option value="20">20</option>
           <option value="10" selected>10</option>
         </select>
-        <div style="margin: 0 10px; font-size: .9rem; min-width: max-content">
+        <div style="margin: 0 10px; font-size: .9rem; margin: auto 0 auto 1rem">
           items per page
-        </div> -->
-
-    <!-- <div class="total" ?hidden="${this.showLoading}">${this
-      .total} results</div>
-
-    <div class="row2-right">
-      <div class="filler"></div>
-
-      <paper-icon-button
-        noink
-        icon="fin-icons:grid"
-        ?disabled="${!this.isListLayout}"
-        on-click="_onLayoutToggle"
-        type="masonry">
-      </paper-icon-button>
-      <div class="spacer"></div>
-      <paper-icon-button
-        noink
-        icon="fin-icons:list"
-        ?disabled="${this.isListLayout}"
-        on-click="_onLayoutToggle"
-        type="list">
-      </paper-icon-button>
-      <div class="spacer"></div>
-
-      <div>
-        <select id="numPerPageM" on-change="_onPageSizeChange">
-          <option>50</option>
-          <option>20</option>
-          <option>10</option>
-        </select>
+        </div>
       </div>
-      <div style="margin: 0 10px; font-style:italic">per page</div>
-    </div> -->
-    <!-- </div>
-    </div> -->
+    </div>
 
     <div ?hidden="${this.showError}">
       <div ?hidden="${this.showLoading}">

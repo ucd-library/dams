@@ -59,9 +59,13 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
     if (e.location.path[0] !== "search") {
       this.shadowRoot.querySelector("app-top-active-filters").style.display =
         "none";
+      this.shadowRoot.querySelector(".add-filter-container").style.display =
+        "none";
       return;
     }
     this.shadowRoot.querySelector("app-top-active-filters").style.display =
+      "block";
+    this.shadowRoot.querySelector(".add-filter-container").style.display =
       "block";
     this._searchFromAppState();
   }

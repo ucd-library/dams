@@ -5,6 +5,7 @@ export default function render() {
       :host {
         display: block;
         /* background: var(--default-primary-color); */
+        overflow: hidden;
       }
 
       [hidden] {

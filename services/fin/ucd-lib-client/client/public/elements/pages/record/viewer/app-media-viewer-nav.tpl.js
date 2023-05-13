@@ -65,6 +65,7 @@ export default function render() {
         border-bottom: none;
         padding-top: 0.5rem;
         margin: 0;
+        width: auto;
       }
 
       #thumbnailInnerContainer {
@@ -148,8 +149,7 @@ export default function render() {
       }
 
       #buttonWrapper {
-        padding-right: 1rem;
-        z-index: 1000;
+        z-index: 500;
       }
 
       #buttonWrapper div {
@@ -170,27 +170,6 @@ export default function render() {
         width: 25px;
       }
 
-      /* #textSearchWrapper {
-        position: absolute;
-        bottom: 5rem;
-        right: 0;
-        background-color: var(--color-aggie-blue-30);
-        width: 25rem;
-        height: 4.5rem;
-        display: flex;
-        padding-right: 0.5rem;
-      }
-
-      #textSearchWrapper::before {
-        position: absolute;
-        left: -1rem;
-        width: 1.8rem;
-        height: 100%;
-        background-color: var(--color-aggie-blue-30);
-        content: "";
-        transform: skewX(344deg);
-      } */
-
       .search-container {
         margin-top: 0.7rem;
         margin-left: 1.2rem;
@@ -202,14 +181,6 @@ export default function render() {
         left: -0.8rem;
         width: 17rem;
       }
-
-      /* #textSearchWrapper::after {
-    width: 1rem;
-    margin-left: 0.5rem;
-    background-color: blue;
-    content: "";
-    transform: skewX(16deg);
-  } */
 
       .search-pagination {
         display: flex;
@@ -243,7 +214,7 @@ export default function render() {
       }
 
       .br-search-non-fs div.zoom {
-        background-color: var(--color-aggie-gold);
+        background-color: var(--color-aggie-blue);
         border-radius: 50%;
         display: inline-block;
         width: 50px;
@@ -259,7 +230,26 @@ export default function render() {
       .br-search-non-fs ucdlib-icon {
         height: 50px;
         margin: auto;
+        fill: white;
+      }
+
+      .br-search-non-fs div.zoom.searching {
+        background-color: var(--color-aggie-gold);
+      }
+
+      .br-search-non-fs div.zoom.searching ucdlib-icon {
         fill: var(--color-aggie-blue);
+      }
+
+      @media (max-width: 767px) {
+        /* mobile */
+        #buttonWrapper div.zoom-controls {
+          /* pinch to zoom */
+          display: none;
+        }
+        .layout {
+          width: 90%;
+        }
       }
     </style>
 
@@ -284,7 +274,10 @@ export default function render() {
           style="min-width: 300px;"
           ?hidden="${this.brFullscreen || !this.isBookReader}"
         >
-          <div class="zoom" @click="${this._onSearchToggled}">
+          <div
+            class="zoom ${this.searching ? "searching" : ""}"
+            @click="${this._onSearchToggled}"
+          >
             <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
           </div>
           <div
@@ -368,24 +361,6 @@ export default function render() {
       </div>
 
       <div style="flex:1"></div>
-
-      <!-- <div id="buttonWrapper" ?hidden="${this
-        .breakControls}" style="white-space: nowrap">
-    <paper-icon-button id="zoomOut1" noink tabindex="0" icon="zoom-out" ?hidden="${!this
-        .isLightbox}" on-click="${this._onZoomOutClicked}"></paper-icon-button>
-    <paper-icon-button noink icon="zoom-in" tabindex="0" ?hidden="${!this
-        .isLightbox}" on-click="${this._onZoomInClicked}"></paper-icon-button>
-
-    <app-share-btn id="shareBtn" role="button"></app-share-btn>
-
-    <span ?hidden="${!this.showOpenLightbox}" class="zoom-btns" pad="${!this
-        .showOpenLightbox}">
-      <paper-icon-button noink icon="zoom-in" tabindex="0" ?hidden="${this
-        .isLightbox}" on-click="${this._onZoomInClicked}"></paper-icon-button>
-      <paper-icon-button noink icon="fin-icons:close" tabindex="0" ?hidden="${!this
-        .isLightbox}" on-click="${this._onCloseClicked}"></paper-icon-button>
-    </span>
-  </div> -->
       <div
         id="buttonWrapper"
         style="white-space: nowrap"
@@ -404,12 +379,14 @@ export default function render() {
         </div>
 
         <div
+          class="zoom-controls"
           @click="${this._onBRZoomOutClicked}"
           ?hidden="${!this.brFullscreen}"
         >
           <ucdlib-icon icon="ucdlib-dams:fa-minus"></ucdlib-icon>
         </div>
         <div
+          class="zoom-controls"
           @click="${this._onBRZoomInClicked}"
           ?hidden="${!this.brFullscreen}"
         >
@@ -447,7 +424,10 @@ export default function render() {
 
         <!-- this is moved next to the bookreader slider in app-media-viewer in full screen -->
         <div class="br-search" ?hidden="${!this.brFullscreen}">
-          <div class="zoom" @click="${this._onSearchToggled}">
+          <div
+            class="zoom ${this.searching ? "searching" : ""}"
+            @click="${this._onSearchToggled}"
+          >
             <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
           </div>
           <div
@@ -480,46 +460,8 @@ export default function render() {
             </div>
           </div>
         </div>
-
-        <!-- this is moved inside .BRcontainer in app-media-viewer -->
-        <!-- <div
-          class="search-side-panel"
-          style="
-          position: absolute;
-          top: 1rem;
-          bottom: 7rem;
-          left: 0;
-          width: 350px;
-          background: var(--color-aggie-gold-40);
-          z-index: 1000;
-          border-radius: 0 30px 30px 0;
-          display: none;"
-        >
-          Search
-        </div> -->
       </div>
-      <!-- <div id="textSearchWrapper" ?hidden="${!this.searchingText}">
-        <div class="search-container" style="flex:1">
-          <input id="input" type="text" placeholder="search" />
-        </div>
-        <div class="search-pagination" style="flex:1">
-          <div>
-            <ucdlib-icon
-              icon="ucdlib-dams:fa-chevron-left"
-              @click="${this._onTextSearchPrev}"
-            ></ucdlib-icon>
-          </div>
-          <div style="margin:auto">
-            <span class="page-n-n">1 / 3</span>
-          </div>
-          <div>
-            <ucdlib-icon
-              icon="ucdlib-dams:fa-chevron-right"
-              @click="${this._onTextSearchNext}"
-            ></ucdlib-icon>
-          </div>
-        </div>
-      </div> -->
+
       <div
         id="buttonWrapper"
         style="white-space: nowrap"
@@ -541,20 +483,5 @@ export default function render() {
         </div>
       </div>
     </div>
-    <!-- <div ?hidden="${!this.breakControls}" style="text-align: right">
-  <paper-icon-button id="zoomOut2" noink tabindex="0" icon="zoom-out" ?hidden="${!this
-      .isLightbox}" on-click="${this._onZoomOutClicked}"></paper-icon-button>
-  <paper-icon-button noink icon="zoom-in" tabindex="0" ?hidden="${!this
-      .isLightbox}" on-click="${this._onZoomInClicked}"></paper-icon-button>
-
-  <app-share-btn></app-share-btn>
-
-  <span ?hidden="${!this.showOpenLightbox}" class="zoom-btns">
-    <paper-icon-button noink icon="zoom-in" tabindex="0" ?hidden="${this
-      .isLightbox}" on-click="${this._onZoomInClicked}"></paper-icon-button>
-    <paper-icon-button noink icon="fin-icons:close" tabindex="0" ?hidden="${!this
-      .isLightbox}" on-click="${this._onCloseClicked}"></paper-icon-button>
-  </span>
-</div> -->
   `;
 }
