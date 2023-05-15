@@ -351,7 +351,7 @@ export default function render() {
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
           <h4>${this.collectionName}</h4>
-          <a href="">42 items</a>
+          <a href="${this.collectionId}">${this.collectionItemCount} items</a>
         </div>
       </div>
 

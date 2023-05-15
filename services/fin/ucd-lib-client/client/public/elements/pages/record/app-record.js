@@ -22,6 +22,8 @@ class AppRecord extends Mixin(LitElement)
       name : {type: String},
       collectionName : {type: String},
       collectionImg : {type: String},
+      collectionId : {type: String},
+      collectionItemCount : {type: Number},
       date : {type: String},
       publisher : {type: String},
       keywords : {type: Array},
@@ -52,6 +54,7 @@ class AppRecord extends Mixin(LitElement)
     this.keywords = [];
     this.callNumber = '';
     this.collectionImg = '';
+    this.collectionId = '';
 
     this.size = '';
     this.rights = {};
@@ -61,6 +64,7 @@ class AppRecord extends Mixin(LitElement)
     this.fedoraLinks = [];
     // this.citations = [];
     this.citationRoot = {};
+    this.collectionItemCount = 0;
 
     this._injectModel('AppStateModel', 'RecordModel', 'CollectionModel', 'RecordVcModel');
   }
@@ -114,6 +118,7 @@ class AppRecord extends Mixin(LitElement)
   async _onSelectedRecordUpdate(record) {
     if( !record ) return;
 
+    debugger;
     let vcRecord = this.RecordVcModel.translate(record);
     if( vcRecord['@id'] === this.renderedRecordId ) return;
 
@@ -129,8 +134,10 @@ class AppRecord extends Mixin(LitElement)
     this.callNumber = this.record.callNumber;
     this.collectionImg = this.record.collectionImg;
     this.citationRoot = this.record.root;
-    console.log('this.citationRoot', this.citationRoot)
-
+    this.collectionId = this.record.collectionId;
+    
+    await this.CollectionModel.get(this.collectionId); // get item count
+    
     this._updateLinks(this.AppStateModel.locationElement.location, record);
 
     // let citation = this.shadowRoot.querySelector('app-citation');
@@ -262,6 +269,11 @@ class AppRecord extends Mixin(LitElement)
     // this.$.chicago.text = await citations.renderEsRecord(this.record, 'chicago');
 
     // this.isBagOfFiles = this.record['@type'].includes('http://digital.ucdavis.edu/schema#BagOfFiles');
+  }
+
+  _onCollectionVcUpdate(e) {
+    if (e.state !== 'loaded') return;
+    this.collectionItemCount = e.payload?.results?.count || 0;
   }
 
   /**
