@@ -5,6 +5,7 @@ export default function render() {
     <style include="shared-styles">
       :host {
         display: block;
+        overflow: hidden;
       }
       .search-container {
         background-color: var(--super-light-background-color);
@@ -19,7 +20,7 @@ export default function render() {
 
       app-filters-panel {
         width: 350px;
-        transition: width 300ms linear;
+        /* transition: width 300ms linear; */
       }
       app-filters-panel[wide] {
         width: 475px;
@@ -38,9 +39,21 @@ export default function render() {
         display: none;
       } */
 
+      .filters-container {
+        width: 350px;
+        background-color: var(--color-aggie-blue-40);
+        transition: width 300ms linear;
+      }
+
       @media (max-width: 1025px) {
+        app-filters-panel {
+          width: 275px;
+        }
         app-filters-panel[wide] {
           width: 415px;
+        }
+        .filters-container {
+          width: 275px;
         }
       }
 
@@ -56,12 +69,24 @@ export default function render() {
       @media (max-width: 767px) {
         /* mobile */
         app-filters-panel {
-          position: absolute;
+          z-index: 1000;
+          width: 90vw;
+          transition: all 0.3s;
+
+          /* prevent scrolling? */
+          position: fixed;
+          overflow-y: scroll;
           top: 0;
           left: 0;
           bottom: 0;
-          z-index: 1000;
-          /* prevent scrolling? */
+          right: 0;
+        }
+
+        app-filters-panel.off-canvas--left {
+          transform: translateX(-100%);
+        }
+        .filters-container {
+          width: 0;
         }
       }
 
@@ -75,11 +100,16 @@ export default function render() {
     </style>
 
     <div class="search-container">
-      <div style="width: 350px; background-color: var(--color-aggie-blue-40);">
+      <div class="filters-container">
         <app-filters-panel
           id="desktop-filter-panel"
+          class="filters-panel ${this.filtersCollapsed
+            ? "off-canvas--left"
+            : ""}"
+          aria-hidden="${this.filtersCollapsed}"
           ${this.wideFiltersPanel ? "wide" : ""}
           @selected-tab-changed="${this._onFiltersTabUpdate}"
+          @collapse-filters="${this._onCollapseFilters}"
         ></app-filters-panel>
       </div>
       <div class="search-content">

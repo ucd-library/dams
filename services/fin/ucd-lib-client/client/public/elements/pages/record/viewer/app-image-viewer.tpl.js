@@ -1,46 +1,46 @@
-import { html } from 'lit';
+import { html } from "lit";
 
 export default function render() {
-return html`
+  return html`
+    <style>
+      :host {
+        display: block;
+        /* background: black; */
+        padding: 20px 0;
+        /* position: relative; */
+        box-sizing: border-box;
+      }
 
-<style>
-  :host {
-    display: block;
-    /* background: black; */
-    padding: 20px 0;
-    /* position: relative; */
-    box-sizing: border-box;
-  }
+      paper-spinner-lite {
+        --paper-spinner-color: var(--default-secondary-color);
+      }
 
-  paper-spinner-lite {
-    --paper-spinner-color: var(--default-secondary-color);
-  }
+      #loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 600px;
+      }
 
-  #loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* img {
+      /* img {
     width: 100%;
   } */
 
-  .layout {
-    text-align: center;
-  }
+      .layout {
+        text-align: center;
+      }
 
-  [hidden] {
-    display: none !important;
-  }
-</style>
+      [hidden] {
+        display: none !important;
+      }
+    </style>
 
-<div id="loading" ?hidden="${!this.loading}">
-  <paper-spinner-lite ?active="${this.loading}"></paper-spinner-lite>
-</div>
+    <div id="loading" ?hidden="${!this.loading}">
+      <paper-spinner-lite ?active="${this.loading}"></paper-spinner-lite>
+    </div>
 
-<div class="layout" ?hidden="${this.loading}" style="line-height: 0">
-  <img id="img" />
-</div>
-
-`;}
+    <div class="layout" ?hidden="${this.loading}" style="line-height: 0">
+      <img id="img" />
+    </div>
+  `;
+}

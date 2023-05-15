@@ -184,22 +184,23 @@ class PageSearch extends FinEsDataModel {
     let [left, bottom, right, top] = word.$.coords
       .split(",")
       .map((item) => parseInt(item));
+    let padding = 8;
 
     return {
       text,
       par: [
         {
-          l: left,
-          t: top,
-          r: right,
-          b: bottom,
+          l: left - padding,
+          t: top - padding,
+          r: right + padding,
+          b: bottom + padding,
           page: pageData.page,
           boxes: [
             {
-              l: left,
-              t: top,
-              r: right,
-              b: bottom,
+              l: left - padding,
+              t: top - padding,
+              r: right + padding,
+              b: bottom + padding,
               page: pageData.page,
             },
           ],

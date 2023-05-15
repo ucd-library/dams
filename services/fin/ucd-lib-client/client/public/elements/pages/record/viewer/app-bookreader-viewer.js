@@ -12,9 +12,10 @@ import "@internetarchive/bookreader/src/plugins/search/plugin.search.js";
 import BookReader from "@internetarchive/bookreader/src/plugins/plugin.text_selection.js";
 
 /*
- * bookreader forces https and not allowing ports, going to submit IA pr to fix, for now override
+ * bookreader forces https and not allowing ports, and we need an event emited when slider search results are clicked.
+ * submitting IA pr to fix, for now overriding 2 prototype functions
  */
-import bookreaderPatch from "./bookreader.patch-search.js";
+import bookreaderPatch from "./app-bookreader.patch-search.js";
 bookreaderPatch(BookReader);
 
 import render from "./app-bookreader-viewer.tpl.js";
@@ -31,6 +32,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
       height: { type: Number },
       fullscreen: { type: Boolean },
       bookData: { type: Object },
+      bookItemId: { type: String },
     };
   }
 
@@ -41,6 +43,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     this._injectModel("AppStateModel", "MediaModel");
 
     this.bookData = {};
+    this.bookItemId = "";
     this.loading = false;
     this.height = 634;
     this.onePage = false;
@@ -50,11 +53,22 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
       "BookReader:SearchCallback",
       this._onSearchResultsChange.bind(this)
     );
+
+    window.addEventListener(
+      "BookReader:SearchCallbackEmpty",
+      this._onSearchResultsEmpty.bind(this)
+    );
   }
 
   willUpdate(e) {
     if (this.bookData?.pages) {
       this._renderBookReader();
+    }
+  }
+
+  firstUpdated(e) {
+    if (window.innerWidth < 801) {
+      this.onePage = true;
     }
   }
 
@@ -183,16 +197,22 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
           enabled: true,
           singlePageDjvuXmlUrl: djvuPath + "/{{pageIndex}}/ocr.djvu",
         },
-        // search: {
-        //   enabled: true,
-        //   server: "test42",
-        //   searchInsideUrl: "/bla",
-        // },
       },
 
       showToolbar: false,
       server: window.location.host,
-      searchInsideUrl: "/api/page-search/ia", // TODO port is stripped from 'server' path in BR code, remove :3000 in production
+      searchInsideUrl: "/api/page-search/ia",
+
+      // controls zoom levels
+      reductionFactors: [
+        { reduce: 3000, autofit: null },
+        { reduce: 3500, autofit: null },
+        { reduce: 4500, autofit: null },
+        { reduce: 5500, autofit: null },
+        { reduce: 7000, autofit: null },
+        { reduce: 8500, autofit: null },
+        { reduce: 10000, autofit: "auto" },
+      ],
 
       ui: "full", // embed, full (responsive)
     };
@@ -202,30 +222,36 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     this.br.init();
   }
 
-  // _searchSuccessCallback(data) {
-  //   console.log(data);
-  // }
-
-  // _searchErrorCallback(data) {
-  //   console.log(data);
-  // }
-
   _onSearchResultsChange(e) {
-    debugger;
     let results = e.detail?.props?.results;
     // this.shadowRoot.querySelector('.search-pagination')
     let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
     if (nav) {
-      nav.searchResults = results.matches.length;
+      nav.searchResultsCount = results.matches.length;
+    }
+  }
+
+  _onSearchResultsEmpty(e) {
+    let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
+    if (nav) {
+      nav.searchResultsCount = 0;
     }
   }
 
   search(queryTerm) {
-    this.br.bookId = "/item/ark:/87293/d3tq5rj7p/media/Agricola_1912.pdf";
-    this.br.search(queryTerm, {
-      // success: this._searchSuccessCallback,
-      // error: this._searchErrorCallback,
-    });
+    this.br.bookId = this.bookItemId;
+    this.br.search(queryTerm);
+  }
+
+  onSearchResultClick(e) {
+    let matchIndex = parseInt(
+      e.currentTarget?.attributes["data-match-index"]?.value || 0
+    );
+    this.br._searchPluginGoToResult(matchIndex);
+  }
+
+  onSearchPrevNext(matchIndex) {
+    this.br._searchPluginGoToResult(matchIndex, false);
   }
 }
 

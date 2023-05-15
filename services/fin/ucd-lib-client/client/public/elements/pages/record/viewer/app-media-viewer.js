@@ -26,6 +26,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
       brFullscreen: { type: Boolean },
       brSearchOpen: { type: Boolean },
       bookData: { type: Object },
+      bookItemId: { type: String },
       isBookReader: { type: Boolean },
       searchResults: { type: Array },
       searchResultsCount: { type: Number },
@@ -43,13 +44,25 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
     this.brFullscreen = false;
     this.brSearchOpen = false;
     this.bookData = {};
+    this.bookItemId = "";
     this.isBookReader = false;
     this.searchResults = [];
     this.searchResultsCount = 0;
+    this.regexPattern = /\{\{\{.*?\}\}\}/g;
 
     window.addEventListener(
       "BookReader:SearchCallback",
       this._onSearchResultsChange.bind(this)
+    );
+
+    window.addEventListener(
+      "BookReader:SearchCallbackEmpty",
+      this._onSearchResultsEmpty.bind(this)
+    );
+
+    window.addEventListener(
+      "BookReader:SearchGoToResult",
+      this._onBRSearchGoToResult.bind(this)
     );
   }
 
@@ -107,6 +120,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
           mediaGroup.display.clientMedia.pdf.manifest
         );
       }
+      this.bookItemId = mediaGroup.display["@id"];
 
       if (brData && brData.body) {
         this.mediaType = "bookreader";
@@ -126,8 +140,34 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
   }
 
   _onSearchResultsChange(e) {
-    this.searchResults = e.detail?.props?.results?.matches || [];
-    this.searchResultsCount = this.searchResults?.matches?.length;
+    this.searchResults = [...e.detail?.props?.results?.matches];
+    if (this.searchResults.length) {
+      this.searchResults = this.searchResults.sort(
+        (a, b) =>
+          parseInt(a.displayPageNumber.replace("n", "")) -
+          parseInt(b.displayPageNumber.replace("n", ""))
+      );
+    }
+    this.searchResultsCount = this.searchResults?.length;
+  }
+
+  _onSearchResultsEmpty(e) {
+    this.searchResults = [];
+    this.searchResultsCount = 0;
+  }
+
+  _onSearchResultClick(e) {
+    let br = this.shadowRoot.querySelector("app-bookreader-viewer");
+    if (!br) return;
+    // navigate to search result in viewer
+    br.onSearchResultClick(e);
+
+    // also update selected search result in nav
+    let nav = br.shadowRoot.querySelector("app-media-viewer-nav");
+    if (!nav) return;
+    let selectedResult =
+      parseInt(e.currentTarget.attributes["data-array-index"].value) + 1;
+    nav.selectedResult = selectedResult;
   }
 
   /**
@@ -159,6 +199,22 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
    */
   _onBRZoomOut(e) {
     this.shadowRoot.querySelector("#bookreader")._zoomOut();
+  }
+
+  /**
+   * @method _onChangeSearchResult
+   * @description bound to bookreader search result change event app-media-viewer-nav.
+   *
+   * @param {Object} e custom HTML event
+   */
+  _onChangeSearchResult(e) {
+    let selectedResult = e.detail?.selectedResult;
+    let brView = this.shadowRoot.querySelector("#bookreader");
+    if (brView) {
+      brView.onSearchPrevNext(
+        this.searchResults[selectedResult - 1].matchIndex
+      );
+    }
   }
 
   /**
@@ -213,7 +269,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
    */
   _onCollapseBookView(e) {
     this.brFullscreen = false;
-    this.brSearchOpen = false;
+    // this.brSearchOpen = false;
     let brView = this.shadowRoot.querySelector("#bookreader");
     if (brView) {
       brView.classList.remove("fullscreen");
@@ -226,6 +282,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
         this.shadowRoot.querySelector(".wrapper").append(mediaNav);
       }
 
+      brView.br.twoPage.autofit = true;
       brView.br.resize();
     }
   }
@@ -238,6 +295,18 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
    */
   _onToggleBRSearch(e) {
     this.brSearchOpen = !this.brSearchOpen;
+    let brNav = this.shadowRoot
+      .querySelector("app-bookreader-viewer")
+      ?.shadowRoot.querySelector("app-media-viewer-nav");
+    if (brNav) {
+      // nav elements are moved into the bookreader viewer in full screen mode
+      brNav.searching = this.brSearchOpen;
+    } else {
+      brNav = this.shadowRoot.querySelector("app-media-viewer-nav");
+      if (brNav) {
+        brNav.searching = this.brSearchOpen;
+      }
+    }
   }
 
   /**
@@ -251,14 +320,52 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
       .querySelector("app-bookreader-viewer")
       ?.shadowRoot.querySelector("app-media-viewer-nav");
     if (brNav) {
+      // nav elements are moved into the bookreader viewer in full screen mode
       brNav.brSearch = true;
+      brNav.selectedResult = 1;
+      brNav.searchResults = [];
+    } else {
+      brNav = this.shadowRoot.querySelector("app-media-viewer-nav");
+      if (brNav) {
+        brNav.brSearch = true;
+        brNav.selectedResult = 1;
+        brNav.searchResults = [];
+      }
     }
     let queryTerm = e.currentTarget.value;
+    if (!queryTerm) {
+      this.searchResults = [];
+      this.searchResultsCount = 0;
+    }
 
     let bookreader = this.shadowRoot.querySelector("app-bookreader-viewer");
     if (bookreader) {
       bookreader.search(queryTerm);
     }
+  }
+
+  _onClearSearch(e) {
+    let searchInput = this.shadowRoot.querySelector("#br-search-input");
+    if (searchInput) {
+      searchInput.value = "";
+    }
+    this.searchResults = [];
+    this.searchResultsCount = 0;
+    this._onBRSearch({ currentTarget: { value: "" } });
+  }
+
+  _onBRSearchGoToResult(e) {
+    let br = this.shadowRoot.querySelector("app-bookreader-viewer");
+    if (!br) return;
+
+    // also update selected search result in nav
+    let nav = br.shadowRoot.querySelector("app-media-viewer-nav");
+    if (!nav) return;
+    let selectedResult =
+      this.searchResults.findIndex(
+        (r) => r.matchIndex === e.detail.matchIndex
+      ) + 1;
+    nav.selectedResult = selectedResult;
   }
 }
 

@@ -279,6 +279,10 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     }, 50);
   }
 
+  _onGridItemRendered(e) {
+    this._resize();
+  }
+
   /**
    * @method _resize
    * @description resize masonary layout
@@ -310,7 +314,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       let cheight = colHeights[col];
 
       eles[i].style.left = leftOffset + col * w + "px";
-      eles[i].style.top = colHeights[col] + "px";
+      eles[i].style.top = cheight + "px";
       // eles[i].style.visibility = 'visible';
 
       colHeights[col] += eles[i].offsetHeight + 25;
@@ -319,7 +323,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     let maxHeight = Math.max.apply(Math, colHeights);
     this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
 
-    // also reposition mosaic grid
     /*
     function resizeGridItem(item){
       grid = document.getElementsByClassName("grid")[0];

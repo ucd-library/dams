@@ -149,13 +149,17 @@ export default function render() {
       }
 
       .br-search div.zoom {
-        background-color: var(--color-aggie-gold);
+        background-color: var(--color-aggie-blue);
         border-radius: 50%;
         display: inline-block;
         width: 50px;
         height: 50px;
         margin-left: 25px;
         margin-top: 12.5px;
+      }
+
+      .br-search div.zoom.searching {
+        background-color: var(--color-aggie-gold);
       }
 
       .br-search div.zoom {
@@ -165,6 +169,13 @@ export default function render() {
       .br-search ucdlib-icon {
         height: 50px;
         margin: auto;
+      }
+
+      .br-search .zoom ucdlib-icon {
+        fill: white;
+      }
+
+      .br-search div.zoom.searching ucdlib-icon {
         fill: var(--color-aggie-blue);
       }
 
@@ -199,6 +210,44 @@ export default function render() {
       .BRmobileMenu .BRchapter > div,
       .BRfloat .BRchapter > div {
         bottom: calc(100% + 17px);
+      }
+
+      .BRprogresspopup {
+        display: none;
+      }
+
+      .BookReader .searchHiliteLayer rect,
+      .BRmobileMenu .searchHiliteLayer rect,
+      .BRfloat .searchHiliteLayer rect {
+        stroke: var(--color-redbud);
+        stroke-width: 3;
+        fill: #f555b140;
+        fill-opacity: 0.6;
+      }
+
+      .BookReader .searchHiliteLayer rect,
+      .BRmobileMenu .searchHiliteLayer rect,
+      .BRfloat .searchHiliteLayer rect {
+        animation: none;
+      }
+
+      .BookReader .BRquery b,
+      .BRmobileMenu .BRquery b,
+      .BRfloat .BRquery b {
+        color: var(--color-thiebaud-icing);
+        font-weight: bold;
+        background-color: none;
+      }
+
+      #BookReader .BRcontainer {
+        padding-bottom: 1rem;
+      }
+
+      @media (max-width: 767px) {
+        /* mobile */
+        .BRcontrols {
+          width: 90%;
+        }
       }
     </style>
     <!--
