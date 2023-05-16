@@ -137,28 +137,7 @@ export default function render() {
         height: 25px;
         fill: white;
       }
-      /* 
-  .media-type__icon image {
-    fill: red;
-  } */
     </style>
-
-    <!-- <div class="container"><a href="${this.href}">
-  <div class="head">
-    <div class="img-container">
-      ${this.imgSrc ? html` <img src="${this.imgSrc}" /> ` : html``}
-    </div>
-  </div>
-  <div class="body">
-    <h5>${this.cardTitle}</h5>
-    <div class="subtitle">${this.itemCt} item${this.itemCt === 1
-      ? ""
-      : "s"}</div>
-  </div>
-  <div class="footer">
-    <div class="gold-dots"></div>
-  </div></a>
-</div> -->
 
     <a
       href="${this.itemUrl}"
@@ -171,7 +150,10 @@ export default function render() {
           aria-label=""
           style="background-image:url(${this.thumbnailUrl});"
         ></div>
-        <div class="media-type" ?hidden="${this.mediaType === "image"}">
+        <div
+          class="media-type"
+          ?hidden="${!this.mediaType || this.mediaType === "image"}"
+        >
           <ucdlib-icon
             ?hidden="${this.mediaType !== "imageList"}"
             class="vertical-link__image"
@@ -187,13 +169,6 @@ export default function render() {
             class="vertical-link__image"
             icon="ucdlib-dams:fa-volume-high"
           ></ucdlib-icon>
-
-          <!-- <img class="media-type__icon" src="/images/icons/item-stack-blank.svg"> -->
-
-          <!-- <svg class="media-type__icon">
-        <image href="/images/icons/item-stack-blank.svg" />
-      </svg> -->
-          <!-- <ucdlib-icon class="vertical-link__image" src="/images/icons/item-stack-blank.svg"></ucdlib-icon> -->
         </div>
       </div>
       <div class="gold-dots"></div>
