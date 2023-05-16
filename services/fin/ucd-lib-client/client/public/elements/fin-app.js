@@ -37,6 +37,7 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
       coreTag: { type: String },
       coreHash: { type: String },
       showVersion: { type: Boolean },
+      isAdmin: { type: Boolean },
     };
   }
 
@@ -89,6 +90,7 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
       this.localBuildTime = "Not set";
     }
 
+    this.isAdmin = APP_CONFIG.user?.roles?.includes("admin");
     this._injectModel(
       "AppStateModel",
       "AuthModel",

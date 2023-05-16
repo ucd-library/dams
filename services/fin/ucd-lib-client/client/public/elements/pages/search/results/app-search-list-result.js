@@ -28,6 +28,7 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
       date: { type: String },
       collection: { type: String },
       format: { type: String },
+      creator: { type: String },
     };
   }
 
@@ -44,6 +45,7 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.date = "";
     this.collection = "";
     this.format = "";
+    this.creator = "";
 
     this._injectModel("RecordModel", "RecordVcModel");
   }
@@ -54,10 +56,16 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Map} props - Properties that have changed.
    */
   willUpdate(props) {
-    if (
-      (this.id && Object.keys(this.data).length === 0) ||
-      this.id !== this.data.itemUrl
-    ) {
+    if (this.data.id) {
+      debugger;
+      this.itemUrl = this.data.id;
+      this.thumbnailUrl = this.data.thumbnailUrl;
+      this.title = this.data.title;
+      this.date = this.data.date;
+      this.collection = this.data.collection;
+      this.format = this.data.format;
+      this.creator = this.data.creator;
+    } else {
       this._getItem(this.id);
     }
   }
@@ -78,6 +86,7 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.data.date = res.date;
     this.data.collection = res.collection;
     this.data.format = res.format;
+
     this.itemUrl = res["@id"];
     this.thumbnailUrl = res.collectionImg;
     this.title = res.name;

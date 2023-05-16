@@ -234,6 +234,9 @@ export default function render() {
             <ucdlib-site-footer-column header="Account">
               <ul>
                 <li><app-auth-footer></app-auth-footer></li>
+                <li class="fin-admin" ?hidden="${!this.isAdmin}">
+                  <a href="/fin/admin/">Fin Admin</a>
+                </li>
               </ul>
             </ucdlib-site-footer-column>
             <div insert-into="below-address" ?hidden="${this.showVersion}">

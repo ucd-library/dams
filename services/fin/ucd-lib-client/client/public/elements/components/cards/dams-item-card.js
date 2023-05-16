@@ -21,6 +21,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
       itemUrl: { type: String },
       thumbnailUrl: { type: String },
       truncatedTitle: { type: String },
+      mediaType: { type: String },
     };
   }
 
@@ -33,6 +34,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     this.truncatedTitle = "";
     this.itemUrl = "";
     this.thumbnailUrl = "";
+    this.mediaType = "";
 
     this._injectModel("RecordModel", "RecordVcModel");
   }
@@ -43,10 +45,20 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Map} props - Properties that have changed.
    */
   willUpdate(props) {
-    if (
-      (this.id && Object.keys(this.data).length === 0) ||
-      this.id !== this.data.itemUrl
-    ) {
+    if (this.data.id) {
+      this.itemUrl = this.data.id;
+      this.thumbnailUrl = this.data.thumbnailUrl;
+      this.mediaType = this.data.mediaType;
+      if (this.data.mediaType === "Image") {
+        this.mediaType = "image";
+      } else if (this.data.mediaType === "Video") {
+        this.mediaType = "video";
+      } else if (this.mediaType === "Audio") {
+        this.mediaType = "audio";
+      } else {
+        this.mediaType = "imageList";
+      }
+    } else {
       this._getItem(this.id);
     }
 
