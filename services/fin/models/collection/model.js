@@ -42,12 +42,14 @@ class CollectionsModel extends FinEsDataModel {
       }
     }
 
-    await super.update(jsonld, index);
+    let result = await super.update(jsonld, index);
 
-    if( !jsonld['@graph'] ) return;
+    if( !jsonld['@graph'] ) return result;
 
     let node = jsonld['@graph'][0];
-    await workflowUtils.autoTriggerWorkflow(node);    
+    await workflowUtils.autoTriggerWorkflow(node);
+
+    return result;
   }
 
   /**

@@ -62,7 +62,7 @@ main:
                                             command: "node"
                                             args: ${["cli/process-pdf.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
-                                      timeoutSeconds: 300
+                                      timeoutSeconds: 600
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - process_image:
@@ -116,7 +116,7 @@ main:
                                                     cpu: "1000m"
                                             command: "node"
                                             args: ${["cli/finalize-pdf.js", args.finWorkflowId]}
-                                      timeoutSeconds: 300
+                                      timeoutSeconds: 600
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
       - finalize_pdf:
           call: googleapis.run.v1.namespaces.jobs.run

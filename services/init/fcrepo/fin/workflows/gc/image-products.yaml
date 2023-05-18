@@ -45,7 +45,7 @@ main:
                                             command: "node"
                                             args: ${["cli/process-image.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
-                                      timeoutSeconds: 300
+                                      timeoutSeconds: 600
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - process_image:
