@@ -160,6 +160,7 @@ export default function render() {
             icon="ucdlib-dams:item-stack-blank"
           ></ucdlib-icon>
           <ucdlib-icon
+            style="margin-left: .2rem;"
             ?hidden="${this.mediaType !== "video"}"
             class="vertical-link__image"
             icon="ucdlib-dams:fa-play"

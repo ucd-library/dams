@@ -1,42 +1,40 @@
-import { LitElement } from 'lit';
+import { LitElement } from "lit";
 import render from "./app-record.tpl.js";
 
-import {markdown} from "markdown"
-import rightsDefinitions from "../../../lib/rights.json"
-import citations from "../../../lib/models/CitationsModel"
-import utils from "../../../lib/utils"
+import { markdown } from "markdown";
+import rightsDefinitions from "../../../lib/rights.json";
+import citations from "../../../lib/models/CitationsModel";
+import utils from "../../../lib/utils";
 
-import "./app-media-download"
-import "./app-fs-media-download"
-import "./app-copy-cite"
-import "./viewer/app-media-viewer"
-import "../../components/citation"
+import "./app-media-download";
+import "./app-fs-media-download";
+import "./app-copy-cite";
+import "./viewer/app-media-viewer";
+import "../../components/citation";
 
-class AppRecord extends Mixin(LitElement)
-      .with(LitCorkUtils) {
-
+class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
     return {
-      record : {type: Object},
-      currentRecordId : {type: String},
-      name : {type: String},
-      collectionName : {type: String},
-      collectionImg : {type: String},
-      collectionId : {type: String},
-      collectionItemCount : {type: Number},
-      date : {type: String},
-      publisher : {type: String},
-      keywords : {type: Array},
-      callNumber : {type: String},
-      size : {type: String},
-      rights : {type: Object},
-      metadata : {type: Array},
-      isBagOfFiles : {type: Boolean},
-      arkDoi : {type: Array},
-      fedoraLinks : {type: Array},
+      record: { type: Object },
+      currentRecordId: { type: String },
+      name: { type: String },
+      collectionName: { type: String },
+      collectionImg: { type: String },
+      collectionId: { type: String },
+      collectionItemCount: { type: Number },
+      date: { type: String },
+      publisher: { type: String },
+      keywords: { type: Array },
+      callNumber: { type: String },
+      size: { type: String },
+      rights: { type: Object },
+      metadata: { type: Array },
+      isBagOfFiles: { type: Boolean },
+      arkDoi: { type: Array },
+      fedoraLinks: { type: Array },
       // citations : {type: Array}
-      citationRoot : {type: Object}
-    }
+      citationRoot: { type: Object },
+    };
   }
 
   constructor() {
@@ -45,47 +43,54 @@ class AppRecord extends Mixin(LitElement)
     this.active = true;
 
     this.record = {};
-    this.currentRecordId = '';
-    this.name = '';
-    this.collectionName = '';
-    
-    this.date = '';
-    this.publisher = '';
-    this.keywords = [];
-    this.callNumber = '';
-    this.collectionImg = '';
-    this.collectionId = '';
+    this.currentRecordId = "";
+    this.name = "";
+    this.collectionName = "";
 
-    this.size = '';
+    this.date = "";
+    this.publisher = "";
+    this.keywords = [];
+    this.callNumber = "";
+    this.collectionImg = "";
+    this.collectionId = "";
+
+    this.size = "";
     this.rights = {};
     this.metadata = [];
-    this.isBagOfFiles = false;    
+    this.isBagOfFiles = false;
     this.arkDoi = [];
     this.fedoraLinks = [];
     // this.citations = [];
     this.citationRoot = {};
     this.collectionItemCount = 0;
 
-    this._injectModel('AppStateModel', 'RecordModel', 'CollectionModel', 'RecordVcModel');
+    this._injectModel(
+      "AppStateModel",
+      "RecordModel",
+      "CollectionModel",
+      "RecordVcModel"
+    );
   }
 
   async firstUpdated() {
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
-    if( selectedRecord ) {
+    if (selectedRecord) {
       await this._onSelectedRecordUpdate(selectedRecord);
-      let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
-      if( selectedRecordMedia ) this._onSelectedRecordMediaUpdate(selectedRecordMedia);
+      let selectedRecordMedia =
+        await this.AppStateModel.getSelectedRecordMedia();
+      if (selectedRecordMedia)
+        this._onSelectedRecordMediaUpdate(selectedRecordMedia);
     }
   }
 
   /**
    * @method _onRecordUpdate
    * @description from RecordModel, listen for loading events and reset UI.
-   * 
-   * @param {Object} e state event 
+   *
+   * @param {Object} e state event
    */
   _onRecordUpdate(e) {
-    if( e.state !== 'loading' ) return;
+    if (e.state !== "loading") return;
 
     // this.renderedRecordId = null;
     // this.record = null;
@@ -112,20 +117,19 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _onSelectedRecordUpdate
    * @description from AppStateInterface, called when a record is selected
-   * 
+   *
    * @param {Object} record selected record
    */
   async _onSelectedRecordUpdate(record) {
-    if( !record ) return;
+    if (!record) return;
 
-    debugger;
     let vcRecord = this.RecordVcModel.translate(record);
-    if( vcRecord['@id'] === this.renderedRecordId ) return;
+    if (vcRecord["@id"] === this.renderedRecordId) return;
 
-    this.renderedRecordId = vcRecord['@id'];
+    this.renderedRecordId = vcRecord["@id"];
     this.record = vcRecord;
-  
-    this.currentRecordId = this.record['@id'];
+
+    this.currentRecordId = this.record["@id"];
     this.name = this.record.name;
     this.collectionName = this.record.collectionName;
     this.date = this.record.date;
@@ -135,9 +139,9 @@ class AppRecord extends Mixin(LitElement)
     this.collectionImg = this.record.collectionImg;
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
-    
+
     await this.CollectionModel.get(this.collectionId); // get item count
-    
+
     this._updateLinks(this.AppStateModel.locationElement.location, record);
 
     // let citation = this.shadowRoot.querySelector('app-citation');
@@ -153,31 +157,30 @@ class AppRecord extends Mixin(LitElement)
     //     this.AppStateModel.locationElement.location.pathname.split('/media')[0],
     //     record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].id,
     //   ];
-  
+
     //   this.fedoraLinks = [
     //     '/fcrepo/rest' + this.AppStateModel.locationElement.location.pathname.split('/media')[0],
     //     record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].image.url + '/fcr:metadata',
-    //   ]; 
-  
+    //   ];
+
     // } else {
     //   this.arkDoi = [
     //     this.AppStateModel.locationElement.location.pathname.split('/media')[0],
     //     this.AppStateModel.locationElement.location.pathname,
     //   ];
-  
+
     //   this.fedoraLinks = [
     //     '/fcrepo/rest' + this.AppStateModel.locationElement.location.pathname.split('/media')[0],
     //     '/fcrepo/rest' + this.AppStateModel.locationElement.location.pathname + '/fcr:metadata',
     //   ];
     // }
 
-
     // this.size = '?'
     // this.rights = {'?': '?'}
     // this.metadata = ['?'],
     // this.isBagOfFiles : {type: Boolean}
 
-      /*
+    /*
       arkDoi: ['?']
       callNumber: "?"
       citationText: "?"
@@ -207,10 +210,10 @@ class AppRecord extends Mixin(LitElement)
 
     // this.$.dateValue.innerHTML = this.record.datePublished || 'Undated';
 
-    // TODO: add back in when we figure out consolidated resource type 
+    // TODO: add back in when we figure out consolidated resource type
     // this.$.resourceType.innerHTML = this.record.type ? '<div>'+this.record.type.join('</div><div>')+'</div>' : 'Unknown';
     // if( this.record.license &&
-    //     this.record.license['@id'] && 
+    //     this.record.license['@id'] &&
     //     rightsDefinitions[this.record.license['@id']] ) {
 
     //   let def = rightsDefinitions[this.record.license['@id']];
@@ -262,7 +265,6 @@ class AppRecord extends Mixin(LitElement)
     //   type : 'chicago',
     //   text : await citations.renderEsRecord(this.record.root, 'chicago')
     // });
-    
 
     // this.$.mla.text = await citations.renderEsRecord(this.record, 'mla');
     // this.$.apa.text = await citations.renderEsRecord(this.record, 'apa');
@@ -272,7 +274,7 @@ class AppRecord extends Mixin(LitElement)
   }
 
   _onCollectionVcUpdate(e) {
-    if (e.state !== 'loaded') return;
+    if (e.state !== "loaded") return;
     this.collectionItemCount = e.payload?.results?.count || 0;
   }
 
@@ -287,36 +289,34 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _updateLinks
    * @description update ark/fedora links
-   * 
+   *
    * @param {Object} location location element
    * @param {Object} record selected record
    */
   _updateLinks(location, record) {
-    if( location.pathname.split('/media').length < 2 ) {
-      if( !record ) return;
+    if (location.pathname.split("/media").length < 2) {
+      if (!record) return;
 
       // pull image with position 1
       this.arkDoi = [
-        location.pathname.split('/media')[0],
-        record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].clientMedia?.images?.original?.url.replace('/fcrepo/rest', ''),
+        location.pathname.split("/media")[0],
+        record.data["@graph"]
+          .filter((r) => r["@id"] === location.pathname.split("/media")[0])[0]
+          .clientMedia?.images?.original?.url.replace("/fcrepo/rest", ""),
       ];
-  
+
       this.fedoraLinks = [
-        '/fcrepo/rest' + location.pathname.split('/media')[0],
-        '/fcrepo/rest' + location.pathname.split('/media')[0] 
+        "/fcrepo/rest" + location.pathname.split("/media")[0],
+        "/fcrepo/rest" + location.pathname.split("/media")[0],
         // TODO second link should point to an image or pdf, which one in the record graph though?
         // location.pathname.split('/media')[0],record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].image['@id'] + '/fcr:metadata',
-      ]; 
-  
-    } else {
-      this.arkDoi = [
-        location.pathname.split('/media')[0],
-        location.pathname,
       ];
-  
+    } else {
+      this.arkDoi = [location.pathname.split("/media")[0], location.pathname];
+
       this.fedoraLinks = [
-        '/fcrepo/rest' + location.pathname.split('/media')[0],
-        '/fcrepo/rest' + location.pathname + '/fcr:metadata',
+        "/fcrepo/rest" + location.pathname.split("/media")[0],
+        "/fcrepo/rest" + location.pathname + "/fcr:metadata",
       ];
     }
   }
@@ -324,7 +324,7 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _onRecordVcUpdate
    * @description from RecordVcModel, called when a record is selected
-   * 
+   *
    * @param {Object} e payload
    */
   // _onRecordVcUpdate(e) {
@@ -347,7 +347,7 @@ class AppRecord extends Mixin(LitElement)
 
   // _renderSelectedMedia() {
   //   let imageList = this._getImageMediaList(this.record);
-  //   if( this.record.associatedMedia ) { 
+  //   if( this.record.associatedMedia ) {
   //     if( imageList.length ) {
 
   //       // see if url has selected an image
@@ -370,7 +370,7 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _renderCreators
    * @description render creator field
-   * 
+   *
    * @param {Object} record
    */
   // _renderCreators(record) {
@@ -382,7 +382,7 @@ class AppRecord extends Mixin(LitElement)
   //   }
 
   //   // TODO: label is under creator.name
-  //   this.$.creatorValue.innerHTML = creators 
+  //   this.$.creatorValue.innerHTML = creators
   //     .map(creator => {
   //       let searchDoc = this.RecordModel.emptySearchDocument();
   //       this.RecordModel.appendKeywordFilter(searchDoc, 'creators', creator);
@@ -398,7 +398,7 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _renderSubjects
    * @description render subject field, which is really 'abouts' derived from 'schema:about'
-   * 
+   *
    * @param {Object} record
    */
   // _renderSubjects(record) {
@@ -411,7 +411,7 @@ class AppRecord extends Mixin(LitElement)
   //   }
 
   //   // TODO: label is under creator.name
-  //   this.$.subjectValue.innerHTML = subjects 
+  //   this.$.subjectValue.innerHTML = subjects
   //     .map(subject => {
   //       // subject = subject.name;
   //       let searchDoc = this.RecordModel.emptySearchDocument();
@@ -428,7 +428,7 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _renderPublisher
    * @description render publisher field
-   * 
+   *
    * @param {Object} record
    */
   // _renderPublisher(record) {
@@ -440,7 +440,7 @@ class AppRecord extends Mixin(LitElement)
   //     return this.$.publisher.classList.add('hidden');
   //   }
 
-  //   this.$.publisherValue.innerHTML = publishers 
+  //   this.$.publisherValue.innerHTML = publishers
   //     .map(publisher => publisher.name)
   //     .join(', ');
 
@@ -450,8 +450,8 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _renderIdentifier
    * @description render ark/doi field
-   * 
-   * @param {Object} record 
+   *
+   * @param {Object} record
    */
   // _renderIdentifier(record, media) {
   //   if( !record['@id']entifier ) {
@@ -495,18 +495,18 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _getHost
    * @description helper for getting protocol/host of window
-   * 
+   *
    * @returns {String}
    */
   _getHost() {
-    return window.location.protocol+'//'+window.location.host+'/';
+    return window.location.protocol + "//" + window.location.host + "/";
   }
 
   /**
    * @method _onSelectedRecordMediaUpdate
    * @description from AppStateInterface, called when a records media is selected
-   * 
-   * @param {Object} record 
+   *
+   * @param {Object} record
    */
   _onSelectedRecordMediaUpdate(record) {
     // if( record._has360ImageList ) {
@@ -514,7 +514,7 @@ class AppRecord extends Mixin(LitElement)
     //   return;
     // }
 
-    this.name = this.record.name || '';
+    this.name = this.record.name || "";
 
     // if (!record.image) return;
 
@@ -547,16 +547,16 @@ class AppRecord extends Mixin(LitElement)
   /**
    * @method _addMetadataRow
    * @description update metadata table row
-   * 
-   * @param {Array} metadata 
-   * @param {String} attr 
-   * @param {String} label 
+   *
+   * @param {Array} metadata
+   * @param {String} attr
+   * @param {String} label
    */
   _addMetadataRow(metadata, attr, label) {
-    if( !this[attr] ) return;
+    if (!this[attr]) return;
     metadata.push({
-      attr: label || attr, 
-      value: this[attr]
+      attr: label || attr,
+      value: this[attr],
     });
   }
 
@@ -570,15 +570,14 @@ class AppRecord extends Mixin(LitElement)
     this.$.link.setSelectionRange(0, 9999);
     document.execCommand("Copy");
 
-    this.$.copyIcon.icon = 'check';
-    this.$.copyButton.setAttribute('active', 'active');
+    this.$.copyIcon.icon = "check";
+    this.$.copyButton.setAttribute("active", "active");
 
     setTimeout(() => {
-      this.$.copyIcon.icon = 'content-copy';
-      this.$.copyButton.removeAttribute('active', 'active');
+      this.$.copyIcon.icon = "content-copy";
+      this.$.copyButton.removeAttribute("active", "active");
     }, 3000);
   }
-
 }
 
-customElements.define('app-record', AppRecord);
+customElements.define("app-record", AppRecord);

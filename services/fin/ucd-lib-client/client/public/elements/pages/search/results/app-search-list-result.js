@@ -57,7 +57,6 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
    */
   willUpdate(props) {
     if (this.data.id) {
-      debugger;
       this.itemUrl = this.data.id;
       this.thumbnailUrl = this.data.thumbnailUrl;
       this.title = this.data.title;

@@ -235,7 +235,7 @@ export default function render() {
               <ul>
                 <li><app-auth-footer></app-auth-footer></li>
                 <li class="fin-admin" ?hidden="${!this.isAdmin}">
-                  <a href="/fin/admin/">Fin Admin</a>
+                  <a href="/fin/admin/${this.pathInfo.length > 1 ? '#path-info' + this.pathInfo : ''}">Fin Admin</a>
                 </li>
               </ul>
             </ucdlib-site-footer-column>
