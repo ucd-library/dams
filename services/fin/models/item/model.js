@@ -32,9 +32,9 @@ class ItemsModel extends FinEsDataModel {
    * @returns 
    */
   async update(jsonld, index) {
-    await super.update(jsonld, index);
+    let result = await super.update(jsonld, index);
 
-    if( !jsonld['@graph'] ) return;
+    if( !jsonld['@graph'] ) return result;
 
     if( !this.activemq ) {
       await this.connect();
@@ -65,6 +65,8 @@ class ItemsModel extends FinEsDataModel {
 
     let node = jsonld['@graph'][0];
     await workflowUtils.autoTriggerWorkflow(node);
+
+    return result;
   }
 
   async getFiles(id, files=[]) {
