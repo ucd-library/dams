@@ -6,7 +6,7 @@ class TesseractWrapper {
 
   async ocr(opts) {
     // see: https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage
-    if( !opts.args ) opts.args = '-l eng --psm 1 --oem 3';
+    if( !opts.args ) opts.args = '--dpi 300 -l eng --psm 1 --oem 3';
     if( !opts.output ) opts.output = 'txt'; // options are: txt, hocr, pdf
     if( !opts.filepath ) throw new Error('File path required');
   

@@ -37,11 +37,11 @@ main:
                                           - image: ${args.jobContainer}
                                             resources:
                                                 requests:
-                                                    memory: "2Gi"
-                                                    cpu: "1000m"
+                                                    memory: "8Gi"
+                                                    cpu: "2000m"
                                                 limits:
-                                                    memory: "2Gi"
-                                                    cpu: "1000m"
+                                                    memory: "8Gi"
+                                                    cpu: "2000m"
                                             command: "node"
                                             args: ${["cli/process-image.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
