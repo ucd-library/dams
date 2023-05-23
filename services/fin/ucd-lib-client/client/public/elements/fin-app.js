@@ -37,6 +37,8 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
       coreTag: { type: String },
       coreHash: { type: String },
       showVersion: { type: Boolean },
+      isAdmin: { type: Boolean },
+      pathInfo: { type: String },
     };
   }
 
@@ -89,6 +91,8 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
       this.localBuildTime = "Not set";
     }
 
+    this.isAdmin = APP_CONFIG.user?.roles?.includes("admin");
+    this.pathInfo = '';
     this._injectModel(
       "AppStateModel",
       "AuthModel",
@@ -134,6 +138,7 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
     }
 
     this.page = page;
+    this.pathInfo = e.location.pathname.split('/media')[0];
   }
 
   /**

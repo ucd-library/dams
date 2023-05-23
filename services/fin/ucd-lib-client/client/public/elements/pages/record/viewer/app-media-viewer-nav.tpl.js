@@ -47,6 +47,7 @@ export default function render() {
       .layout {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         width: 60%;
         margin: auto;
         padding-bottom: 0.7rem;
@@ -250,6 +251,19 @@ export default function render() {
         .layout {
           width: 90%;
         }
+
+        .break {
+          width: 100%;
+        }
+
+        #buttonWrapper.wrap {
+          padding-top: 1rem;
+          position: relative;
+          left: 62vw;
+        }
+        #thumbnails {
+          width: 80% !important;
+        }
       }
     </style>
 
@@ -361,8 +375,10 @@ export default function render() {
       </div>
 
       <div style="flex:1"></div>
+      <div class="break"></div>
       <div
         id="buttonWrapper"
+        class="wrap"
         style="white-space: nowrap"
         ?hidden="${this.isLightbox}"
       >

@@ -49,10 +49,12 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Map} props - Properties that have changed.
    */
   firstUpdated(props) {
-    if (
-      (this.id && Object.keys(this.data).length === 0) ||
-      this.id !== this.data.itemUrl
-    ) {
+    if (this.data.id) {
+      this.title = this.data.title;
+      this.itemUrl = this.data.id;
+      this.thumbnailUrl = this.data.thumbnailUrl;
+      if (this.thumbnailUrl) this._renderImage();
+    } else {
       this._getItem(this.id);
     }
   }
@@ -95,6 +97,10 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.itemUrl = res["@id"];
     this.thumbnailUrl = res.collectionImg;
     this.title = res.name;
+    this._renderImage();
+  }
+
+  async _renderImage() {
     await this._loadImage(this.thumbnailUrl);
 
     let img = this.shadowRoot.querySelector("#img");

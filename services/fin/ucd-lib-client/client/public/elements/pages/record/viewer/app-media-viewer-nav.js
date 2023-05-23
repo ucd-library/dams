@@ -196,7 +196,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       if (this.isLightbox) iconsWidth += this.iconWidth * 2;
     }
 
-    let availableThumbSpace = Math.min(w - iconsWidth, w * 0.42);
+    let spaceBuffer = window.innerWidth < 1000 ? 0.35 : 0.42;
+    let availableThumbSpace = Math.min(w - iconsWidth, w * spaceBuffer);
     this.thumbnailsPerFrame = Math.max(
       Math.floor(availableThumbSpace / this.totalThumbnailWidth),
       1

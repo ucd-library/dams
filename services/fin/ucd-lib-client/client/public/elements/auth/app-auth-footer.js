@@ -1,46 +1,41 @@
-import {PolymerElement} from "@polymer/polymer/polymer-element"
+import { LitElement } from "lit";
 import AuthInterface from "../interfaces/AuthInterface"
-import template from "./app-auth-footer.html"
+import render from "./app-auth-footer.tpl.js"
 
-class AppAuthFooter extends Mixin(PolymerElement)
-      .with(EventInterface, AuthInterface) {
-
-  static get template() {
-    let tag = document.createElement('template');
-    tag.innerHTML = template;
-    return tag;
-  }
+class AppAuthFooter extends Mixin(LitElement).with(LitCorkUtils) {
 
   static get properties() {
     return {
-      loggedIn : {
-        type : Boolean,
-        value : false
-      },
-      user : {
-        type : Object,
-        value : () => {}
-      }
+      loggedIn : { type : Boolean },
+      user : { type : Object }
     }
   }
 
   constructor() {
     super();
     this.active = true;
+    this.render = render.bind(this);
+
+    this.loggedIn = false;
+    this.user = {};
+
+    this._injectModel("AppStateModel", "AuthModel");
   }
 
-  /**
-   * @method _onAuthUpdate
-   * @description from AuthInterface. called whenever auth state changes
-   */
-  _onAuthUpdate(e) {
-    if( e.state === 'loggedIn' ) {
-      this.user = e.user;
-      this.loggedIn = true;
-    } else {
-      this.loggedIn = false;
-    }
+  _onAppStateUpdate(e) {
+    this.user = APP_CONFIG.user;
+    this.loggedIn = this.user.loggedIn;
+    debugger;
   }
+
+  _login() {
+    this.AuthModel.login();
+  }
+
+  _logout() {
+    this.AuthModel.logout();
+  }
+
 }
 
 customElements.define('app-auth-footer', AppAuthFooter);

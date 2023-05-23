@@ -127,11 +127,6 @@ export default function render() {
         padding-top: 0.9rem;
       }
 
-      .overflow {
-        overflow-y: auto;
-        height: calc(100vh - 100px);
-      }
-
       .heading {
         display: none;
       }
@@ -142,6 +137,10 @@ export default function render() {
         }
         :host {
           box-shadow: 0px 3px 6px #00000029;
+        }
+        .overflow {
+          overflow-y: auto;
+          height: calc(100vh - 100px);
         }
       }
 

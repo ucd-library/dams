@@ -359,7 +359,7 @@ export default function render() {
             (res) => html`
               <dams-item-card
                 .data="${res}"
-                data-itemid="${res.id}"
+                data-url="${res.id}"
                 @click=${this._onRecordClicked}
               ></dams-item-card>
             `
@@ -372,7 +372,7 @@ export default function render() {
               <app-search-grid-result
                 .data="${res}"
                 class="item"
-                data-itemid="${res.id}"
+                data-url="${res.id}"
                 @click=${this._onRecordClicked}
                 @rendered=${this._onGridItemRendered}
               ></app-search-grid-result>
@@ -385,7 +385,7 @@ export default function render() {
             (res) => html`
               <app-search-list-result
                 .data="${res}"
-                data-itemid="${res.id}"
+                data-url="${res.id}"
                 @click=${this._onRecordClicked}
               ></app-search-list-result>
             `
