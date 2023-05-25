@@ -48,7 +48,7 @@ class WorkflowUtils {
       jwt : await keycloak.getServiceAccountToken()
     });
 
-    let hasRunCheck = JSON.parse(response.data.body);
+    let hasRunCheck = JSON.parse(response.last.body);
     for( let workflow of hasRunCheck ) {
       if( workflow.name === finWorkflowName ) {
         Logger.error(`Workflow ${finWorkflowName} has already been run on ${node['@id']}. Something is wrong with the item transform!!`);
