@@ -23,17 +23,6 @@ class CollectionVcModel extends BaseModel {
         (g) => g["@id"] === e.payload["@id"]
       )[0];
 
-      // e.payload.node.shift();
-      // todo this will come from admin application storage pref
-      // let highlightedCollections = [];
-      // for( let i = 1; i < 7 && e.payload.node.length > i; i++ ) {
-      //   highlightedCollections.push({
-      //     id : e.payload.node[i]['@id'],
-      // title : e.payload.node[i].?,
-      // thumbnailUrl : e.payload.node[i].?,
-      // });
-      // }
-
       let callNumber = "";
       if (rootNode.identifier) {
         if (!Array.isArray(rootNode.identifier))
@@ -44,7 +33,7 @@ class CollectionVcModel extends BaseModel {
         });
       }
 
-      // TODO change to leverage clientMedia.images, however they're not building from the api yet
+      // TODO change to leverage clientMedia.images, however they're not building from the api yet for collections
       let thumbnailUrl;
       if (
         e.payload["@graph"] &&
@@ -64,7 +53,6 @@ class CollectionVcModel extends BaseModel {
         callNumber,
         count: rootNode.itemCount,
         yearPublished: rootNode.yearPublished,
-        // highlightedCollections
       };
 
       e.payload.results = collection;

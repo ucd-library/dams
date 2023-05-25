@@ -70,7 +70,6 @@ class RecordVcModel extends BaseModel {
         name: e.root.name,
         collectionId,
         collectionName: e.root.creator?.name,
-        collectionItemsCount: 42,
         collectionImg,
         clientMedia: e.clientMedia,
         date: e.root.yearPublished,

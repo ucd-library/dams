@@ -469,7 +469,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   _onRecordClicked(e) {
     e.preventDefault();
     if (e.type === "keyup" && e.which !== 13) return;
-    const location = e.target.dataset.itemid;
+    const location = e.target.dataset.url;
     if (location) {
       this.AppStateModel.setLocation(location);
     }
