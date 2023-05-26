@@ -35,15 +35,7 @@ class CollectionModel extends BaseModel {
      * @returns {Promise} resolves to array of collections
      */
     async overview() {
-      let state = this.store.data.overview;
-
-      if( state.state === 'init' ) {
-        await this.service.overview();
-      } else if( state.state === 'loading' ) {
-        await state.request;
-      }
-
-      return this.store.data.overview;
+      return APP_CONFIG.collectionLabels;
     }
 
     /**

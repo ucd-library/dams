@@ -8,7 +8,6 @@ import utils from "../../../lib/utils";
 
 import "./app-media-download";
 import "./app-fs-media-download";
-import "./app-copy-cite";
 import "./viewer/app-media-viewer";
 import "../../components/citation";
 

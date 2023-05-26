@@ -1,6 +1,6 @@
 const config = require("../config.js");
 const api = require("@ucd-lib/fin-api");
-const { ActiveMqClient, logger } = require("@ucd-lib/fin-service-utils");
+const { ActiveMqClient, logger, keycloak } = require("@ucd-lib/fin-service-utils");
 
 const { ActiveMqStompClient } = ActiveMqClient;
 const CONTAINS = "http://www.w3.org/ns/ldp#contains";
@@ -12,8 +12,8 @@ const graphUtils = api.io.utils;
 
 api.setConfig({
   host: config.fcrepo.host,
-  basePath: config.fcrepo.root,
   directAccess: true,
+  superuser: true
 });
 
 class AppConfig {
@@ -60,7 +60,7 @@ class AppConfig {
         directAccess: true,
       })
       .then(async (resp) => {
-        if (resp.data && resp.data.statusCode === 200) {
+        if (resp.last && resp.last.statusCode === 200) {
           if (typeof this.fcrepoResolve === "function") {
             this.fcrepoResolve();
           }
@@ -86,9 +86,10 @@ class AppConfig {
         prefer: api.GET_PREFER.REPRESENTATION_OMIT_SERVER_MANAGED,
       },
     });
-    if (response.data.statusCode !== 200) return ldp;
 
-    response = this.graphToArray(response.data.body);
+    if (response.last.statusCode !== 200) return ldp;
+
+    response = this.graphToArray(response.last.body);
     ldp[path] = { graph: response.graph };
 
     // now get the full version to crawl
@@ -98,7 +99,7 @@ class AppConfig {
         accept: api.GET_JSON_ACCEPT.COMPACTED,
       },
     });
-    let { graph, context } = this.graphToArray(response.data.body);
+    let { graph, context } = this.graphToArray(response.last.body);
 
     let firstNode = graphUtils.getGraphNode(
       graph,
@@ -111,9 +112,9 @@ class AppConfig {
 
       if (mimeType && mimeType.find((item) => item === "application/json")) {
         response = await api.get({ path });
-        if (response.data.statusCode === 200) {
+        if (response.last.statusCode === 200) {
           try {
-            ldp[path].body = JSON.parse(response.data.body);
+            ldp[path].body = JSON.parse(response.last.body);
           } catch (e) {
             logger.error("Error parsing json", path, e);
           }

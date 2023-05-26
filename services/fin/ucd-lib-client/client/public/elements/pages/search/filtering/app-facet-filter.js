@@ -3,7 +3,6 @@ import { LitElement} from 'lit';
 import render from './app-facet-filter.tpl.js'
 
 import clone from "clone"
-import "./app-facet-checkbox"
 
 class AppFacetFilter extends Mixin(LitElement)
   .with(LitCorkUtils) {

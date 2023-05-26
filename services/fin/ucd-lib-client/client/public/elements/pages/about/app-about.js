@@ -1,7 +1,6 @@
 import { LitElement, html } from 'lit';
 import render from "./app-about.tpl.js";
 
-import "@ucd-lib/fin-search-box";
 import "../../components/search-box";
 
 class AppAbout extends Mixin(LitElement) 

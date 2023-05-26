@@ -70,9 +70,6 @@ export default function render() {
         background-size: 10px 6px;
         background-repeat: no-repeat;
         background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMCA2IiB3aWR0aD0iMTBweCIgaGVpZ2h0PSI2cHgiPjxkZWZzPjxzdHlsZT4uY2xzLTF7ZmlsbDojMDAyNjU1O308L3N0eWxlPjwvZGVmcz48Zz48cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMCAwIDEwIDAgNSA2IDAgMCIvPjwvZz48L3N2Zz4=");
-        /* TODO: Seems to cause problem w/width of select box being too small
-      @apply --fin-search-box-select-inverse;
-      */
         background-color: var(--medium-background-color);
         color: var(--default-primary-color);
       }

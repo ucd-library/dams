@@ -141,8 +141,6 @@ export default function render() {
       }
     </style>
 
-    <!-- <app-route app-routes="${this.appRoutes}"></app-route> -->
-
     <app-search-header
       ?hidden="${!this.showSearchHeader}"
       @expand-search-filters=${this._expandSearchFilters}

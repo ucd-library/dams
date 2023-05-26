@@ -1,4 +1,3 @@
-// import {PolymerElement} from "@polymer/polymer/polymer-element"
 import { LitElement } from "lit";
 import "@polymer/paper-spinner/paper-spinner-lite";
 import render from "./app-image-viewer.tpl.js";

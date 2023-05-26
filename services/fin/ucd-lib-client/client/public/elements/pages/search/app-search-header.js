@@ -1,8 +1,6 @@
 import { LitElement, html } from "lit";
 import render from "./app-search-header.tpl.js";
 
-import "../../auth/app-auth-header";
-import "@ucd-lib/fin-search-box";
 import "../../components/search-box";
 import "../../components/nav-bar";
 // import "../../components/icon";
@@ -138,7 +136,7 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
 
   /**
    * @method _onBrowse
-   * @description bound to fin-search-box `browse` event.  Called when user
+   * @description bound to `browse` event.  Called when user
    * selects a specific collection to browse
    *
    * @param {Object} e
@@ -161,7 +159,7 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
 
   /**
    * @method _onSearch
-   * @description bound to fin-search-box `search` event.  called when user
+   * @description bound to `search` event.  called when user
    * hits enter or clicked the search icon.  start a text search
    *
    * @param {Object} e

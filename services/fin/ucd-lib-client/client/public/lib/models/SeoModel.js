@@ -63,7 +63,7 @@ class SeoModel extends BaseModel {
    */
   async _onCollectionUpdate(e) {
     if( e.state !== 'loaded' ) return;
-    if( AppStateModel.locationElement.location.page !== 'collection' ) return;
+    if( AppStateModel.location.page !== 'collection' ) return;
 
     let collection = e.payload?.['@graph']?.[0];
 

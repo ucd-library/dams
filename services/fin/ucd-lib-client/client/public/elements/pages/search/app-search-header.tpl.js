@@ -3,16 +3,6 @@ import { html } from "lit";
 export default function render() {
   return html`
     <style>
-      app-auth-header {
-        margin-left: 10px;
-      }
-
-      fin-search-box {
-        display: inline-block;
-        width: 100%;
-        box-sizing: border-box;
-        max-width: 525px;
-      }
 
       .layout {
         width: 100%;

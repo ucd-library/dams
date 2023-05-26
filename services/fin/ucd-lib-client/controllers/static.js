@@ -23,6 +23,8 @@ const bundle = `
   </script>
   <script>${loaderSrc}</script>`;
 
+appConfig.reload(true);
+
 module.exports = async (app) => {
   let assetsDir = path.join(__dirname, '..', 'client', config.client.assets);
   logger.info('CLIENT_ENV='+config.client.env.CLIENT_ENV+', Serving static assets from '+assetsDir);
@@ -41,16 +43,10 @@ module.exports = async (app) => {
     getConfig : async (req, res, next) => {
       let user = req.user;
 
-      await appConfig.reload(true)
-
       if( user ) {
-        let result = {
-          loggedIn : true,
-          username : user.username || user.name || user.preferred_username,
-          roles : user.roles || []
-        };
-        if( result.roles.includes('admin') ) result.admin = true;
-        user = result;
+        if( !user.roles ) user.roles = [];
+        if( user.roles.includes('admin') ) user.admin = true;
+        user.loggedIn = true;
       } else {
         user = {loggedIn: false};
       }

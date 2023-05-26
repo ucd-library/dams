@@ -1,6 +1,5 @@
 import { LitElement } from 'lit';
 import utils from "../../../../lib/utils"
-import "./app-search-result-creator"
 
 export default class AppSearchResult extends Mixin(LitElement)
   .with(LitCorkUtils) {

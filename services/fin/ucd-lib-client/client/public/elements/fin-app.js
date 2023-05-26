@@ -1,8 +1,6 @@
 import { LitElement, html } from "lit";
 import render from "./fin-app.tpl.js";
 
-import "@ucd-lib/fin-icons";
-
 // sets globals Mixin and EventInterface
 import "@ucd-lib/cork-app-utils";
 
@@ -19,7 +17,6 @@ import "./app-footer";
 import "./auth/app-auth-footer";
 import "./components/site/ucdlib-site-footer";
 import "./components/site/ucdlib-site-footer-column";
-import "./utils/app-header-colorbar";
 import "./components/graphics/dams-watercolor-overlay";
 
 export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
