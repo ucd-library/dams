@@ -4,7 +4,7 @@ const CollectionModel = require('./CollectionModel');
 const config = require('../config');
 const clone = require('clone');
 
-const seo = require('@ucd-lib/fin-service-utils/lib/seo');
+const seo = require('../../../../../models/seo/index.js')
 
 const transform = seo.recordTransform;
 const collectionTransform = seo.collectionTransform;
@@ -19,27 +19,27 @@ class SeoModel extends BaseModel {
     
     this.EventBus.on(AppStateModel.store.events.APP_STATE_UPDATE, (e) => this._onAppStateUpdate(e));
     this.EventBus.on(AppStateModel.store.events.SELECTED_RECORD_UPDATE, (e) => this._onAppStateUpdate(e));
-    this.EventBus.on(CollectionModel.store.events.SELECTED_COLLECTION_UPDATE, (e) => this._onAppStateUpdate(e));
+    this.EventBus.on(CollectionModel.store.events.COLLECTION_UPDATE, (e) => this._onAppStateUpdate(e));
+    this.EventBus.on(CollectionModel.store.events.COLLECTION_UPDATE, (e) => this._onCollectionUpdate(e));
+
+    this.register('SeoModel');
   }
 
   /**
    * @method _onAppStateUpdate
    * @description set site meta tags and jsonld
    */
-  async _onAppStateUpdate() {
+  async _onAppStateUpdate(e) {
+    if( e.state !== 'loaded' ) return;
+
     let state = AppStateModel.store.data;
 
     let isRecord = (state.location.page === 'item');
-    let isCollection = (
-      state.location.pathname.match(/^\/search\//) &&
-      CollectionModel.getSelectedCollection()
-    ) ? true : false;
-    if( !isCollection && 
-        state.location.path.length === 2 &&
-        state.location.path[0] === 'collection' ) {
-      isCollection = '/'+state.location.path.join('/');
-    }
+    let isCollection = (state.location.page === 'collection');
 
+    if( isCollection ) return;
+
+    if( isCollection ) await CollectionModel.get(state.location.fullpath);
     if( state.selectedRecord && isRecord ) {
       this._setJsonLd(state.selectedRecord);
       this._setMetaTags({
@@ -47,19 +47,7 @@ class SeoModel extends BaseModel {
         description : state.selectedRecord.description || '',
         keywords : (state.selectedRecord.abouts || []).join(', ')
       });
-    } else if ( isCollection ) {
-      let collection = CollectionModel.getSelectedCollection();
-      if( !collection && typeof isCollection === 'string' ) {
-        collection = await CollectionModel.get(isCollection);
-      }
-
-      this._setCollectionJsonLd(collection);
-      this._setMetaTags({
-        title : collection.name + ' - ' + config.metadata.title,
-        description : collection.description || '',
-        keywords : (collection.abouts || []).join(', ')
-      });
-    } else if( !isRecord ) {
+    } else if( !isRecord && !isCollection ) {
       this._clearJsonLd();
       this._setMetaTags({
         title : config.metadata.title,
@@ -67,6 +55,24 @@ class SeoModel extends BaseModel {
         keywords : ''
       });
     }
+  }
+
+  /**
+   * @method _onCollectionUpdate
+   * @description set site meta tags and jsonld for collection page
+   */
+  async _onCollectionUpdate(e) {
+    if( e.state !== 'loaded' ) return;
+    if( AppStateModel.locationElement.location.page !== 'collection' ) return;
+
+    let collection = e.payload?.['@graph']?.[0];
+
+    this._setCollectionJsonLd(collection);
+    this._setMetaTags({
+      title : collection.name + ' - ' + config.metadata.title,
+      description : collection.description || '',
+      keywords : (collection.abouts || []).join(', ')
+    });
   }
 
   /**
@@ -100,10 +106,10 @@ class SeoModel extends BaseModel {
   _setJsonLd(selectedRecord) {
     let record = clone(selectedRecord);
     
-    for( var key in record ) {
+    for( var key in record.root ) {
       if( key[0] === '_' ) delete record[key];
     }
-    record = transform(record);
+    record = transform(record.root, record.clientMedia);
 
     this.ele.innerHTML = JSON.stringify(record, '  ', '  ');
   }

@@ -35,7 +35,8 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
       "AppStateModel",
       "CollectionModel",
       "RecordModel",
-      "SearchVcModel"
+      "SearchVcModel",
+      "SeoModel"
     );
   }
 

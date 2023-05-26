@@ -16,6 +16,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       defaultImage: { type: Boolean },
       formats: { type: Array },
       href: { type: String },
+      archiveHref: { type: String },
       imageSizes: { type: Array },
       hasMultipleDownloadMedia: { type: Boolean },
       selectedMediaHasSources: { type: Boolean },
@@ -25,6 +26,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       showImageFormats: { type: Boolean },
       selectedRecordMedia: { type: Object },
       isMultimedia: { type: Boolean },
+      zipConcatenatedPaths: { type: String },
     };
   }
 
@@ -37,6 +39,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.defaultImage = true;
     this.formats = [];
     this.href = "";
+    this.archiveHref = "";
     this.imageSizes = [];
     this.hasMultipleDownloadMedia = false;
     this.selectedMediaHasSources = true;
@@ -46,6 +49,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.showImageFormats = true;
     this.selectedRecordMedia = {};
     this.isMultimedia = false;
+    this.zipConcatenatedPaths = "";
 
     this._injectModel(
       "AppStateModel",
@@ -473,7 +477,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    * @description set the fullset/zip form elements.
    */
   _setZipPaths() {
-    let urls = {};
+    let urls = [];
     this.zipName = this.rootRecord.root.name
       .replace(/[^a-zA-Z0-9]/g, "-")
       .toLowerCase();
@@ -482,38 +486,96 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     // let sources = this._getAllNativeDownloadSources();
 
     for (let source of sources) {
-      urls[source.filename] = source.src;
+      urls.push(source.src.replace('/fcrepo/rest', ''));
     }
 
-    this.shadowRoot.querySelector("#zipPaths").value = JSON.stringify(urls);
+    this.zipConcatenatedPaths = urls.join(',');
+    this.zipPaths = urls;
+    this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}}`;
+    // this.archiveHref = `/fin/archive${this.zipName ? '?name='+this.zipName : ''}}`;
   }
 
   /**
-   * @method _getAllNativeDownloadSources
-   * @description for the current root record, return all media records that are
-   * available for download.  Note, for images, there is only only record per image,
-   * the native format.
-   *
-   * @return {Array}
-   */
-  // _getAllNativeDownloadSources() {
-  //   let sources = [];
-  //   for( let type in this.rootRecord.media ) {
-  //     for( let media of this.rootRecord.media[type] ) {
-  //       sources = sources.concat(this._getDownloadSources(media, true));
-  //     }
-  //   }
-  //   return sources;
-  // }
-
-  /**
-   * @method _downloadZip
+   * @method _onDownloadFullSetClicked
    * @description bound to download set button click event
    */
-  _onDownloadFullSetClicked() {
-    this.shadowRoot.querySelector("#downloadZip").submit();
+  async _onDownloadFullSetClicked(e) {
+    // this.shadowRoot.querySelector("#downloadZip").submit();
+    // let res = await this.MediaModel.downloadMediaZip(this.zipName, this.zipPaths);
 
-    let path = this.rootRecord["@id"].replace(config.fcrepoBasePath, "");
+    // METHOD 0: just a get request, which works with zipConcatenatedPaths
+    // TODO other methods below for post requests have other issues
+
+
+    // e.preventDefault();
+
+    // METHOD 1: formdata
+    // TODO setting content type breaks the request if using formData, the content type is multipart formdata which the bodyparser doesn't handle
+    // const formData = new FormData();
+    // formData.append('name', this.zipName);
+    // formData.append('paths', JSON.stringify(this.zipPaths));
+    // const request = new XMLHttpRequest();
+    // request.open('POST', this.archiveHref);
+    // request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    // request.send(formData);
+
+
+    // METHOD 2: xmlhttprequest vanilla with .onload
+    // TODO this uses the blob api, works, but doesn't show download in progress until everything is returned from the server
+    // const request = new XMLHttpRequest();
+    // request.open('POST', this.archiveHref);
+
+    //  TODO also trying just JSON.stringifying this.zipPaths instead of passing FormData, 
+    //   which downloads all the media in the api call but isn't handled by browser
+    // request.responseType = 'blob';
+    // request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+    // request.onload = (e) => {
+    //   var blob = e.currentTarget.response;
+    //   var contentDispo = e.currentTarget.getResponseHeader('Content-Disposition');
+    //   // https://stackoverflow.com/a/23054920/
+    //   var fileName = contentDispo.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
+
+    //   var a = document.createElement('a');
+    //   a.href = window.URL.createObjectURL(blob);
+    //   a.download = fileName;
+    //   a.dispatchEvent(new MouseEvent('click'));
+    // }
+
+    // request.send(JSON.stringify(this.zipPaths));
+
+
+    // METHOD 3: fetch api with blob streaming
+    // const res = await fetch(this.archiveHref, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(this.zipPaths),
+    //   duplex: 'half',
+    // });
+
+    // // const reader = res.body.getReader();
+    // // debugger;
+    // const blob = await res.blob();
+    // const newBlob = new Blob([blob]);
+
+    // const blobUrl = window.URL.createObjectURL(newBlob);
+
+    // const link = document.createElement('a');
+    // link.href = blobUrl;
+    // link.setAttribute('download', this.zipName + '.zip');
+    // document.body.appendChild(link);
+    // link.click();
+    // link.parentNode.removeChild(link);
+
+    // // clean up Url
+    // window.URL.revokeObjectURL(blobUrl);
+
+    // TODO how to pass back control to the browser for the request?
+
+
+    let path = this.rootRecord.root["@id"].replace(config.fcrepoBasePath, "");
     gtag("event", "download", {
       event_category: "fullset",
       event_label: path,

@@ -20,6 +20,7 @@ class AppCollection extends Mixin(LitElement)
       description : { type : String },
       title : { type : String },
       thumbnailUrl : { type : String },
+      thumbnailUrlOverride : { type : String },
       callNumber : { type : String },
       keywords : { type : Array },    
       items : { type : Number }, 
@@ -43,7 +44,7 @@ class AppCollection extends Mixin(LitElement)
 
     this.reset();
 
-    this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'CollectionVcModel', 'FcAppConfigModel');
+    this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'CollectionVcModel', 'FcAppConfigModel', 'SeoModel');
   }
 
   async firstUpdated() {
@@ -89,7 +90,7 @@ class AppCollection extends Mixin(LitElement)
     this.collectionId = e.payload.results.id;
     this.description = e.payload.results.description
     this.title = e.payload.results.title;
-    if( !this.thumbnailUrl ) this.thumbnailUrl = e.payload.results.thumbnailUrl;
+    this.thumbnailUrl = e.payload.results.thumbnailUrl;
     this.callNumber = e.payload.results.callNumber;
     this.keywords = e.payload.results.keywords;
     this.items = e.payload.results.count;
@@ -108,7 +109,6 @@ class AppCollection extends Mixin(LitElement)
             image : item['@graph'][0].thumbnailUrl
           };
         });
-        console.log('this.highlightedItems line 111 _onCollectionVcUpdate', this.highlightedItems)
       }
     }
 
@@ -126,6 +126,7 @@ class AppCollection extends Mixin(LitElement)
     this.description = '';
     this.title = '';
     this.thumbnailUrl = '';
+    this.thumbnailUrlOverride = '';
     this.callNumber = '';
     this.keywords = [];    
     this.items = 0;
@@ -159,7 +160,6 @@ class AppCollection extends Mixin(LitElement)
           image : '' // rg.root.image.url
         };
       })
-      console.log('this.highlightedItems line 162 _onDefaultRecordSearchUpdate', this.highlightedItems)
     }
 
     this._updateDisplayData();
@@ -197,8 +197,8 @@ class AppCollection extends Mixin(LitElement)
    */
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
-    // TODO save to fcrepo container
-    //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
+
+    // TODO how to handle validation that all 6 featured items are populated? or more like how to alert user
 
     // parse highlighted items
     this.savedItems = [];
@@ -213,13 +213,10 @@ class AppCollection extends Mixin(LitElement)
       }
     });
     this.savedItems = [...newSavedItems];
-    console.log('this.savedItems line 216 _onSaveClicked', this.savedItems);
-    console.log('this.highlightedItems line 217 _onSaveClicked', this.highlightedItems);
     
     this._updateDisplayData();
     let featuredImage = this.shadowRoot.querySelector('#file-upload').files[0];
-    let res = await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, featuredImage);
-    console.dir(res)
+    await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, featuredImage);
     
     this.editMode = false;
 
@@ -312,7 +309,7 @@ class AppCollection extends Mixin(LitElement)
         }
       
         // featured image
-        this.thumbnailUrl = '/fcrepo/rest'+ graphRoot.thumbnailUrl;
+        this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot.thumbnailUrl;
 
         // itemDisplayCount
         this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount'];
