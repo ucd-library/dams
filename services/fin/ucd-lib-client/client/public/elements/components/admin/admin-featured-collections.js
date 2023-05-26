@@ -37,12 +37,17 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
       APP_CONFIG.fcAppConfig[
         "/application/ucd-lib-client/featured-collections/config.json"
       ];
-    if (displayData && displayData.body && Array.isArray(displayData.body))
+    if (displayData && displayData.body && Array.isArray(displayData.body) ) {
       this.panels = displayData.body;
+    }
     if (!displayData) {
       displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
-      if (displayData && displayData.body)
-        this.panels = JSON.parse(displayData.body);
+      if (displayData && displayData.body) {
+        if( typeof displayData.body === 'string' ) {
+          displayData.body = JSON.parse(displayData.body);
+        }
+        this.panels = displayData.body;
+      }
     }
   }
 
