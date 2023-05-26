@@ -1,6 +1,6 @@
 const { config } = require('@ucd-lib/fin-service-utils');
 
-const OCR_TO_IA_BOOK_SCALE = 4;
+const OCR_TO_IA_BOOK_SCALE = 2;
 const IA_BOOK_SIZE = 1024;
 const env = process.env;
 
@@ -10,7 +10,8 @@ config.ocr = {
     density : 300,
     alpha : 'remove',
     fill : 'black',
-    fuzz : '30% +opaque "#FFFFFF"',
+    // setting this too high will cause the image to be too dark
+    fuzz : '80% +opaque "#FFFFFF"',
     deskew : '40%',
     // trim : '+repage',
     filter : 'catrom',

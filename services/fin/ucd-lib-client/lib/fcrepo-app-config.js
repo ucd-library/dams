@@ -60,7 +60,7 @@ class AppConfig {
         directAccess: true,
       })
       .then(async (resp) => {
-        if (resp.data.statusCode === 200) {
+        if (resp.data && resp.data.statusCode === 200) {
           if (typeof this.fcrepoResolve === "function") {
             this.fcrepoResolve();
           }
