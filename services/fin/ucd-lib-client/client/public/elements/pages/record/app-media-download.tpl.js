@@ -132,7 +132,7 @@ export default function render() {
       }
 
       .downloadBtn.archive {
-        max-width: 30%;
+        width: 115px;
       }
 
       #downloadOptions,

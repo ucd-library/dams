@@ -491,8 +491,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     this.zipConcatenatedPaths = urls.join(',');
     this.zipPaths = urls;
-    // this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}}`;
-    this.archiveHref = `/fin/archive${this.zipName ? '?name='+this.zipName : ''}}`;
+    this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}}`;
+    // this.archiveHref = `/fin/archive${this.zipName ? '?name='+this.zipName : ''}}`;
   }
 
   /**
@@ -503,12 +503,14 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     // this.shadowRoot.querySelector("#downloadZip").submit();
     // let res = await this.MediaModel.downloadMediaZip(this.zipName, this.zipPaths);
 
-    // TODO if preventDefault, the download from the anchor tag doesn't work, but it's corrupted anyway
-    e.preventDefault();
+    // METHOD 0: just a get request, which works with zipConcatenatedPaths
+    // TODO other methods below for post requests have other issues
 
+
+    // e.preventDefault();
 
     // METHOD 1: formdata
-    // TODO setting content type breaks the request if using formData, the content type is multi-part? which the bodyparser doesn't handle
+    // TODO setting content type breaks the request if using formData, the content type is multipart formdata which the bodyparser doesn't handle
     // const formData = new FormData();
     // formData.append('name', this.zipName);
     // formData.append('paths', JSON.stringify(this.zipPaths));
@@ -544,34 +546,31 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
 
     // METHOD 3: fetch api with blob streaming
-    const res = await fetch(this.archiveHref, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(this.zipPaths),
-      duplex: 'half',
-    });
+    // const res = await fetch(this.archiveHref, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(this.zipPaths),
+    //   duplex: 'half',
+    // });
 
-    // const reader = res.body.getReader();
-    // debugger;
-    const blob = await res.blob();
-    const newBlob = new Blob([blob]);
+    // // const reader = res.body.getReader();
+    // // debugger;
+    // const blob = await res.blob();
+    // const newBlob = new Blob([blob]);
 
-    const blobUrl = window.URL.createObjectURL(newBlob);
+    // const blobUrl = window.URL.createObjectURL(newBlob);
 
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.setAttribute('download', this.zipName + '.zip');
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode.removeChild(link);
+    // const link = document.createElement('a');
+    // link.href = blobUrl;
+    // link.setAttribute('download', this.zipName + '.zip');
+    // document.body.appendChild(link);
+    // link.click();
+    // link.parentNode.removeChild(link);
 
-    // clean up Url
-    window.URL.revokeObjectURL(blobUrl);
-
-
-
+    // // clean up Url
+    // window.URL.revokeObjectURL(blobUrl);
 
     // TODO how to pass back control to the browser for the request?
 
