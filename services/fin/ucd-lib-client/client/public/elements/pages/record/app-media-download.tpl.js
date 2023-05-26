@@ -119,16 +119,20 @@ export default function render() {
         margin-bottom: 10px;
       }
 
-      #downloadBtn {
+      .downloadBtn {
         padding: 0.75rem 0;
         font-size: 0.9rem;
         min-width: 6rem;
         text-transform: none;
       }
 
-      #downloadBtn:hover {
+      .downloadBtn:hover {
         background-color: var(--color-aggie-blue);
         color: var(--color-aggie-gold);
+      }
+
+      .downloadBtn.archive {
+        max-width: 30%;
       }
 
       #downloadOptions,
@@ -161,7 +165,7 @@ export default function render() {
           width: 33%;
           max-width: 33%;
         }
-        #downloadBtn {
+        .downloadBtn {
           min-width: auto;
           text-overflow: clip;
           overflow: hidden;
@@ -215,7 +219,7 @@ export default function render() {
           ?hidden="${!this.showImageFormats}"
         ></select>
         <a
-          id="downloadBtn"
+          class="downloadBtn"
           href="${this.href}"
           @click="${this._onDownloadClicked}"
           download
@@ -234,23 +238,32 @@ export default function render() {
       </div>
     </div>
 
-    <form
-      id="downloadZip"
-      action="/api/zip/${this.zipName}"
-      method="post"
-      target="_blank"
+    <!-- <button ?hidden="${!this.fullSetSelected}" @click="${this._onDownloadFullSetClicked}">
+      <span>Download</span>
+    </button> -->
+
+    <a
+      class="downloadBtn archive"
       ?hidden="${!this.fullSetSelected}"
-    >
-      <input
-        type="text"
-        hidden
-        name="paths"
-        id="zipPaths"
-        style="display: none;"
-      />
+      href="${this.archiveHref}"
+      @click="${this._onDownloadFullSetClicked}"
+      target="_blank"
+      rel="noopener"
+      download
+      style="white-space: nowrap; text-align: center;">
+      <span> Download </span>
+    </a>
+
+    <!-- <form id="downloadZip" 
+      action="/fin/archive" 
+      method="get" 
+      ?hidden="${!this.fullSetSelected}">    
+      <input type="text" hidden name="name" value="${this.zipName}" style="display: none;">
+      <input type="text" hidden name="paths" value="${this.zipConcatenatedPaths}" style="display: none;">
       <button @click="${this._onDownloadFullSetClicked}">
         <span>Download</span>
       </button>
-    </form>
+    </form> -->
+
   `;
 }
