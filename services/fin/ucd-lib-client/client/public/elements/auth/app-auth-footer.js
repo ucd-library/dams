@@ -25,7 +25,6 @@ class AppAuthFooter extends Mixin(LitElement).with(LitCorkUtils) {
   _onAppStateUpdate(e) {
     this.user = APP_CONFIG.user;
     this.loggedIn = this.user.loggedIn;
-    debugger;
   }
 
   _login() {

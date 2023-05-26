@@ -68,7 +68,8 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       "AppStateModel",
       "RecordModel",
       "CollectionModel",
-      "RecordVcModel"
+      "RecordVcModel",
+      "SeoModel"
     );
   }
 

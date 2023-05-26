@@ -13,6 +13,15 @@ RUN npm install
 RUN npm link @ucd-lib/fin-service-utils
 RUN npm link @ucd-lib/fin-api
 
+# Models 
+WORKDIR ${FIN_SERVICE_ROOT}/models
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package.json .
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package-lock.json .
+RUN npm install
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models ${FIN_SERVICE_ROOT}/models
+
+# Browser Client Code
+WORKDIR ${FIN_SERVICE_ROOT}/ucd-lib-client
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/client client
 RUN cd client/public && npm install
 
@@ -26,13 +35,6 @@ COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/config.js .
 RUN npm run build
 # production client build
 RUN npm run dist
-
-# Models 
-WORKDIR ${FIN_SERVICE_ROOT}/models
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package.json .
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package-lock.json .
-RUN npm install
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models ${FIN_SERVICE_ROOT}/models
 
 WORKDIR ${FIN_SERVICE_ROOT}
 

@@ -1,14 +1,14 @@
 const remove = ['createdBy', 'lastModifiedBy', 'yearPublished', 
 'collectionId', 'isRootRecord', 'parent', 'creators', 'abouts', 'identifiers',
 'fileFormats', 'indexableContents', 'indexableContent', 'type', 'textIndexable',
-'media', 'clientMedia', 'clientMediaDownload'];
+'media', 'clientMedia', 'clientMediaDownload', 'itemCount', '_'];
 const nested = ['associatedMedia', 'hasPart'];
 
 const map = {
   lastModified : 'dateModified'
 }
 
-function transform(jsonld) {
+function transform(jsonld, clientMedia, nestedKey) {
   jsonld['@context'] = {
     "@vocab" : "http://schema.org/"
   }
@@ -21,26 +21,7 @@ function transform(jsonld) {
     return jsonld;
   } 
 
-
-  let types = jsonld['@type'];
-  if( types ) {
-    for( let i = types.length-1; i >= 0; i-- ) {
-      if( !types[i].match(/^http:\/\/schema.org/) ) {
-        types.splice(i, 1);
-      }
-    }
-  }
-
-  remove.forEach(key => {
-    if( jsonld[key] ) delete jsonld[key];
-  });
-
-  for( let key in map ) {
-    if( jsonld[key] ) {
-      if( !jsonld[map[key]] ) jsonld[map[key]] = jsonld[key];
-      delete jsonld[key];
-    }
-  }
+  // TODO nested loops over associatedMedia/hasPart, but not image or file info from clientMedia.graph
 
   if( jsonld.image ) {
     jsonld.image['@type'] = 'ImageObject';
@@ -59,7 +40,7 @@ function transform(jsonld) {
       if( !jsonld.image.encodingFormat ) jsonld.image.encodingFormat = jsonld.fileFormat;
       delete jsonld.fileFormat;
     }
-  } else {
+  } else if( jsonld.filename || jsonld.fileSize || jsonld.fileFormat) {
     if( jsonld.filename ) {
       if( !jsonld.name ) jsonld.name = jsonld.filename;
       delete jsonld.filename;
@@ -80,10 +61,33 @@ function transform(jsonld) {
     else delete jsonld.license;
   }
 
+  let types = jsonld['@type'];
+  if( types ) {
+    for( let i = types.length-1; i >= 0; i-- ) {
+      if( !types[i].match(/^http:\/\/schema.org/) ) {
+        types.splice(i, 1);
+      }
+    }
+  }
+
+  remove.forEach(key => {
+    if( jsonld[key] ) delete jsonld[key];
+  });
+
+  for( let key in map ) {
+    if( jsonld[key] ) {
+      if( !jsonld[map[key]] ) jsonld[map[key]] = jsonld[key];
+      delete jsonld[key];
+    }
+  }
+  
   nested.forEach(key => {
     let data = (jsonld[key] || [])
     if( !Array.isArray(data) ) data = [data];
-    data.forEach(item => transform(item));
+    data.forEach(item => 
+      transform(item, clientMedia, key)
+      // clientMedia.graph.filter(n => n['@id'] === item['@id'])[0]
+    );
   });
   
   return jsonld;
