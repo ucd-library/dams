@@ -197,24 +197,12 @@ export default function render() {
           selected-attribute="showing"
         >
           <div id="filters">
-            <!-- <div ?hidden="${!this
-              .collectionMode}" class="label">Collection</div>
-        <div ?hidden="${!this.collectionMode}" class="collection-filter">
-          <app-facet-checkbox
-            type="collection"
-            value="${this.selectedCollection.name}"
-            checked="${this.collectionMode}"
-            on-click="_removeCollectionFilter">
-          </app-facet-checkbox>
-        </div> -->
-
             ${this.facetFilters.map(
               (item, index) => html`
                 <app-filter-panel .filter="${item}"></app-filter-panel>
               `
             )}
           </div>
-          <app-collection-info-panel id="info"></app-collection-info-panel>
         </iron-pages>
 
       </div>

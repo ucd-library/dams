@@ -1,6 +1,5 @@
 import { LitElement} from 'lit';
 
-import "@ucd-lib/fin-search-box";
 import "../../utils/app-collection-card";
 
 // import "@polymer/iron-icons";

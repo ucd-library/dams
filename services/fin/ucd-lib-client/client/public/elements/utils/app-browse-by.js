@@ -1,7 +1,6 @@
 import { LitElement } from 'lit';
 import render from "./app-browse-by.tpl.js";
 
-// import "@ucd-lib/cork-pagination";
 import "../components/cards/dams-collection-card";
 
 import config from '../../lib/config';

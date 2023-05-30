@@ -50,6 +50,8 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
     this.searchResultsCount = 0;
     this.regexPattern = /\{\{\{.*?\}\}\}/g;
 
+    this.$ = {};
+
     window.addEventListener(
       "BookReader:SearchCallback",
       this._onSearchResultsChange.bind(this)

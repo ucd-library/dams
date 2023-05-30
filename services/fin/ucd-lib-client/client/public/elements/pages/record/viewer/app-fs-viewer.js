@@ -2,7 +2,6 @@ import { LitElement, html } from 'lit';
 import render from "./app-fs-viewer.tpl.js"
 import "../../../utils/app-virtual-scroller"
 import "@polymer/iron-icons/editor-icons"
-import "@ucd-lib/fin-icons"
 import bytes from "bytes"
 
 const ICONS = {

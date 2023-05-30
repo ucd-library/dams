@@ -29,6 +29,7 @@ export default class AppAudioViewer extends Mixin(LitElement)
     this.render = render.bind(this);
     this._injectModel('AppStateModel', 'MediaModel');
     this.libsLoaded = false;
+    this.$ = {};
   }
 
   _onAppStateUpdate(e) {

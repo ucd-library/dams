@@ -1,7 +1,6 @@
 import { LitElement } from "lit";
 import render from "./app-search-results-panel.tpl.js";
 
-// import "@ucd-lib/cork-pagination";
 import "@polymer/paper-spinner/paper-spinner-lite";
 
 import "./app-search-grid-result";
@@ -482,10 +481,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Object} e click|keyup event
    */
   _onPaginationChange(e) {
-    // let searchUrlParts = this.AppStateModel.locationElement.location.path;
-    // let query = this.RecordModel.urlToSearchDocument(searchUrlParts.slice(1, searchUrlParts.length));
-    // query.offset = e.detail.page * this.numPerPage - this.numPerPage;
-    // this.RecordModel.search(query, true, true, true);
     e.detail.startIndex = e.detail.page * 10 - 10;
     this.dispatchEvent(
       new CustomEvent("page-change", {

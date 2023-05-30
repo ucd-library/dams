@@ -1,4 +1,3 @@
-// import {PolymerElement} from "@polymer/polymer/polymer-element"
 import { LitElement } from "lit";
 import "@polymer/paper-spinner/paper-spinner-lite";
 import render from "./app-image-viewer.tpl.js";
@@ -32,12 +31,15 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   }
 
   async firstUpdated() {
-    let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
-    if (selectedRecordMedia)
-      this._onSelectedRecordMediaUpdate(selectedRecordMedia, true);
+    this._onAppStateUpdate(await this.AppStateModel.get());
+
+    // let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
+    // if (selectedRecordMedia)
+    //   this._onSelectedRecordMediaUpdate(selectedRecordMedia, true);
   }
 
   _onAppStateUpdate(e) {
+    debugger;
     if (
       e.selectedRecord &&
       (!e.selectedRecordMedia ||
@@ -61,13 +63,14 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @param {Object} media
    */
   _onSelectedRecordMediaUpdate(media) {
+    debugger;
     if (!media) return;
     let getMediaType = utils.getMediaType(media);
     if (getMediaType !== "ImageList" && getMediaType !== "ImageObject") return;
 
     if (
       this.media["@id"] !==
-        this.AppStateModel.locationElement.location.pathname &&
+        this.AppStateModel.location.pathname &&
       media.id.indexOf("/media/images/") < 0
     )
       return;

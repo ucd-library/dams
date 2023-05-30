@@ -1,7 +1,6 @@
 import { LitElement } from "lit";
 import "@polymer/iron-pages/iron-pages";
 import "./app-filter-panel";
-import "../app-collection-info-panel";
 import "../../../utils/app-tabs";
 
 import render from "./app-filters-panel.tpl.js";

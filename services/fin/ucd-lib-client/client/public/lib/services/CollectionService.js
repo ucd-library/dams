@@ -66,16 +66,6 @@ class CollectionService extends BaseService {
     });
   }
 
-  async overview() {
-    return this.request({
-      url : `${this.baseUrl}/all`,
-      checkCached : () => this.store.data.overview,
-      onLoading : request => this.store.setCollectionOverviewLoading(request),
-      onLoad : result => this.store.setCollectionOverviewLoaded(result.body),
-      onError : e => this.store.setCollectionOverviewError(e)
-    });
-  }
-
   /**
    * @method searchCollection
    * @description Search the catalogs

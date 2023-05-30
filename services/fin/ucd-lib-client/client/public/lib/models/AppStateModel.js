@@ -9,6 +9,9 @@ class AppStateModelImpl extends AppStateModel {
     super();
     this.store = AppStateStore;
 
+
+    this.init(APP_CONFIG.appRoutes);
+
     this._sendGA();
   }
 

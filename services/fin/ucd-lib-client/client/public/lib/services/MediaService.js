@@ -31,6 +31,17 @@ class MediaService extends BaseService {
     });
   }
 
+  async getManifest(url) {
+    return this.request({
+      url,
+      json : true,
+      checkCached : () => this.store.data.manifest[url],
+      onLoading : request => this.store.setManifestLoading(url, request),
+      onLoad : response => this.store.setManifestLoaded(url, response.body),
+      onError : error => this.store.setManifestError(url, error)
+    });
+  }
+
 }
 
 module.exports = new MediaService();

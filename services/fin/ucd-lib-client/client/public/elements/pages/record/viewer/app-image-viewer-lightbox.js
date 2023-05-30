@@ -72,7 +72,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @param {Object} media
    */
   _onSelectedRecordMediaUpdate(media) {
-    if (media["@id"] !== this.AppStateModel.locationElement.location.pathname)
+    if (media["@id"] !== this.AppStateModel.location.pathname)
       return;
     this.media = media;
     if (this.visible) this.renderCanvas();

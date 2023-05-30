@@ -65,27 +65,5 @@ html {
   /**
   * Custom mixins
   */
-  --fin-search-box-select: {
-    font-size: var(--fs-p);
-    font-weight: var(--fw-regular);
-    color: var(--default-primary-color);
-    background-color: var(--default-secondary-color);
-    width: 100px;
-  }
-  --fin-search-box-select-inverse: {
-    @apply(--fin-search-box-select);
-    color: var(--default-secondary-color);
-    background-color: var(--default-primary-color);
-  }
-  --fin-search-box-input: {
-    padding-left: 10px;
-    font-size: var(--fs-p);
-    background-color: white;
-  }
   --cork-drop-down-arrow-color: var(--default-primary-color);
-  --cork-toggle-panel-label : {
-    padding: 10px 0;
-    color: var(--default-primary-color);
-    font-weight: var(--fw-regular-bold);
-  }
 }

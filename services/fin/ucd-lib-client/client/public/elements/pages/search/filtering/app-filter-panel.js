@@ -1,8 +1,5 @@
 import { LitElement } from "lit";
 
-import "@polymer/paper-tabs/paper-tabs"
-import "@ucd-lib/cork-toggle-panel/cork-toggle-panel"
-
 import "./app-range-filter"
 import render from "./app-filter-panel.tpl.js"
 import "./app-facet-filter"

@@ -1,6 +1,5 @@
 import { LitElement} from 'lit';
 
-import "@ucd-lib/fin-search-box";
 import "../../utils/app-collection-card";
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-iconset/ucdlib-iconset";
@@ -81,7 +80,10 @@ class AppHome extends Mixin(LitElement)
     if( displayData && displayData.body && Array.isArray(displayData.body) ) this.displayData = displayData.body;
     if( !displayData ) {
       displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
-      if( displayData && displayData.body ) this.displayData = JSON.parse(displayData.body);
+      if( displayData && displayData.body ) {
+        if( typeof displayData.body === 'string' ) displayData.body = JSON.parse(displayData.body);
+        this.displayData = displayData.body;
+      }
     }
 
     console.log('displayData', this.displayData);

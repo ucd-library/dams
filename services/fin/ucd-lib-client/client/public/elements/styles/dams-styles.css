@@ -1,19 +1,4 @@
 /* Default typography */
-paper-tabs {
-  --paper-tabs-selection-bar: {
-    border-bottom: 3px solid var(--default-primary-color);
-  }
-}
-paper-tab {
-  --paper-tab-content-unselected : {    
-    text-transform: uppercase;
-    color: var(--text-disabled);
-  }
-  --paper-tab-content : {
-    text-transform: uppercase;
-    color: var(--default-primary-color);
-  }
-}
 
 button {
   margin: 0;
@@ -93,10 +78,6 @@ a.gold {
   max-width: var(--max-width);
   width: 100%;
   justify-content: center;
-}
-
-fin-search-box > iron-icon {
-  color: var(--default-secondary-color);
 }
 
 /** EVERYTHING BELOW HERE IS BEING USED. NEED TO AUDIT ABOVE RULES **/
