@@ -84,14 +84,14 @@ class Utils {
     let graph = clientMedia.graph;
 
     for (const mediaGroup of clientMedia.mediaGroups) {
-      if (mediaGroup.display?.clientMedia?.images?.medium?.url) {
-        thumbnailUrl = mediaGroup.display.clientMedia.images.medium.url;
+      if (mediaGroup.clientMedia?.images?.medium?.url) {
+        thumbnailUrl = mediaGroup.clientMedia.images.medium.url;
         continue;
       }
 
-      let mediaType = this.getMediaType(mediaGroup.display);
+      let mediaType = this.getMediaType(mediaGroup);
       if (mediaType === "ImageObject") {
-        thumbnailUrl = "/fcrepo/rest" + mediaGroup.display["@id"];
+        thumbnailUrl = "/fcrepo/rest" + mediaGroup["@id"];
       } else if (mediaType === "ImageList") {
         let firstImage = graph.filter(
           (g) => parseInt(g.position) === 1 && g.clientMedia

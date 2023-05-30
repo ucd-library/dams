@@ -161,38 +161,36 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if (!record) return sources;
 
     record.clientMedia.mediaGroups.forEach((mediaGroup) => {
-      mediaGroup.downloads.forEach((media) => {
-        let mediaType = utils.getMediaType(media);
+      let mediaType = utils.getMediaType(mediaGroup);
 
-        // TODO start of simplifying getting sources..
-        //  can we just loop over downloads like we are here and just concat everything?
-        //  prob not, vid objects have more complicated structure with transcripts and such
-        // if( ![ 'ImageObject', 'ImageList', 'VideoObject', 'AudioObject' ].includes(mediaType) ) return;
+      // TODO start of simplifying getting sources..
+      //  can we just loop over downloads like we are here and just concat everything?
+      //  prob not, vid objects have more complicated structure with transcripts and such
+      // if( ![ 'ImageObject', 'ImageList', 'VideoObject', 'AudioObject' ].includes(mediaType) ) return;
 
-        // TODO this works for pdf / single image, however breaks for lists that have multiple hasParts
-        if (
-          mediaType !== "ImageList" &&
-          (!media.fileFormat || !media.fileSize || !media.filename)
-        )
-          return;
+      // TODO this works for pdf / single image, however breaks for lists that have multiple hasParts
+      if (
+        mediaType !== "ImageList" &&
+        (!mediaGroup.fileFormat || !mediaGroup.fileSize || !mediaGroup.filename)
+      )
+        return;
 
-        if (mediaType === "VideoObject") {
-          sources = sources.concat(this._getVideoSources(media));
-        } else if (mediaType === "AudioObject") {
-          sources = sources.concat(this._getAudioSources(media));
-        } else if (mediaType === "ImageObject") {
-          this.showImageFormats = true;
-          sources = sources.concat(this._getImageSources(media, true));
-          this._renderImgFormats(media, null, "FR");
-        } else if (mediaType === "ImageList") {
-          this.showImageFormats = true;
-          (media.hasPart || []).forEach((img) => {
-            sources = sources.concat(
-              this._getImageSources(img, nativeImageOnly)
-            );
-          });
-        }
-      });
+      if (mediaType === "VideoObject") {
+        sources = sources.concat(this._getVideoSources(mediaGroup));
+      } else if (mediaType === "AudioObject") {
+        sources = sources.concat(this._getAudioSources(mediaGroup));
+      } else if (mediaType === "ImageObject") {
+        this.showImageFormats = true;
+        sources = sources.concat(this._getImageSources(mediaGroup, true));
+        this._renderImgFormats(mediaGroup, null, "FR");
+      } else if (mediaType === "ImageList") {
+        this.showImageFormats = true;
+        (mediaGroup.hasPart || []).forEach((img) => {
+          sources = sources.concat(
+            this._getImageSources(img, nativeImageOnly)
+          );
+        });
+      }
     });
 
     /*

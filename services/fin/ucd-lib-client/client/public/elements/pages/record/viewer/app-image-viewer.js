@@ -39,7 +39,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   }
 
   _onAppStateUpdate(e) {
-    debugger;
     if (
       e.selectedRecord &&
       (!e.selectedRecordMedia ||
@@ -63,7 +62,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @param {Object} media
    */
   _onSelectedRecordMediaUpdate(media) {
-    debugger;
     if (!media) return;
     let getMediaType = utils.getMediaType(media);
     if (getMediaType !== "ImageList" && getMediaType !== "ImageObject") return;
