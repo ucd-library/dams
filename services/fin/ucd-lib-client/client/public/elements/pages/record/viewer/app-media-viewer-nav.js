@@ -322,12 +322,12 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     record.clientMedia.mediaGroups.forEach((mg) => {
       let nodes = [];
 
-      let type = utils.getMediaType(mg.display);
+      let type = utils.getMediaType(mg);
       if (type) {
-        if (mg.display.hasPart) {
-          nodes = mg.display.hasPart.map((item) => record.index[item["@id"]]);
+        if (mg.hasPart) {
+          nodes = mg.hasPart.map((item) => record.index[item["@id"]]);
         } else {
-          nodes.push(mg.display["@id"]);
+          nodes.push(mg["@id"]);
         }
 
         mediaList.push(...utils.organizeMediaList(nodes));

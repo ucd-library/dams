@@ -111,12 +111,12 @@ class ClientMedia {
    */
   async loadManifests() {
     for( let node of this.mediaGroups ) {
-      if( node.clientMedia.manifest ) {
-        if( node.clientMedia.manifest.loaded ) continue;
+      if( node.clientMedia.pdf.manifest ) {
+        if( node.clientMedia.pdf.loaded ) continue;
 
-        let payload = await mediaModel.getManifest(node.clientMedia.manifest.url);
-        node.clientMedia = Object.assign(node.clientMedia, payload);
-        node.clientMedia.manifest.loaded = true;
+        let res = await mediaModel.getManifest(node.clientMedia.pdf.manifest);
+        node.clientMedia = Object.assign(node.clientMedia, res.payload);
+        node.clientMedia.pdf.loaded = true;
 
         // make sure we are sorted
         if( node.clientMedia.pages ) {
@@ -210,7 +210,7 @@ class ClientMedia {
 
     if( node.clientMedia.pages ) {
       node.clientMedia.pages.forEach(page => {
-        if( !page.download ) {
+        if( !page.download && page.original ) {
           page.download = {
             url : page.original.url
           }

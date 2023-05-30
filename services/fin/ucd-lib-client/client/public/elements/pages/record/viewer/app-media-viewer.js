@@ -83,7 +83,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
 
     let mediaType;
     mediaGroup.forEach((media) => {
-      let type = utils.getMediaType(media.display);
+      let type = utils.getMediaType(media);
       if (type) {
         mediaType = type.toLowerCase().replace(/object/i, "");
         mediaGroup = media;
@@ -103,27 +103,29 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
     }
 
     // TODO hack to test for specific item, but should change to use app container config?
-    let renderAsBr = false; // mediaGroup.display.hasPart && mediaGroup.display.encodesCreativeWork && mediaGroup.display.encodesCreativeWork['@id'] === '/item/ark:/87287/d7k06n';
+    let renderAsBr = false; // mediaGroup.hasPart && mediaGroup.encodesCreativeWork && mediaGroup.encodesCreativeWork['@id'] === '/item/ark:/87287/d7k06n';
 
     if (
       renderAsBr ||
-      (mediaGroup.display?.clientMedia && mediaGroup.display?.clientMedia.pdf)
+      (mediaGroup.clientMedia && mediaGroup.clientMedia.pdf)
     ) {
       mediaType = "bookreader";
       this.isBookReader = true;
       let brData;
-      if (renderAsBr && !mediaGroup.display?.clientMedia?.pdf?.manifest) {
+      if (renderAsBr && !mediaGroup.clientMedia?.pdf?.manifest) {
         this.bookData = utils.buildIaReaderPages(
-          mediaGroup.display.hasPart,
+          mediaGroup.hasPart,
           e.selectedRecord?.clientMedia?.index
         );
       } else {
-        brData = await this.RecordModel.getIaBookManifest(
-          mediaGroup.display.clientMedia.pdf.manifest
-        );
+        // brData = await this.RecordModel.getIaBookManifest(mediaGroup.clientMedia.pdf.manifest);
+        await e.selectedRecord.clientMedia.loadManifests();
+        this.bookData = { pages : e.selectedRecord.clientMedia.mediaGroups[0].clientMedia?.pages };
+        this.mediaType = "bookreader";
       }
-      this.bookItemId = mediaGroup.display["@id"];
+      this.bookItemId = mediaGroup["@id"];
 
+      // TODO can this be removed since we switched to loadManifests() ?
       if (brData && brData.body) {
         this.mediaType = "bookreader";
         this.bookData =
