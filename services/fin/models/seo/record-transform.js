@@ -21,24 +21,30 @@ function transform(jsonld, clientMedia, nestedKey) {
     return jsonld;
   } 
 
-  // TODO nested loops over associatedMedia/hasPart, but not image or file info from clientMedia.graph
-
   if( jsonld.image ) {
     jsonld.image['@type'] = 'ImageObject';
     if( jsonld.image.colorPalette ) delete jsonld.image.colorPalette;
     if( jsonld.image.iiif ) delete jsonld.image.iiif;
 
-    if( jsonld.filename ) {
-      if( !jsonld.image.name ) jsonld.image.name = jsonld.filename;
-      delete jsonld.filename;
+    if( jsonld.image.filename ) {
+      if( !jsonld.image.name ) jsonld.image.name = jsonld.image.filename;
+      delete jsonld.image.filename;
     }
     if( jsonld.fileSize ) {
       if( !jsonld.image.contentSize ) jsonld.image.contentSize = jsonld.fileSize;
       delete jsonld.fileSize;
     }
-    if( jsonld.fileFormat ) {
-      if( !jsonld.image.encodingFormat ) jsonld.image.encodingFormat = jsonld.fileFormat;
-      delete jsonld.fileFormat;
+    if( jsonld.image.fileFormat ) {
+      if( !jsonld.image.encodingFormat ) jsonld.image.encodingFormat = jsonld.image.fileFormat;
+      delete jsonld.image.fileFormat;
+    }
+    if( jsonld.image.clientMedia ) delete jsonld.image.clientMedia;
+    if( jsonld.image._ ) delete jsonld.image._;
+    if( jsonld.image['@shortType'] ) delete jsonld.image['@shortType'];
+    if( jsonld.image.id ) delete jsonld.image.id;
+    if( jsonld.image['@id'] ) {
+      jsonld.image.url = '/fcrepo/rest'+jsonld.image['@id'];
+      delete jsonld.image['@id'];
     }
   } else if( jsonld.filename || jsonld.fileSize || jsonld.fileFormat) {
     if( jsonld.filename ) {
@@ -86,7 +92,6 @@ function transform(jsonld, clientMedia, nestedKey) {
     if( !Array.isArray(data) ) data = [data];
     data.forEach(item => 
       transform(item, clientMedia, key)
-      // clientMedia.graph.filter(n => n['@id'] === item['@id'])[0]
     );
   });
   

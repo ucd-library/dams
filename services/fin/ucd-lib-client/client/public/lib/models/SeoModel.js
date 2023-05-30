@@ -109,6 +109,42 @@ class SeoModel extends BaseModel {
     for( var key in record.root ) {
       if( key[0] === '_' ) delete record[key];
     }
+    
+    // populate associatedMedia from graph
+    if( record.root.associatedMedia ) {
+      let associatedMedia = [...record.root.associatedMedia];
+      associatedMedia.forEach((media, index1) => {
+        let graphMatch = record.clientMedia.graph.filter(r => r['@id'] === media['@id'])[0];
+        if( graphMatch ) {
+          associatedMedia[index1] = graphMatch;
+          graphMatch.hasPart.forEach((part, index2) => {
+            graphMatch = record.clientMedia.graph.filter(r => r['@id'] === part['@id'])[0];
+            if( graphMatch ) {
+              let matchedMedia = associatedMedia[index1].hasPart[index2];
+              matchedMedia.image = graphMatch;
+              matchedMedia['@type'] = graphMatch['@type'];
+              if( graphMatch.position ) {
+                matchedMedia.position = parseInt(graphMatch.position);
+                delete graphMatch.position;
+              }
+              let imageSize = graphMatch.clientMedia?.images?.original?.size;
+              if( imageSize ) {
+                matchedMedia.image.width = parseInt(imageSize.width);
+                matchedMedia.image.height = parseInt(imageSize.height);
+              }
+              let thumbnailUrl = graphMatch.clientMedia?.images?.small?.url;
+              if( thumbnailUrl ) {
+                matchedMedia.thumbnailUrl = thumbnailUrl;
+              }
+              matchedMedia.isPartOf = media;
+              matchedMedia.directParent = media['@id'];
+            }
+          });
+        }
+      });
+      record.root.associatedMedia = associatedMedia;
+    }
+
     record = transform(record.root, record.clientMedia);
 
     this.ele.innerHTML = JSON.stringify(record, '  ', '  ');
