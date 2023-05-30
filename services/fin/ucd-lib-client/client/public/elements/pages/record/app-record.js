@@ -142,7 +142,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
 
     await this.CollectionModel.get(this.collectionId); // get item count
 
-    this._updateLinks(this.AppStateModel.locationElement.location, record);
+    this._updateLinks(this.AppStateModel.location, record);
 
     // let citation = this.shadowRoot.querySelector('app-citation');
     // if( citation ) citation.requestUpdate();

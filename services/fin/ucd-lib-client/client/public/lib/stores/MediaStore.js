@@ -7,64 +7,44 @@ class MediaStore extends BaseStore {
     super();
 
     this.data = {
-      byId : {},
-      // by collection id
-      defaultSearch : {},
-      search : {
-        state : this.STATE.INIT
-      }
+      manifest : {},
     }
 
     this.events = {
-      // COLLECTION_VC_UPDATE : 'collection-vc-update',
+      CLIENT_MEDIA_MANIFEST_UPDATE : 'client-media-manifest-update',
     }
 
   }
 
-  /*
-  getRecord(id) {
-    let parts = id.split('/').filter(p => p !== '');
-    for( let i = parts.length-1; i >= 0; i-- ) {
-      let pid = '/'+parts.join('/');
-      if( this.data.byId[pid] ) {
-        return this.data.byId[pid];
-      }
-      parts.splice(i, 1);
-    }
-    return null;
-  }
-
-  setRecordLoading(id, promise) {
-    this._setRecordState({
-      state: this.STATE.LOADING, 
-      id,
-      request : promise
+  setManifestLoading(url, request) {
+    this._setManifest(url, {
+      id : url,
+      state : this.STATE.LOADING,
+      request
     });
   }
 
-  setRecordLoaded(id, payload) {
-    this._setRecordState({
-      state: this.STATE.LOADED,
-      rootId : payload.id,
-      payload, id
+  setManifestError(url, error) {
+    this._setManifest(url, {
+      id : url,
+      state : this.STATE.ERROR,
+      error
     });
   }
 
-  setRecordError(id, error) {
-    this._setRecordState({
-      state: this.STATE.ERROR,   
-      error, id
+  setManifestLoaded(url, payload) {
+    this._setManifest(url, {
+      id : url,
+      state : this.STATE.LOADED,
+      payload
     });
   }
 
-  _setRecordState(state) {
-    this.data.byId[state.id] = state;
-    if( state.rootId ) {
-      this.data.byId[state.rootId] = state;
-    }
-    this.emit(this.events.RECORD_UPDATE, state);
+  _setManifest(url, manifest) {
+    this.data.manifest[url] = clone(manifest);
+    this.emit(this.events.CLIENT_MEDIA_MANIFEST_UPDATE, url);
   }
-  */
+
 }
 
 module.exports = new MediaStore();

@@ -126,12 +126,8 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Object} e
    */
   _setCollections(e) {
-    let overview = e.payload;
-
-    let browse = {};
-    overview.forEach((item) => {
-      browse[item["@id"]] = item.name;
-    });
+    let browse = e.payload;
+    // todo
   }
 
   /**
