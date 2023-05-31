@@ -43,7 +43,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       e.selectedRecord &&
       (!e.selectedRecordMedia ||
         e.selectedRecord?.index[e.location.pathname]["@id"] !==
-          e.selectedRecordMedia["@id"])
+          e.selectedRecordMedia)
     ) {
       // todo find position 1
       let selectedRecordMedia = e.selectedRecord.clientMedia.graph.filter(

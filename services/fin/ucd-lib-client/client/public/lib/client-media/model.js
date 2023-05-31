@@ -23,6 +23,7 @@ class ClientMedia {
       throw new Error('Root '+id+' not found in graph');
     }
 
+    // debugger;
     // parse() populates the mediaGroups array
     this.mediaGroups = new Set();
     this.parse();

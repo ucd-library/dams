@@ -112,6 +112,7 @@ class SeoModel extends BaseModel {
     
     // populate associatedMedia from graph
     if( record.root.associatedMedia ) {
+      if( !Array.isArray(record.root.associatedMedia) ) record.root.associatedMedia = [record.root.associatedMedia];
       let associatedMedia = [...record.root.associatedMedia];
       associatedMedia.forEach((media, index1) => {
         let graphMatch = record.clientMedia.graph.filter(r => r['@id'] === media['@id'])[0];

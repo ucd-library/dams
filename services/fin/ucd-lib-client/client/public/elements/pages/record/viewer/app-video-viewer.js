@@ -58,9 +58,10 @@ export default class AppVideoViewer extends Mixin(LitElement)
 
     this.fullPath = e.location.fullpath;
 
+    debugger;
     // TODO change to support multiple media groups
     this._onSelectedRecordMediaUpdate(
-      e.selectedRecord.clientMedia?.mediaGroups[0]?.display
+      e.selectedRecord.clientMedia?.mediaGroups[0]
     );
   }
 
