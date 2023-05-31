@@ -71,6 +71,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @param {Object} media
    */
   _onSelectedRecordUpdate(e) {
+    if( !e ) return;
     let {graph, clientMedia, selectedMedia, selectedMediaPage} = e;
     
     let currentMedia = this.record?.selectedMedia || {};
@@ -145,12 +146,17 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   async renderCanvas() {
     if( !this.record ) return;
 
-    let {graph, clientMedia, selectedMedia, selectedPageMedia} = this.record;
+    let {graph, clientMedia, selectedMedia, selectedMediaPage} = this.record;
 
     if (selectedMedia["@id"] === this.renderedMedia?.["@id"]) {
       return;
     }
-    this.renderedMedia = selectedMedia;
+
+    this.renderedMedia = selectedMedia.clientMedia.pages.filter(media => media.page === selectedMediaPage)[0];
+    // on first page load, selectedMediaPage is -1, so just show first page from clientMedia.images
+    if( !this.renderedMedia ) {
+      this.renderedMedia = selectedMedia.clientMedia.images;
+    }
 
     this.loading = false;
 
@@ -166,12 +172,11 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.viewer.removeLayer(this.currentLayer);
     }
 
-    let scm = this.renderedMedia.clientMedia;
-    if (scm.images.tiled) {
-      let tiledUrl = scm.images.tiled.iiif + "/info.json";
+    if (this.renderedMedia.tiled) {
+      let tiledUrl = this.renderedMedia.tiled.iiif + "/info.json";
       this.currentLayer = L.tileLayer.iiif(tiledUrl);
     } else {
-      let original = scm.images.original;
+      let original = this.renderedMedia.original;
 
       // we might not have size
       let size = await this.getImageSize(original);

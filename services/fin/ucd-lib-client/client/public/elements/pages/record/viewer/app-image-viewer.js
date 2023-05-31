@@ -45,28 +45,36 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @param {Object} media
    */
   _onSelectedRecordUpdate(e) {
-    let {graph, clientMedia, selectedMedia, selectedPageMedia} = e;
+    if( !e ) return;
+    let {graph, clientMedia, selectedMedia, selectedMediaPage} = e;
 
-    let getMediaType = utils.getMediaType(selectedMedia);
-    if (getMediaType !== "ImageList" && getMediaType !== "ImageObject") return;
+    let mediaType = utils.getMediaType(selectedMedia);
+    if (mediaType !== "ImageList" && mediaType !== "ImageObject") return;
 
     this.loading = true;
-    this.media = selectedMedia;
+
+    this.media = selectedMedia.clientMedia.pages.filter(media => media.page === selectedMediaPage)[0];
+    // on first page load, selectedMediaPage is -1, so just show first page from clientMedia.images
+    if( !this.media ) {
+      this.media = selectedMedia.clientMedia.images;
+    }
+
     this._renderImg();
   }
 
-  _renderImg() {
-    if (this.media.hasPart && this.media.hasPart.length > 0) {
-      this.media.image = this.media.hasPart[0].image;
-    }
+  async _renderImg() {
+    if( this.media ) {
+      // there could be gcs errors where only some of the images are available, or only the original
+      let srcset = '';
+      if( this.media.small?.url ) srcset += `${this.media.small.url} ${this.media.small.size.width}w,`;
+      if( this.media.medium?.url ) srcset += `${this.media.medium.url} ${this.media.medium.size.width}w,`;
+      if( this.media.large?.url ) srcset += `${this.media.large.url} ${this.media.large.size.width}w,`;
 
-    if (this.media.clientMedia?.images) {
-      let srcset = `
-        ${this.media.clientMedia.images.small.url} ${this.media.clientMedia.images.small.size.width}w,
-        ${this.media.clientMedia.images.medium.url} ${this.media.clientMedia.images.medium.size.width}w,
-        ${this.media.clientMedia.images.large.url} ${this.media.clientMedia.images.large.size.width}w,
-        ${this.media.clientMedia.images.original.url} ${this.media.clientMedia.images.original.size.width}w
-      `;
+      if( this.media.original?.url ) {
+        // we might not have size
+        let size = await this.getImageSize(this.media.original);
+        srcset += `${this.media.original.url} ${size.width}w`;
+      }
 
       let sizes = "600px";
 
@@ -77,6 +85,22 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     }
     requestAnimationFrame(() => {
       this.loading = false;
+    });
+  }
+
+  getImageSize(original) {
+    if( original.size ) return original.size;
+
+    return new Promise((resolve, reject) => {
+      let img = new Image();
+      img.src = original.url;
+      img.onload = () => {
+        original.size = {
+          height : img.naturalHeight, 
+          width : img.naturalWidth
+        }
+        resolve(); 
+      };
     });
   }
 }

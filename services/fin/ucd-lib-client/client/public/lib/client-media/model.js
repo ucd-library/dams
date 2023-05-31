@@ -87,7 +87,7 @@ class ClientMedia {
         node.clientMedia.images = {};
       }
 
-      if( !node.clientMedia.images.original ) {
+      if( !node.clientMedia.images.original && displayType ) {
         node.clientMedia.images.original = {
           // TODO: DC get better unknown image from kimmy
           url : '/images/tree-bike-illustration.png'

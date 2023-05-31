@@ -79,11 +79,10 @@ class RecordService extends BaseService {
         body : JSON.stringify(searchDocument)
       },
       onLoading : promise => this.store.setSearchLoading(searchDocument,  promise),
-      onLoad : result => {
+      onLoad : result => {        
         if( result.body.results ) {
           result.body.results = result.body.results.map(record => {
             let rg = new RecordGraph(record);
-            // debugger;
             // if( !ignoreClientMedia ) {
               rg.clientMedia = new ClientMedia(record['@id'], record);
             // }
