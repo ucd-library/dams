@@ -110,7 +110,6 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
 
   /**
    * @method _onAppStateUpdate
-   * @description AppStateInterface
    */
   async _onAppStateUpdate(e) {
     this.drawerOpen = e.filtersDrawerOpen ? true : false;

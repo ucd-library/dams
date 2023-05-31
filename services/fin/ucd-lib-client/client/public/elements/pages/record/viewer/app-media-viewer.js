@@ -138,9 +138,9 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
     }
 
     this.mediaType = mediaType;
-    this.AppStateModel.setSelectedRecordMedia(
-      e.selectedRecord.index[e.location.pathname]
-    );
+    // this.AppStateModel.setSelectedRecordMedia(
+    //   e.selectedRecord.index[e.location.pathname]
+    // );
   }
 
   _onSearchResultsChange(e) {

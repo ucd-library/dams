@@ -44,8 +44,8 @@ export default class AppAudioViewer extends Mixin(LitElement)
     this.$.audio  = this.shadowRoot.getElementById('audio_player');
     this.$.poster = this.shadowRoot.getElementById('audio_poster');
 
-    let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
-    if( selectedRecordMedia ) this._onSelectedRecordMediaUpdate(selectedRecordMedia);
+    let selectedRecord = await this.AppStateModel.getSelectedRecord();
+    if( selectedRecord && selectedRecord.selectedMedia ) this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
 
     this.fullPath = (await this.AppStateModel.get()).location.fullpath;
     

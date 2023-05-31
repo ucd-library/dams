@@ -63,14 +63,6 @@ class AppStateModelImpl extends AppStateModel {
     return this.store.getSelectedRecord();
   }
 
-  setSelectedRecordMedia(record) {
-    this.store.setSelectedRecordMedia(record);
-  }
-
-  getSelectedRecordMedia() {
-    return this.store.getSelectedRecordMedia();
-  }
-
   setSelectedCollection(collection) {
     this.store.setSelectedCollection(collection);
   }

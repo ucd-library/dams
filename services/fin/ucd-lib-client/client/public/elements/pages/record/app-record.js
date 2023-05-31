@@ -76,10 +76,6 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
     if (selectedRecord) {
       await this._onSelectedRecordUpdate(selectedRecord);
-      let selectedRecordMedia =
-        await this.AppStateModel.getSelectedRecordMedia();
-      if (selectedRecordMedia)
-        this._onSelectedRecordMediaUpdate(selectedRecordMedia);
     }
   }
 
@@ -116,7 +112,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
 
   /**
    * @method _onSelectedRecordUpdate
-   * @description from AppStateInterface, called when a record is selected
+   * @description called when a record is selected
    *
    * @param {Object} record selected record
    */
@@ -280,7 +276,6 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
 
   /**
    * @method _onAppStateUpdate
-   * @description AppStateInterface
    */
   _onAppStateUpdate(e) {
     this._updateLinks(e.location);
@@ -504,7 +499,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
 
   /**
    * @method _onSelectedRecordMediaUpdate
-   * @description from AppStateInterface, called when a records media is selected
+   * @description from AppStateModel, called when a records media is selected
    *
    * @param {Object} record
    */
