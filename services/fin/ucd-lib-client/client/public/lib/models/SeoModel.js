@@ -30,6 +30,7 @@ class SeoModel extends BaseModel {
    * @description set site meta tags and jsonld
    */
   async _onAppStateUpdate(e) {
+    return; // TODO loop badness
     if( e.state !== 'loaded' ) return;
 
     let state = AppStateModel.store.data;

@@ -1,5 +1,6 @@
 const { BaseModel } = require("@ucd-lib/cork-app-utils");
 const RecordVcStore = require("../stores/RecordVcStore");
+const config = require("../config");
 
 class RecordVcModel extends BaseModel {
   constructor() {
@@ -17,69 +18,52 @@ class RecordVcModel extends BaseModel {
    * @param {Object} e
    */
   translate(e) {
-    if (e && e.clientMedia) {
+    let {graph, clientMedia, selectedMedia, selectedPageMedia} = e;
+
+    if (graph && clientMedia) {
       let callNumber = "";
-      if (e.root.identifier) {
-        if (!Array.isArray(e.root.identifier))
-          e.root.identifier = [e.root.identifier];
-        e.root.identifier.forEach((id) => {
-          let match = id.match(/[a-zA-Z]{1,2}-\d{3}/g);
-          if (match) callNumber = match[0];
+
+      if (graph.root && graph.root.identifier) {
+        if (!Array.isArray(graph.root.identifier))
+          graph.root.identifier = [graph.root.identifier];
+          graph.root.identifier.forEach((id) => {
+            let match = id.match(/[a-zA-Z]{1,2}-\d{3}/g);
+            if (match) callNumber = match[0];
         });
       }
 
-      // imagelists
-      let collectionImg = e.clientMedia.graph.filter(
-        (g) => parseInt(g.position) === 1 && g.clientMedia
-      )[0];
-      if (collectionImg) {
-        collectionImg = collectionImg.clientMedia.images?.medium?.url;
-      } else if (
-        e.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium?.url
-      ) {
-        // pdf / video
-        collectionImg =
-          e.clientMedia.mediaGroups[0]?.display?.clientMedia?.images?.medium
-            ?.url;
-      } else if (e.clientMedia.mediaGroups[0]?.display?.fileFormat) {
-        // single image
-        collectionImg =
-          "/fcrepo/rest" + e.clientMedia.mediaGroups[0].display.id;
+      let collectionId = '';
+      if (graph.root.isPartOf) {
+        if (!Array.isArray(graph.root.isPartOf)) {
+          graph.root.isPartOf = [graph.root.isPartOf];
+        }
+
+        for( let part of graph.root.isPartOf ) {
+          if( part['@id'].startsWith(window.location.origin+'/collection/') ) {
+            collectionId = part['@id'];
+            break;
+          }
+        }
       }
 
-      // TODO temp remove oac isPartOf records
-      let collectionId;
-      if (e.root.isPartOf) {
-        if (!Array.isArray(e.root.isPartOf))
-          e.root.isPartOf = [e.root.isPartOf];
-        e.root.isPartOf.forEach((ipo) => {
-          if (!ipo["@id"].includes("oac.cdlib.org")) collectionId = ipo["@id"];
-        });
-      }
-
-      let keywords = [];
-      if (e.root.about && Array.isArray(e.root.about)) {
-        keywords = e.root.about;
-      } else if (e.root.about) {
-        keywords = [e.root.about];
-      }
+      let keywords = graph.root.about || [];
+      if( !Array.isArray(keywords) ) keywords = [keywords];
 
       // translate collection and related nodes/items to ui model
       const item = {
-        "@id": e.root["@id"],
-        name: e.root.name,
+        "@id": graph.root["@id"],
+        name: graph.root.name,
         collectionId,
-        collectionName: e.root.creator?.name,
-        collectionImg,
-        clientMedia: e.clientMedia,
-        date: e.root.yearPublished,
-        publisher: e.root.publisher?.name,
+        collectionName: config.collectionLabels[collectionId] || '',
+        clientMedia: clientMedia,
+        date: graph.root.yearPublished,
+        publisher: graph.root?.publisher?.name,
         keywords,
         callNumber,
         arkDoi: ["?"],
         fedoraLinks: ["?"],
         citationText: "?",
-        root: e.root,
+        graph,
       };
 
       // todo save translated data to store

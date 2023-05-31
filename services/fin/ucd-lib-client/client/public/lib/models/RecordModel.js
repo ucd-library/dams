@@ -32,71 +32,52 @@ class RecordModel extends ElasticSearchModel {
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) {
       this.currentRecordId = null;
-      this.currentMediaId = null;
+      this.selectedMediaPage = null;
       AppStateModel.setSelectedRecord(null);
-      AppStateModel.setSelectedRecordMedia(null);
       return;
     }
+
     let id = '/' + e.location.path.join('/');
+    let mediaPage = -1;
+
+    // parse out selected page within media
+    if( id.match(/:\d+$/) ) {
+      mediaPage = parseInt(id.split(':').pop());
+      id = id.replace(/:\d+$/, '');
+    }
 
     let result = await this.get(id);
+    await result.payload.clientMedia.loadManifests();
 
     // item view controller event vs stuff below?
 
     // only trigger a change if the root record changed.
-    if( result.id !== this.currentRecordId ) {
+    if( result.id !== this.currentRecordId || this.selectedMediaPage !== mediaPage ) {
       this.currentRecordId = result.id;
-      AppStateModel.setSelectedRecord(result.payload);
+      this.selectedMediaPage = mediaPage;
 
-      // if( result.payload ) {
-      AppStateModel.setSelectedRecordMedia(Object.values(result.payload.index).filter(r => r.clientMedia && r.clientMedia.images && parseInt(r.position) === 1)[0]);
-      // }
-      //
-      // result.payload.index[result.payload.clientMedia.id]
-      // if( result.payload.clientMedia.id === result.payload.root.id ) then need to render image with position 1
+      let selectedMedia = result.payload.clientMedia.mediaGroups.find(node => node['@id'] === id);
+      
+      if( !selectedMedia ) {
+        if( id !== result.id ) {
+          console.warn('Unable to find selected media', id);
+        }
 
-      // if( result.payload.clientMedia.id === result.payload.root.id ) {
-      // } else {
-      // }
+        selectedMedia = result.payload.clientMedia.mediaGroups[0];
+        if( selectedMedia.clientMedia.pages ) {
+          mediaPage = 0;
+        } else {
+          mediaPage = -1;
+        }
+      }
 
+      AppStateModel.setSelectedRecord({
+        graph: result.payload, // record graph class
+        clientMedia : result.payload.clientMedia, // client media class
+        selectedMedia: selectedMedia, // selected media node
+        selectedMediaPage: mediaPage // selected page (integer)
+      });
     }
-
-    // selected media can be any child
-    // if( this.currentMediaId === id ) return;
-    // this.currentMediaId = id;
-
-    // // select the current media based on url id
-    // for( let type in result.payload.media ) {
-    //   let mediaGroup = result.payload.media[type];
-    //   for( let media of mediaGroup ) {
-    //     if( type === 'imageList' ) {
-    //       for( let image of media.hasPart ) {
-    //         if( image['@id'] === id ) {
-    //           AppStateModel.setSelectedRecordMedia(image);
-    //           return;
-    //         }
-    //       }
-    //     } else if( media['@id'] === id ) {
-    //       AppStateModel.setSelectedRecordMedia(media);
-    //       return;
-    //     }
-    //   }
-    // }
-
-    // // default, nothing currently selected
-    // if (result.payload.media.imageList && result.payload.media.imageList[0].hasPart.length ) {
-    //   AppStateModel.setSelectedRecordMedia(result.payload.media.imageList[0].hasPart[0]);
-    // } else if (result.payload.media.video) {
-    //   AppStateModel.setSelectedRecordMedia(result.payload.media.video[0]);
-    // } else if (result.payload.media.audio) {
-    //   AppStateModel.setSelectedRecordMedia(result.payload.media.audio[0]);
-    // } else if (result.payload.media.image) {
-    //   AppStateModel.setSelectedRecordMedia(result.payload.media.image[0]);
-    // } else if (result.payload.media.bagOfFiles ) {
-    //   AppStateModel.setSelectedRecordMedia(result.payload.media.bagOfFiles[0]);
-    // } else {
-    //   AppStateModel.setSelectedRecordMedia(null);
-    // }
 
   }
 

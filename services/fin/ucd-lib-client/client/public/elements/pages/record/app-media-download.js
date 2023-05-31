@@ -63,10 +63,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
     if (selectedRecord) {
       this._onSelectedRecordUpdate(selectedRecord);
-      let selectedRecordMedia =
-        await this.AppStateModel.getSelectedRecordMedia();
-      if (selectedRecordMedia)
-        this._onSelectedRecordMediaUpdate(selectedRecordMedia);
+      if (selectedRecord.selectedMedia) {
+        this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
+      }
     }
   }
 
@@ -125,7 +124,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let isRoot = false;
 
     // build list based on selected page, or first page if root record is selected
-    if (window.location.pathname === this.rootRecord.root["@id"]) {
+    if (window.location.pathname === this.rootRecord.selectedMedia["@id"]) {
       this.downloadOptions = [firstRecord];
       isRoot = true;
     } else if (Object.keys(this.selectedRecordMedia).length) {
@@ -160,38 +159,39 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let sources = [];
     if (!record) return sources;
 
-    record.clientMedia.mediaGroups.forEach((mediaGroup) => {
-      let mediaType = utils.getMediaType(mediaGroup);
+    record.clientMedia.mediaGroups.forEach((media) => {
+        let mediaType = utils.getMediaType(media);
 
-      // TODO start of simplifying getting sources..
-      //  can we just loop over downloads like we are here and just concat everything?
-      //  prob not, vid objects have more complicated structure with transcripts and such
-      // if( ![ 'ImageObject', 'ImageList', 'VideoObject', 'AudioObject' ].includes(mediaType) ) return;
+        // TODO start of simplifying getting sources..
+        //  can we just loop over downloads like we are here and just concat everything?
+        //  prob not, vid objects have more complicated structure with transcripts and such
+        // if( ![ 'ImageObject', 'ImageList', 'VideoObject', 'AudioObject' ].includes(mediaType) ) return;
 
-      // TODO this works for pdf / single image, however breaks for lists that have multiple hasParts
-      if (
-        mediaType !== "ImageList" &&
-        (!mediaGroup.fileFormat || !mediaGroup.fileSize || !mediaGroup.filename)
-      )
-        return;
+        // TODO this works for pdf / single image, however breaks for lists that have multiple hasParts
+        if (
+          mediaType !== "ImageList" &&
+          (!media.fileFormat || !media.fileSize || !media.filename)
+        )
+          return;
 
-      if (mediaType === "VideoObject") {
-        sources = sources.concat(this._getVideoSources(mediaGroup));
-      } else if (mediaType === "AudioObject") {
-        sources = sources.concat(this._getAudioSources(mediaGroup));
-      } else if (mediaType === "ImageObject") {
-        this.showImageFormats = true;
-        sources = sources.concat(this._getImageSources(mediaGroup, true));
-        this._renderImgFormats(mediaGroup, null, "FR");
-      } else if (mediaType === "ImageList") {
-        this.showImageFormats = true;
-        (mediaGroup.hasPart || []).forEach((img) => {
-          sources = sources.concat(
-            this._getImageSources(img, nativeImageOnly)
-          );
-        });
-      }
-    });
+        if (mediaType === "VideoObject") {
+          sources = sources.concat(this._getVideoSources(media));
+        } else if (mediaType === "AudioObject") {
+          sources = sources.concat(this._getAudioSources(media));
+        } else if (mediaType === "ImageObject") {
+          this.showImageFormats = true;
+          sources = sources.concat(this._getImageSources(media, true));
+          this._renderImgFormats(media, null, "FR");
+        } else if (mediaType === "ImageList") {
+          this.showImageFormats = true;
+          (media.hasPart || []).forEach((img) => {
+            let node = record.clientMedia.graph.filter(r => r['@id'] === img['@id'])[0];
+            sources = sources.concat(
+              this._getImageSources(node, nativeImageOnly)
+            );
+          });
+        }
+      });
 
     /*
     if( record.clientMediaDownload ) {
@@ -264,7 +264,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     // TODO remove iiif stuff below, need to test with imagelists though, make sure zip works with sources array
     let sources = [];
 
-    let record = this.rootRecord.index[imageRecord["@id"]];
+    let record = this.rootRecord.graph.index[imageRecord["@id"]];
     return [
       {
         record,
@@ -426,7 +426,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _getImageFormat(imageRecord) {
     if (!imageRecord.fileFormat) {
-      imageRecord = this.rootRecord.index[imageRecord["@id"]];
+      imageRecord = this.rootRecord.graph.index[imageRecord["@id"]];
     }
     if (!imageRecord) return;
 

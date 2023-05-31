@@ -112,7 +112,8 @@ class ClientMedia {
    */
   async loadManifests() {
     for( let node of this.mediaGroups ) {
-      if( node.clientMedia.pdf.manifest ) {
+      // pdf manifest load
+      if( node.clientMedia.pdf && node.clientMedia.pdf.manifest ) {
         if( node.clientMedia.pdf.loaded ) continue;
 
         let res = await mediaModel.getManifest(node.clientMedia.pdf.manifest);
@@ -150,7 +151,7 @@ class ClientMedia {
       } else if( fileType === 'image' ) {
         this.handleImage(node);
       } else if( fileType === 'pdf' ) {
-        this.handlePdf(node);
+        this.handlePdf(node); 
       }
     }
   }
@@ -171,7 +172,8 @@ class ClientMedia {
         node = this.getNode(node)
         if( !node ) return null;
         this.handleImage(node);
-
+        
+        node.clientMedia.images['@id'] = node['@id'];
         node.clientMedia.images.page = parseInt(node.position);
         node.clientMedia.images.download = node.clientMedia.download;
 
@@ -210,11 +212,9 @@ class ClientMedia {
     }
 
     if( node.clientMedia.pages ) {
-      node.clientMedia.pages.forEach(page => {
-        if( !page.download && page.original ) {
-          page.download = {
-            url : page.original.url
-          }
+      node.clientMedia.pages.forEach((page, index) => {
+        if( !page['@id'] ) {
+          page['@id'] = node['@id']+':'+index;
         }
       });
     }

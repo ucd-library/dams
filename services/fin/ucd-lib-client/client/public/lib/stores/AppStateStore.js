@@ -10,7 +10,6 @@ class ImplAppStateStore extends AppStateStore {
     this.data.selectedCollection = null;
 
     this.events.SELECTED_RECORD_UPDATE = 'selected-record-update';
-    this.events.SELECTED_RECORD_MEDIA_UPDATE = 'selected-record-media-update';
     this.events.SELECTED_COLLECTION_UPDATE = 'selected-collection-update';
   }
 
@@ -19,7 +18,6 @@ class ImplAppStateStore extends AppStateStore {
   }
 
   setSelectedRecord(record) {
-    if( this.data.selectedRecord === record ) return;
     this.set({selectedRecord: record});
     this.emit(this.events.SELECTED_RECORD_UPDATE, record);
   }
@@ -28,15 +26,6 @@ class ImplAppStateStore extends AppStateStore {
     return this.data.selectedRecord;
   }
 
-  setSelectedRecordMedia(record) {
-    if( this.data.selectedRecordMedia === record ) return;
-    this.set({selectedRecordMedia: record});
-    this.emit(this.events.SELECTED_RECORD_MEDIA_UPDATE, record);
-  }
-
-  getSelectedRecordMedia() {
-    return this.data.selectedRecordMedia;
-  }
 
   setSelectedCollection(collection) {
     if( this.data.selectedCollection === collection ) return;

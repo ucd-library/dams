@@ -22,7 +22,7 @@ class CollectionStore extends BaseStore {
     }
   }
 
-  getCollection(id) {
+  getCollection(id='') {
     let parts = id.split('/').filter(p => p !== '');
     for( let i = parts.length-1; i >= 0; i-- ) {
       let pid = '/'+parts.join('/');

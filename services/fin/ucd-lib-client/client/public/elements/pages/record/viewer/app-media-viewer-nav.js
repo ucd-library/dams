@@ -102,10 +102,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
     if (selectedRecord) {
       this._onSelectedRecordUpdate(selectedRecord);
-      let selectedRecordMedia =
-        await this.AppStateModel.getSelectedRecordMedia();
-      if (selectedRecordMedia)
-        this._onSelectedRecordMediaUpdate(selectedRecordMedia);
     }
 
     // also set brSinglePage if width is less than 801px
@@ -310,74 +306,86 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    *
    * @param {Object} record selected record
    */
-  _onSelectedRecordUpdate(record) {
-    // this.leftMostThumbnail = 0;
-    if (!record) {
+  _onSelectedRecordUpdate(item) {
+    if( !item ) return;
+
+    let { graph, clientMedia, selectedMedia, selectedMediaPage} = item;
+  
+    if ( clientMedia.mediaGroups.length === 1 &&
+          selectedMediaPage === -1 ) {
       this.singleImage = true;
       return;
     }
 
     // sort thumbnails, and add each mediaGroup into mediaList
-    let mediaList = [];
-    record.clientMedia.mediaGroups.forEach((mg) => {
-      let nodes = [];
+    // let mediaList = [];
+    // record.clientMedia.mediaGroups.forEach((mg) => {
+    //   let nodes = [];
 
-      let type = utils.getMediaType(mg);
-      if (type) {
-        if (mg.hasPart) {
-          nodes = mg.hasPart.map((item) => record.index[item["@id"]]);
-        } else {
-          nodes.push(mg["@id"]);
-        }
+    //   let type = utils.getMediaType(mg.display);
+    //   if (type) {
+    //     if (mg.display.hasPart) {
+    //       nodes = mg.display.hasPart.map((item) => record.index[item["@id"]]);
+    //     } else {
+    //       nodes.push(mg.display["@id"]);
+    //     }
 
-        mediaList.push(...utils.organizeMediaList(nodes));
+    //     mediaList.push(...utils.organizeMediaList(nodes));
+    //   }
+    // });
+    // this.mediaList = mediaList;
+
+    let thumbnails = [];
+    for( let node of clientMedia.mediaGroups ) {
+      if( !node.clientMedia.pages ) {
+        thumbnails.push(this._renderThumbnail(selectedMedia, node.clientMedia.images, selectedMediaPage));
+        continue;
       }
-    });
-    this.mediaList = mediaList;
+      for( let page of node.clientMedia.pages ) {
+        thumbnails.push(this._renderThumbnail(selectedMedia, page, selectedMediaPage));
+      }
+    }
 
-    // if (this.mediaList.length === 1) {
-    //   this.singleImage = true;
-    //   return;
-    // }
-    // this.mediaList = utils.flattenMediaList(record.media);
-    // this.mediaList = utils.organizeMediaList(this.mediaList);
-
-    this.thumbnails = this.mediaList
-      .map((media) => {
-        if (!media) return null;
-
-        let { fileType, iconType } = this._getFileAndIconType(media);
-
-        if (this.isLightbox && fileType !== "image") {
-          return null;
-        }
-
-        let thumbnailUrl = media.clientMedia?.images?.small?.url;
-        // if( thumbnailUrl && !thumbnailUrl.match(/\/svc:iiif\//) ) {
-        //   thumbnailUrl += '/svc:iiif/full/,50/0/default.jpg';
-        // }
-
-        let thumbnail = {
-          id: media["@id"],
-          icon: iconType,
-          position: media.position,
-          selected: false,
-          disabled: false,
-          src: thumbnailUrl,
-          // thumbnail: url
-        };
-
-        return thumbnail;
-      })
-      .filter((item) => (item ? true : false))
+    this.thumbnails = thumbnails
+      .filter((element) => element !== null)
       // TODO: Filtering out the text based files for now until we get the PDF/text viewer set up correctly
       .filter((element) => element.icon !== "blank-round");
 
-    this.singleImage =
-      this.thumbnails.length !== 0 && this.thumbnails.length > 1 ? false : true;
-    this._resize();
 
+    this._resize();
+ 
     // this.AppStateModel.set({mediaViewerNavLeftMostThumbnail: 0});
+  }
+
+  _renderThumbnail(node, clientMediaPage, selectedMediaPage) {
+    let { fileType, iconType } = this._getFileAndIconType(node);
+
+    // if (this.isLightbox && fileType !== "image") {
+    //   return null;
+    // }
+
+    let thumbnailUrl = clientMediaPage.small?.url;
+    if( !thumbnailUrl ) {
+      thumbnailUrl = clientMediaPage.medium?.url;
+    }
+    if( !thumbnailUrl ) {
+      thumbnailUrl = clientMediaPage.original?.url;
+    }
+    // if( thumbnailUrl && !thumbnailUrl.match(/\/svc:iiif\//) ) {
+    //   thumbnailUrl += '/svc:iiif/full/,50/0/default.jpg';
+    // }
+
+    let thumbnail = {
+      id: node["@id"]+(clientMediaPage.page === undefined ? '' : ':'+clientMediaPage.page),
+      icon: iconType,
+      position: clientMediaPage.page,
+      selected: clientMediaPage.page === selectedMediaPage,
+      disabled: false,
+      src: thumbnailUrl,
+      // thumbnail: url
+    };
+
+    return thumbnail;
   }
 
   /**
@@ -387,6 +395,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} media
    */
   _onSelectedRecordMediaUpdate(media) {
+    debugger;
     this.media = media;
     if (!media) return;
 
@@ -426,21 +435,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     else if (fileType === "360") iconType = "360-round";
 
     return { fileType, iconType };
-  }
-
-  /**
-   * @method _onThumbnailClicked
-   * @description bound to thumbnail click event.  select a media object
-   *
-   * @param {Object} e HTML click event
-   */
-  _onThumbnailClicked(e) {
-    this.shadowRoot
-      .querySelectorAll("#thumbnailInnerContainer > button")
-      .forEach((btn) => btn.removeAttribute("selected"));
-    e.currentTarget.setAttribute("selected", "");
-    let id = e.currentTarget.getAttribute("media-id");
-    this.AppStateModel.setLocation(id);
   }
 
   /**

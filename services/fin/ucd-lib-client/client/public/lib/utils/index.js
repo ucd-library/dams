@@ -57,6 +57,7 @@ class Utils {
    * @return {String}
    */
   getMediaType(record) {
+    if( !record ) debugger;
     if (record.error) return null;
     let types = record["@type"] || [];
 

@@ -1,8 +1,6 @@
 import { LitElement } from 'lit';
 import render from "./app-share-btn.tpl.js"
 
-import AppStateInterface from "../interfaces/AppStateInterface"
-import MediaInterface from "../interfaces/MediaInterface"
 
 const BASE_SHARE_LINKS = {
   facebook : 'https://www.facebook.com/sharer/sharer.php',
@@ -63,7 +61,7 @@ export default class AppShareBtn extends Mixin(LitElement)
    */
   _onSocialIconClick(e) {
     let record = this.AppStateModel.getSelectedRecord();
-    let media = this.AppStateModel.getSelectedRecordMedia();
+    let media = record.selectedMedia;
 
     if( e.type === 'keyup' && e.which !== 13 ) return;
     let id = e.currentTarget['id'];

@@ -31,49 +31,27 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   }
 
   async firstUpdated() {
-    this._onAppStateUpdate(await this.AppStateModel.get());
+    await this.AppStateModel.get();
 
-    // let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
-    // if (selectedRecordMedia)
-    //   this._onSelectedRecordMediaUpdate(selectedRecordMedia, true);
-  }
-
-  _onAppStateUpdate(e) {
-    if (
-      e.selectedRecord &&
-      (!e.selectedRecordMedia ||
-        e.selectedRecord?.index[e.location.pathname]["@id"] !==
-          e.selectedRecordMedia)
-    ) {
-      // todo find position 1
-      let selectedRecordMedia = e.selectedRecord.clientMedia.graph.filter(
-        (g) => parseInt(g.position) === 1 && g.clientMedia
-      )[0];
-      if (!selectedRecordMedia)
-        selectedRecordMedia = e.selectedRecord.index[e.location.pathname];
-      this._onSelectedRecordMediaUpdate(selectedRecordMedia);
-    }
+    let selectedRecord = await this.AppStateModel.getSelectedRecord();
+    if (selectedRecord)
+      this._onSelectedRecordUpdate(selectedRecord);
   }
 
   /**
    * @method _onSelectedRecordMediaUpdate
-   * @description from AppStateInterface, called when a records media is selected
+   * @description from AppStateModel, called when a records media is selected
    *
    * @param {Object} media
    */
-  _onSelectedRecordMediaUpdate(media) {
-    if (!media) return;
-    let getMediaType = utils.getMediaType(media);
+  _onSelectedRecordUpdate(e) {
+    let {graph, clientMedia, selectedMedia, selectedPageMedia} = e;
+
+    let getMediaType = utils.getMediaType(selectedMedia);
     if (getMediaType !== "ImageList" && getMediaType !== "ImageObject") return;
 
-    if (
-      this.media["@id"] !==
-        this.AppStateModel.location.pathname &&
-      media.id.indexOf("/media/images/") < 0
-    )
-      return;
     this.loading = true;
-    this.media = media;
+    this.media = selectedMedia;
     this._renderImg();
   }
 

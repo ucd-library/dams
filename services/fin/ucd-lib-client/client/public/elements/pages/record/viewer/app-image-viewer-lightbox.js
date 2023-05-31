@@ -46,9 +46,10 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       document.body.appendChild(safeCoverNode);
     }
 
-    let selectedRecordMedia = await this.AppStateModel.getSelectedRecordMedia();
-    if (selectedRecordMedia)
-      this._onSelectedRecordMediaUpdate(selectedRecordMedia);
+    let selectedRecord = await this.AppStateModel.getSelectedRecord();
+    if (selectedRecord ) {
+      this._onSelectedRecordUpdate(selectedRecord);
+    }
   }
 
   /**
@@ -57,24 +58,28 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    */
   _onAppStateUpdate(e) {
     if (e.showLightbox && !this.visible) {
-      console.log("_onAppStateUpdate show()");
       this.show();
     } else if (!e.showLightbox && this.visible) {
-      console.log("_onAppStateUpdate hide()");
       this.hide();
     }
   }
 
   /**
-   * @method _onSelectedRecordMediaUpdate
-   * @description from AppStateInterface, called when a records media is selected
+   * @method _onSelectedRecordUpdate
+   * @description from AppStateModel, called when a records media is selected
    *
    * @param {Object} media
    */
-  _onSelectedRecordMediaUpdate(media) {
-    if (media["@id"] !== this.AppStateModel.location.pathname)
+  _onSelectedRecordUpdate(e) {
+    let {graph, clientMedia, selectedMedia, selectedMediaPage} = e;
+    
+    let currentMedia = this.record?.selectedMedia || {};
+    if( currentMedia['@id'] === selectedMedia['@id'] && 
+      selectedMediaPage === this.record?.selectedMediaPage ) {
       return;
-    this.media = media;
+    }
+
+    this.record = e;
     if (this.visible) this.renderCanvas();
   }
 
@@ -138,9 +143,14 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    *
    */
   async renderCanvas() {
-    if (this.renderedMedia && this.renderedMedia["@id"] === this.media["@id"])
+    if( !this.record ) return;
+
+    let {graph, clientMedia, selectedMedia, selectedPageMedia} = this.record;
+
+    if (selectedMedia["@id"] === this.renderedMedia?.["@id"]) {
       return;
-    this.renderedMedia = this.media;
+    }
+    this.renderedMedia = selectedMedia;
 
     this.loading = false;
 
@@ -151,18 +161,24 @@ export default class AppImageViewer extends Mixin(LitElement).with(
         zoom: 0,
       });
     }
+    
     if (this.currentLayer) {
       this.viewer.removeLayer(this.currentLayer);
     }
-    if (this.renderedMedia.clientMedia.images.tiled) {
-      let tiledUrl =
-        this.renderedMedia.clientMedia.images.tiled.iiif + "/info.json";
+
+    let scm = this.renderedMedia.clientMedia;
+    if (scm.images.tiled) {
+      let tiledUrl = scm.images.tiled.iiif + "/info.json";
       this.currentLayer = L.tileLayer.iiif(tiledUrl);
     } else {
-      let original = this.renderedMedia.clientMedia.images.original;
+      let original = scm.images.original;
+
+      // we might not have size
+      let size = await this.getImageSize(original);
+
       this.currentLayer = L.imageOverlay(original.url, [
         [0, 0],
-        [parseInt(original.size.height), parseInt(original.size.width)],
+        [parseInt(size.height), parseInt(size.width)],
       ]);
     }
 
@@ -178,6 +194,22 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     ).style.display = "none";
     this.shadowRoot.querySelector(".leaflet-control-container").style.display =
       "none";
+  }
+
+  getImageSize(original) {
+    if( original.size ) return original.size;
+
+    return new Promise((resolve, reject) => {
+      let img = new Image();
+      img.src = original.url;
+      img.onload = () => {
+        original.size = {
+          height : img.naturalHeight, 
+          width : img.naturalWidth
+        }
+        resolve(); 
+      };
+    });
   }
 
   /**

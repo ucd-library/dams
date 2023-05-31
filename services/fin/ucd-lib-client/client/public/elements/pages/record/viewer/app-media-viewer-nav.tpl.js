@@ -270,8 +270,7 @@ export default function render() {
     <div
       class="layout ${this.isLightbox ? "lightbox" : ""} ${this.brFullscreen
         ? "fullscreen"
-        : ""}"
-    >
+        : ""}">
       <div id="navLeft">
         <ucdlib-icon
           icon="ucdlib-dams:fa-chevron-left"
@@ -280,46 +279,39 @@ export default function render() {
           alt="Page thumbnails left"
           ?disabled="${!this.showNavLeft}"
           ?hidden="${!this.showNavLeft || this.singleImage}"
-          @click="${this._pageLeft}"
-        >
+          @click="${this._pageLeft}">
         </ucdlib-icon>
         <div
           class="br-search-non-fs"
           style="min-width: 300px;"
-          ?hidden="${this.brFullscreen || !this.isBookReader}"
-        >
+          ?hidden="${this.brFullscreen || !this.isBookReader}">
           <div
             class="zoom ${this.searching ? "searching" : ""}"
-            @click="${this._onSearchToggled}"
-          >
+            @click="${this._onSearchToggled}">
             <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
           </div>
           <div
             class="search-pagination"
-            ?hidden="${this.searchResultsCount === 0}"
-          >
-            <div
-              id="search-prev"
+            ?hidden="${this.searchResultsCount === 0}">
+
+            <div id="search-prev"
               style="padding-left: .5rem; width: 40px;"
-              @click="${this._prevSearchResult}"
-            >
+              @click="${this._prevSearchResult}">
               <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
             </div>
 
-            <span
-              class="search-results"
+            <span class="search-results"
               style="position: relative;
                 bottom: 1rem;
                 font-size: .9rem;
-                font-weight: bold;"
-              >${this.selectedResult} / ${this.searchResultsCount}</span
-            >
+                font-weight: bold;">
+              ${this.selectedResult} / ${this.searchResultsCount}
+            </span>
 
             <div
               id="search-next"
               style="padding-right: .5rem; width: 40px;"
-              @click="${this._nextSearchResult}"
-            >
+              @click="${this._nextSearchResult}">
               <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
             </div>
           </div>
@@ -328,36 +320,19 @@ export default function render() {
 
       <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader}">
         <div id="thumbnailInnerContainer">
-          ${this.thumbnails.map((item) =>
-            item.selected
-              ? html`
-                  <button
-                    class="thumbnail"
-                    alt="Page #${item.position}"
-                    title="${item.id}"
-                    media-id="${item.id}"
-                    ?disabled="${item.disabled}"
-                    selected
-                    style="background-image:url(${item.src})"
-                    @click="${this._onThumbnailClicked}"
-                  >
-                    <iron-icon icon="fin-icons:${item.icon}"></iron-icon>
-                  </button>
-                `
-              : html`
-                  <button
-                    class="thumbnail"
-                    alt="Page #${item.position}"
-                    title="${item.id}"
-                    media-id="${item.id}"
-                    ?disabled="${item.disabled}"
-                    style="background-image:url(${item.src})"
-                    @click="${this._onThumbnailClicked}"
-                  >
-                    <iron-icon icon="fin-icons:${item.icon}"></iron-icon>
-                  </button>
-                `
-          )}
+          ${this.thumbnails.map((item) => html`
+            <a
+              class="thumbnail"
+              href="${item.id}"
+              alt="Page #${item.page}"
+              ?selected="${item.selected}"
+              title="${item.id}"
+              media-id="${item.id}"
+              ?disabled="${item.disabled}"
+              style="background-image:url(${item.src})">
+              <iron-icon icon="fin-icons:${item.icon}" ?hidden="${!item.icon}"></iron-icon>
+            </a>
+          `)}
         </div>
       </div>
 
