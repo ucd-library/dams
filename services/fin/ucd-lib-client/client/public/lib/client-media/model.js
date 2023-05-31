@@ -23,7 +23,6 @@ class ClientMedia {
       throw new Error('Root '+id+' not found in graph');
     }
 
-    // debugger;
     // parse() populates the mediaGroups array
     this.mediaGroups = new Set();
     this.parse();
@@ -88,7 +87,7 @@ class ClientMedia {
         node.clientMedia.images = {};
       }
 
-      if( !node.clientMedia.images.original ) {
+      if( !node.clientMedia.images.original && displayType ) {
         node.clientMedia.images.original = {
           // TODO: DC get better unknown image from kimmy
           url : '/images/tree-bike-illustration.png'

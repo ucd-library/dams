@@ -83,7 +83,6 @@ class RecordService extends BaseService {
         if( result.body.results ) {
           result.body.results = result.body.results.map(record => {
             let rg = new RecordGraph(record);
-            // debugger;
             // if( !ignoreClientMedia ) {
               rg.clientMedia = new ClientMedia(record['@id'], record);
             // }

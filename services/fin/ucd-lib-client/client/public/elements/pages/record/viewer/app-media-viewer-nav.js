@@ -395,7 +395,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} media
    */
   _onSelectedRecordMediaUpdate(media) {
-    debugger;
     this.media = media;
     if (!media) return;
 

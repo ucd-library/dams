@@ -151,6 +151,7 @@ export default function render() {
 
       #buttonWrapper {
         z-index: 500;
+        margin-right: 2rem;
       }
 
       #buttonWrapper div {

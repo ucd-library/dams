@@ -554,7 +554,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     // });
 
     // // const reader = res.body.getReader();
-    // // debugger;
     // const blob = await res.blob();
     // const newBlob = new Blob([blob]);
 
