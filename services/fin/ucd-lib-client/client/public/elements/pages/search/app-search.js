@@ -61,9 +61,9 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
    * or if state update event is from popup state (forward, back button hit)
    */
   _searchFromAppState() {
-    if (!this.drawerOpen || window.innerWidth > 975) {
-      window.scrollTo(0, 0);
-    }
+    // if (!this.drawerOpen || window.innerWidth > 975) {
+    //   window.scrollTo(0, 0);
+    // }
 
     this.firstLoad = false;
 
@@ -170,6 +170,7 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Object} e
    */
   _onPaginationChange(e) {
+    debugger;
     let searchDoc = this.RecordModel.getCurrentSearchDocument();
     this.RecordModel.setPaging(searchDoc, e.detail.startIndex);
     this.RecordModel.setSearchLocation(searchDoc);

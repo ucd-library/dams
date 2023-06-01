@@ -78,20 +78,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     // find out if the number of download options is greater than 1
     sources = this._getDownloadSources(record);
-    // for( let type in record.media ) {
-    //   for( let media of record.media[type] ) {
-    //     if( type === 'imageList' ) {
-    //       record.media.imageList.forEach(list => {
-    //         sourceCount += list.hasPart.length;
-    //       });
-    //     } else {
-    //       sourceCount += this._getDownloadSources(media, true).length;
-    //     }
-
-    //     if( sourceCount > 1 ) break;
-    //   }
-    //   if( sourceCount > 1 ) break;
-    // }
 
     this.hasMultipleDownloadMedia = sources.length > 1;
     if (this.hasMultipleDownloadMedia) {
@@ -161,13 +147,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     record.clientMedia.mediaGroups.forEach((media) => {
         let mediaType = utils.getMediaType(media);
-
-        // TODO start of simplifying getting sources..
-        //  can we just loop over downloads like we are here and just concat everything?
-        //  prob not, vid objects have more complicated structure with transcripts and such
-        // if( ![ 'ImageObject', 'ImageList', 'VideoObject', 'AudioObject' ].includes(mediaType) ) return;
-
-        // TODO this works for pdf / single image, however breaks for lists that have multiple hasParts
         if (
           mediaType !== "ImageList" &&
           (!media.fileFormat || !media.fileSize || !media.filename)
@@ -184,6 +163,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
           this._renderImgFormats(media, null, "FR");
         } else if (mediaType === "ImageList") {
           this.showImageFormats = true;
+          if( media.hasPart && !Array.isArray(media.hasPart) ) media.hasPart = [ media.hasPart ];
           (media.hasPart || []).forEach((img) => {
             let node = record.clientMedia.graph.filter(r => r['@id'] === img['@id'])[0];
             sources = sources.concat(
@@ -193,31 +173,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         }
       });
 
-    /*
-    if( record.clientMediaDownload ) {
-      if( Array.isArray(record.clientMediaDownload) ) {
-        if( record.clientMediaDownload.length ) {
-          record = record.clientMediaDownload[0];
-        }
-      } else {
-        record = record.clientMediaDownload;
-      }
-    }
-
-    if (utils.getMediaType(record) === 'VideoObject') {
-      sources = sources.concat(this._getVideoSources(record));
-    } else if (utils.getMediaType(record) === 'AudioObject') {
-      sources = sources.concat(this._getAudioSources(record));
-    } else if (utils.getMediaType(record) === 'ImageObject' ) {
-      this.showImageFormats = true;
-      sources = sources.concat(this._getImageSources(record, true));
-      this._renderImgFormats(record, null, 'FR');
-    } else if (utils.getMediaType(record) === 'ImageList' ) {
-      (record.hasPart || []).forEach(img => {
-        sources = sources.concat(this._getImageSources(img, nativeImageOnly));
-      });
-    }
-    */
     return sources;
   }
 
@@ -487,6 +442,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       urls.push(source.src.replace('/fcrepo/rest', ''));
     }
 
+    debugger;
     this.zipConcatenatedPaths = urls.join(',');
     this.zipPaths = urls;
     this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}}`;

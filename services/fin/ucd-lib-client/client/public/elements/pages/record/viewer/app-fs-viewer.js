@@ -121,7 +121,7 @@ export default class AppFsViewer extends Mixin(LitElement)
   async show() {
     this.style.display = 'block';
     document.body.style.overflow = 'hidden';
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 
     this._onResize();
 

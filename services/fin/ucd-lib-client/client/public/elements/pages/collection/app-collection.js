@@ -52,6 +52,7 @@ class AppCollection extends Mixin(LitElement)
   }
 
   willUpdate() {
+    debugger;
     // this._showAdminPanel();
     // could we check if this.adminRendered is false here to hide the admin section? or possibly recall the showAdmin function?
     if( !this.adminRendered && !this.collectionId ) {
@@ -69,7 +70,8 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
    async _onAppStateUpdate(e) {
-    if( e.location.path[0] !== 'collection' && this.collectionId === e.location.fullpath ) return;
+    debugger;
+    if( e.location.path[0] !== 'collection' || this.collectionId === e.location.fullpath ) return;
     this.reset();
 
     this.collectionId = e.location.fullpath;
@@ -85,6 +87,7 @@ class AppCollection extends Mixin(LitElement)
    * @param {*} e 
    */
    async _onCollectionVcUpdate(e) {
+    debugger;
     if( e.state !== 'loaded' ) return;
     
     this.collectionId = e.payload.results.id;
@@ -149,6 +152,7 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
   _onDefaultRecordSearchUpdate(e) {
+    debugger;
     if( e.state !== 'loaded' || this.highlightedItems.length ) return;
 
     if( e.payload && e.payload.results ) {
