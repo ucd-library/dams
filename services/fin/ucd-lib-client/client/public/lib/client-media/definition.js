@@ -23,7 +23,7 @@
 const MEDIA_TYPES = [
   'http://digital.ucdavis.edu/schema#StreamingVideo',
   'http://digital.ucdavis.edu/schema#ImageList',
-  'http://digital.ucdavis.edu/schema#TextList',
+  // 'http://digital.ucdavis.edu/schema#TextList',
   'http://schema.org/ImageObject',
   'http://schema.org/VideoObject',
   'http://schema.org/AudioObject', 
