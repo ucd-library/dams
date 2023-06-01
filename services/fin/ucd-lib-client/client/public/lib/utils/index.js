@@ -205,7 +205,6 @@ class Utils {
       if (a.page < b.page) return -1;
       return 1;
     });
-    console.log("pages", pages);
 
     return { pages };
   }

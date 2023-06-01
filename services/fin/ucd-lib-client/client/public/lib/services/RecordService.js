@@ -1,11 +1,9 @@
 const {BaseService} = require('@ucd-lib/cork-app-utils');
 const RecordStore = require('../stores/RecordStore');
-const deepEqual = require('deep-equal');
 const config = require('../config');
 // const seo = require('@ucd-lib/fin-service-utils/lib/seo');
 // const graphConcat = seo.graphConcat;
 const RecordGraph = require('../utils/RecordGraph.js').default;
-const ClientMedia = require('../client-media/model.js');
 
 class RecordService extends BaseService {
 
@@ -24,13 +22,7 @@ class RecordService extends BaseService {
       url : `${this.baseUrl}${id.replace(/^\/item/, '')}?compact=true`,
       checkCached : () => this.store.getRecord(id),
       onLoading : request => this.store.setRecordLoading(id, request),
-      onLoad : result => {
-        let rg = new RecordGraph(result.body);
-        // get clientMedia for entire collection, even if viewing a single item
-        rg.clientMedia = new ClientMedia(id.split('/media')[0], result.body['@graph']);
-
-        this.store.setRecordLoaded(id, rg);
-      },
+      onLoad : result => this.store.setRecordLoaded(id, new RecordGraph(result.body)),
       onError : e => this.store.setRecordError(id, e)
     });
   }
@@ -53,48 +45,32 @@ class RecordService extends BaseService {
    * 
    * @returns {Promise}
    */
-  search(searchDocument = {}, debug=true, compact=true, singleNode=true, ignoreClientMedia=false) {
+  search(searchDocument = {}, opts={}) {
     if( !searchDocument.textFields ) {
       searchDocument.textFields = config.elasticSearch.textFields.record;
     }
 
-    // make sure we aren't sending the same query twice
-    let currentSearchDocument = this.store.data.search.searchDocument || {};
-    if( deepEqual(currentSearchDocument, searchDocument) ) {
-      return this.store.getSearch();
-    }
-
-    let params = [];
-    if( debug ) params.push('debug=true');
-    if( compact ) params.push('compact=true');
-    if( singleNode ) params.push('single-node=true');
+    let params = {};
+    if( opts.debug ) params.debug = true;
+    if( opts.compact ) params.compact = true;
+    if( opts.singleNode ) params['single-node'] = true;
     
     return this.request({
-      url : `${this.baseUrl}${params.length ? '?' + params.join('&') : ''}`,
+      url : this.baseUrl,
+      qs : params,
+      json : true,
       fetchOptions : {
         method : 'POST',
-        headers : {
-          'Content-Type' : 'application/json'
-        },
-        body : JSON.stringify(searchDocument)
+        body : searchDocument
       },
-      onLoading : promise => this.store.setSearchLoading(searchDocument,  promise),
+      onLoading : promise => this.store.setSearchLoading(opts, searchDocument,  promise),
       onLoad : result => {        
         if( result.body.results ) {
-          result.body.results = result.body.results.map(record => {
-            let rg = new RecordGraph(record);
-            // if( !ignoreClientMedia ) {
-              rg.clientMedia = new ClientMedia(record['@id'], record);
-            // }
-            return rg;
-          });
-          // if( !ignoreClientMedia ) {
-            result.body.results.map(item => item.getChildren(item.root));
-          // }
-          this.store.setSearchLoaded(searchDocument, result.body);
+          result.body.results = result.body.results.map(record => new RecordGraph(record));
         }
+        this.store.setSearchLoaded(opts, searchDocument, result.body);
       },
-      onError : e => this.store.setSearchError(searchDocument, e)
+      onError : e => this.store.setSearchError(opts, searchDocument, e)
     });
   }
 

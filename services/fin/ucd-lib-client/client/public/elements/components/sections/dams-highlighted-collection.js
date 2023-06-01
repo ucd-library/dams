@@ -35,7 +35,7 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
     this._itemCt = 0;
     this._href = "";
 
-    this._injectModel("CollectionModel", "CollectionVcModel");
+    this._injectModel("CollectionModel");
   }
 
   /**

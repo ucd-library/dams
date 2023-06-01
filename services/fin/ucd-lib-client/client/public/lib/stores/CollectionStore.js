@@ -1,4 +1,5 @@
 var {BaseStore} = require('@ucd-lib/cork-app-utils');
+const vcModel = require('../models/CollectionVcModel');
 
 class CollectionStore extends BaseStore {
 
@@ -23,15 +24,7 @@ class CollectionStore extends BaseStore {
   }
 
   getCollection(id='') {
-    let parts = id.split('/').filter(p => p !== '');
-    for( let i = parts.length-1; i >= 0; i-- ) {
-      let pid = '/'+parts.join('/');
-      if( this.data.byId[pid] ) {
-        return this.data.byId[pid];
-      }
-      parts.splice(i, 1);
-    }
-    return null;
+    return this.data.byId[id];
   }
 
   /**
@@ -109,43 +102,36 @@ class CollectionStore extends BaseStore {
   /**
    * Get
    */
-  setCollectionLoading(promise) {
+  setCollectionLoading(id, promise) {
     this._setCollectionState({
+      id,
       state: this.STATE.LOADING, 
       request : promise
     });
   }
 
-  setCollectionLoaded(payload) {
-    if( payload.node && payload.node.length ) {
-      payload.node.forEach(item => {
-        item._id = item['@id']; // friendly id for polymer data binding
-        this.data.byId[item['@id']] = item;
-      });
-
-      // payload.sort((a,b) => {
-      //   if( a.name > b.name ) return 1;
-      //   if( a.name < b.name ) return -1;
-      //   return 0;
-      // });  
-    }
-   
+  setCollectionLoaded(id, payload) {
     this._setCollectionState({
+      id,
       state: this.STATE.LOADED,   
       payload
     });
   }
 
-  setCollectionError(error) {
+  setCollectionError(id, error) {
     this._setCollectionState({
+      id,
       state: this.STATE.ERROR,   
       error
     });
   }
 
   _setCollectionState(state) {
-    this.data.overview = state;
-    this.emit(this.events.COLLECTION_UPDATE, this.data.overview);
+    if( state.state === this.STATE.LOADED ) {
+      vcModel.renderCollection(state);
+    }
+    this.data.byId[state.id] = state;
+    this.emit(this.events.COLLECTION_UPDATE, state);
   }
 
 

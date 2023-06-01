@@ -39,52 +39,29 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     this.href = "";
     this.darkBg = false;
 
-    this._injectModel("CollectionModel", "CollectionVcModel");
+    this._injectModel("CollectionModel");
   }
 
-  /**
-   * @method willUpdate
-   * @description Lit lifecycle method called when element is updated.
-   * @param {Map} props - Properties that have changed.
-   */
-  willUpdate(props) {
-    if (
-      (this.id && Object.keys(this.collection).length === 0) ||
-      (this.id && this.collection.id !== this.id)
-    ) {
-      this._getCollection(this.id);
-    } else if (this.collection && this.collection.id) {
-      if (this.collection.associatedMedia) {
-        this.imgSrc = this.collection.thumbnailUrl
-          ? this.collection.thumbnailUrl
-          : this.collection.associatedMedia.thumbnailUrl;
-        this.cardTitle = this.collection.title
-          ? this.collection.title
-          : this.collection.associatedMedia.name;
-        this.itemCt = this.collection.associatedMedia.recordCount; // TODO should we use associatedMedia still? or VC
-        this.href = this.collection.associatedMedia.id;
-      } else {
-        this.imgSrc = this.collection.thumbnailUrl;
-        this.cardTitle = this.collection.title;
-        this.itemCt = this.collection.count;
-        this.href = this.collection.id;
-      }
+  async updated(props) {
+    if (props.has("id") && this.id ) {
+      this._onCollectionUpdate(
+        await this.CollectionModel.get(this.id)
+      );
     }
-    this.darkBg = this.attributes["data-dark-bg"] ? true : false;
   }
 
-  async _getCollection(id) {
-    await this.CollectionModel.get(id);
-  }
+  _onCollectionUpdate(e) {
+    if (e.state !== "loaded" || e.id !== this.id) return;
 
-  _onCollectionVcUpdate(e) {
-    if (e.state !== "loaded" || e.payload.results.id !== this.id) return;
-
-    this.collection = e.payload.results;
-    this.imgSrc = this.collection.thumbnailUrl;
+    this.collection = e.vcData;
+    if(  this.collection.images ) {
+      let images = this.collection.images;
+      this.imgSrc = images.medium ? images.medium.url : images.original.url;
+    }
     this.cardTitle = this.collection.title;
-    this.itemCt = e.payload.results.count;
+    this.itemCt = this.collection.count;
     this.href = this.collection.id;
+    this.darkBg = this.attributes["data-dark-bg"] ? true : false;
   }
 }
 

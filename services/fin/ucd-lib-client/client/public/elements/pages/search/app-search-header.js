@@ -77,6 +77,8 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
     // if (!this.drawerOpen || window.innerWidth > 975) {
     //   window.scrollTo(0, 0);
     // }
+    return;
+    // TODO: remove this
 
     this.firstLoad = false;
 

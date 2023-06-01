@@ -173,7 +173,6 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
     });
     // this.isDirty = true;
     this.requestUpdate();
-    console.log("this.panels moveUp", this.panels);
     requestAnimationFrame(() => {
       this._updateUiStyles(null, true);
     });
@@ -200,7 +199,6 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
     });
     // this.isDirty = true;
     this.requestUpdate();
-    console.log("this.panels moveDown", this.panels);
     requestAnimationFrame(() => {
       this._updateUiStyles(null, true);
     });

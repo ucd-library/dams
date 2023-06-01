@@ -720,10 +720,10 @@ export default function render() {
     this.recentCollections.length === 3 ? "three-total" : ""
   }">
   ${this.recentCollections.map(
-    (collection) =>
+    (graph) =>
       html`
         <dams-collection-card
-          data-id="${collection["@id"]}"
+          data-id="${graph.root['@id']}"
         ></dams-collection-card>
       `
   )}

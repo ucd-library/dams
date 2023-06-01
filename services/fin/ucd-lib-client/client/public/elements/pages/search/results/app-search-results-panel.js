@@ -482,7 +482,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Object} e click|keyup event
    */
   _onPaginationChange(e) {
-    debugger;
     e.detail.startIndex = e.detail.page * 10 - 10;
     // this.currentPage = e.detail.page - 1;
     this.dispatchEvent(

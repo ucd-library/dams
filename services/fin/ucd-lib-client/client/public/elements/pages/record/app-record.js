@@ -295,7 +295,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       // pull image with position 1
       this.arkDoi = [
         location.pathname.split("/media")[0],
-        record.data["@graph"]
+        record.graph
           .filter((r) => r["@id"] === location.pathname.split("/media")[0])[0]
           .clientMedia?.images?.original?.url.replace("/fcrepo/rest", ""),
       ];

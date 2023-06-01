@@ -1,3 +1,4 @@
+const ClientMedia = require('./client-media/model.js');
 const CHILD_LINKS = ['hasPart', 'associatedMedia'];
 const PARENT_LINKS = ['isPartOf', 'encodesCreativeWork'];
 
@@ -24,6 +25,10 @@ class RecordGraph {
 
       // create a quick lookup index by node URI
       this.index[item['@id']] = item;
+    }
+
+    if( this.root ) {
+      this.clientMedia = new ClientMedia(this.root['@id'], this.data['@graph']);
     }
   }
 

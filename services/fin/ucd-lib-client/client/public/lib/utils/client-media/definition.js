@@ -62,7 +62,7 @@ const DISPLAY_ORDER = {
 
 module.exports = {
   MEDIA_TYPES,
-  MEDIA_LINK : ['associatedMedia'],
+  MEDIA_LINK : ['associatedMedia', 'image'],
   CRAWL_LINKS : ['hasPart'],
   DISPLAY_ORDER
 }

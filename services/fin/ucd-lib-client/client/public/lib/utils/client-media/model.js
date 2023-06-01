@@ -1,5 +1,5 @@
 const definition = require('./definition.js');
-const mediaModel = require('../models/MediaModel.js');
+const mediaModel = require('../../models/MediaModel.js');
 
 class ClientMedia {
 

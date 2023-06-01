@@ -19,6 +19,8 @@ import "../../components/graphics/dams-hero";
 import "../../components/sections/dams-highlighted-collection";
 import "../../components/admin/admin-featured-collections";
 
+import user from "../../../lib/utils/user";
+
 import render from './app-home.tpl.js';
 
 /**
@@ -73,7 +75,7 @@ class AppHome extends Mixin(LitElement)
    * @description Lit lifecycle method called when element is first updated
    */
   async firstUpdated() {
-    this.isUiAdmin = (APP_CONFIG.user?.loggedIn && APP_CONFIG.user?.roles?.includes('ui-admin'));
+    this.isUiAdmin = user.canEditUi();
 
     // Get featured collections
     let displayData = APP_CONFIG.fcAppConfig['/application/ucd-lib-client/featured-collections/config.json'];
@@ -85,9 +87,6 @@ class AppHome extends Mixin(LitElement)
         this.displayData = displayData.body;
       }
     }
-
-    console.log('displayData', this.displayData);
-
 
     // this.featuredCollections = this.FcAppConfigModel.getFeaturedCollections();
     // this.featuredCollectionsCt = this.featuredCollections.length;
@@ -155,7 +154,6 @@ class AppHome extends Mixin(LitElement)
   _onEditClicked(e) {
     if( !this.isUiAdmin ) return;
     this.editMode = true;
-    console.log('this.editMode', this.editMode);
   }
 
   /**
@@ -175,7 +173,6 @@ class AppHome extends Mixin(LitElement)
     }
     await this.FcAppConfigModel.saveFeaturedCollectionAppData(this.displayData);
     this.editMode = false;
-    console.log('this.displayData', this.displayData)
   }
 
   /**

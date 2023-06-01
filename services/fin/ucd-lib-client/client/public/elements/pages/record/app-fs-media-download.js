@@ -45,12 +45,10 @@ export default class AppFsMediaDownload extends Mixin(LitElement)
         if( Array.isArray(url) ) url = url[0];
         if( typeof url === 'object' ) url = url['@id'];
         url = '/fcrepo/rest/'+url;
-        console.log('downloading archive using: '+url);
         open(url, '_blank');
       } else {
         let url = '/api/zip/bag-of-files'+this.selectedRecordMedia['@id'];
         open(url, '_blank');
-        console.log('downloading archive using: '+url);
       }
     }
   }

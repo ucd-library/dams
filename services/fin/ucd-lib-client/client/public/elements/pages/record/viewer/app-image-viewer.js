@@ -69,7 +69,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       if( this.media.small?.url ) srcset += `${this.media.small.url} ${this.media.small.size.width}w,`;
       if( this.media.medium?.url ) srcset += `${this.media.medium.url} ${this.media.medium.size.width}w,`;
       if( this.media.large?.url ) srcset += `${this.media.large.url} ${this.media.large.size.width}w,`;
-      debugger;
+
       if( this.media.original?.url ) {
         // we might not have size
         let size = await this.getImageSize(this.media.original);
@@ -90,7 +90,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
   getImageSize(original) {
     if( original.size ) return original.size;
-    debugger;
     return new Promise((resolve, reject) => {
       let img = new Image();
       img.src = original.url;

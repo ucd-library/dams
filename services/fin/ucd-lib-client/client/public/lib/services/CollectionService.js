@@ -1,6 +1,7 @@
 const {BaseService} = require('@ucd-lib/cork-app-utils');
 const CollectionStore = require('../stores/CollectionStore');
 const config = require('../config');
+const RecordGraph = require('../utils/RecordGraph.js').default;
 
 class CollectionService extends BaseService {
 
@@ -15,9 +16,9 @@ class CollectionService extends BaseService {
     return this.request({
       url : `${this.baseUrl}${id.replace('/collection', '')}`, // TODO add back? but we need image for collection cards ?compact=true`,
       checkCached : () => this.store.getCollection(id),
-      onLoading : request => this.store.setCollectionLoading(request),
-      onLoad : result => this.store.setCollectionLoaded(result.body),
-      onError : e => this.store.setCollectionError(e)
+      onLoading : request => this.store.setCollectionLoading(id, request),
+      onLoad : result => this.store.setCollectionLoaded(id, new RecordGraph(result.body)),
+      onError : e => this.store.setCollectionError(id, e)
     });
   }
 
@@ -74,19 +75,25 @@ class CollectionService extends BaseService {
    * 
    * @returns {Promise}
    */
-  async search(searchDocument = {}) {
+  async search(searchDocument = {}, opts={}) {
+    if( !opts.compact ) opts.compact = true;
+
     searchDocument.textFields = config.elasticSearch.textFields.collection;
     return this.request({
-      url : this.baseUrl+'?debug=true&single-node=true&compact=true',
+      url : this.baseUrl,
+      qs : opts,
+      json : true,
       fetchOptions : {
         method : 'POST',
-        headers : {
-          'Content-Type' : 'application/json'
-        },
-        body : JSON.stringify(searchDocument)
+        body : JSON.searchDocument
       },
       onLoading : promise => this.store.setSearchLoading(searchDocument, promise),
-      onLoad : result => this.store.setSearchLoaded(searchDocument, result.body),
+      onLoad : result => {
+        if( result.body.results ) {
+          result.body.results = result.body.results.map(record => new RecordGraph(record));
+        }
+        this.store.setSearchLoaded(searchDocument, result.body)
+      },
       onError : e => this.store.setSearchError(searchDocument, e)
     });
   }

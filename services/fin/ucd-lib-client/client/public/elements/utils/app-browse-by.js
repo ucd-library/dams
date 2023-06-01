@@ -312,7 +312,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
    * @param {Object} e 
    */
   _onPageClicked(e) {
-    debugger;
     this.currentPage = e.detail.page;
     this.currentIndex = (this.currentPage - 1) * this.resultsPerPage;
     this._renderResults();

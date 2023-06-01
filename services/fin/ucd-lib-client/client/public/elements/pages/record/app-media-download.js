@@ -442,7 +442,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       urls.push(source.src.replace('/fcrepo/rest', ''));
     }
 
-    debugger;
     this.zipConcatenatedPaths = urls.join(',');
     this.zipPaths = urls;
     this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}}`;

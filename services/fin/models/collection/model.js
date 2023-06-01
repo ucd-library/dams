@@ -1,4 +1,4 @@
-const {dataModels, RDF_URIS} = require('@ucd-lib/fin-service-utils');
+const {dataModels, models} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 const workflowUtils = require('../workflows.js');
@@ -50,6 +50,59 @@ class CollectionsModel extends FinEsDataModel {
     await workflowUtils.autoTriggerWorkflow(node);
 
     return result;
+  }
+
+  /**
+   * @method get
+   * @description override to add image node to collection graph
+   * if image node exists in different graph.
+   * 
+   * @param {String} id 
+   * @param {Object} opts 
+   * @param {String} index
+   *  
+   * @returns {Promise}
+   */
+  async get(id, opts={}, index) {
+    let collection = await super.get(id, opts, index);
+    return this._appendImageNode(collection);    
+  }
+
+  async search(searchDocument = {}, opts={}, index) { 
+    let result = await super.search(searchDocument, opts, index);
+    if( result.results ) {
+      for( let collection of result.results ) {
+        await this._appendImageNode(collection);
+      }
+    }
+    return result;
+  }
+
+  async _appendImageNode(collection) {
+    let id = collection['@id'];
+    let root = collection['@graph'].find(node => node['@id'] === id);
+
+    if( !root ) return collection;
+    if( !root.image ) return collection;
+
+    try {
+      if( root.image['@id'].startsWith(id) ) {
+        return collection;
+      }
+
+      let model = root.image['@id'].replace(/\//, '').split('/')[0];
+      // if( model !== 'item' ) return collection;
+
+      model = (await models.get(model)).model;
+
+      let imageGraph = await model.get(
+        root.image['@id'], 
+        {compact: true, singleNode: true}
+      );
+      collection['@graph'].push(imageGraph['@graph'][0]);
+    } catch(e) {}
+
+    return collection;
   }
 
   /**

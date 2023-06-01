@@ -10,9 +10,7 @@ class RecordStore extends BaseStore {
       byId : {},
       // by collection id
       defaultSearch : {},
-      search : {
-        state : this.STATE.INIT
-      }
+      search : {}
     }
 
     this.events = {
@@ -69,22 +67,28 @@ class RecordStore extends BaseStore {
   /**
    * Search
    */
-  setSearchLoaded(searchDocument, payload) {
+  setSearchLoaded(opts, searchDocument, payload) {
     this._setSearchState({
+      name: opts.name,
+      opts,
       state: this.STATE.LOADED,   
       searchDocument, payload
     });
   }
 
-  setSearchLoading(searchDocument, request) {
+  setSearchLoading(opts, searchDocument, request) {
     this._setSearchState({
+      name: opts.name,
+      opts,
       state: this.STATE.LOADING,   
       searchDocument, request
     });
   }
 
-  setSearchError(searchDocument, error, showErrorMessage=false) {
+  setSearchError(opts, searchDocument, error, showErrorMessage=false) {
     this._setSearchState({
+      name: opts.name,
+      opts,
       state: this.STATE.ERROR,   
       searchDocument, error,
       showErrorMessage
@@ -92,12 +96,12 @@ class RecordStore extends BaseStore {
   }
 
   _setSearchState(state) {
-    this.data.search = state;
+    this.data.search[state.name] = state;
     this.emit(this.events.RECORD_SEARCH_UPDATE, state);
   }
 
-  getSearch() {
-    return clone(this.data.search);
+  getSearch(name='default') {
+    return this.data.search[name] || {};
   }
 
   /**

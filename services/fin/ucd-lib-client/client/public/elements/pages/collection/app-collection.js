@@ -10,6 +10,8 @@ import '../../components/citation';
 import "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/keybinding-vim";
 
+import user from '../../../lib/utils/user.js';
+
 class AppCollection extends Mixin(LitElement) 
     .with(LitCorkUtils) {
 
@@ -52,7 +54,6 @@ class AppCollection extends Mixin(LitElement)
   }
 
   willUpdate() {
-    debugger;
     // this._showAdminPanel();
     // could we check if this.adminRendered is false here to hide the admin section? or possibly recall the showAdmin function?
     if( !this.adminRendered && !this.collectionId ) {
@@ -70,7 +71,6 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
    async _onAppStateUpdate(e) {
-    debugger;
     if( e.location.path[0] !== 'collection' || this.collectionId === e.location.fullpath ) return;
     this.reset();
 
@@ -87,7 +87,6 @@ class AppCollection extends Mixin(LitElement)
    * @param {*} e 
    */
    async _onCollectionVcUpdate(e) {
-    debugger;
     if( e.state !== 'loaded' ) return;
     
     this.collectionId = e.payload.results.id;
@@ -139,8 +138,8 @@ class AppCollection extends Mixin(LitElement)
     this.dbsync = {};
     this.watercolor = 'rose';
     this.displayData = [];
-    this.isAdmin = (APP_CONFIG.user?.loggedIn && APP_CONFIG.user?.roles?.includes('admin'));
-    this.isUiAdmin = (APP_CONFIG.user?.loggedIn && APP_CONFIG.user?.roles?.includes('ui-admin'));
+    this.isAdmin = user.hasRole('admin');
+    this.isUiAdmin = user.canEditUi();
     this.editMode = false;
     this.itemDisplayCount = 6;
   }
@@ -152,7 +151,6 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
   _onDefaultRecordSearchUpdate(e) {
-    debugger;
     if( e.state !== 'loaded' || this.highlightedItems.length ) return;
 
     if( e.payload && e.payload.results ) {
@@ -309,7 +307,6 @@ class AppCollection extends Mixin(LitElement)
           });
 
           this.savedItems.sort((a,b) => a.position - b.position);
-          console.log('this.savedItems line 306 _parseDisplayData', this.savedItems);
         }
       
         // featured image
