@@ -218,8 +218,8 @@ export default function render() {
         /* visibility: hidden; */
         top: 25px;
         left: 25px;
-        will-change: top, left;
-        transition: top 500ms ease-out, left 500ms ease-out;
+        /* will-change: top, left;
+        transition: top 500ms ease-out, left 500ms ease-out; */
       }
 
       .selected-layout {

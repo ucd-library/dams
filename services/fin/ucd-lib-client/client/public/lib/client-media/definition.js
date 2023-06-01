@@ -27,7 +27,7 @@ const MEDIA_TYPES = [
   'http://schema.org/ImageObject',
   'http://schema.org/VideoObject',
   'http://schema.org/AudioObject', 
-  'http://schema.org/MediaObject'
+  // 'http://schema.org/MediaObject'
 ]
 
 const DISPLAY_ORDER = {

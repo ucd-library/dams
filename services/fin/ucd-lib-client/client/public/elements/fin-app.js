@@ -120,7 +120,7 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
     this.showSearchHeader = this.SEARCH_HEADER_PAGES.includes(e.location.page);
 
     this.appState = e;
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
     let page = e.location.page;
     if (!this.loadedPages[page]) {
       this.page = "loading";

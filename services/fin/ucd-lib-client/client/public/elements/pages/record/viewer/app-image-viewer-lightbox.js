@@ -94,7 +94,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
     document.querySelector("fin-app").style.display = "none";
     document.body.style.overflow = "hidden";
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 
     this.renderCanvas();
 

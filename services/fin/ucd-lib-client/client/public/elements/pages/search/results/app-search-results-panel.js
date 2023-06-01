@@ -321,6 +321,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
 
     let maxHeight = Math.max.apply(Math, colHeights);
     this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
+    this.requestUpdate();
 
     /*
     function resizeGridItem(item){
@@ -397,14 +398,14 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   _scrollToCollections(e) {
     e.preventDefault();
 
-    let pagination = this.shadowRoot.querySelector("ucd-theme-pagination");
-    if (pagination) {
-      window.scrollTo({
-        top: pagination.offsetTop + 100,
-        left: 0,
-        behavior: "smooth",
-      });
-    }
+    // let pagination = this.shadowRoot.querySelector("ucd-theme-pagination");
+    // if (pagination) {
+    //   window.scrollTo({
+    //     top: pagination.offsetTop + 100,
+    //     left: 0,
+    //     behavior: "smooth",
+    //   });
+    // }
   }
 
   /**
@@ -481,7 +482,9 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Object} e click|keyup event
    */
   _onPaginationChange(e) {
+    debugger;
     e.detail.startIndex = e.detail.page * 10 - 10;
+    // this.currentPage = e.detail.page - 1;
     this.dispatchEvent(
       new CustomEvent("page-change", {
         detail: e.detail,

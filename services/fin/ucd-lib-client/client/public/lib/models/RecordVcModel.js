@@ -39,7 +39,7 @@ class RecordVcModel extends BaseModel {
         }
 
         for( let part of graph.root.isPartOf ) {
-          if( part['@id'].startsWith(window.location.origin+'/collection/') ) {
+          if( part['@id'].startsWith('/collection/') ) {
             collectionId = part['@id'];
             break;
           }

@@ -541,7 +541,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       let firstBtn = this.shadowRoot.querySelector("button");
       if (firstBtn) firstBtn.focus();
     }
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
   }
 
   /**

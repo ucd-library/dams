@@ -26,7 +26,7 @@ export default function render() {
       }
 
       img {
-        animation: show-img 300ms linear;
+        /* animation: show-img 300ms linear; */
         box-sizing: border-box;
         display: none;
         /* width: var(--grid-cell-width); */
@@ -38,7 +38,7 @@ export default function render() {
     left: 0; */
         cursor: pointer;
         border: solid 2px transparent;
-        transition: border-color 0.3s ease-in-out;
+        /* transition: border-color 0.3s ease-in-out; */
       }
 
       img:hover,
