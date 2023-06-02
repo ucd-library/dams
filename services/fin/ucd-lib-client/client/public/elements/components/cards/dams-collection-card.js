@@ -54,7 +54,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     if (e.state !== "loaded" || e.id !== this.id) return;
 
     this.collection = e.vcData;
-    if(  this.collection.images ) {
+    if( this.collection.images ) {
       let images = this.collection.images;
       this.imgSrc = images.medium ? images.medium.url : images.original.url;
     }

@@ -115,8 +115,10 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
   /**
    * @method _onAppStateUpdate
    */
-  _onAppStateUpdate(e) {
+  async _onAppStateUpdate(e) {
+    // if (e.state !== "loaded") return;
     this._updateLinks(e.location);
+    this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
   }
 
   /**
@@ -132,7 +134,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     if( !selectedRecord ) return;
 
     let mediaGroup = selectedRecord.clientMedia.mediaGroups[0];
-    let path = location.pathname;
+    let path = selectedRecord.clientMedia?.root?.['@id'] || location.pathname;
     let imagePath = '';
 
     // check if we are on a specific /media path
@@ -145,7 +147,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
           m.position === selectedRecord.selectedMediaPage
         )[0];
       if( media?.['@id'] ) {
-        path = media['@id'].split('/media')[0];
+        // path = media['@id'].split('/media')[0];
         imagePath = media['@id'];
       }
 
@@ -153,18 +155,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       imagePath = mediaGroup.clientMedia?.images?.original?.url || path;
 
     } else {
-      debugger;
-      // single object?
-      // TODO
-
-
-
-
-
-
-
-
-      
+      imagePath = selectedRecord.selectedMedia?.['@id'];
     }
 
     this.arkDoi = [

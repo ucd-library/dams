@@ -1,14 +1,14 @@
 import { LitElement} from 'lit';
 import render from "./app-collection.tpl.js";
-import JSONFormatter from 'json-formatter-js'
+// import JSONFormatter from 'json-formatter-js'
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 
 import "../../components/cards/dams-item-card";
 import '../../components/citation';
 
-import "ace-builds/src-noconflict/ace";
-import "ace-builds/src-noconflict/keybinding-vim";
+// import "ace-builds/src-noconflict/ace";
+// import "ace-builds/src-noconflict/keybinding-vim";
 
 import user from '../../../lib/utils/user.js';
 
@@ -18,7 +18,7 @@ class AppCollection extends Mixin(LitElement)
   static get properties() {
     return {
       collectionId : { type : String },
-      adminRendered : { type : Boolean },
+      // adminRendered : { type : Boolean },
       description : { type : String },
       title : { type : String },
       thumbnailUrl : { type : String },
@@ -32,7 +32,7 @@ class AppCollection extends Mixin(LitElement)
       dbsync : { type : Object },
       watercolor : { type : String },
       displayData : { type : Array },
-      isAdmin : { type : Boolean },
+      // isAdmin : { type : Boolean },
       isUiAdmin : { type : Boolean },
       editMode : { type : Boolean },
       itemDisplayCount : { type : Number }
@@ -46,22 +46,23 @@ class AppCollection extends Mixin(LitElement)
 
     this.reset();
 
-    this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'CollectionVcModel', 'FcAppConfigModel', 'SeoModel');
+    this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'FcAppConfigModel', 'SeoModel');
   }
 
   async firstUpdated() {
     this._onAppStateUpdate(await this.AppStateModel.get());
+    this._onCollectionUpdate(await this.CollectionModel.get(this.AppStateModel.location.pathname));
   }
 
-  willUpdate() {
-    // this._showAdminPanel();
-    // could we check if this.adminRendered is false here to hide the admin section? or possibly recall the showAdmin function?
-    if( !this.adminRendered && !this.collectionId ) {
-      // this.collectionId = window.location.pathname;
-    } else if( !this.adminRendered && this.collectionId ) {
-      this._showAdminPanel();
-    }
-  }
+  // willUpdate() {
+  //   // this._showAdminPanel();
+  //   // could we check if this.adminRendered is false here to hide the admin section? or possibly recall the showAdmin function?
+  //   if( !this.adminRendered && !this.collectionId ) {
+  //     // this.collectionId = window.location.pathname;
+  //   } else if( !this.adminRendered && this.collectionId ) {
+  //     this._showAdminPanel();
+  //   }
+  // }
 
   /**
    * @method _onAppStateUpdate
@@ -79,27 +80,35 @@ class AppCollection extends Mixin(LitElement)
     await this._parseDisplayData();
     await this.CollectionModel.get(this.collectionId);
     
-    this._createEditor();
+    // this._createEditor();
   }
 
   /**
-   * @description _onCollectionVcUpdate, fired when collection viewController updates
-   * @param {*} e 
+   * @method _onCollectionUpdate
+   * @description fired when collection updates
+   * 
+   * @param {Object} e 
    */
-   async _onCollectionVcUpdate(e) {
+   async _onCollectionUpdate(e) {
     if( e.state !== 'loaded' ) return;
+
+    // TODOO fix, vc data is not being set correctly
+    this.collectionId = e.vcData.id;
+
+    this.description = e.vcData.description
+    this.title = e.vcData.title;
     
-    this.collectionId = e.payload.results.id;
-    this.description = e.payload.results.description
-    this.title = e.payload.results.title;
-    this.thumbnailUrl = e.payload.results.thumbnailUrl;
-    this.callNumber = e.payload.results.callNumber;
-    this.keywords = e.payload.results.keywords;
-    this.items = e.payload.results.count;
-    this.yearPublished = e.payload.results.yearPublished;
+    // TODO fix, vc data is not being set correctly
+    this.thumbnailUrl = e.vcData.images || '';
+    
+    this.callNumber = e.vcData.callNumber;
+    this.keywords = e.vcData.keywords;
+    this.items = e.vcData.count;
+    this.yearPublished = e.vcData.yearPublished;
 
     // try to load from app container first
     if( !this.savedItems.length ) {
+      debugger;
       // default to most recent 3 items by year published descending    
       let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, 3);
       if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
@@ -114,7 +123,7 @@ class AppCollection extends Mixin(LitElement)
       }
     }
 
-    this._showAdminPanel();
+    // this._showAdminPanel();
 
     // search highlighted collection items
     // this.RecordModel.searchHighlighted(this.collectionId, true, true);
@@ -124,7 +133,7 @@ class AppCollection extends Mixin(LitElement)
 
   reset() {
     this.collectionId = '';
-    this.adminRendered = false;
+    // this.adminRendered = false;
     this.description = '';
     this.title = '';
     this.thumbnailUrl = '';
@@ -138,7 +147,7 @@ class AppCollection extends Mixin(LitElement)
     this.dbsync = {};
     this.watercolor = 'rose';
     this.displayData = [];
-    this.isAdmin = user.hasRole('admin');
+    // this.isAdmin = user.hasRole('admin');
     this.isUiAdmin = user.canEditUi();
     this.editMode = false;
     this.itemDisplayCount = 6;
@@ -255,25 +264,25 @@ class AppCollection extends Mixin(LitElement)
   /**
    * @description _showAdminPanel, checks if user is an admin and populates admin section with data
    */
-  async _showAdminPanel() {
-    if( !this.isAdmin ) return;
-    if( !this.adminRendered ) {
-      const adminData = await this.CollectionModel.getAdminData(this.collectionId);
-      if( adminData && adminData.response && adminData.response.status === 200 ) {
+  // async _showAdminPanel() {
+  //   if( !this.isAdmin ) return;
+  //   if( !this.adminRendered ) {
+  //     const adminData = await this.CollectionModel.getAdminData(this.collectionId);
+  //     if( adminData && adminData.response && adminData.response.status === 200 ) {
 
-        const response = adminData.body;
-        if( response && !this.adminRendered ) {
-          this.dbsync = response.dbsync;
+  //       const response = adminData.body;
+  //       if( response && !this.adminRendered ) {
+  //         this.dbsync = response.dbsync;
 
-          this.shadowRoot.querySelector('.admin-content')
-            .appendChild((new JSONFormatter(Object.values(this.dbsync)[0], 1)).render());
-          this.adminRendered = true;
-          this.shadowRoot.querySelector('.admin-heading').style.display = '';
-          this.shadowRoot.querySelector('.admin-content').style.display = '';  
-        }
-      }
-    }
-  }
+  //         this.shadowRoot.querySelector('.admin-content')
+  //           .appendChild((new JSONFormatter(Object.values(this.dbsync)[0], 1)).render());
+  //         this.adminRendered = true;
+  //         this.shadowRoot.querySelector('.admin-heading').style.display = '';
+  //         this.shadowRoot.querySelector('.admin-content').style.display = '';  
+  //       }
+  //     }
+  //   }
+  // }
 
   /**
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
@@ -401,21 +410,21 @@ class AppCollection extends Mixin(LitElement)
   /**
    * @description _createEditor, creates ace-build editor for changing display preferences
    */
-  _createEditor() {
-    let editor = ace.edit(this.shadowRoot.querySelector('.display-editor-root'));
-    // let type = 'Admin Display Preferences'; // editorRoot.getAttribute('type');
-    editor.renderer.attachToShadowRoot();
-    // editor.setValue(assetDefs.textSearchFields[type].join('\n'));
-    editor.setValue(JSON.stringify(this.displayData, null, '\t'));
-    editor.getSession().on('change', () => {
-      // let values = editor.getValue()
-      //   .split('\n')
-      //   .map(item => item.trim())
-      //   .filter(item => item);
-      // assetDefs.textSearchFields[type] = values;
-      // window.localStorage.setItem('textSearchFields', JSON.stringify(assetDefs.textSearchFields));
-    });
-  }
+  // _createEditor() {
+  //   let editor = ace.edit(this.shadowRoot.querySelector('.display-editor-root'));
+  //   // let type = 'Admin Display Preferences'; // editorRoot.getAttribute('type');
+  //   editor.renderer.attachToShadowRoot();
+  //   // editor.setValue(assetDefs.textSearchFields[type].join('\n'));
+  //   editor.setValue(JSON.stringify(this.displayData, null, '\t'));
+  //   editor.getSession().on('change', () => {
+  //     // let values = editor.getValue()
+  //     //   .split('\n')
+  //     //   .map(item => item.trim())
+  //     //   .filter(item => item);
+  //     // assetDefs.textSearchFields[type] = values;
+  //     // window.localStorage.setItem('textSearchFields', JSON.stringify(assetDefs.textSearchFields));
+  //   });
+  // }
 
   // async _onSave(e) {
   //   e.preventDefault();

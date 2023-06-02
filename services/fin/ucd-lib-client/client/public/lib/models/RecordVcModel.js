@@ -40,6 +40,17 @@ class RecordVcModel {
       let keywords = root.about || [];
       if( !Array.isArray(keywords) ) keywords = [keywords];
 
+      let images;
+      if( e.payload?.clientMedia?.mediaGroups ) {
+        let groups = e.payload.clientMedia.mediaGroups;
+        let group = groups.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
+        if( group ) {
+          images = groups.clientMedia.images;
+        } else if( groups[0].clientMedia?.images ) {
+          images = groups[0].clientMedia?.images;
+        }
+      }
+
       // translate collection and related nodes/items to ui model
       const vcData = {
         "@id": root["@id"],
@@ -47,6 +58,7 @@ class RecordVcModel {
         collectionId,
         collectionName: config.collectionLabels[collectionId] || '',
         clientMedia: clientMedia,
+        images,
         date: root.yearPublished,
         publisher: root?.publisher?.name,
         keywords,

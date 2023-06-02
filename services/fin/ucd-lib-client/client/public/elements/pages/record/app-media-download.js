@@ -62,16 +62,18 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
     if (selectedRecord) {
       this._onSelectedRecordUpdate(selectedRecord);
-      if (selectedRecord.selectedMedia) {
-        this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
-      }
+      // if (selectedRecord.selectedMedia) {
+      //   this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
+      // }
     }
   }
 
   _onSelectedRecordUpdate(record) {
     if (!record) return;
 
-    this.rootRecord = record;
+    let { graph, clientMedia, selectedMedia, selectedMediaPage} = record;    
+
+    this.rootRecord = selectedMedia;
     let sources = [];
 
     // find out if the number of download options is greater than 1
@@ -96,6 +98,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     // this.fullSetCount = this._getAllNativeDownloadSources().length;
 
     this.allSources = sources;
+    this._onSelectedRecordMediaUpdate(selectedMedia)
   }
 
   _onSelectedRecordMediaUpdate(media) {
@@ -108,7 +111,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let isRoot = false;
 
     // build list based on selected page, or first page if root record is selected
-    if (window.location.pathname === this.rootRecord.selectedMedia["@id"]) {
+    if( window.location.pathname === this.rootRecord ) { // }.selectedMedia["@id"]) {
       this.downloadOptions = [firstRecord];
       isRoot = true;
     } else if (Object.keys(this.selectedRecordMedia).length) {
@@ -217,7 +220,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     // TODO remove iiif stuff below, need to test with imagelists though, make sure zip works with sources array
     let sources = [];
 
-    let record = this.rootRecord.graph.index[imageRecord["@id"]];
+    let record = this.rootRecord; // .graph.index[imageRecord["@id"]];
     return [
       {
         record,
@@ -379,7 +382,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _getImageFormat(imageRecord) {
     if (!imageRecord.fileFormat) {
-      imageRecord = this.rootRecord.graph.index[imageRecord["@id"]];
+      imageRecord = this.rootRecord; // .graph.index[imageRecord["@id"]];
     }
     if (!imageRecord) return;
 

@@ -22,18 +22,17 @@ class CollectionVcModel {
       });
     }
 
-    // TODO change to leverage clientMedia.images, however they're not building from the api yet for collections
     let images;
     if( e.payload?.clientMedia?.mediaGroups ) {
       let groups = e.payload.clientMedia.mediaGroups;
       let group = groups.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
       if( group ) {
-        images = group.clientMedia.images;
+        images = groups.clientMedia.images;
       }
     }
 
     const vcData = {
-      id: e.payload["@id"],
+      id: rootNode["@id"],
       description: rootNode.description,
       title: rootNode.name,
       images,
