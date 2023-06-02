@@ -67,16 +67,13 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       "AppStateModel",
       "RecordModel",
       "CollectionModel",
-      "RecordVcModel",
       "SeoModel"
     );
   }
 
   async firstUpdated() {
-    let selectedRecord = await this.AppStateModel.getSelectedRecord();
-    if (selectedRecord) {
-      await this._onSelectedRecordUpdate(selectedRecord);
-    }
+    this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath));
+    this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
   }
 
   /**
@@ -85,45 +82,14 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
    *
    * @param {Object} e state event
    */
-  _onRecordUpdate(e) {
-    if (e.state !== "loading") return;
+  async _onRecordUpdate(e) {
+    if (e.state !== "loaded") return;
 
-    // this.renderedRecordId = null;
-    // this.record = null;
-    // this.$.description.classList.add('hidden');
-    // this.description = '';
-    // this.alternativeHeadline = '';
-    // this.$.link.value = '';
-    // this.date = '';
-    // this.collectionName = '';
-    // this.rights = null;
-    // this.$.collectionValue.innerHTML = '';
-    // this.$.mla.text = '';
-    // this.$.apa.text = '';
-    // this.$.chicago.text = '';
-    // this.$.identifier.classList.add('hidden');
-    // this.$.creator.classList.add('hidden');
-    // this.$.subject.classList.add('hidden');
-    // this.$.publisher.classList.add('hidden');
-    // this.$.fedoraValue.innerHTML = '';
-    // this.metadata = [];
-    // this.isBagOfFiles = false;
-  }
+    let record = e.vcData;
+    if( !record ) return;
 
-  /**
-   * @method _onSelectedRecordUpdate
-   * @description called when a record is selected
-   *
-   * @param {Object} record selected record
-   */
-  async _onSelectedRecordUpdate(record) {
-    if (!record) return;
-
-    let vcRecord = this.RecordVcModel.translate(record);
-    if (vcRecord["@id"] === this.renderedRecordId) return;
-
-    this.renderedRecordId = vcRecord["@id"];
-    this.record = vcRecord;
+    this.renderedRecordId = record["@id"];
+    this.record = record;
 
     this.currentRecordId = this.record["@id"];
     this.name = this.record.name;
@@ -135,143 +101,15 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     this.collectionImg = this.record.collectionImg;
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
-
-    await this.CollectionModel.get(this.collectionId); // get item count
+    this.arkDoi = this.record.arkDoi;
+    this.fedoraLinks = this.record.fedoraLinks;
 
     this._updateLinks(this.AppStateModel.location, record);
-
-    // let citation = this.shadowRoot.querySelector('app-citation');
-    // if( citation ) citation.requestUpdate();
-
-    // if( this.AppStateModel.locationElement.location.pathname.split('/media').length < 2 ) {
-    //   // pull image with position 1
-
-    //   //    pathname + record.root.image.url for second links in ark/fedora
-    //   // record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].id === /item/bla
-    //   // record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].image.url === /fcrepo/bla
-    //   this.arkDoi = [
-    //     this.AppStateModel.locationElement.location.pathname.split('/media')[0],
-    //     record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].id,
-    //   ];
-
-    //   this.fedoraLinks = [
-    //     '/fcrepo/rest' + this.AppStateModel.locationElement.location.pathname.split('/media')[0],
-    //     record.data['@graph'].filter(r => parseInt(r.position) === 1 && r.image)[0].image.url + '/fcr:metadata',
-    //   ];
-
-    // } else {
-    //   this.arkDoi = [
-    //     this.AppStateModel.locationElement.location.pathname.split('/media')[0],
-    //     this.AppStateModel.locationElement.location.pathname,
-    //   ];
-
-    //   this.fedoraLinks = [
-    //     '/fcrepo/rest' + this.AppStateModel.locationElement.location.pathname.split('/media')[0],
-    //     '/fcrepo/rest' + this.AppStateModel.locationElement.location.pathname + '/fcr:metadata',
-    //   ];
-    // }
-
-    // this.size = '?'
-    // this.rights = {'?': '?'}
-    // this.metadata = ['?'],
-    // this.isBagOfFiles : {type: Boolean}
-
-    /*
-      arkDoi: ['?']
-      callNumber: "?"
-      citationText: "?"
-      clientMedia: 
-        ClientMedia {id: '/item/ark:/87287/d7k06n', graph: Array(86), index: Array(0), root: {…}, mediaGroups: Array(2)}
-      collectionId: "/collection/sherry-lehmann"
-      collectionItemsCount: 42
-      collectionName: "Sherry-Lehmann Wine & Spirits Co."
-      date: 2010
-      fedoraLinks: ['?']
-      id: "/item/ark:/87287/d7k06n"
-      keywords: ['?']
-      name: "Holiday 2010: Sherry-Lehmann Wine & Spirits Merchants Since 1934"
-      publisher: "Sherry-Lehmann Wine & Spirits Co."
-    */
-
-    // if( this.record.description ) {
-    //   this.$.description.classList.remove('hidden');
-    //   this.$.descriptionValue.innerHTML = markdown.toHTML(this.record.description);
-    // } else {
-    //   this.$.description.classList.add('hidden');
-    // }
-
-    // this.description = this.record.description || '';
-    // this.alternativeHeadline = this.record.alternativeHeadline || '';
-    // this.$.link.value = window.location.href;
-
-    // this.$.dateValue.innerHTML = this.record.datePublished || 'Undated';
-
-    // TODO: add back in when we figure out consolidated resource type
-    // this.$.resourceType.innerHTML = this.record.type ? '<div>'+this.record.type.join('</div><div>')+'</div>' : 'Unknown';
-    // if( this.record.license &&
-    //     this.record.license['@id'] &&
-    //     rightsDefinitions[this.record.license['@id']] ) {
-
-    //   let def = rightsDefinitions[this.record.license['@id']];
-    //   this.rights = {
-    //     link : this.record.license['@id'],
-    //     label : def.text.toLowerCase(),
-    //     icon : `/images/rights-icons/${def.icon}.svg`
-    //   }
-    // } else {
-    //   this.rights = null;
-    // }
-
-    // this.collectionName = this.record.collectionId || '';
-    // if( this.collectionName ) {
-    //   let collection = await this._getCollection(this.collectionName);
-    //   this.collectionName = collection.name;
-    //   this.record.collectionName = collection.name;
-    // }
-
-    // Attach a recod to the download options
-    // this.$.download.setRootRecord(record);
-
-    // find arks or doi
-    // this._renderIdentifier(record);
-    // this._renderCreators(record);
-    // this._renderSubjects(record);
-    // this._renderPublisher(record);
-
-    // set collection link
-    // this.$.collectionValue.innerHTML = `<a href="${record.collectionId}">${this.collectionName}</a>`;
-
-    // set fedora collection link
-    // this._renderFcLink(record);
-
-    // this._updateMetadataRows();
-    // this._setTarHref();
-
-    // render citations.. this might need to load library, do it last
-
-    // this.citations.push({
-    //   type : 'mla',
-    //   text : await citations.renderEsRecord(this.record.root, 'mla')
-    // });
-    // this.citations.push({
-    //   type : 'apa',
-    //   text : await citations.renderEsRecord(this.record.root, 'apa')
-    // });
-    // this.citations.push({
-    //   type : 'chicago',
-    //   text : await citations.renderEsRecord(this.record.root, 'chicago')
-    // });
-
-    // this.$.mla.text = await citations.renderEsRecord(this.record, 'mla');
-    // this.$.apa.text = await citations.renderEsRecord(this.record, 'apa');
-    // this.$.chicago.text = await citations.renderEsRecord(this.record, 'chicago');
-
-    // this.isBagOfFiles = this.record['@type'].includes('http://digital.ucdavis.edu/schema#BagOfFiles');
   }
 
-  _onCollectionVcUpdate(e) {
+  _onCollectionUpdate(e) {
     if (e.state !== "loaded") return;
-    this.collectionItemCount = e.payload?.results?.count || 0;
+    this.collectionItemCount = e.vcData?.count || 0;
   }
 
   /**
@@ -286,206 +124,60 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
    * @description update ark/fedora links
    *
    * @param {Object} location location element
-   * @param {Object} record selected record
    */
-  _updateLinks(location, record) {
-    if (location.pathname.split("/media").length < 2) {
-      if (!record) return;
+  _updateLinks(location) {
+    if( location.page !== 'item' ) return;
 
-      // pull image with position 1
-      this.arkDoi = [
-        location.pathname.split("/media")[0],
-        record.graph
-          .filter((r) => r["@id"] === location.pathname.split("/media")[0])[0]
-          .clientMedia?.images?.original?.url.replace("/fcrepo/rest", ""),
-      ];
+    let selectedRecord = this.AppStateModel.getSelectedRecord();
+    if( !selectedRecord ) return;
 
-      this.fedoraLinks = [
-        "/fcrepo/rest" + location.pathname.split("/media")[0],
-        "/fcrepo/rest" + location.pathname.split("/media")[0],
-        // TODO second link should point to an image or pdf, which one in the record graph though?
-        // location.pathname.split('/media')[0],record.data['@graph'].filter(r => r['@id'] === location.pathname.split('/media')[0])[0].image['@id'] + '/fcr:metadata',
-      ];
+    let mediaGroup = selectedRecord.clientMedia.mediaGroups[0];
+    let path = location.pathname;
+    let imagePath = '';
+
+    // check if we are on a specific /media path
+    let isMediaUrl = path.indexOf('/media') > -1;
+    if( isMediaUrl ) {
+      // find media in graph
+      let media = selectedRecord.clientMedia.graph
+        .filter(
+          m => m['@shortType'].includes('ImageObject') && 
+          m.position === selectedRecord.selectedMediaPage
+        )[0];
+      if( media?.['@id'] ) {
+        path = media['@id'].split('/media')[0];
+        imagePath = media['@id'];
+      }
+
+    } else if (mediaGroup?.['@shortType']?.includes('ImageList')) {
+      imagePath = mediaGroup.clientMedia?.images?.original?.url || path;
+
     } else {
-      this.arkDoi = [location.pathname.split("/media")[0], location.pathname];
+      debugger;
+      // single object?
+      // TODO
 
-      this.fedoraLinks = [
-        "/fcrepo/rest" + location.pathname.split("/media")[0],
-        "/fcrepo/rest" + location.pathname + "/fcr:metadata",
-      ];
+
+
+
+
+
+
+
+      
     }
+
+    this.arkDoi = [
+      path,
+      imagePath.replace('/fcrepo/rest', '')
+    ];
+
+    this.fedoraLinks = [
+      '/fcrepo/rest'+ path.replace('/fcrepo/rest', ''),
+      '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
+    ];
+
   }
-
-  /**
-   * @method _onRecordVcUpdate
-   * @description from RecordVcModel, called when a record is selected
-   *
-   * @param {Object} e payload
-   */
-  // _onRecordVcUpdate(e) {
-
-  // }
-
-  // _renderFcLink(record, media) {
-  //   let metadataPart = record['@type'].find(type => type.match(/binary/i)) ? '/fcr:metadata' : '';
-  //   let link = this._getHost()+'fcrepo/rest'+record['@id']+metadataPart;
-  //   let html = `<a href="${link}">${record['@id']}</a>`;
-
-  //   if( media && record['@id'] !== media['@id'] ) {
-  //     metadataPart = media['@type'].find(type => type.match(/binary/i)) ? '/fcr:metadata' : '';
-  //     link = this._getHost()+'fcrepo/rest'+media['@id']+metadataPart;
-  //     html += `<div class="fc-break"></div><div><a href="${link}">${media['@id']}</a></div>`;
-  //   }
-
-  //   this.$.fedoraValue.innerHTML = html;
-  // }
-
-  // _renderSelectedMedia() {
-  //   let imageList = this._getImageMediaList(this.record);
-  //   if( this.record.associatedMedia ) {
-  //     if( imageList.length ) {
-
-  //       // see if url has selected an image
-  //       let selected = imageList[0];
-  //       for( let img of imageList ) {
-  //         if( img['@id'] === window.location.pathname ) {
-  //           selected = img;
-  //         }
-  //       }
-
-  //       this._setSelectedRecordMedia(selected);
-  //     } else {
-  //       this._setSelectedRecordMedia(this.record);
-  //     }
-  //   } else {
-  //     this._setSelectedRecordMedia(this.record);
-  //   }
-  // }
-
-  /**
-   * @method _renderCreators
-   * @description render creator field
-   *
-   * @param {Object} record
-   */
-  // _renderCreators(record) {
-  //   // filter to those w/ labels
-  //   let creators = utils.asArray(record, 'creators');
-
-  //   if( creators.length === 0 ) {
-  //     return this.$.creator.classList.add('hidden');
-  //   }
-
-  //   // TODO: label is under creator.name
-  //   this.$.creatorValue.innerHTML = creators
-  //     .map(creator => {
-  //       let searchDoc = this.RecordModel.emptySearchDocument();
-  //       this.RecordModel.appendKeywordFilter(searchDoc, 'creators', creator);
-  //       this.RecordModel.appendKeywordFilter(searchDoc, 'isPartOf.@id', record.collectionId);
-  //       let link = this._getHost()+'search/'+this.RecordModel.searchDocumentToUrl(searchDoc);
-  //       return `<a href="${link}">${creator}</a>`;
-  //     })
-  //     .join(', ');
-
-  //   this.$.creator.classList.remove('hidden');
-  // }
-
-  /**
-   * @method _renderSubjects
-   * @description render subject field, which is really 'abouts' derived from 'schema:about'
-   *
-   * @param {Object} record
-   */
-  // _renderSubjects(record) {
-  //   // filter to those w/ labels
-  //   let subjects = utils.asArray(record, 'abouts');
-  //   // .filter(subject => subject.name ? true : false);
-
-  //   if( subjects.length === 0 ) {
-  //     return this.$.subject.classList.add('hidden');
-  //   }
-
-  //   // TODO: label is under creator.name
-  //   this.$.subjectValue.innerHTML = subjects
-  //     .map(subject => {
-  //       // subject = subject.name;
-  //       let searchDoc = this.RecordModel.emptySearchDocument();
-  //       this.RecordModel.appendKeywordFilter(searchDoc, 'abouts.raw', subject);
-  //       this.RecordModel.appendKeywordFilter(searchDoc, 'isPartOf.@id', record.collectionId);
-  //       let link = this._getHost()+'search/'+this.RecordModel.searchDocumentToUrl(searchDoc);
-  //       return `<a href="${link}">${subject}</a>`;
-  //     })
-  //     .join(', ');
-
-  //   this.$.subject.classList.remove('hidden');
-  // }
-
-  /**
-   * @method _renderPublisher
-   * @description render publisher field
-   *
-   * @param {Object} record
-   */
-  // _renderPublisher(record) {
-  //   // filter to those w/ labels
-  //   let publishers = utils.asArray(record, 'publisher')
-  //     .filter(publisher => publisher.name ? true : false);
-
-  //   if( publishers.length === 0 ) {
-  //     return this.$.publisher.classList.add('hidden');
-  //   }
-
-  //   this.$.publisherValue.innerHTML = publishers
-  //     .map(publisher => publisher.name)
-  //     .join(', ');
-
-  //   this.$.publisher.classList.remove('hidden');
-  // }
-
-  /**
-   * @method _renderIdentifier
-   * @description render ark/doi field
-   *
-   * @param {Object} record
-   */
-  // _renderIdentifier(record, media) {
-  //   if( !record['@id']entifier ) {
-  //     return this.$.identifier.classList.add('hidden');
-  //   }
-
-  //   let ids = Array.isArray(record.identifier) ? record.identifier : [record.identifier];
-  //   let arks = ids.filter(id => id.match(/^(ark|doi)/) ? true : false);
-
-  //   if( arks.length ) {
-
-  //     // if we are passed a selected media, append identifiers as well
-  //     if( media && media.identifier ) {
-  //       let mediaIds = Array.isArray(media.identifier) ? media.identifier : [media.identifier];
-  //       mediaIds = mediaIds.filter(id => id.match(/^(ark|doi)/) ? true : false);
-  //       for( let id of mediaIds ) {
-  //         if( arks.indexOf(id) === -1 ) arks.push(id);
-  //       }
-  //     }
-
-  //     this.$.identifier.classList.remove('hidden');
-  //     this.$.identifierValue.innerHTML = arks.map(id => `<div><a href="${this._getHost()}${id}">${id}</a></div>`).join('')
-  //   } else {
-  //     this.$.identifier.classList.add('hidden');
-  //   }
-
-  //   if( !record.identifiers ) {
-  //     return this.$.libLocation.classList.add('hidden');
-  //   }
-
-  //   let callNumber = Array.isArray(record.identifiers) ? record.identifiers : [record.identifiers];
-  //   callNumber = callNumber.filter(id => id.match(/^.*,.*box:.*,.*folder:.*$/i) ? true : false);
-  //   if( callNumber.length ) {
-  //     this.$.callNumberValue.innerHTML = callNumber.map(id => `<div>${id}</div>`).join('')
-  //     this.$.callNumber.classList.remove('hidden');
-  //   } else {
-  //     this.$.callNumber.classList.add('hidden');
-  //   }
-  // }
 
   /**
    * @method _getHost
@@ -523,21 +215,6 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     // this._renderIdentifier(this.record, record);
     // this._renderFcLink(this.record, record);
   }
-
-  /**
-   * @method _updateMetadataRows
-   * @description update metadata table
-   */
-  // _updateMetadataRows() {
-  //   let metadata = [];
-
-  //   this._addMetadataRow(metadata, 'name', 'Item Name');
-  //   this._addMetadataRow(metadata, 'collectionName', 'Collection');
-  //   this._addMetadataRow(metadata, 'date', 'Date');
-  //   this._addMetadataRow(metadata, 'resourceType', 'Resource Type');
-
-  //   this.metadata = metadata;
-  // }
 
   /**
    * @method _addMetadataRow

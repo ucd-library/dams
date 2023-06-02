@@ -47,7 +47,7 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.format = "";
     this.creator = "";
 
-    this._injectModel("RecordModel", "RecordVcModel");
+    this._injectModel("RecordModel");
   }
 
   /**
@@ -78,6 +78,7 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
     let res = await this.RecordModel.get(id);
 
     if (res.state !== "loaded") return;
+    debugger;
     res = this.RecordVcModel.translate(res.payload);
     this.data.title = res.name;
     this.data.itemUrl = res["@id"];

@@ -36,7 +36,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     this.thumbnailUrl = "";
     this.mediaType = "";
 
-    this._injectModel("RecordModel", "RecordVcModel");
+    this._injectModel("RecordModel");
   }
 
   /**
@@ -74,6 +74,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     let res = await this.RecordModel.get(id);
 
     if (res.state !== "loaded") return;
+    debugger;
     res = this.RecordVcModel.translate(res.payload);
     this.data.title = res.name;
     this.data.itemUrl = res["@id"];

@@ -40,7 +40,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.bounds = [];
     this.imageHeight = 0;
 
-    this._injectModel("RecordModel", "RecordVcModel");
+    this._injectModel("RecordModel");
   }
 
   /**
@@ -90,6 +90,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     let res = await this.RecordModel.get(id);
 
     if (res.state !== "loaded") return;
+    debugger;
     res = this.RecordVcModel.translate(res.payload);
     this.data.title = res.name;
     this.data.itemUrl = res["@id"];

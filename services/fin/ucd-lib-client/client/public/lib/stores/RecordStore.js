@@ -1,5 +1,6 @@
 const {BaseStore} = require('@ucd-lib/cork-app-utils');
 const clone = require('clone');
+const vcModel = require('../models/RecordVcModel');
 
 class RecordStore extends BaseStore {
 
@@ -58,9 +59,10 @@ class RecordStore extends BaseStore {
 
   _setRecordState(state) {
     this.data.byId[state.id] = state;
-    // if( state.rootId ) {
-    //   this.data.byId[state.rootId] = state;
-    // }
+
+    if( state.state === this.STATE.LOADED ) {
+      vcModel.renderRecord(state);
+    }
     this.emit(this.events.RECORD_UPDATE, state);
   }
 

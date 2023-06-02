@@ -101,7 +101,7 @@ class CollectionModel extends BaseModel {
     }
 
     getRecentCollections() {
-      //TODO: change to 'uploadDate'
+      // TODO: change to 'uploadDate'
       let searchDocument = {
         limit: 3,
         sort: [{

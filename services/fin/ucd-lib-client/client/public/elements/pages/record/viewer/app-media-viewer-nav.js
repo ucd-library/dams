@@ -75,7 +75,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     window.addEventListener("touchmove", (e) => this._onTouchMove(e));
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
-    this._injectModel("AppStateModel", "MediaModel", "RecordVcModel");
+    this._injectModel("AppStateModel", "MediaModel");
 
     window.addEventListener(
       "BookReader:pageChanged",

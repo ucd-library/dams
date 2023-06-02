@@ -55,7 +55,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       "AppStateModel",
       "MediaModel",
       "CollectionModel",
-      "RecordVcModel"
     );
   }
 
@@ -71,7 +70,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
   _onSelectedRecordUpdate(record) {
     if (!record) return;
-    // let vcRecord = this.RecordVcModel.translateMedia(record);
 
     this.rootRecord = record;
     let sources = [];

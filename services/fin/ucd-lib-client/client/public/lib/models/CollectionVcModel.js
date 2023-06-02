@@ -1,8 +1,8 @@
 class CollectionVcModel {
 
   /**
-   * @method _onCollectionUpdate
-   * @description listen for record search update events, transform data for ui and emit event to update
+   * @method renderCollection
+   * @description transform data for ui
    *
    * @param {Object} e
    */
