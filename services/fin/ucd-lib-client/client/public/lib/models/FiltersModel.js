@@ -16,7 +16,7 @@ class FiltersModel extends BaseModel {
     this.selectedCollection = null;
 
     this.EventBus.on(RecordModel.store.events.RECORD_SEARCH_UPDATE, e => this._update());
-    this.EventBus.on(CollectionModel.store.events.SELECTED_COLLECTION_UPDATE, e => {
+    this.EventBus.on(CollectionModel.store.events.COLLECTION_SEARCH_UPDATE, e => {
       this.selectedCollection = e ? e['@id'] : '';
       this._update();
     });
@@ -42,14 +42,14 @@ class FiltersModel extends BaseModel {
   }
 
   _updateFilter(key) {
-    let e = RecordModel.store.data.search;
-    if( e.state !== 'loaded' ) return;
+    let e = RecordModel.store.data.search.default;
+    if( !e || e.state !== 'loaded' ) return;
 
     setTimeout(() => this._updateFilterAsync(key), 0);
   }
 
   async _updateFilterAsync(filter) {
-    let e = RecordModel.store.data.search;
+    let e = RecordModel.store.data.search.default;
     if( e.state !== 'loaded' ) return;
 
     var activeFilters = [];

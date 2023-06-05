@@ -239,10 +239,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this.collectionResults = [];
     this.collectionResults.push(...this.allResults.map(r => {
       return {
-        thumbnailUrl : r['@graph'][0].thumbnailUrl, 
-        title : r.name,
-        count : r['@graph'][0].itemCount,
-        id : r['@id']
+        thumbnailUrl : r.data['@graph'][0].thumbnailUrl, 
+        title : r.data.name,
+        count : r.data['@graph'][0].itemCount,
+        id : r.data['@id']
       }
     }));
 

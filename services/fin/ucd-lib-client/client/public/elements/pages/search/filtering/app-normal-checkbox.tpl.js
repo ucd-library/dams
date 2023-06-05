@@ -38,7 +38,6 @@ export default function render() {
   }
 
   span {
-    display: inline-block;
     padding-top: 3px;
     line-height: normal;
   }
@@ -48,24 +47,36 @@ export default function render() {
   }
 
   div[checked] .value {
-    /* font-style: italic; */
     font-weight: bold;
+    display: flex;
+    align-items: center;
   }
 
-  div[disabled] iron-icon {
+  div[disabled] #close,
+  div #close {
     display: none;
   }
 
   div[disabled] .value {
-    /* font-style: italic; */
     color: var(--gray-text);
+  }
+  div[checked] #close {
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    /* justify-content: center; */
+  }
+  ucdlib-icon {
+    fill: var(--color-aggie-blue-80);
   }
 </style>
 
 <div ?checked="${this.checked}" ?disabled="${this.disabled}">
 
-  <!-- TODO change to ucdlib-icon -->
-  <iron-icon icon="fin-icons:close"></iron-icon>
+  <div id="close">
+    <ucdlib-icon icon="ucdlib-dams:fa-xmark" @click="${this._onClick}"></ucdlib-icon>
+  </div>   
 
   <span class="value">${this._realLabel()}</span>
 </div>

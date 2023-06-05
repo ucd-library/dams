@@ -108,7 +108,6 @@ class AppCollection extends Mixin(LitElement)
 
     // try to load from app container first
     if( !this.savedItems.length ) {
-      debugger;
       // default to most recent 3 items by year published descending    
       let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, 3);
       if( highlightedItems.response.ok && highlightedItems.body.results.length ) {

@@ -57,6 +57,12 @@ export default function render() {
       margin-right: 2px;
     }
 
+    ucdlib-icon {
+      fill: var(--color-aggie-blue-80);
+      width: 18px;
+      height: 18px;
+    }
+
     /* JM - think this is redundant, scroll inforced by app-*-filter element */
     /* #filters {
       overflow-y: auto;
@@ -66,7 +72,13 @@ export default function render() {
 
   <div class="label" @click="${this._onToggleClicked}" @keyup="${this._onToggleClicked}" role="button" tabindex="0">
     <div style="flex: 1; font-size: 1.15rem">${this.filter.label}</div>
-    <iron-icon icon="arrow-drop-down" ?closed="${!this.opened}"></iron-icon>
+    
+    <!-- <iron-icon icon="arrow-drop-down" ?closed="${!this.opened}"></iron-icon> -->
+    <div style="padding-right: 1rem; padding-top: .5rem;">
+      <ucdlib-icon icon="ucdlib-dams:fa-caret-right" ?hidden=${this.opened}></ucdlib-icon>
+      <ucdlib-icon icon="ucdlib-dams:fa-caret-down" ?hidden=${!this.opened}></ucdlib-icon>
+    </div>
+    
     <div class="highlight"></div>
   </div>
 
@@ -80,7 +92,9 @@ export default function render() {
           ?label="${item.label}"
           tabindex="0" 
           role="button">
-            <iron-icon icon="fin-icons:close" clear></iron-icon>
+            <!-- <iron-icon icon="fin-icons:close" clear></iron-icon> -->
+            
+
           <div>${item.niceLabel}</div>
         </div>
       `)}

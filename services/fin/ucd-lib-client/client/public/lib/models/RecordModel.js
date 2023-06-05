@@ -291,7 +291,7 @@ class RecordModel extends ElasticSearchModel {
    * @returns {Object}
    */
   getCurrentSearchDocument() {
-    if( this.store.data.search.searchDocument ) {
+    if( this.store.data.search.default.searchDocument ) {
       return this.store.getSearch().searchDocument;
     }
     return this.emptySearchDocument();

@@ -85,8 +85,8 @@ class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils) {
    */
   _removeCollectionFilter() {
     let searchDoc = this._getCurrentSearchDocument();
-    this._removeKeywordFilter(searchDoc, "isPartOf.@id");
-    this._setPaging(searchDoc, 0);
+    this.RecordModel.removeKeywordFilter(searchDoc, "isPartOf.@id");
+    this.RecordModel.setPaging(searchDoc, 0);
     this.RecordModel.setSearchLocation(searchDoc);
   }
 
