@@ -1,7 +1,5 @@
-const {BaseService} = require('@ucd-lib/cork-app-utils');
-const config = require('../config');
-const MediaStore = require('../stores/MediaStore');
-
+import {BaseService} from '@ucd-lib/cork-app-utils';
+import MediaStore from '../stores/MediaStore.mjs';
 class MediaService extends BaseService {
 
   constructor() {
@@ -44,4 +42,5 @@ class MediaService extends BaseService {
 
 }
 
-module.exports = new MediaService();
+let mediaService = new MediaService();
+export default mediaService;

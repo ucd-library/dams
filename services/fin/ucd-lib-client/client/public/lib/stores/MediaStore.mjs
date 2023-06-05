@@ -1,5 +1,5 @@
-const {BaseStore} = require('@ucd-lib/cork-app-utils');
-const clone = require('clone');
+import {BaseStore} from '@ucd-lib/cork-app-utils';
+import clone from 'clone';
 
 class MediaStore extends BaseStore {
 
@@ -47,4 +47,5 @@ class MediaStore extends BaseStore {
 
 }
 
-module.exports = new MediaStore();
+let mediaStore = new MediaStore();
+export default mediaStore;
