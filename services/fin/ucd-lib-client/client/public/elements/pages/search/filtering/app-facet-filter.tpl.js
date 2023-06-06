@@ -74,7 +74,7 @@ export default function render() {
 
   .overflow {
     overflow: auto;
-    max-height: 200px;
+    max-height: 215px;
   }
 
   iron-list {

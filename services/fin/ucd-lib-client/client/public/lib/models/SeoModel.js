@@ -66,11 +66,12 @@ class SeoModel extends BaseModel {
     if( e.state !== 'loaded' ) return;
     if( AppStateModel.location.page !== 'collection' ) return;
 
-    let collection = e.payload?.['@graph']?.[0];
+    let collection = e.payload?.root;
+    if( !collection ) return;
 
     this._setCollectionJsonLd(collection);
     this._setMetaTags({
-      title : collection.name + ' - ' + config.metadata.title,
+      title : collection.name + ' - ' + config?.metadata?.title,
       description : collection.description || '',
       keywords : (collection.abouts || []).join(', ')
     });

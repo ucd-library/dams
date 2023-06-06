@@ -1,6 +1,7 @@
 import { LitElement} from 'lit';
 
 import render from './app-facet-filter.tpl.js'
+import './app-normal-checkbox.js';
 
 import clone from "clone"
 
@@ -49,7 +50,7 @@ class AppFacetFilter extends Mixin(LitElement)
       let overflowDiv = this.shadowRoot.querySelector('.overflow');
 
       // TODO more testing here, pretty sure 200px is correct but it's possible it's different
-      if( overflowDiv && overflowDiv.offsetHeight >= 200 ) {
+      if( overflowDiv && overflowDiv.offsetHeight >= 215 ) {
         this.noOverflow = false;
       }
     });

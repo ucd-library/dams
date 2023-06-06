@@ -4,7 +4,6 @@ const models =  {
   AuthModel : require('./models/AuthModel'),
   AppStateModel : require('./models/AppStateModel'),
   RecordModel : require('./models/RecordModel'),
-  RecordVcModel : require('./models/RecordVcModel'),
   SearchVcModel : require('./models/SearchVcModel'),
   CollectionModel : require('./models/CollectionModel'),
   MediaModel : require('./models/MediaModel.mjs'),

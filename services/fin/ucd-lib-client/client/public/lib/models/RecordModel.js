@@ -107,6 +107,7 @@ class RecordModel extends ElasticSearchModel {
   async handleSearch(e) {
     let searchUrlParts = e.location.path;
     let query;
+    let path = e.location.pathname;
 
     if (searchUrlParts[0] === "collection") {
       // query = this._urlToSearchDocument(['', encodeURIComponent(JSON.stringify([
@@ -115,7 +116,7 @@ class RecordModel extends ElasticSearchModel {
         encodeURIComponent(
           JSON.stringify([
             // ["isPartOf.@id","or",`/collection/${searchUrlParts[1]}`]
-            ["collectionId", "or", `/collection/${searchUrlParts[1]}`],
+            ["collectionId", "or", path],
           ])
         ),
         "",
@@ -290,7 +291,7 @@ class RecordModel extends ElasticSearchModel {
    * @returns {Object}
    */
   getCurrentSearchDocument() {
-    if( this.store.data.search.searchDocument ) {
+    if( this.store.data.search.default.searchDocument ) {
       return this.store.getSearch().searchDocument;
     }
     return this.emptySearchDocument();

@@ -11,11 +11,18 @@ export default function render() {
         font-size: var(--fs-sm);
       }
 
-      iron-icon {
-        color: var(--color-aggie-blue-80);
+      #close {
+        display: inline-block;
+        vertical-align: middle;
+        padding-right: 5px;
+      }
+
+      ucdlib-icon {
+        fill: var(--color-aggie-blue-80);
         margin-left: -6px;
-        width: 27px;
-        height: 27px;
+        width: 25px;
+        height: 25px;
+        padding: 3px;
       }
 
       .title {
@@ -36,7 +43,7 @@ export default function render() {
         background-color: var(--color-aggie-blue-40);
       }
 
-      .rm-btn:hover iron-icon {
+      .rm-btn:hover ucdlib-icon {
         fill: var(--color-aggie-gold-80);
         border-radius: 50%;
         background-color: var(--color-aggie-blue-90);
@@ -55,7 +62,9 @@ export default function render() {
             role="button"
             tabindex="0"
           >
-            <iron-icon icon="fin-icons:close"></iron-icon> ${item.label}
+          <div id="close">
+            <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+          </div> ${item.label}
           </div>
         `
       )}

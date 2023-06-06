@@ -398,14 +398,14 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   _scrollToCollections(e) {
     e.preventDefault();
 
-    // let pagination = this.shadowRoot.querySelector("ucd-theme-pagination");
-    // if (pagination) {
-    //   window.scrollTo({
-    //     top: pagination.offsetTop + 100,
-    //     left: 0,
-    //     behavior: "smooth",
-    //   });
-    // }
+    let pagination = this.shadowRoot.querySelector("ucd-theme-pagination");
+    if (pagination) {
+      window.scrollTo({
+        top: pagination.offsetTop + 100,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
   }
 
   /**

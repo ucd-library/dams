@@ -75,7 +75,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     window.addEventListener("touchmove", (e) => this._onTouchMove(e));
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
-    this._injectModel("AppStateModel", "MediaModel", "RecordVcModel");
+    this._injectModel("AppStateModel", "MediaModel");
 
     window.addEventListener(
       "BookReader:pageChanged",
@@ -316,24 +316,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       this.singleImage = true;
       return;
     }
-
-    // sort thumbnails, and add each mediaGroup into mediaList
-    // let mediaList = [];
-    // record.clientMedia.mediaGroups.forEach((mg) => {
-    //   let nodes = [];
-
-    //   let type = utils.getMediaType(mg.display);
-    //   if (type) {
-    //     if (mg.display.hasPart) {
-    //       nodes = mg.display.hasPart.map((item) => record.index[item["@id"]]);
-    //     } else {
-    //       nodes.push(mg.display["@id"]);
-    //     }
-
-    //     mediaList.push(...utils.organizeMediaList(nodes));
-    //   }
-    // });
-    // this.mediaList = mediaList;
 
     let thumbnails = [];
     for( let node of clientMedia.mediaGroups ) {

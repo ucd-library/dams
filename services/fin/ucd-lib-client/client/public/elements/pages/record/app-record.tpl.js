@@ -46,46 +46,6 @@ export default function render() {
         display: inline;
       }
 
-      /* .container.top {
-      padding: 20px 0;
-      background-color: var(--light-background-color);
-    } */
-
-      /* input {
-      padding: 0 0 0 5px;
-      display: block;
-      border: none;
-      height: 38px;
-    }
-
-    .copyButton {
-      white-space: nowrap;
-      height: 38px;
-      width: 85px;
-      text-transform: uppercase;
-      font-size: var(--fs-sm);
-      font-weight: var(--fw-bold);
-      background-color: var(--default-secondary-color);
-      color: var(--default-primary-color);
-      border-radius: 0;
-      border: none;
-      cursor: pointer;
-    }
-    .copyButton[active] {
-      text-align: center;
-      background-color: var(--default-primary-color);
-      color: var(--default-secondary-color);
-    }
-    .copyButton[active] span {
-      display: none;
-    }
-
-    h3 {
-      margin: 0 0 10px 0;
-    }
-
-    */
-
       .label {
         font-weight: var(--fw-bold);
         color: var(--default-primary-color);
@@ -99,46 +59,6 @@ export default function render() {
         padding-bottom: 10px;
         border-bottom: 1px dashed var(--medium-background-color);
       }
-
-      /*
-    .overview {
-      display: flex;
-      width: 100%;
-    }
-
-    .overview > div {
-      flex : 1;
-      padding : 0 10px;
-    }
-
-    .type-date-collection {
-      display: flex;
-    }
-
-    .resource-type {
-      text-transform: capitalize;
-    }
-    .resource-type iron-icon {
-      color: var(--default-primary-color);
-    }
-
-    paper-toast {
-      --paper-toast-background-color: var(--default-secondary-color);
-      --paper-toast-color: var(--default-primary-color);
-    }
-
-    #descriptionValue p,
-    #descriptionValue h1,
-    #descriptionValue h2,
-    #descriptionValue h3 {
-      margin-top: 0;
-    }
-
-    #link {
-      width: 100%;
-      box-sizing: border-box;
-    }
-    */
 
       .metadata-row,
       .download-section {
@@ -156,72 +76,6 @@ export default function render() {
         flex: 0.75;
         word-break: break-word;
       }
-
-      /*
-    .cite-container {
-      padding: 15px 0;
-      margin: 0 15px;
-      border-bottom: 1px dashed var(--medium-background-color);
-      display: flex;
-    }
-    .cite-container .label {
-      padding-right: 10px;
-      flex: 0.25;
-      color: var(--default-primary-color);
-      font-weight: var(--fw-bold);
-    }
-    .cite-container .text {
-      flex: 0.75;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .fc-break {
-      height: 10px;
-    }
-
-    .rights {
-      font-size: var(--fs-p);
-      font-style: italic;
-      text-transform: capitalize;
-    }
-
-    .rights-break {
-      margin-top: 10px;
-      margin-bottom: 10px;
-      border-top: 1px dashed var(--medium-background-color);
-    }
-
-    img[rights] {
-      height: 22px;
-      width: 22px;
-      vertical-align: sub;
-    }
-
-    @media( max-width: 550px ) {
-      .metadata-row {
-        display: block;
-      }
-    }
-
-    @media( max-width: 768px ) {
-      .overview {
-        display: block;
-      }
-      .cite-container {
-        display: block;
-        padding: 15px 0 15px 15px;
-        margin: 0;
-      }
-      .type-date-collection {
-        display: block;
-      }
-      .type-date-collection > div {
-        margin: 15px 5px;
-      }
-    } */
 
       .part-of {
         background-image: url(/images/watercolors/blue--1.webp);
@@ -292,48 +146,6 @@ export default function render() {
     </style>
 
     <app-media-viewer></app-media-viewer>
-
-    <!-- <div class="container top">
-    <div class="overview">
-      <div>
-        <div ?hidden="${!this.alternativeHeadline}" class="section">
-          <div style="font-weight: bold;">${this.alternativeHeadline}</div>
-        </div>
-
-        <div ?hidden="${!this.rights}" class="rights">
-          <div class="rights-break"></div>
-          <div>
-            <a href="${this.rights.link}" target="_blank">
-              <img src="${this.rights.icon}" rights />&nbsp;
-              <span>${this.rights.label}</span>
-            </a>
-          </div>
-        </div>
-
-      </div>
-      <div>
-        <div style="display: flex; align-items: center" class="section bordered">
-          <span class="label" style="padding-right: 10px; display:inline-block">Permalink</span>
-          <div style="flex:1">
-            <input id="link" type="text" />
-          </div>
-          <button on-click="_copyLink" id="copyButton" class="copyButton">
-            <iron-icon icon="content-copy" id="copyIcon"></iron-icon>
-            <span>Copy</span>
-          </button>
-        </div>
-
-        <div class="section">
-          <div class="label">Download</div>
-          <app-media-download id="download" ?hidden="${this
-      .isBagOfFiles}"></app-media-download>
-          <app-fs-media-download id="download" ?hidden="${!this
-      .isBagOfFiles}"></app-fs-media-download>
-        </div>
-
-      </div>
-    </div>
-  </div> -->
 
     <div class="container" style="padding-bottom: 50px">
       <h3>${this.name}</h3>

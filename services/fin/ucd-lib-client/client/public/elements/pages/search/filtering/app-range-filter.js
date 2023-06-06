@@ -58,7 +58,7 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
   _isDefaultState() {
     if (!this._isFilterApplied()) {
       let searchDoc = this.RecordModel.getCurrentSearchDocument();
-      this._removeRangeFilter(searchDoc, this.filter);
+      this.RecordModel.removeRangeFilter(searchDoc, this.filter);
       this.RecordModel.setSearchLocation(searchDoc);
 
       return true;

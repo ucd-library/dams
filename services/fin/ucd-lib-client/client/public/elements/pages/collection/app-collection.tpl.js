@@ -223,7 +223,7 @@ export default function render() {
       margin-bottom: 3rem;
     } */
 
-    .admin-heading {
+    /* .admin-heading {
       margin-top: 5rem;
       text-align: center;
     }
@@ -238,7 +238,7 @@ export default function render() {
       text-align: center;
       font-weight: normal;
       margin: 0;
-    }
+    } */
 
     @media (min-width: 767px) {
       .card-2,
@@ -282,17 +282,16 @@ export default function render() {
         width: 80%;
         padding-top: 0;
       }
-
     }
 
-    .display-editor-root {
+    /* .display-editor-root {
       height: 500px;
       margin: 2rem;
-    }
+    } */
 
-    .display-pref-heading {
+    /* .display-pref-heading {
       margin: 2rem;
-    }
+    } */
 
     /* input[type=file]::file-selector-button {
       align-content: center;
@@ -688,16 +687,16 @@ export default function render() {
 
     <app-citation></app-citation>
 
-    <h2 class="admin-heading">Debug ${this.collectionId}</h2>
+    <!-- <h2 class="admin-heading">Debug ${this.collectionId}</h2>
     <div class="admin-content">
-      <h4 class="admin-box-title">dbsync</h4>
+      <h4 class="admin-box-title">dbsync</h4> -->
       <!-- json injected admin data -->
-    </div>
+    <!-- </div> -->
 
-    <h2 class="display-pref-heading">Admin Display Preferences</h2>
+    <!-- <h2 class="display-pref-heading">Admin Display Preferences</h2>
     <div class="display-editor-root">
     
-    </div>
+    </div> -->
     
     <!-- <div class="file-upload-container">    
       <label for="file-upload" class="file-upload-label">

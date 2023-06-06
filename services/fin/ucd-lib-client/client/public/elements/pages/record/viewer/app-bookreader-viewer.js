@@ -169,9 +169,9 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     this.bookData.pages.forEach((bd) => {
       data.push([
         {
-          width: bd[bd.ocr.imageSize].size.width,
-          height: bd[bd.ocr.imageSize].size.height,
-          uri: bd[bd.ocr.imageSize].url,
+          width: bd[bd.ocr?.imageSize]?.size?.width,
+          height: bd[bd.ocr?.imageSize]?.size?.height,
+          uri: bd[bd.ocr?.imageSize]?.url,
         },
       ]);
     });

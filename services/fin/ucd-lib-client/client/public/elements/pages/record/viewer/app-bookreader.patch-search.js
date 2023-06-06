@@ -26,7 +26,7 @@ module.exports = function patchSearch(BookReader) {
     // Remove the port and userdir
     // const serverPath = this.server.replace(/:.+/, "");
     const serverPath = this.server;
-    const baseUrl = `http://${serverPath}${this.searchInsideUrl}?`;
+    const baseUrl = `${window.location.protocol}//${serverPath}${this.searchInsideUrl}?`;
 
     // Remove subPrefix from end of path
     let path = this.bookPath;
