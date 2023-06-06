@@ -123,19 +123,24 @@ class ItemsModel extends FinEsDataModel {
     } else {
       // check that all nodes are crawlable from root
       let nodeCount = jsonld['@graph'].length;
-      let crawled = this._validateCrawlable(graph, graph.root);
-      if( crawled.length !== nodeCount ) {
-        let missing = [];
-        for( let node of jsonld['@graph'] ) {
-          if( !crawled.includes(node['@id']) ) {
-            // skip direct containers
-            if( !node['@shortType'].includes('DirectContainer') && !node['@shortType'].includes('IndirectContainer') ) {
-              missing.push(node['@id']);
+
+      try {
+        let crawled = this._validateCrawlable(graph, graph.root);
+        if( crawled.length !== nodeCount ) {
+          let missing = [];
+          for( let node of jsonld['@graph'] ) {
+            if( !crawled.includes(node['@id']) ) {
+              // skip direct containers
+              if( !node['@shortType'].includes('DirectContainer') && !node['@shortType'].includes('IndirectContainer') ) {
+                missing.push(node['@id']);
+              }
             }
           }
-        }
 
-        result.warnings.push('Not all nodes are crawlable from root: '+missing.join(', '));
+          result.warnings.push('Not all nodes are crawlable from root: '+missing.join(', '));
+        }
+      } catch(e) { 
+        result.errors.push('Error validating crawlable nodes: '+e.message+' '+e.stack);
       }
     }
 
@@ -184,6 +189,7 @@ class ItemsModel extends FinEsDataModel {
 
     for( let link in links ) {
       for( let child of links[link] ) {
+        if( !child['@id'] ) continue;
         if( crawled.includes(child['@id']) ) continue;
         crawled.push(child['@id']);
         this._validateCrawlable(graph, child, crawled);

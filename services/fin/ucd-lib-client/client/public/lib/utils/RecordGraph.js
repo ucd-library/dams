@@ -53,11 +53,13 @@ class RecordGraph {
     CHILD_LINKS.forEach(prop => {
       children[prop] = [];
       this.asArray(container[prop]).forEach(item => {
-        children[prop].push(this.getContainer(item));
+        let child = this.getContainer(item);
+        if( !child ) return;
+        children[prop].push(child);
       });
     });
 
-    // console.log(children);
+
     return children;
   }
 
