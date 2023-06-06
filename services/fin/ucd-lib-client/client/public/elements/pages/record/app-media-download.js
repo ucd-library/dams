@@ -72,9 +72,14 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if (!record) return;
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = record;    
+    // debugger;
 
-    this.rootRecord = selectedMedia;
+    this.rootRecord = graph.root;
+    this.selectedMedia = selectedMedia;
     let sources = [];
+
+    let download = selectedMedia.clientMedia.pages.filter(node => node.page === selectedMediaPage)[0]?.download?.url;
+    this._setDownloadHref(download);
 
     // find out if the number of download options is greater than 1
     sources = this._getDownloadSources(record);
@@ -135,7 +140,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         .join();
     this.shadowRoot.querySelector("#downloadOptions").value = "0";
 
-    this._setDownloadHref(isRoot ? firstRecord : this.selectedRecordMedia);
+    // this._setDownloadHref(isRoot ? firstRecord : this.selectedRecordMedia);
     let mediaType = utils.getMediaType(
       isRoot ? firstRecord : this.selectedRecordMedia
     );
@@ -186,8 +191,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     //   }
     // }
 
+    // debugger;
     this.sourceType = source.type || this._getImageFormat(source); // stored for analytics
-    this.href = source.src || source.clientMedia?.images?.original?.url;
+    this.href = source || source.clientMedia?.images?.original?.url;
   }
 
   /**
@@ -358,6 +364,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.formats = formats;
     this.shadowRoot.querySelector("#format").innerHTML = "";
 
+    debugger;
     this.formats.forEach((format) => {
       if (!format) return;
       let option = document.createElement("option");
@@ -432,7 +439,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _setZipPaths() {
     let urls = [];
-    this.zipName = this.rootRecord.root.name
+    this.zipName = this.rootRecord.name
       .replace(/[^a-zA-Z0-9]/g, "-")
       .toLowerCase();
 
@@ -525,10 +532,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     // // clean up Url
     // window.URL.revokeObjectURL(blobUrl);
 
-    // TODO how to pass back control to the browser for the request?
-
-
-    let path = this.rootRecord.root["@id"].replace(config.fcrepoBasePath, "");
+    let path = this.rootRecord["@id"].replace(config.fcrepoBasePath, "");
     gtag("event", "download", {
       event_category: "fullset",
       event_label: path,
