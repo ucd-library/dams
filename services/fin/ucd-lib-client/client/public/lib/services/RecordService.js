@@ -3,7 +3,7 @@ const RecordStore = require('../stores/RecordStore');
 const config = require('../config');
 // const seo = require('@ucd-lib/fin-service-utils/lib/seo');
 // const graphConcat = seo.graphConcat;
-const RecordGraph = require('../utils/RecordGraph.js').default;
+const RecordGraph = require('../utils/RecordGraph.js');
 
 class RecordService extends BaseService {
 
