@@ -176,7 +176,7 @@ class ItemsModel extends FinEsDataModel {
         missingOriginal = true;
       }
 
-      if( node.fileFormat && node.fileFormat.includes('image') ) {
+      if( missingOriginal && node.fileFormat && node.fileFormat.includes('image') ) {
         result.errors.push('Image media has no original image: '+node['@id']);
       }
 
@@ -187,7 +187,11 @@ class ItemsModel extends FinEsDataModel {
           result.warnings.push('Media group is missing sized image: '+node['@id']);
         }
       }
+
+      // TODO: check for ocr
     }
+
+    // TODO: head check any pdf manifest
 
     return result;
   }
