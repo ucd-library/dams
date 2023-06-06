@@ -1,11 +1,15 @@
 const definition = require('./definition.js');
-const mediaModel = require('../../models/MediaModel.js');
 
 class ClientMedia {
 
-  constructor(id, graph) {
-
+  constructor(id, graph, opts={}) {
     this.id = id;
+    this.opts = opts;
+
+    // for CommonJS to ES6 module import
+    import('../../models/MediaModel.mjs').then(module => {
+      this.mediaModel = module.default;
+    });
 
     // if( graph.node ) graph = graph.node; 
     if( graph['@graph'] ) graph = graph['@graph'];
@@ -89,14 +93,24 @@ class ClientMedia {
 
       if( !node.clientMedia.images.original && displayType ) {
         node.clientMedia.images.original = {
+          missing : true,
           // TODO: DC get better unknown image from kimmy
           url : '/images/tree-bike-illustration.png'
         }
       }
 
-      if( !node.clientMedia.download && displayType !== 'imagelist' ) {
-        node.clientMedia.download = {
-          url : '/fcrepo/rest'+node['@id']
+      if( !node.clientMedia.download ) {
+        if( displayType !== 'imagelist' ) {
+          node.clientMedia.download = {
+            url : '/fcrepo/rest'+node['@id']
+          }
+        } else {
+          node.clientMedia.download = {
+            archive : {
+              binary : true,
+              metadata : false
+            }
+          }
         }
       }
     }
@@ -115,7 +129,7 @@ class ClientMedia {
       if( node.clientMedia.pdf && node.clientMedia.pdf.manifest ) {
         if( node.clientMedia.pdf.loaded ) continue;
 
-        let res = await mediaModel.getManifest(node.clientMedia.pdf.manifest);
+        let res = await this.mediaModel.getManifest(node.clientMedia.pdf.manifest);
         node.clientMedia = Object.assign(node.clientMedia, res.payload);
         node.clientMedia.pdf.loaded = true;
 

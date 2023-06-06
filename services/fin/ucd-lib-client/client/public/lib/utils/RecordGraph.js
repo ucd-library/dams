@@ -1,11 +1,15 @@
 const ClientMedia = require('./client-media/model.js');
-const CHILD_LINKS = ['hasPart', 'associatedMedia'];
+const CHILD_LINKS = ['hasPart', 'associatedMedia', 'image'];
 const PARENT_LINKS = ['isPartOf', 'encodesCreativeWork'];
 
 class RecordGraph {
 
-  constructor(data) {
+  constructor(data, opts={}) {
     this.data = data;
+
+    this.CHILD_LINKS = CHILD_LINKS;
+
+    this.opts = {};
     this.index = {};
     this.root = null;
     this.init();
@@ -28,7 +32,7 @@ class RecordGraph {
     }
 
     if( this.root ) {
-      this.clientMedia = new ClientMedia(this.root['@id'], this.data['@graph']);
+      this.clientMedia = new ClientMedia(this.root['@id'], this.data['@graph'], this.opts);
     }
   }
 
@@ -49,11 +53,13 @@ class RecordGraph {
     CHILD_LINKS.forEach(prop => {
       children[prop] = [];
       this.asArray(container[prop]).forEach(item => {
-        children[prop].push(this.getContainer(item));
+        let child = this.getContainer(item);
+        if( !child ) return;
+        children[prop].push(child);
       });
     });
 
-    // console.log(children);
+
     return children;
   }
 
@@ -88,4 +94,4 @@ class RecordGraph {
 
 }
 
-export default RecordGraph;
+module.exports = RecordGraph;

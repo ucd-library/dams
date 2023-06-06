@@ -70,7 +70,6 @@ router.get('/pdf/getNumPages/:workflowId', async (req, res) => {
       stack : e.stack
     });
   }
-
 });
 
 router.get('/pdf/finalize/:workflowId', async (req, res) => {

@@ -6,7 +6,7 @@ const models =  {
   RecordModel : require('./models/RecordModel'),
   SearchVcModel : require('./models/SearchVcModel'),
   CollectionModel : require('./models/CollectionModel'),
-  MediaModel : require('./models/MediaModel'),
+  MediaModel : require('./models/MediaModel.mjs'),
   CitationModel : require('./models/CitationsModel'),
   SeoModel : require('./models/SeoModel'),
   FiltersModel : require('./models/FiltersModel'),

@@ -60,8 +60,14 @@ class ImageUtils {
    * @returns {Promise}
    */
   async getNumPdfPages(file) {
-    let {stdout, stderr} = await exec(`pdfinfo ${file} | awk '/^Pages:/ {print $2}'`);
-    return parseInt(stdout.trim());
+    // let {stdout, stderr} = await exec(`pdfinfo ${file} | awk '/^Pages:/ {print $2}'`);
+    let {stdout, stderr} = await exec(`pdfinfo ${file}`);
+    let lines = stdout.split('\n')
+      .map(line => line.trim())
+      .filter(line => line.match(/^Pages:/))
+      .map(line => parseInt(line.replace(/^Pages:\s+/, '')));
+
+    return lines[0];
   }
 
   async runToIaReaderPage(workflowId, page, opts={}) {

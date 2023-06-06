@@ -1,8 +1,6 @@
-const {BaseModel} = require('@ucd-lib/cork-app-utils');
-const config = require('../config');
-const utils = require('../utils/index');
-const MediaService = require('../services/MediaService');
-const MediaStore = require('../stores/MediaStore');
+import {BaseModel} from '@ucd-lib/cork-app-utils';
+import MediaService from '../services/MediaService.mjs';
+import MediaStore from '../stores/MediaStore.mjs';
 
 const IMAGE_LIST = 'http://digital.ucdavis.edu/schema#ImageList';
 const IMAGE_LIST_360 = 'http://digital.ucdavis.edu/schema#ImageList360';
@@ -50,4 +48,5 @@ class MediaModel extends BaseModel {
 
 }
 
-module.exports = new MediaModel();
+let mediaModel = new MediaModel();
+export default mediaModel;

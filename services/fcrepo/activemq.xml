@@ -23,7 +23,6 @@
                         <forwardTo>
                             <queue physicalName="dbsync"/>
                             <queue physicalName="gcssync"/>
-                            <queue physicalName="ucd-lib-client"/>
                         </forwardTo>
                     </compositeTopic>
                 </virtualDestinations>
