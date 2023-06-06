@@ -1,7 +1,7 @@
 const {BaseService} = require('@ucd-lib/cork-app-utils');
 const CollectionStore = require('../stores/CollectionStore');
 const config = require('../config');
-const RecordGraph = require('../utils/RecordGraph.js').default;
+const RecordGraph = require('../utils/RecordGraph.js');
 
 class CollectionService extends BaseService {
 
