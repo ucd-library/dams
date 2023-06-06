@@ -137,7 +137,9 @@ class ItemsModel extends FinEsDataModel {
             }
           }
 
-          result.warnings.push('Not all nodes are crawlable from root: '+missing.join(', '));
+          if( missing.length ) {
+            result.warnings.push('Not all nodes are crawlable from root: '+missing.join(', '));
+          }
         }
       } catch(e) { 
         result.errors.push('Error validating crawlable nodes: '+e.message+' '+e.stack);
@@ -167,14 +169,23 @@ class ItemsModel extends FinEsDataModel {
       }
       let images = node.clientMedia.images;
 
+      let missingOriginal = false;
       if( !images.original ) {
-        result.errors.push('Media group has no original image: '+node['@id']);
+        missingOriginal = true;
       } else if( images.original.missing === true ) {
-        result.errors.push('Media group has no original image: '+node['@id']);
+        missingOriginal = true;
+      }
+
+      if( node.fileFormat && node.fileFormat.includes('image') ) {
+        result.errors.push('Image media has no original image: '+node['@id']);
       }
 
       if( !images.large || !images.medium || !images.small ) {
-        result.warnings.push('Media group is missing sized image: '+node['@id']);
+        if( missingOriginal ) {
+          result.errors.push('Media group is missing sized image and has no original: '+node['@id']);
+        } else {
+          result.warnings.push('Media group is missing sized image: '+node['@id']);
+        }
       }
     }
 
