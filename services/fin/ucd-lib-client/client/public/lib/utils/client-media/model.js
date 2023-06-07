@@ -1,15 +1,19 @@
 const definition = require('./definition.js');
 
+// for CommonJS to ES6 module import
+let loadingMediaProm = import('../../models/MediaModel.mjs')
+let mediaModel;
+loadingMediaProm.then(module => {
+  mediaModel = module.default;
+});
+
 class ClientMedia {
 
   constructor(id, graph, opts={}) {
     this.id = id;
     this.opts = opts;
 
-    // for CommonJS to ES6 module import
-    import('../../models/MediaModel.mjs').then(module => {
-      this.mediaModel = module.default;
-    });
+
 
     // if( graph.node ) graph = graph.node; 
     if( graph['@graph'] ) graph = graph['@graph'];
@@ -34,7 +38,9 @@ class ClientMedia {
 
     // just loop all nodes in graph for media
     if( this.mediaGroups.length === 0 ) {
-      console.warn('No media found for '+id, graph);
+      if( typeof window !== 'undefined' ) {
+        console.warn('No media found for '+id, graph);
+      }
     }
 
     this.ensureClientMedia();
@@ -129,7 +135,12 @@ class ClientMedia {
       if( node.clientMedia.pdf && node.clientMedia.pdf.manifest ) {
         if( node.clientMedia.pdf.loaded ) continue;
 
-        let res = await this.mediaModel.getManifest(node.clientMedia.pdf.manifest);
+        // hack until we port all models to es6
+        if( !mediaModel ) {
+          await loadingMediaProm;
+        }
+
+        let res = await mediaModel.getManifest(node.clientMedia.pdf.manifest);
         node.clientMedia = Object.assign(node.clientMedia, res.payload);
         node.clientMedia.pdf.loaded = true;
 
@@ -220,7 +231,9 @@ class ClientMedia {
    */
   handlePdf(node) {
     if( !node.clientMedia ) {
-      console.warn('No clientMedia for pdf '+node['@id']);
+      if( typeof window !== 'undefined' ) {
+        console.warn('No clientMedia for pdf '+node['@id']);
+      }
       node.clientMedia = {};
     }
 
@@ -247,7 +260,9 @@ class ClientMedia {
    */
   handleImage(node) {
     if( !node.clientMedia ) {
-      console.warn('No clientMedia for '+node['@id']);
+      if( typeof window !== 'undefined' ) {
+        console.warn('No clientMedia for '+node['@id']);
+      }
       node.clientMedia = {};
     }
 

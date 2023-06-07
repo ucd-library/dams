@@ -1,9 +1,10 @@
-const {dataModels, ActiveMqClient} = require('@ucd-lib/fin-service-utils');
+const {dataModels, ActiveMqClient, config} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 const {ActiveMqStompClient} = ActiveMqClient;
 const workflowUtils = require('../workflows.js');
 const RecordGraph = require('../../ucd-lib-client/client/public/lib/utils/RecordGraph');
+const fetch = require('node-fetch');
 
 class ItemsModel extends FinEsDataModel {
 
@@ -100,7 +101,7 @@ class ItemsModel extends FinEsDataModel {
     return files;
   }
 
-  validate(jsonld) {
+  async validate(jsonld) {
     if( !jsonld ) {
       throw new Error('Elastic search response is empty');
     }
@@ -117,7 +118,9 @@ class ItemsModel extends FinEsDataModel {
     // graph checks
     if( !graph.root ) {
       result.errors.push('No root node found in graph');
+      return result;
     }
+
     if( !graph.data['@graph'] ) {
       result.errors.push('No @graph found');
     } else {
@@ -188,10 +191,23 @@ class ItemsModel extends FinEsDataModel {
         }
       }
 
-      // TODO: check for ocr
-    }
+      if( !images.ocr ) {
+        result.warnings.push('Image is missing ocr file: '+node['@id']);
+      }
 
-    // TODO: head check any pdf manifest
+      let pdf = node.clientMedia.pdf;
+      if( !pdf && node.fileFormat && node.fileFormat.includes('pdf') ) {
+        result.errors.push('No pdf client media found for: '+node['@id']);
+      }
+      if( pdf && pdf.manifest ) {
+        let url = config.server.url+pdf.manifest;
+        let hResp = await fetch(config.gateway.host+pdf.manifest, {method: 'HEAD'});
+        if( hResp.status !== 200 ) {
+          result.errors.push('Pdf client media manifest is not available; node='+node['@id']+' manifest='+url+' status='+hResp.status);
+        }
+      }
+
+    }
 
     return result;
   }
