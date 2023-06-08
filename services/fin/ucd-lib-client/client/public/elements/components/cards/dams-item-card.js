@@ -41,13 +41,6 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     this._injectModel("RecordModel");
   }
 
-  // async updated(props) {
-  //   if (props.has("id") && this.id ) {
-  //     this._onRecordUpdate(
-  //       await this.RecordModel.get(this.id)
-  //     );
-  //   }
-  // }
   /**
    * @method willUpdate
    * @description Lit lifecycle method called when element is updated.
@@ -74,20 +67,20 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     this._truncateTitle();
   }
 
-  // async _onRecordUpdate(e) {
-  //   if (e.state !== "loaded" || e.id !== this.id) return;
+  async _onRecordUpdate(e) {
+    if (e.state !== "loaded" || e.id !== this.id) return;
 
-  //   this.record = e.vcData;
-  //   if( this.record.images ) {
-  //     let images = this.record.images;
-  //     this.thumbnailUrl = images.medium ? images.medium.url : images.original.url;
-  //   }
-  //   this.title = this.record.name;
-  //   this.itemUrl = this.record['@id'];
-  //   this.id = this.record['@id'];
+    this.record = e.vcData;
+    if( this.record.images ) {
+      let images = this.record.images;
+      this.thumbnailUrl = images.medium ? images.medium.url : images.original.url;
+    }
+    this.title = this.record.name;
+    this.itemUrl = this.record['@id'];
+    this.id = this.record['@id'];
 
-  //   this._truncateTitle();
-  // }
+    this._truncateTitle();
+  }
 
   /**
    * @method _getItem
@@ -95,17 +88,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {String} id - Item id to fetch
    */
   async _getItem(id) {
-    let res = await this.RecordModel.get(id);
-
-    if (res.state !== "loaded") return;
-    debugger;
-    res = this.RecordVcModel.translate(res.payload);
-    this.data.title = res.name;
-    this.data.itemUrl = res["@id"];
-    this.data.thumbnailUrl = res.collectionImg;
-    this.itemUrl = res["@id"];
-    this.thumbnailUrl = res.collectionImg;
-    this._truncateTitle();
+    await this.RecordModel.get(id);
   }
 
   /**
@@ -113,9 +96,6 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
    * @description Truncates titles over 38 characters to fit a single line
    */
   _truncateTitle() {
-    // if( this.title.length > 38) {
-    //   this.truncatedTitle = this.title.substring(0, 34) + "...";
-    // }
     if (this.data && this.data.title && this.data.title.length > 38) {
       this.truncatedTitle = this.data.title.substring(0, 34) + "...";
     } else if (this.data && this.data.title) {

@@ -72,13 +72,12 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if (!record) return;
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = record;    
-    // debugger;
 
     this.rootRecord = graph.root;
     this.selectedMedia = selectedMedia;
     let sources = [];
 
-    let download = selectedMedia.clientMedia.pages.filter(node => node.page === selectedMediaPage)[0]?.download?.url;
+    let download = selectedMedia.clientMedia?.download?.url || selectedMedia.clientMedia.pages.filter(node => node.page === selectedMediaPage)[0]?.download?.url;
     this._setDownloadHref(download);
 
     // find out if the number of download options is greater than 1
@@ -123,10 +122,11 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.downloadOptions = [this.selectedRecordMedia];
     }
 
-    this.isMultimedia = this.downloadOptions[0].type === "video";
+    this.isMultimedia = this.downloadOptions[0]?.fileFormat?.includes('video');
     if (this.isMultimedia) {
       this.shadowRoot.querySelector("#multimedia-format-label").innerHTML =
-        this.downloadOptions[0].label;
+        this.downloadOptions[0].fileFormat;
+        this.showImageFormats = false;
     }
 
     this.shadowRoot.querySelector("#downloadOptions").innerHTML =
@@ -183,15 +183,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
   }
 
   _setDownloadHref(source) {
-    // let href = source.src;
-    // if( source.type === 'image' ) {
-    //   let format = this.shadowRoot.querySelector('#format').value;
-    //   if( source.originalFormat !== format || source.imageType !== 'FR' ) {
-    //     href += source.service+format;
-    //   }
-    // }
-
-    // debugger;
+    if (!source) return;
     this.sourceType = source.type || this._getImageFormat(source); // stored for analytics
     this.href = source || source.clientMedia?.images?.original?.url;
   }
@@ -223,8 +215,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     //   }]
     // }
 
-    // TODO remove iiif stuff below, need to test with imagelists though, make sure zip works with sources array
-    let sources = [];
+    // let sources = [];
 
     let record = this.rootRecord; // .graph.index[imageRecord["@id"]];
     return [
@@ -364,7 +355,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.formats = formats;
     this.shadowRoot.querySelector("#format").innerHTML = "";
 
-    debugger;
     this.formats.forEach((format) => {
       if (!format) return;
       let option = document.createElement("option");
@@ -389,13 +379,14 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _getImageFormat(imageRecord) {
     if (!imageRecord.fileFormat) {
-      imageRecord = this.rootRecord; // .graph.index[imageRecord["@id"]];
+      imageRecord = imageRecord.clientMedia?.images?.original?.url;
     }
     if (!imageRecord) return;
 
     let originalFormat = (
       imageRecord.fileFormat ||
-      imageRecord["@id"].split(".").pop() ||
+      imageRecord["@id"]?.split(".").pop() ||
+      imageRecord?.split('.').pop() ||
       ""
     )
       .replace(/.*\//, "")

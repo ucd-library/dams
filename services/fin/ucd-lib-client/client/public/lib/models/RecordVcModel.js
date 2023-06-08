@@ -46,8 +46,8 @@ class RecordVcModel {
         let group = groups.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
         if( group ) {
           images = groups.clientMedia.images;
-        } else if( groups[0].clientMedia?.images ) {
-          images = groups[0].clientMedia?.images;
+        } else if( groups[0]?.clientMedia?.images ) {
+          images = groups[0].clientMedia.images;
         }
       }
 

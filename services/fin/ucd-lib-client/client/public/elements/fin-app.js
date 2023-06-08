@@ -120,18 +120,13 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
     this.showSearchHeader = this.SEARCH_HEADER_PAGES.includes(e.location.page);
 
     this.appState = e;
-    // window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
     let page = e.location.page;
     if (!this.loadedPages[page]) {
       this.page = "loading";
       this.loadedPages[page] = this.loadPage(page);
     }
     await this.loadedPages[page];
-
-    // handle browse by pages
-    if (page === "browse" && e.location.path.length > 1) {
-      page = e.location.path[1];
-    }
 
     this.page = page;
     this.pathInfo = e.location.pathname.split('/media')[0];
@@ -165,17 +160,9 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
       return import(
         /* webpackChunkName: "page-about" */ "./pages/about/app-about"
       );
-    } else if (page === "collections") {
-      return import(
-        /* webpackChunkName: "page-collections" */ "./pages/collections/app-collections"
-      );
     } else if (page === "collection") {
       return import(
         /* webpackChunkName: "page-collections" */ "./pages/collection/app-collection"
-      );
-    } else if (page === "components") {
-      return import(
-        /* webpackChunkName: "page-components" */ "./pages/components/app-components"
       );
     }
     return page;
@@ -189,24 +176,6 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
   _toggleDrawer() {
     this.AppStateModel.set({ filtersDrawerOpen: !this.drawerOpen });
   }
-
-  /**
-   * @method _onRecordSearchUpdate
-   * @description RecordInterface, fired when search document updates.
-   * used to set the window url
-   *
-   */
-  // _onRecordSearchUpdate(e) {
-  //   if( this.appState.location.path[0] === 'collection' ) return;
-
-  //   let path = this._searchDocumentToUrl(e.searchDocument, true);
-  //   if( path.match(/\/collection/) ) {
-  //     this._setWindowLocation(path);
-  //   } else {
-  //     this._setWindowLocation('/search/'+path);
-  //   }
-
-  // }
 
   _expandSearchFilters(e) {
     let appSearch = this.shadowRoot.querySelector("app-search");

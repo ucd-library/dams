@@ -69,6 +69,25 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
     }
   }
 
+  async _onRecordUpdate(e) {
+    if (e.state !== "loaded" || e.id !== this.id) return;
+
+    this.record = e.vcData;
+    if( this.record.images ) {
+      let images = this.record.images;
+      this.thumbnailUrl = images.medium ? images.medium.url : images.original.url;
+    }
+    this.title = this.record.name;
+    this.itemUrl = this.record['@id'];
+    this.id = this.record['@id'];
+
+    // TODO populate
+    // this.date = res.date;
+    // this.collection = res.collection;
+    // this.format = res.format;
+    
+  }
+
   /**
    * @method _getItem
    * @description Fetches item data from RecordModel
@@ -76,23 +95,6 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
    */
   async _getItem(id) {
     let res = await this.RecordModel.get(id);
-
-    if (res.state !== "loaded") return;
-    debugger;
-    res = this.RecordVcModel.translate(res.payload);
-    this.data.title = res.name;
-    this.data.itemUrl = res["@id"];
-    this.data.thumbnailUrl = res.collectionImg;
-    this.data.date = res.date;
-    this.data.collection = res.collection;
-    this.data.format = res.format;
-
-    this.itemUrl = res["@id"];
-    this.thumbnailUrl = res.collectionImg;
-    this.title = res.name;
-    this.date = res.date;
-    this.collection = res.collection;
-    this.format = res.format;
   }
 }
 

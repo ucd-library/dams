@@ -632,7 +632,7 @@ export default function render() {
       <ucd-theme-primary-nav>
         <a href=/browse>Browse</a>
         <a href="/about">About</a>
-        <a href="#">FAQ</a>
+        <!-- <a href="#">FAQ</a> -->
       </ucd-theme-primary-nav>
     </ucd-theme-header>
 
@@ -642,8 +642,8 @@ export default function render() {
         <a href="/browse">Browse</a>
         <span class="dot"></span>
         <a href="/about">About</a>
-        <span class="dot"></span>
-        <a href="#">FAQ</a>
+        <!-- <span class="dot"></span> -->
+        <!-- <a href="#">FAQ</a> -->
       </div>
     </div>
 

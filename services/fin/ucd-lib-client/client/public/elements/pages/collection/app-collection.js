@@ -72,7 +72,13 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
    async _onAppStateUpdate(e) {
+    
+    // TODO this is causing some badness, need to figure out why 'this.collectionId === e.location.fullpath' stops from rendering
+    // can we use the new vcData stuff instead?
+
+
     if( e.location.path[0] !== 'collection' || this.collectionId === e.location.fullpath ) return;
+    // if( e.location.path[0] !== 'collection' ) return;
     this.reset();
 
     this.collectionId = e.location.fullpath;

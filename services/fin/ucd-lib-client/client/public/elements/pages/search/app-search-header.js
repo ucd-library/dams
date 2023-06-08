@@ -33,7 +33,7 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
         ],
       },
       { text: "About", href: "/about" },
-      { text: "FAQ", href: "/faq" },
+      // { text: "FAQ", href: "/faq" },
     ];
     // this.EventBus.on('search-controller-update', e => this._onSearchControllerUpdate(e));
     this._injectModel("AppStateModel", "CollectionModel", "RecordModel");

@@ -126,7 +126,7 @@ return html`
       <li><a href="/browse/subject">Subjects</a></li>
     </ul>
     <a href="/about">About</a>
-    <a href="#">FAQ</a>
+    <!-- <a href="#">FAQ</a> -->
   </ucdlib-primary-nav>
   </ucdlib-header>
 `;}
