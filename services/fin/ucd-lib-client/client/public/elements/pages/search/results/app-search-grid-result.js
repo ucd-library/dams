@@ -11,7 +11,7 @@ import render from "./app-search-grid-result.tpl.js";
  * @prop {Object} data - Data object containing item information
  * @prop {String} itemUrl - Url to item
  * @prop {String} thumbnailUrl - Thumbnail url
- * @prop {String} truncatedTitle - Titles over 38 characters will be truncated to fit a single line
+ * @prop {String} title - Item title
  */
 export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
@@ -20,7 +20,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
       data: { type: Object },
       itemUrl: { type: String },
       thumbnailUrl: { type: String },
-      truncatedTitle: { type: String },
+      title: { type: String },
       bounds: { type: Array },
       imageHeight: { type: Number },
     };
@@ -33,10 +33,9 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
 
     this.id = "";
     this.data = {};
-    this.truncatedTitle = "";
+    this.title = "";
     this.itemUrl = "";
     this.thumbnailUrl = "";
-    this.hasRendered = false;
     this.bounds = [];
     this.imageHeight = 0;
 
@@ -57,6 +56,20 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     } else {
       this._getItem(this.id);
     }
+  }
+
+  async _onRecordUpdate(e) {
+    if (e.state !== "loaded" || e.id !== this.id) return;
+
+    this.record = e.vcData;
+    if( this.record.images ) {
+      let images = this.record.images;
+      this.thumbnailUrl = images.medium ? images.medium.url : images.original.url;
+    }
+    this.title = this.record.name;
+    this.itemUrl = this.record['@id'];
+    this.id = this.record['@id'];
+    this._renderImage();
   }
 
   /**
@@ -87,18 +100,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {String} id - Item id to fetch
    */
   async _getItem(id) {
-    let res = await this.RecordModel.get(id);
-
-    if (res.state !== "loaded") return;
-    debugger;
-    res = this.RecordVcModel.translate(res.payload);
-    this.data.title = res.name;
-    this.data.itemUrl = res["@id"];
-    this.data.thumbnailUrl = res.collectionImg;
-    this.itemUrl = res["@id"];
-    this.thumbnailUrl = res.collectionImg;
-    this.title = res.name;
-    this._renderImage();
+    this._onRecordUpdate(await this.RecordModel.get(id));
   }
 
   async _renderImage() {

@@ -1,14 +1,10 @@
 import { LitElement} from 'lit';
 import render from "./app-collection.tpl.js";
-// import JSONFormatter from 'json-formatter-js'
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 
 import "../../components/cards/dams-item-card";
 import '../../components/citation';
-
-// import "ace-builds/src-noconflict/ace";
-// import "ace-builds/src-noconflict/keybinding-vim";
 
 import user from '../../../lib/utils/user.js';
 
@@ -72,15 +68,17 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
    async _onAppStateUpdate(e) {
-    if( e.location.path[0] !== 'collection' || this.collectionId === e.location.fullpath ) return;
+    if( this.AppStateModel.location.page !== 'collection' ) {
+      this.reset();
+      return;
+    }
+    if( this.collectionId === e.location.fullpath ) return;
     this.reset();
 
     this.collectionId = e.location.fullpath;
 
     await this._parseDisplayData();
-    await this.CollectionModel.get(this.collectionId);
-    
-    // this._createEditor();
+    this._onCollectionUpdate(await this.CollectionModel.get(e.location.fullpath));
   }
 
   /**
@@ -91,8 +89,8 @@ class AppCollection extends Mixin(LitElement)
    */
    async _onCollectionUpdate(e) {
     if( e.state !== 'loaded' ) return;
+    if( this.AppStateModel.location.page !== 'collection' ) return;
 
-    // TODOO fix, vc data is not being set correctly
     this.collectionId = e.vcData.id;
 
     this.description = e.vcData.description
@@ -261,29 +259,6 @@ class AppCollection extends Mixin(LitElement)
   }
 
   /**
-   * @description _showAdminPanel, checks if user is an admin and populates admin section with data
-   */
-  // async _showAdminPanel() {
-  //   if( !this.isAdmin ) return;
-  //   if( !this.adminRendered ) {
-  //     const adminData = await this.CollectionModel.getAdminData(this.collectionId);
-  //     if( adminData && adminData.response && adminData.response.status === 200 ) {
-
-  //       const response = adminData.body;
-  //       if( response && !this.adminRendered ) {
-  //         this.dbsync = response.dbsync;
-
-  //         this.shadowRoot.querySelector('.admin-content')
-  //           .appendChild((new JSONFormatter(Object.values(this.dbsync)[0], 1)).render());
-  //         this.adminRendered = true;
-  //         this.shadowRoot.querySelector('.admin-heading').style.display = '';
-  //         this.shadowRoot.querySelector('.admin-content').style.display = '';  
-  //       }
-  //     }
-  //   }
-  // }
-
-  /**
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
@@ -405,34 +380,6 @@ class AppCollection extends Mixin(LitElement)
         ${JSON.stringify(this.savedItems)}
     }`);
   }
-
-  /**
-   * @description _createEditor, creates ace-build editor for changing display preferences
-   */
-  // _createEditor() {
-  //   let editor = ace.edit(this.shadowRoot.querySelector('.display-editor-root'));
-  //   // let type = 'Admin Display Preferences'; // editorRoot.getAttribute('type');
-  //   editor.renderer.attachToShadowRoot();
-  //   // editor.setValue(assetDefs.textSearchFields[type].join('\n'));
-  //   editor.setValue(JSON.stringify(this.displayData, null, '\t'));
-  //   editor.getSession().on('change', () => {
-  //     // let values = editor.getValue()
-  //     //   .split('\n')
-  //     //   .map(item => item.trim())
-  //     //   .filter(item => item);
-  //     // assetDefs.textSearchFields[type] = values;
-  //     // window.localStorage.setItem('textSearchFields', JSON.stringify(assetDefs.textSearchFields));
-  //   });
-  // }
-
-  // async _onSave(e) {
-  //   e.preventDefault();
-  //   let editor = ace.edit(this.shadowRoot.querySelector('.display-editor-root'));
-  //   this.displayData = JSON.parse(editor.getValue().replace(/\n|\t/g, ''));
-  //   // await this.CollectionModel.saveDisplayData(this.collectionId, this.displayData);
-
-  //   this._parseDisplayData();
-  // }
 
   async _onFileChange(e) {  
     let selectedFilename = e.target.value.split('\\').pop();

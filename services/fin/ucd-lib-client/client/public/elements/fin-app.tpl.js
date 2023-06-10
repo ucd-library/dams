@@ -180,8 +180,6 @@ export default function render() {
           <app-browse id="browse"></app-browse>
           <app-about id="about"></app-about>
           <app-collection id="collection"></app-collection>
-          <app-collections id="collections"></app-collections>
-          <app-components id="components"></app-components>
         </iron-pages>
         <div class="footer site-frame">
           <ucdlib-site-footer>
@@ -190,7 +188,7 @@ export default function render() {
                 <li><a href="/#collections">Collections</a></li>
                 <li><a href="/search">Items</a></li>
                 <li><a href="/about">About Digital Collections</a></li>
-                <li><a href="">FAQ</a></li>
+                <!-- <li><a href="">FAQ</a></li> -->
               </ul>
             </ucdlib-site-footer-column>
             <ucdlib-site-footer-column header="Library Info">

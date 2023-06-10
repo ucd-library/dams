@@ -47,7 +47,7 @@ export default function render() {
       .layout {
         display: flex;
         align-items: center;
-        flex-wrap: wrap;
+        /* flex-wrap: wrap; */
         width: 60%;
         margin: auto;
         padding-bottom: 0.7rem;
@@ -235,6 +235,11 @@ export default function render() {
         fill: white;
       }
 
+      .br-search-non-fs #search-prev ucdlib-icon,
+      .br-search-non-fs #search-next ucdlib-icon {
+        fill: var(--ucdlib-icon-fill-color);
+      }
+
       .br-search-non-fs div.zoom.searching {
         background-color: var(--color-aggie-gold);
       }
@@ -251,6 +256,10 @@ export default function render() {
         }
         .layout {
           width: 90%;
+          flex-wrap: wrap;
+        }
+        .layout.lightbox {
+          height: 150px;
         }
 
         .break {
@@ -319,7 +328,7 @@ export default function render() {
         </div>
       </div>
 
-      <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader}">
+      <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader || this.thumbnails.length < 2}">
         <div id="thumbnailInnerContainer">
           ${this.thumbnails.map((item) => html`
             <a

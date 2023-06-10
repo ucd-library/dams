@@ -72,7 +72,8 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
   }
 
   async firstUpdated() {
-    this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath));
+    // this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath)); // this causes badness with ie /media/images:4 paths
+    this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
   }
 
@@ -98,11 +99,13 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     this.publisher = this.record.publisher;
     this.keywords = this.record.keywords || [];
     this.callNumber = this.record.callNumber;
-    this.collectionImg = this.record.collectionImg;
+    this.collectionImg = this.record.images?.small?.url                   
+                      || this.record.images?.medium?.url 
+                      || this.record.images?.large?.url
+                      || this.record.images?.original?.url;
+
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
-    this.arkDoi = this.record.arkDoi;
-    this.fedoraLinks = this.record.fedoraLinks;
 
     this._updateLinks(this.AppStateModel.location, record);
   }
@@ -118,6 +121,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
   async _onAppStateUpdate(e) {
     // if (e.state !== "loaded") return;
     this._updateLinks(e.location);
+    this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
   }
 
@@ -138,13 +142,13 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     let imagePath = '';
 
     // check if we are on a specific /media path
-    let isMediaUrl = path.indexOf('/media') > -1;
+    let isMediaUrl = location.pathname; // path.indexOf('/media') > -1;
     if( isMediaUrl ) {
       // find media in graph
       let media = selectedRecord.clientMedia.graph
         .filter(
           m => m['@shortType'].includes('ImageObject') && 
-          m.position === selectedRecord.selectedMediaPage
+          parseInt(m.position) === selectedRecord.selectedMediaPage
         )[0];
       if( media?.['@id'] ) {
         // path = media['@id'].split('/media')[0];

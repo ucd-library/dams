@@ -180,11 +180,33 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
       // we might not have size
       let size = await this.getImageSize(original);
+      
+      // determine the pixel dimensions of the image
+      let imageWidthInPixels = parseInt(size.width);
+      let imageHeightInPixels = parseInt(size.height);
 
-      this.currentLayer = L.imageOverlay(original.url, [
-        [0, 0],
-        [parseInt(size.height), parseInt(size.width)],
-      ]);
+      // calc the pixel dimensions based on the map's container size and the desired maximum dimensions
+      let mapContainer = this.viewer.getContainer();
+      let maxImageWidthInPixels = mapContainer.offsetWidth;
+      let maxImageHeightInPixels = mapContainer.offsetHeight;
+
+      // scale the image dimensions down if they exceed the maximum dimensions
+      if (imageWidthInPixels > maxImageWidthInPixels || imageHeightInPixels > maxImageHeightInPixels) {
+        let scaleFactor = Math.min(maxImageWidthInPixels / imageWidthInPixels, maxImageHeightInPixels / imageHeightInPixels);
+        imageWidthInPixels *= scaleFactor;
+        imageHeightInPixels *= scaleFactor;
+      }
+      let imageBounds = [[0, 0], [imageHeightInPixels, imageWidthInPixels]];
+
+      // calc center of image
+      let centerLat = (imageBounds[0][0] + imageBounds[1][0]) / 2;
+      let centerLon = (imageBounds[0][1] + imageBounds[1][1]) / 2;
+
+      // set the view of the map to center on the image and apply an appropriate zoom level
+      let zoomLevel = 0; // Adjust as needed
+      this.viewer.setView([centerLat, centerLon], zoomLevel);
+
+      this.currentLayer = L.imageOverlay(original.url, imageBounds).addTo(this.viewer);
     }
 
     this.currentLayer.addTo(this.viewer);
@@ -194,11 +216,8 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.viewer.invalidateSize();
     }, 1000);
 
-    this.shadowRoot.querySelector(
-      ".leaflet-control-attribution"
-    ).style.display = "none";
-    this.shadowRoot.querySelector(".leaflet-control-container").style.display =
-      "none";
+    this.shadowRoot.querySelector('.leaflet-control-attribution').style.display = 'none';
+    this.shadowRoot.querySelector(".leaflet-control-container").style.display = 'none';
   }
 
   getImageSize(original) {
@@ -208,11 +227,10 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       let img = new Image();
       img.src = original.url;
       img.onload = () => {
-        original.size = {
+        resolve(original.size = {
           height : img.naturalHeight, 
           width : img.naturalWidth
-        }
-        resolve(); 
+        }); 
       };
     });
   }

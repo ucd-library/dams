@@ -14,6 +14,11 @@ const models =  {
   BrowseByModel : require('./models/BrowseByModel')
 };
 
+if( typeof window !== 'undefined' ) {
+  window.damsClientModels = models;
+  window.recordData = models.RecordModel.store.data.byId
+}
+
 Registry.ready();
 
 module.exports = models;

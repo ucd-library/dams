@@ -271,7 +271,6 @@ class RecordModel extends ElasticSearchModel {
 
     if( !searchDocument.filters ) searchDocument.filters = {};
 
-
     if( searchDocument.limit + searchDocument.offset > this.MAX_WINDOW ) {
       this.store.setSearchError(searchDocument, new Error('Sorry, digital.ucdavis.edu does not serve more than 10,000 results for a query'), true);
       return this.store.getSearch();
@@ -291,7 +290,7 @@ class RecordModel extends ElasticSearchModel {
    * @returns {Object}
    */
   getCurrentSearchDocument() {
-    if( this.store.data.search.default.searchDocument ) {
+    if( this.store.data.search?.default?.searchDocument ) {
       return this.store.getSearch().searchDocument;
     }
     return this.emptySearchDocument();
