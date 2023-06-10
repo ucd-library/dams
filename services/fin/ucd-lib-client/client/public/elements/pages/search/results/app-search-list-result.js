@@ -94,7 +94,7 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {String} id - Item id to fetch
    */
   async _getItem(id) {
-    let res = await this.RecordModel.get(id);
+    this._onRecordUpdate(await this.RecordModel.get(id));
   }
 }
 

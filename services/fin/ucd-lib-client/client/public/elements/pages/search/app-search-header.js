@@ -165,7 +165,7 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
   _onSearch(e) {
     // let searchDoc = this._getCurrentSearchDocument();
     let searchDoc = this.RecordModel.getCurrentSearchDocument();
-
+    if( this.AppStateModel.location.path.length < 3 ) searchDoc.filters = {};
     // this._setPaging(searchDoc, 0);
     this.RecordModel.setPaging(searchDoc, 0);
 

@@ -172,6 +172,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
           if( media.hasPart && !Array.isArray(media.hasPart) ) media.hasPart = [ media.hasPart ];
           (media.hasPart || []).forEach((img) => {
             let node = record.clientMedia.graph.filter(r => r['@id'] === img['@id'])[0];
+            if( !node ) return;
             sources = sources.concat(
               this._getImageSources(node, nativeImageOnly)
             );
@@ -379,7 +380,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _getImageFormat(imageRecord) {
     if (!imageRecord.fileFormat) {
-      imageRecord = imageRecord.clientMedia?.images?.original?.url;
+      imageRecord = imageRecord.clientMedia?.images?.original?.url || imageRecord;
     }
     if (!imageRecord) return;
 

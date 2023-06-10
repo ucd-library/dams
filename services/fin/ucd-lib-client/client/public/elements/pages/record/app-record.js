@@ -99,11 +99,13 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     this.publisher = this.record.publisher;
     this.keywords = this.record.keywords || [];
     this.callNumber = this.record.callNumber;
-    this.collectionImg = this.record.thumbnailUrl || this.record.images?.original?.url;
+    this.collectionImg = this.record.images?.small?.url                   
+                      || this.record.images?.medium?.url 
+                      || this.record.images?.large?.url
+                      || this.record.images?.original?.url;
+
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
-    this.arkDoi = this.record.arkDoi;
-    this.fedoraLinks = this.record.fedoraLinks;
 
     this._updateLinks(this.AppStateModel.location, record);
   }
@@ -119,6 +121,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
   async _onAppStateUpdate(e) {
     // if (e.state !== "loaded") return;
     this._updateLinks(e.location);
+    this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
   }
 
@@ -145,7 +148,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       let media = selectedRecord.clientMedia.graph
         .filter(
           m => m['@shortType'].includes('ImageObject') && 
-          m.position === selectedRecord.selectedMediaPage
+          parseInt(m.position) === selectedRecord.selectedMediaPage
         )[0];
       if( media?.['@id'] ) {
         // path = media['@id'].split('/media')[0];

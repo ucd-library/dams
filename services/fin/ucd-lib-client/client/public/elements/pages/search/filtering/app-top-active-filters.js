@@ -18,7 +18,7 @@ export default class AppTopActiveFilters extends Mixin(LitElement)
     this.filters = {};
     this.activeFilters = [];
 
-    this._injectModel('FiltersModel', 'RecordModel');
+    this._injectModel('AppStateModel', 'FiltersModel', 'RecordModel');
   }
 
   /**
@@ -29,6 +29,7 @@ export default class AppTopActiveFilters extends Mixin(LitElement)
    */
   _onRecordSearchUpdate(e) {
     if( e.state !== 'loaded' ) return;
+    if( this.AppStateModel.location.page !== 'search' ) e.searchDocument.filters = {};
 
     let active = [];
     this.currentFilters = e.searchDocument.filters || {};

@@ -4,7 +4,6 @@ import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md.js';
 
 import { sharedStyles } from "../../styles/shared-styles";
 import SharedHtml from '../../utils/shared-html';
-import jsonStyles from 'json-formatter-js/dist/json-formatter.css';
 import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
 import buttonsCss from "@ucd-lib/theme-sass/2_base_class/_buttons.css";
 import headingsCss from "@ucd-lib/theme-sass/2_base_class/_headings.css";
@@ -18,7 +17,6 @@ export default function render() {
     ${linksCss}
     ${buttonsCss}
     ${headingsCss}
-    ${unsafeCSS(jsonStyles)}
     ${formsHtmlCss}
     ${formsCss}
 

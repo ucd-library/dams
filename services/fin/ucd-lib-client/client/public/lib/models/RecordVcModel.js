@@ -45,7 +45,7 @@ class RecordVcModel {
         let groups = e.payload.clientMedia.mediaGroups;
         let group = groups.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
         if( group ) {
-          images = groups.clientMedia.images;
+          images = group.clientMedia?.images;
         } else if( groups[0]?.clientMedia?.images ) {
           images = groups[0].clientMedia.images;
         }
@@ -59,7 +59,7 @@ class RecordVcModel {
         collectionName: config.collectionLabels[collectionId] || '',
         clientMedia: clientMedia,
         images,
-        date: root.yearPublished,
+        date: root.yearPublished || 'Undated',
         publisher: root?.publisher?.name,
         keywords,
         callNumber,

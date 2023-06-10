@@ -88,7 +88,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {String} id - Item id to fetch
    */
   async _getItem(id) {
-    await this.RecordModel.get(id);
+    this._onRecordUpdate(await this.RecordModel.get(id));
   }
 
   /**
@@ -100,6 +100,12 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
       this.truncatedTitle = this.data.title.substring(0, 34) + "...";
     } else if (this.data && this.data.title) {
       this.truncatedTitle = this.data.title;
+    } else if ( this.title && this.title.length > 38 ) {
+      this.truncatedTitle = this.title.substring(0, 34) + "...";
+    } else if ( this.title ) {
+      this.truncatedTitle = this.title;
+    } else {
+      this.truncatedTitle = "";
     }
   }
 }
