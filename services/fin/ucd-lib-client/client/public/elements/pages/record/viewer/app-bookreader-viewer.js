@@ -1,5 +1,4 @@
 import { LitElement } from "lit";
-import "@polymer/paper-spinner/paper-spinner-lite";
 
 import "@internetarchive/bookreader/src/BookReader.js";
 

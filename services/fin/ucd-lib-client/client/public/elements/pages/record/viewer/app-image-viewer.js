@@ -1,5 +1,4 @@
 import { LitElement } from "lit";
-import "@polymer/paper-spinner/paper-spinner-lite";
 import render from "./app-image-viewer.tpl.js";
 
 import utils from "../../../../lib/utils";
@@ -82,10 +81,15 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.shadowRoot.querySelector("#img").srcset = srcset;
       this.shadowRoot.querySelector("#img").sizes = sizes;
       this.shadowRoot.querySelector("#img").style.height = "600px";
+
+      this.shadowRoot.querySelector('#img').addEventListener('load', () => {
+        this.loading = false;
+        console.log('setting loading to false in load event callback')
+      });
     }
-    requestAnimationFrame(() => {
-      this.loading = false;
-    });
+    // requestAnimationFrame(() => {
+    //   this.loading = false;
+    // });
   }
 
   getImageSize(original) {
