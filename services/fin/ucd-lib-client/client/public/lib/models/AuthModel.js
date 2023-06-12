@@ -18,7 +18,7 @@ class AuthModel extends BaseModel {
     }
 
     login() {
-      window.location = '/auth/keycloak-oidc/login';
+      window.location = '/auth/login';
     }
 
     logout() {

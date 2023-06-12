@@ -53,7 +53,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
     this.loading = true;
 
-    this.media = selectedMedia.clientMedia.pages.filter(media => media.page === selectedMediaPage)[0];
+    this.media = selectedMedia.clientMedia?.pages?.filter(media => media.page === selectedMediaPage)[0];
     // on first page load, selectedMediaPage is -1, so just show first page from clientMedia.images
     if( !this.media ) {
       this.media = selectedMedia.clientMedia.images;
@@ -94,11 +94,10 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       let img = new Image();
       img.src = original.url;
       img.onload = () => {
-        original.size = {
+        resolve(original.size = {
           height : img.naturalHeight, 
           width : img.naturalWidth
-        }
-        resolve(); 
+        }); 
       };
     });
   }

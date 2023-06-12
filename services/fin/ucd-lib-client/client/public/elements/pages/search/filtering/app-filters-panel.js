@@ -1,7 +1,6 @@
 import { LitElement } from "lit";
 import "@polymer/iron-pages/iron-pages";
 import "./app-filter-panel";
-import "../../../utils/app-tabs";
 
 import render from "./app-filters-panel.tpl.js";
 
@@ -26,10 +25,8 @@ class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
     return {
       facetFilters: { type: Array },
-      selectedTab: { type: String },
       selectedCollection: { type: Object },
       collectionMode: { type: Boolean },
-      tabs: { type: Array },
     };
   }
 
@@ -40,34 +37,8 @@ class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this._injectModel("AppStateModel");
 
     this.facetFilters = facetFilters;
-    this.selectedTab = "";
     this.selectedCollection = {};
     this.collectionMode = false;
-    this.tabs = [
-      { label: "Information", value: "info" },
-      { label: "Filters", value: "filters" },
-    ];
-  }
-
-  firstUpdated() {
-    this._onSelectedCollectionUpdate();
-  }
-
-  /**
-   * @method _onSelectedCollectionUpdate
-   * @description CollectionInterface, render the iron-pages and current collection
-   */
-  _onSelectedCollectionUpdate(selected) {
-    if (!selected) {
-      this.selectedTab = "filters";
-      this.collectionMode = false;
-      return;
-    }
-
-    this.collectionMode = true;
-    this.selectedCollection = selected;
-
-    if (!this.selectedTab) this.selectedTab = "info";
   }
 
   /**

@@ -33,7 +33,7 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
         ],
       },
       { text: "About", href: "/about" },
-      { text: "FAQ", href: "/faq" },
+      // { text: "FAQ", href: "/faq" },
     ];
     // this.EventBus.on('search-controller-update', e => this._onSearchControllerUpdate(e));
     this._injectModel("AppStateModel", "CollectionModel", "RecordModel");
@@ -165,7 +165,7 @@ class AppSearchHeader extends Mixin(LitElement).with(LitCorkUtils) {
   _onSearch(e) {
     // let searchDoc = this._getCurrentSearchDocument();
     let searchDoc = this.RecordModel.getCurrentSearchDocument();
-
+    if( this.AppStateModel.location.path.length < 3 ) searchDoc.filters = {};
     // this._setPaging(searchDoc, 0);
     this.RecordModel.setPaging(searchDoc, 0);
 

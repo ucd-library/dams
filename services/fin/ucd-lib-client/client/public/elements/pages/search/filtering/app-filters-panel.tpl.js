@@ -159,54 +159,24 @@ export default function render() {
       </div>
     </div>
 
-      <!-- <div class="title" ?hidden="${
-        this.collectionMode
-      }" >FILTERS</div> -->
+    <div class="thumbnail-root" ?hidden="${!this.collectionMode}">
+      <div
+        class="thumbnail"
+        style="background-image: url('${
+          this.selectedCollection.thumbnailUrl
+        }')"
+      ></div>
+    </div>
 
-      <!-- <div class="outer-drawer-toggle" ?spacer="${!this
-        .collectionMode}" on-click="_fireToggleDrawer">
-    <button class="drawer-toggle">
-      <span><span ?hidden="${!this.collectionMode}">Info / </span>Filters</span>
-      <iron-icon icon="fin-icons:close"></iron-icon>
-    </button>
-  </div> -->
-      <div class="thumbnail-root" ?hidden="${!this.collectionMode}">
-        <div
-          class="thumbnail"
-          style="background-image: url('${
-            this.selectedCollection.thumbnailUrl
-          }')"
-        ></div>
-        <!-- <div class="thumbnail" style="background-image: url('${
-          this.selectedCollection.thumbnail
-        }')"></div>  -->
+    <div class="overflow">
+      <div id="filters">
+        ${this.facetFilters.map(
+          (item, index) => html`
+            <app-filter-panel .filter="${item}"></app-filter-panel>
+          `
+        )}
       </div>
-
-      <app-tabs
-        .tabs="${this.tabs}"
-        selected="${this.selectedTab}"
-        ?hidden="${!this.collectionMode}"
-      >
-      </app-tabs>
-
-
-      <div class="overflow">
-        <iron-pages
-          selected="${this.selectedTab}"
-          attr-for-selected="id"
-          selected-attribute="showing"
-        >
-          <div id="filters">
-            ${this.facetFilters.map(
-              (item, index) => html`
-                <app-filter-panel .filter="${item}"></app-filter-panel>
-              `
-            )}
-          </div>
-        </iron-pages>
-
-      </div>
-
+    </div>
 
 
     </div>

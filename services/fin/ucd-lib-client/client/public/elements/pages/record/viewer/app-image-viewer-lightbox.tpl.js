@@ -102,6 +102,10 @@ export default function render() {
   #close:hover ucdlib-icon {
     fill: var(--color-aggie-gold);
   }
+
+  .leaflet-control-zoom {
+    display: none;
+  }
 </style>
 
 <!-- make sure background is blacked out... iOS hack -->
