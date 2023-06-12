@@ -1,5 +1,7 @@
 const RecordGraph = require('../ucd-lib-client/client/public/lib/utils/RecordGraph');
 const fetch = require('node-fetch');
+const {config} = require('@ucd-lib/fin-service-utils');
+
 
 class Validate {
 
