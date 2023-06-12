@@ -336,9 +336,9 @@ class ClientMedia {
     if( crawled[node['@id']] ) return;
     crawled[node['@id']] = true;
 
-    // check if node is of media type
-    let mediaType = this.getMediaType(node);
-    if( mediaType ) {
+    // check if node is of display type
+    let displayType = this.getDisplayType(node);
+    if( displayType ) {
       this.mediaGroups.add(node);
     }
 
@@ -388,6 +388,11 @@ class ClientMedia {
 
     if( node.encodingFormat ) {
       parts = node.encodingFormat.split('/');
+      if( parts.length ) return parts[0].toLowerCase();
+    }
+
+    if( node.fileFormat ) {
+      parts = node.fileFormat.split('/');
       if( parts.length ) return parts[0].toLowerCase();
     }
 

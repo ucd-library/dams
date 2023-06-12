@@ -2,6 +2,7 @@ const {dataModels, models} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 const workflowUtils = require('../workflows.js');
+const validate = require('../validate.js');
 
 class CollectionsModel extends FinEsDataModel {
 
@@ -79,6 +80,8 @@ class CollectionsModel extends FinEsDataModel {
   }
 
   async _appendImageNode(collection) {
+    if( !collection ) return collection;
+
     let id = collection['@id'];
     let root = collection['@graph'].find(node => node['@id'] === id);
 
@@ -91,16 +94,19 @@ class CollectionsModel extends FinEsDataModel {
       }
 
       let model = root.image['@id'].replace(/\//, '').split('/')[0];
-      // if( model !== 'item' ) return collection;
-
       model = (await models.get(model)).model;
 
       let imageGraph = await model.get(
         root.image['@id'], 
         {compact: true, singleNode: true}
       );
+      
+      if( !imageGraph ) return collection;
+
       collection['@graph'].push(imageGraph['@graph'][0]);
-    } catch(e) {}
+    } catch(e) {
+      logger.error('Error appending image node to collection graph', e)
+    }
 
     return collection;
   }
@@ -154,6 +160,10 @@ class CollectionsModel extends FinEsDataModel {
     }
 
     return map;
+  }
+
+  async validate(jsonld) {
+    return validate.validateItem(jsonld);
   }
 }
 

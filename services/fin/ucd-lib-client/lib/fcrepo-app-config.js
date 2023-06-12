@@ -19,8 +19,9 @@ api.setConfig({
 class AppConfig {
   constructor() {
     this.activemq = new ActiveMqStompClient(config.client.appName);
-    this.activemq.onMessage((e) => this.handleMessage(e));
-    this.activemq.connect({ queue: "/topic/fcrepo" });
+    this.activemq.subscribe("/topic/fcrepo",
+      e => this.handleMessage(e),
+    );
     this.ROOT_PATH = "/application/" + config.client.appName;
     this.config = {};
     this.reload(true);

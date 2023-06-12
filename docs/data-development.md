@@ -20,6 +20,12 @@ Create container to work in
 docker run -d --name [collection-name]-import -v [collection-name]:/data gcr.io/ucdlib-pubreg/fin-base-service:sandbox bash -c "tail -f /dev/null"
 ```
 
+example:
+
+```bash
+docker run -d --name sherry-lehmann-import -v sherry-lehmann:/data gcr.io/ucdlib-pubreg/fin-base-service:sandbox bash -c "tail -f /dev/null"
+```
+
 Now you have a container `[collection-name]-import` with the volume `[collection-name]` mounted at `/data`
 
 ## Setup VS Code
