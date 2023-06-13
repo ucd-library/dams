@@ -252,13 +252,13 @@ export default function render() {
 
     <div id="BookReader" ?fullscreen=${this.fullscreen}></div>
 
-    <div id="prev" @click="${this._prevPage}" style="display: none;">
+    <div id="prev" @click="${this._prevPage}">
       <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
     </div>
 
-    <span class="BRcurrentpage-override" style="display: none;"></span>
+    <span class="BRcurrentpage-override"></span>
 
-    <div id="next" @click="${this._nextPage}" style="display: none;">
+    <div id="next" @click="${this._nextPage}">
       <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
     </div>
   `;

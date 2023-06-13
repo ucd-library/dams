@@ -66,46 +66,16 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
   }
 
   willUpdate(e) {
-    /*
-    if( this.AppStateModel.location.page !== 'item' ) {
-      this.bookData = {};
-      this.bookItemId = '';
-      this.iaInitialized = false;
-      return;
-    }
-
-    if( this.AppStateModel.location.fullpath !== this.bookItemId && this.bookData?.pages ) {
-      this.iaInitialized = false;
+    if (this.bookData?.pages) {
       this._renderBookReader();
     }
-    */
-
-    if( this.AppStateModel.location.page !== 'item' ) return;
-
-    if( !this.iaInitialized && this.bookData?.pages ) {
-      console.log('this.bookData', this.bookData);
-      this._renderBookReader();
-    }
-  }
-
-  updated() {
-    // if( !this.iaInitialized && this.bookData?.pages ) {
-    //   console.log('this.bookData', this.bookData);
-    //   this._renderBookReader();
-    // }
-    if( this.AppStateModel.location.page === 'item' && !this.navUpdated ) this._movePrevNext();
   }
 
   _onAppStateUpdate(e) {
-    if( e.location.page !== 'item' ) {
-      this.iaInitialized = false;
+    if (e.location.page !== 'item') {
       this.bookData = {};
-      this.navUpdated = false;
+      this.iaInitialized = false;
     }
-    // if( !this.iaInitialized && this.bookData?.pages ) {
-    //   console.log('this.bookData', this.bookData);
-    //   this._renderBookReader();
-    // }
   }
 
   _renderBookReader() {
@@ -157,9 +127,27 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     );
     this._updateCurrentPageLabel();
 
-    currentPage.parentElement.prepend(prevButton.cloneNode(true));
-    currentPage.parentElement.append(currentPageOverride.cloneNode(true));
-    currentPage.parentElement.append(nextButton.cloneNode(true));
+    // clone buttons and reposition them. changing between bookreader items 
+    //  destroys previous original arrow/label elements if append/prepend originals
+    let prevButtonClone = prevButton.cloneNode(true);
+    let currentPageOverrideClone = currentPageOverride.cloneNode(true);
+    let nextButtonClone = nextButton.cloneNode(true);
+
+    prevButtonClone.style.display = "inline-flex";
+    nextButtonClone.style.display = "inline-flex";
+    currentPageOverrideClone.style.display = "inline-block";
+    
+    prevButtonClone.addEventListener("click", this._prevPage.bind(this));
+    nextButtonClone.addEventListener("click", this._nextPage.bind(this));
+
+    prevButton.style.display = "none";
+    nextButton.style.display = "none";
+    currentPageOverride.style.display = "none";
+
+    currentPage.parentElement.prepend(prevButtonClone);
+    currentPage.parentElement.append(currentPageOverrideClone);
+    currentPage.parentElement.append(nextButtonClone);
+
     this.navUpdated = true;
   }
 
@@ -195,6 +183,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
   _toggleBookView() {
     this.onePage = !this.onePage;
     this.br.switchMode(this.onePage ? 1 : 2);
+    this._updateCurrentPageLabel(); // trigger ui change to media download
   }
 
   _zoomIn(e, amount = 1) {
@@ -267,12 +256,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     this.br = new UcdBookReader(options);
     
     this.br.init();
-
-    // TODO for some reason, nav between 2 bookreader items,
-    // causes pagination to disappear cause it tries to render before the page is rendered
-    // requestAnimationFrame(() => {
-    //   this._updateCurrentPageLabel();
-    // });
   }
 
   _onSearchResultsChange(e) {

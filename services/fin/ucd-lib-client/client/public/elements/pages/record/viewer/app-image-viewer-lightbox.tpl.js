@@ -131,7 +131,7 @@ export default function render() {
 
 <div id="viewer" ?hidden="${this.loading}"></div>
 
-<div class="spinner" ?hidden="${!this.loading}"></div>
+<div class="spinner"></div>
 
 <div id="close">
   <ucdlib-icon icon="ucdlib-dams:fa-xmark" @click="${this._onCloseClicked}"></ucdlib-icon>

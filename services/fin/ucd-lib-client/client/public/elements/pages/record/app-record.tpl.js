@@ -172,7 +172,6 @@ export default function render() {
         <div class="download-options">
           <app-media-download
             id="download"
-            .brPageChangeDetail="${this.brPageChangeDetail}"
             ?hidden="${this.isBagOfFiles}"
           ></app-media-download>
           <app-fs-media-download

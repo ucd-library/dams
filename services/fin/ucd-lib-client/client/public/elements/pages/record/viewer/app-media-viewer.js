@@ -103,7 +103,8 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
     }
 
     // TODO hack to test for specific item, but should change to use app container config?
-    let renderAsBr = false; // mediaGroup.hasPart && mediaGroup.encodesCreativeWork && mediaGroup.encodesCreativeWork['@id'] === '/item/ark:/87287/d7k06n';
+    let renderAsBr = false;
+    renderAsBr = e.selectedRecord.clientMedia.root.id === '/item/ark:/87287/d79p96';
 
     if (
       renderAsBr ||
@@ -118,10 +119,14 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
           e.selectedRecord?.clientMedia?.index
         );
       } else {
-        // brData = await this.RecordModel.getIaBookManifest(mediaGroup.clientMedia.pdf.manifest);
         await e.selectedRecord.clientMedia.loadManifests();
-        this.bookData = { pages : e.selectedRecord.clientMedia.mediaGroups[0].clientMedia?.pages };
-        this.mediaType = "bookreader";
+        // just in case pdf isn't root mediaGroup
+        e.selectedRecord.clientMedia.mediaGroups.forEach((media) => {
+          if( media.clientMedia?.pdf && media.clientMedia?.pages ) {
+            this.bookData = { pages : media.clientMedia.pages };
+            this.mediaType = "bookreader";
+          }
+        });
       }
       this.bookItemId = mediaGroup["@id"];
 
@@ -172,6 +177,15 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
     let selectedResult =
       parseInt(e.currentTarget.attributes["data-array-index"].value) + 1;
     nav.selectedResult = selectedResult;
+  }
+
+  _onBookViewPageChange(e) {
+    // emit event to notify app-media-download which pages to download
+    // (single page mode would be 1 file, two page mode would be the 2 files being viewed)
+    if( !this.isBookReader ) return;
+    this.dispatchEvent(new CustomEvent('br-page-change', {
+      detail: e.detail
+    }));
   }
 
   /**
