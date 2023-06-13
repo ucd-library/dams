@@ -84,12 +84,8 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
       this.shadowRoot.querySelector('#img').addEventListener('load', () => {
         this.loading = false;
-        console.log('setting loading to false in load event callback')
       });
     }
-    // requestAnimationFrame(() => {
-    //   this.loading = false;
-    // });
   }
 
   getImageSize(original) {

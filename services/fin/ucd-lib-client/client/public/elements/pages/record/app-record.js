@@ -33,6 +33,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       fedoraLinks: { type: Array },
       // citations : {type: Array}
       citationRoot: { type: Object },
+      brPageChangeDetail: { type: Object }
     };
   }
 
@@ -62,6 +63,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     // this.citations = [];
     this.citationRoot = {};
     this.collectionItemCount = 0;
+    this.brPageChangeDetail = {};
 
     this._injectModel(
       "AppStateModel",
@@ -244,6 +246,10 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       this.$.copyIcon.icon = "content-copy";
       this.$.copyButton.removeAttribute("active", "active");
     }, 3000);
+  }
+
+  _onBookViewPageChange(e) {
+    this.brPageChangeDetail = e.detail;
   }
 }
 

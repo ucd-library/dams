@@ -145,7 +145,7 @@ export default function render() {
       }
     </style>
 
-    <app-media-viewer></app-media-viewer>
+    <app-media-viewer @br-page-change="${this._onBookViewPageChange}"></app-media-viewer>
 
     <div class="container" style="padding-bottom: 50px">
       <h3>${this.name}</h3>
@@ -172,6 +172,7 @@ export default function render() {
         <div class="download-options">
           <app-media-download
             id="download"
+            .brPageChangeDetail="${this.brPageChangeDetail}"
             ?hidden="${this.isBagOfFiles}"
           ></app-media-download>
           <app-fs-media-download

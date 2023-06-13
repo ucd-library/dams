@@ -27,6 +27,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       selectedRecordMedia: { type: Object },
       isMultimedia: { type: Boolean },
       zipConcatenatedPaths: { type: String },
+      brPageChangeDetail: { type: Object }
     };
   }
 
@@ -50,6 +51,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.selectedRecordMedia = {};
     this.isMultimedia = false;
     this.zipConcatenatedPaths = "";
+    this.brPageChangeDetail = {};
 
     this._injectModel(
       "AppStateModel",

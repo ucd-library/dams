@@ -15,7 +15,7 @@ import BookReader from "@internetarchive/bookreader/src/plugins/plugin.text_sele
  * submitting IA pr to fix, for now overriding 2 prototype functions
  */
 import bookreaderPatch from "./app-bookreader.patch-search.js";
-bookreaderPatch(BookReader);
+const UcdBookReader = bookreaderPatch(BookReader);
 
 import render from "./app-bookreader-viewer.tpl.js";
 
@@ -59,16 +59,53 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     );
   }
 
-  willUpdate(e) {
-    if (this.bookData?.pages) {
-      this._renderBookReader();
-    }
-  }
-
   firstUpdated(e) {
     if (window.innerWidth < 801) {
       this.onePage = true;
     }
+  }
+
+  willUpdate(e) {
+    /*
+    if( this.AppStateModel.location.page !== 'item' ) {
+      this.bookData = {};
+      this.bookItemId = '';
+      this.iaInitialized = false;
+      return;
+    }
+
+    if( this.AppStateModel.location.fullpath !== this.bookItemId && this.bookData?.pages ) {
+      this.iaInitialized = false;
+      this._renderBookReader();
+    }
+    */
+
+    if( this.AppStateModel.location.page !== 'item' ) return;
+
+    if( !this.iaInitialized && this.bookData?.pages ) {
+      console.log('this.bookData', this.bookData);
+      this._renderBookReader();
+    }
+  }
+
+  updated() {
+    // if( !this.iaInitialized && this.bookData?.pages ) {
+    //   console.log('this.bookData', this.bookData);
+    //   this._renderBookReader();
+    // }
+    if( this.AppStateModel.location.page === 'item' && !this.navUpdated ) this._movePrevNext();
+  }
+
+  _onAppStateUpdate(e) {
+    if( e.location.page !== 'item' ) {
+      this.iaInitialized = false;
+      this.bookData = {};
+      this.navUpdated = false;
+    }
+    // if( !this.iaInitialized && this.bookData?.pages ) {
+    //   console.log('this.bookData', this.bookData);
+    //   this._renderBookReader();
+    // }
   }
 
   _renderBookReader() {
@@ -120,9 +157,10 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     );
     this._updateCurrentPageLabel();
 
-    currentPage.parentElement.prepend(prevButton);
-    currentPage.parentElement.append(currentPageOverride);
-    currentPage.parentElement.append(nextButton);
+    currentPage.parentElement.prepend(prevButton.cloneNode(true));
+    currentPage.parentElement.append(currentPageOverride.cloneNode(true));
+    currentPage.parentElement.append(nextButton.cloneNode(true));
+    this.navUpdated = true;
   }
 
   _prevPage() {
@@ -138,9 +176,20 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     let currentPageOverride = this.shadowRoot.querySelector(
       ".BRcurrentpage-override"
     );
-    currentPageOverride.innerHTML = currentPage.innerHTML
+    let currentPageTrimmed = currentPage.innerHTML
       .replace("(", "")
       .replace(")", "");
+
+    if( currentPageOverride ) currentPageOverride.innerHTML = currentPageTrimmed;
+
+    // emit event to notify app-media-download which pages to download
+    // (single page mode would be 1 file, two page mode would be the 2 files being viewed)
+    this.dispatchEvent(new CustomEvent('br-page-change', {
+      detail: {
+        onePageMode: this.onePage,
+        currentPage: parseInt(currentPageTrimmed.split(' ')[0])
+      },
+    }));
   }
 
   _toggleBookView() {
@@ -157,13 +206,9 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
   }
 
   _renderBookReaderAsync() {
-    if (this.iaInitialized || !this.bookData.pages) return;
+    if( this.iaInitialized || !this.bookData.pages ) return;
     this.iaInitialized = true;
     let data = [];
-
-    let djvuPath = this.bookData.pages[0].ocr.url;
-    djvuPath = djvuPath.split("/");
-    djvuPath = djvuPath.splice(0, djvuPath.length - 2).join("/"); // remove page number and extension
 
     this.bookData.pages.forEach((bd) => {
       data.push([
@@ -171,6 +216,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
           width: bd[bd.ocr?.imageSize]?.size?.width,
           height: bd[bd.ocr?.imageSize]?.size?.height,
           uri: bd[bd.ocr?.imageSize]?.url,
+          ocr: bd.ocr?.url
         },
       ]);
     });
@@ -188,13 +234,15 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
       metadata: [
         { label: "Title", value: "Open Library BookReader Presentation" },
         { label: "Author", value: "Internet Archive" },
-        // {label: 'Demo Info', value: 'This demo shows how one could use BookReader with their own content.'},
       ],
 
       plugins: {
         textSelection: {
           enabled: true,
-          singlePageDjvuXmlUrl: djvuPath + "/{{pageIndex}}/ocr.djvu",
+          singlePageDjvuCallback: (index) => {
+            return data[index]?.[0]?.ocr;
+          },
+          singlePageDjvuXmlUrl: "no-op"
         },
       },
 
@@ -216,9 +264,15 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
       ui: "full", // embed, full (responsive)
     };
 
-    this.br = new BookReader(options);
-
+    this.br = new UcdBookReader(options);
+    
     this.br.init();
+
+    // TODO for some reason, nav between 2 bookreader items,
+    // causes pagination to disappear cause it tries to render before the page is rendered
+    // requestAnimationFrame(() => {
+    //   this._updateCurrentPageLabel();
+    // });
   }
 
   _onSearchResultsChange(e) {
