@@ -104,7 +104,7 @@ export default class AppMediaViewer extends Mixin(LitElement).with(
 
     // TODO hack to test for specific item, but should change to use app container config?
     let renderAsBr = false;
-    renderAsBr = e.selectedRecord.clientMedia.root.id === '/item/ark:/87287/d79p96';
+    // renderAsBr = e.selectedRecord.clientMedia.root.id === '/item/ark:/87287/d79p96';
 
     if (
       renderAsBr ||
