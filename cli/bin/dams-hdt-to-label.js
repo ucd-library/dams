@@ -1,10 +1,18 @@
-const hdt = require('hdt');
-const path = require('path');
+const {Command} = require('commander');
+const program = new Command();
 const fs = require('fs');
+const path = require('path');
+const hdt = require('hdt');
 
-const file = process.argv[2];
+program
+  .argument('<path>')
+  .description('convert hdt file to labels.jsonld.json')
+  .action((file, options) => {
+    run(file)
+  });
 
-(async function() {
+async function run(file) {
+  console.log('file', file);
   let hdtDoc = await hdt.fromFile(file);
 
   let jsonld = [{
@@ -28,4 +36,6 @@ const file = process.argv[2];
     path.join(fileInfo.dir, 'labels.jsonld.json'),
     JSON.stringify(jsonld, null, 2)
   );
-})();
+}
+
+program.parse(process.argv);
