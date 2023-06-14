@@ -196,51 +196,50 @@ export default function render() {
     </div>
 
     <div ?hidden="${this.fullSetSelected}">
-      <div
-        class="layout btns"
+      <div class="layout btns"
         style="margin-bottom: 5px;"
-        ?hidden="${!this.selectedMediaHasSources}"
-      >
-        <select
-          ?hidden="${this.isMultimedia}"
+        ?hidden="${!this.selectedMediaHasSources}">
+        <select ?hidden="${this.isMultimedia}"
           id="downloadOptions"
-          @change="${this._onChangeDownloadOptions}"
-        ></select>
-        <span
-          id="multimedia-format-label"
-          ?hidden="${!this.isMultimedia}"
-        ></span>
-        <select
-          id="format"
+          @change="${this._onChangeDownloadOptions}">
+        </select>
+        <span id="multimedia-format-label"
+          ?hidden="${!this.isMultimedia}">
+        </span>
+        <select id="format"
           @change="${this._onFormatSelected}"
-          ?hidden="${!this.showImageFormats}"
-        ></select>
-        <a
-          class="downloadBtn"
+          ?hidden="${!this.showImageFormats}">
+        </select>
+        <a class="downloadBtn"
+          ?hidden="${this.isTwoPageView}"
           href="${this.href}"
           @click="${this._onDownloadClicked}"
           download
           target="_blank"
           rel="noopener"
-          style="white-space: nowrap; text-align: center;"
-        >
+          style="white-space: nowrap; text-align: center;">
+          <span> Download </span>
+        </a>
+        <a class="downloadBtn archive"
+          ?hidden="${!this.isTwoPageView}"
+          href="${this.archiveHref}"
+          @click="${this._onDownloadFullSetClicked}"
+          target="_blank"
+          rel="noopener"
+          download
+          style="white-space: nowrap; text-align: center;">
           <span> Download </span>
         </a>
       </div>
     </div>
 
-    <div ?hidden="${this.fullSetSelected}">
+    <div ?hidden="${this.fullSetSelected || this.isTwoPageView}">
       <div ?hidden="${this.selectedMediaHasSources}">
         <em>No downloadable items available</em>
       </div>
     </div>
 
-    <!-- <button ?hidden="${!this.fullSetSelected}" @click="${this._onDownloadFullSetClicked}">
-      <span>Download</span>
-    </button> -->
-
-    <a
-      class="downloadBtn archive"
+    <a class="downloadBtn archive"
       ?hidden="${!this.fullSetSelected}"
       href="${this.archiveHref}"
       @click="${this._onDownloadFullSetClicked}"

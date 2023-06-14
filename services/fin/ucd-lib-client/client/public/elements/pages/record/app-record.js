@@ -121,8 +121,8 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
   async _onAppStateUpdate(e) {
     // if (e.state !== "loaded") return;
     this._updateLinks(e.location);
-    this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
-    this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+    if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
+    if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
   }
 
   /**
@@ -244,6 +244,13 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       this.$.copyIcon.icon = "content-copy";
       this.$.copyButton.removeAttribute("active", "active");
     }, 3000);
+  }
+
+  _onBookViewPageChange(e) {
+    let appMediaDownload = this.shadowRoot.querySelector('app-media-download');
+    if( appMediaDownload ) {
+      appMediaDownload.brPageChange(e.detail);
+    }
   }
 }
 

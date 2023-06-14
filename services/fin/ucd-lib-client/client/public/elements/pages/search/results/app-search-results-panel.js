@@ -1,8 +1,6 @@
 import { LitElement } from "lit";
 import render from "./app-search-results-panel.tpl.js";
 
-import "@polymer/paper-spinner/paper-spinner-lite";
-
 import "./app-search-grid-result";
 import "./app-search-list-result";
 import "../../../utils/app-collection-card";

@@ -198,14 +198,13 @@ export default function render() {
       <iron-pages
         selected="${this.mediaType}"
         attr-for-selected="id"
-        selected-attribute="visible"
-      >
+        selected-attribute="visible">
         <!-- <app-360-image-viewer id="360"></app-360-image-viewer> -->
         <div id="bagoffiles">
           <iron-icon
             icon="fin-icons:various-outline-stacked"
-            ?hidden="${this.bagOfFilesImage}"
-          ></iron-icon>
+            ?hidden="${this.bagOfFilesImage}">
+          </iron-icon>
           <img
             src="${this.bagOfFilesImage}"
             ?hidden="${!this.bagOfFilesImage}"
@@ -217,7 +216,8 @@ export default function render() {
           .fullscreen="${this.brFullscreen}"
           .bookData="${this.bookData}"
           bookItemId="${this.bookItemId}"
-        ></app-bookreader-viewer>
+          @br-page-change="${this._onBookViewPageChange}">
+        </app-bookreader-viewer>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>
       </iron-pages>

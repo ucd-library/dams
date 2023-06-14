@@ -14,10 +14,6 @@ export default function render() {
         position: relative;
       }
 
-      paper-spinner-lite {
-        --paper-spinner-color: var(--default-secondary-color);
-      }
-
       #loading {
         display: flex;
         align-items: center;
@@ -250,15 +246,6 @@ export default function render() {
         }
       }
     </style>
-    <!--
-<div id="loading" ?hidden="${!this.loading}">
-  <paper-spinner-lite ?active="${this.loading}"></paper-spinner-lite>
-</div> -->
-
-    <!-- <div class="layout" ?hidden="${this.loading}" style="line-height: 0">
-  <img id="img" /> -->
-
-    <!-- </div> -->
 
     <button class="zooms-in" @click="${this._zoomIn}">Zoom In</button>
     <button class="zooms-out" @click="${this._zoomOut}">Zoom Out</button>

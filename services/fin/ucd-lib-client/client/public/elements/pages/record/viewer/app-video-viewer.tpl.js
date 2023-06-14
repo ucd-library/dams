@@ -13,13 +13,6 @@ return html`
             margin: auto;
         }
 
-        /*
-        .plyr__controls {
-            margin: 0 auto;
-            width: calc(100vw / 1.8);
-        }
-        */
-
         .container {
             padding: 10px;
         }
@@ -57,14 +50,6 @@ return html`
             outline: 0 !important;
             background: transparent !important;
         }
-
-        paper-spinner-lite {
-            --paper-spinner-color: var(--default-secondary-color);
-        }
-
-        #loading {
-            text-align: center;
-        }
     </style>
     
     <div class="container">
@@ -73,9 +58,6 @@ return html`
             ${repeat(this.tracks, (t) => 
                 html`<track kind="${t.kind}" label="${t.label}" src="${t.src}" srclang="${t.srclang}" default="${t.default}" />`)}
         </video>
-        <div id="loading" ?hidden="${this.libsLoaded}">
-            <paper-spinner-lite ?active="${!this.libsLoaded}"></paper-spinner-lite>
-        </div>
     </div>
 `
 }
