@@ -5,42 +5,56 @@ export default function render() {
     <style>
       :host {
         display: block;
-        /* background: black; */
         padding: 20px 0;
-        /* position: relative; */
         box-sizing: border-box;
       }
 
-      paper-spinner-lite {
-        --paper-spinner-color: var(--default-secondary-color);
-      }
-
-      #loading {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 600px;
-      }
-
-      /* img {
-    width: 100%;
-  } */
-
       .layout {
         text-align: center;
+        height: 600px;
       }
 
       [hidden] {
         display: none !important;
       }
+
+      .spinner {
+        position: relative;
+        top: 300px;
+        left: 0;
+        width: 100vw;
+        /* height: 100vh; */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color:  transparent;
+        transition: opacity 0.75s, visibility 0.75s;
+      }
+
+      .spinner:after {
+        content: '';
+        width: 30px;
+        height: 30px;
+        border: 5px solid  var(--color-aggie-gold-70);
+        border-top-color: var(--color-aggie-gold);
+        border-radius: 50%;
+        animation: loading 0.75s ease infinite;
+      }
+
+      @keyframes loading {
+        from {
+          transform: rotate(0turn); 
+        }
+        to {
+          transform: rotate(1turn);
+        }
+      }
     </style>
 
-    <div id="loading" ?hidden="${!this.loading}">
-      <paper-spinner-lite ?active="${this.loading}"></paper-spinner-lite>
-    </div>
+    <div class="spinner" ?hidden="${!this.loading}"></div>
 
-    <div class="layout" ?hidden="${this.loading}" style="line-height: 0">
-      <img id="img" />
+    <div class="layout" style="line-height: 0">
+      <img ?hidden="${this.loading}" id="img" />
     </div>
   `;
 }

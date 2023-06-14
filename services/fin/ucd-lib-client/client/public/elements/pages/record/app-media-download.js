@@ -27,6 +27,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       selectedRecordMedia: { type: Object },
       isMultimedia: { type: Boolean },
       zipConcatenatedPaths: { type: String },
+      isTwoPageView: { type: Boolean },
     };
   }
 
@@ -50,6 +51,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.selectedRecordMedia = {};
     this.isMultimedia = false;
     this.zipConcatenatedPaths = "";
+    this.isTwoPageView = false;
 
     this._injectModel(
       "AppStateModel",
@@ -60,12 +62,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
   async firstUpdated() {
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
-    if (selectedRecord) {
-      this._onSelectedRecordUpdate(selectedRecord);
-      // if (selectedRecord.selectedMedia) {
-      //   this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
-      // }
-    }
+    if (selectedRecord) this._onSelectedRecordUpdate(selectedRecord);    
   }
 
   _onSelectedRecordUpdate(record) {
@@ -145,6 +142,40 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       isRoot ? firstRecord : this.selectedRecordMedia
     );
     this._renderImgFormats(isRoot ? firstRecord : this.selectedRecordMedia);
+  }
+
+  /**
+   * @method brPageChange
+   * 
+   * @description bookreader page change event. set download sources to 2 pages if 2 page view, 
+   *  otherwise set to single page at currentPage
+   * @param {Object}} detail page change detail, page number and if single page or 2 page view 
+   */
+  async brPageChange(detail) { 
+    let { currentPage, onePageMode } = detail;
+
+    let record = await this.AppStateModel.getSelectedRecord();
+    if (!record) return;
+
+    let { graph, clientMedia, selectedMedia, selectedMediaPage} = record;
+
+    if( onePageMode ) {
+      // set download href to single page
+      this.href = selectedMedia.clientMedia.pages[currentPage - 1]?.download?.url;  
+      this.isTwoPageView = false;
+    } else {
+      this.isTwoPageView = true;      
+
+      // set download href to 2 pages for archive download option
+      let image1 = selectedMedia.clientMedia.pages[currentPage - 1]?.download?.url?.replace('/fcrepo/rest', '');
+      let image2 = selectedMedia.clientMedia.pages[currentPage]?.download?.url?.replace('/fcrepo/rest', '');
+      let urls = [];
+      if( image1 ) urls.push(image1);
+      if( image2 ) urls.push(image2);
+      if( urls.length ) this._setZipPaths(urls);
+
+      this._setZipPaths(urls);
+    }
   }
 
   _getDownloadSources(record, nativeImageOnly = false) {
@@ -429,23 +460,24 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    * @method _setZipPaths
    * @description set the fullset/zip form elements.
    */
-  _setZipPaths() {
-    let urls = [];
+  _setZipPaths(urls=[]) {
     this.zipName = this.rootRecord.name
       .replace(/[^a-zA-Z0-9]/g, "-")
       .toLowerCase();
 
-    let sources = this.allSources;
-    // let sources = this._getAllNativeDownloadSources();
+    if( !urls.length ) {
 
-    for (let source of sources) {
-      urls.push(source.src.replace('/fcrepo/rest', ''));
+      let sources = this.allSources;
+      // let sources = this._getAllNativeDownloadSources();
+
+      for (let source of sources) {
+        urls.push(source.src.replace('/fcrepo/rest', ''));
+      }
     }
 
     this.zipConcatenatedPaths = urls.join(',');
     this.zipPaths = urls;
     this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}}`;
-    // this.archiveHref = `/fin/archive${this.zipName ? '?name='+this.zipName : ''}}`;
   }
 
   /**

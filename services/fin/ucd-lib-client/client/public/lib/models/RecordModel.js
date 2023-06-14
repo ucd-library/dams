@@ -81,7 +81,10 @@ class RecordModel extends ElasticSearchModel {
           console.warn('Unable to find selected media', id);
         }
 
-        selectedMedia = result.payload.clientMedia.mediaGroups[0];
+        // if pdf, use first
+        selectedMedia = result.payload.clientMedia.mediaGroups.find(node => node.clientMedia?.pdf && node.clientMedia?.pages);
+        if( !selectedMedia ) selectedMedia = result.payload.clientMedia.mediaGroups[0];
+
         if( selectedMedia.clientMedia.pages ) {
           mediaPage = 0;
         } else {

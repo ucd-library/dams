@@ -119,17 +119,6 @@ export default function render() {
         font-style: italic;
       }
 
-      paper-spinner-lite {
-        --paper-spinner-color: var(--default-secondary-color);
-      }
-
-      .loading {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 250px;
-      }
-
       .error {
         display: flex;
         align-items: center;
@@ -396,9 +385,6 @@ export default function render() {
 
     <div class="error" ?hidden="${!this.showError}">
       <div>${this.errorMsg}</div>
-    </div>
-    <div class="loading" ?hidden="${!this.showLoading}">
-      <paper-spinner-lite ?active="${this.showLoading}"></paper-spinner-lite>
     </div>
 
     <ucd-theme-pagination

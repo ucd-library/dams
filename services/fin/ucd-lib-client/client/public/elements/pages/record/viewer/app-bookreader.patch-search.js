@@ -169,4 +169,55 @@ module.exports = function patchSearch(BookReader) {
       $boxes.removeAttr("style");
     }
   };
+
+  class UcdBookReader extends BookReader {
+
+    /**
+     * @methods updateFromParams
+     * @description hack for injecting our getPageText function into the instantiated
+     * TextSelectPlugin instance.  TextSelectionPlugin is scoped within the text_selection.js 
+     * module, so we can override.  It's instantiated in the BookReader.init() process.  After
+     * the BookReader.textSelectionPlugin is set, BookReader.updateFromParams() is called while
+     * still in the init() process.  Sooo, we are using this opportunity to inject our hack function
+     * AFTER init() set textSelectionPlugin but before the init() calls createPageContainer() for 
+     * the first couple pages. updateFromParams is our lucky function for this.  
+     * 
+     */
+    updateFromParams(params) {
+      if( !this.ucdHackedGetPageText ) {
+        this.textSelectionPlugin.getPageText = this.getPageText.bind(this.textSelectionPlugin);
+        this.ucdHackedGetPageText = true;
+      }
+      super.updateFromParams(params);
+    }
+
+    /**
+     * @param {number} index
+     * @returns {Promise<HTMLElement|undefined>}
+     */
+    async getPageText(index) {
+      const cachedEntry = this.pageTextCache.entries.find(x => x.index == index);
+      if (cachedEntry) {
+        return cachedEntry.response;
+      }
+      const res = await $.ajax({
+        type: "GET",
+        url: this.options.singlePageDjvuCallback(index),
+        dataType: this.options.jsonp ? "jsonp" : "html",
+        cache: true,
+        error: (e) => undefined,
+      });
+      try {
+        const xmlDoc = $.parseXML(res);
+        const result = xmlDoc && $(xmlDoc).find("OBJECT")[0];
+        this.pageTextCache.add({ index, response: result });
+        return result;
+      } catch (e) {
+        return undefined;
+      }
+    }
+  }
+
+  return UcdBookReader;
 };
+

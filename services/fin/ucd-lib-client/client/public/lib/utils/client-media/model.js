@@ -295,7 +295,10 @@ class ClientMedia {
     if( typeof node === 'string' ) {
       return this.index[node];
     }
-    return this.index[node['@id']];
+
+    // TODO talk with Justin, this is a hack for /collection/sherry-lehmann
+    // the image "/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg" is an object with an id but doesn't exist as a graph in this.index graph
+    return this.index[node['@id']]; // || node;
   }
 
   parse(node, crawled={}) {
@@ -359,7 +362,25 @@ class ClientMedia {
    */
   getMediaType(node) {
     if( !node ) return '';
-    let type = definition.MEDIA_TYPES.find(type => node['@type'].includes(type)) || '';
+    let type = definition.MEDIA_TYPES.find(type => node['@type']?.includes(type)) || '';
+    
+    // TODO chat with Justin about this, should data structure change so that type has a value?
+    // hack since type is just [] for root collection-type nodes with an image
+    // ie collection "/collection/ark:/13030/kt4w1032bf" with image id "/item/ark:/87293/d3jf5s/cua_000011_access006.jpg"
+    // if( !type && node.fileFormat?.includes('image') ) {
+    //   type = 'ImageObject';
+    //   node['@type'].push('http://schema.org/ImageObject');
+    //   console.warn('@type is empty for node ', node);
+    // }
+
+    // or node['@id'] === '/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg' 
+    // sherry lehmann image with no types or fileFormats, just @id key in object
+    // if( !type && node['@id'] === '/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg' ) {
+    //   node['@type'] = ['http://schema.org/ImageObject'];
+    //   type = 'ImageObject';
+    //   console.warn('@type is empty for node ', node);
+    // }
+
     return type.split(/(#|\/)/).pop();
   }
 

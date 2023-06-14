@@ -1,7 +1,6 @@
 import { LitElement } from "lit";
 import render from "./app-image-viewer-lightbox.tpl.js";
 
-import "@polymer/paper-spinner/paper-spinner-lite";
 import "leaflet";
 import "leaflet-iiif";
 
@@ -146,6 +145,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   async renderCanvas() {
     if( !this.record ) return;
 
+    this.loading = true;
     let {graph, clientMedia, selectedMedia, selectedMediaPage} = this.record;
 
     if (selectedMedia["@id"] === this.renderedMedia?.["@id"]) {
@@ -157,8 +157,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     if( !this.renderedMedia ) {
       this.renderedMedia = selectedMedia.clientMedia.images;
     }
-
-    this.loading = false;
 
     if (!this.viewer) {
       this.viewer = L.map(this.shadowRoot.querySelector("#viewer"), {
@@ -211,13 +209,25 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
     this.currentLayer.addTo(this.viewer);
 
+    // listen to load event to stop spinner
+    if( this.renderedMedia.tiled ) {
+      this.currentLayer.on('load', function() {
+        this.loading = false;
+      });
+    } else {      
+      let imageElement = this.currentLayer.getElement();
+      imageElement.addEventListener('load', () => {
+        this.loading = false;
+      });
+    }
+
     // TODO this is a hack to get the viewer to resize correctly
     setTimeout(() => {
       this.viewer.invalidateSize();
     }, 1000);
 
     this.shadowRoot.querySelector('.leaflet-control-attribution').style.display = 'none';
-    this.shadowRoot.querySelector(".leaflet-control-container").style.display = 'none';
+    this.shadowRoot.querySelector(".leaflet-control-container").style.display = 'none';  
   }
 
   getImageSize(original) {

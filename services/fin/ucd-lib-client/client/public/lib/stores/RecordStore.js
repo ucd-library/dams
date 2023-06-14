@@ -23,6 +23,7 @@ class RecordStore extends BaseStore {
   }
 
   getRecord(id) {
+    if( !id ) return null;
     let parts = id.split('/').filter(p => p !== '');
     for( let i = parts.length-1; i >= 0; i-- ) {
       let pid = '/'+parts.join('/');

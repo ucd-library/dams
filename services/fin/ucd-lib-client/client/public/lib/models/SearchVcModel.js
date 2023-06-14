@@ -30,6 +30,7 @@ class SearchVcModel extends BaseModel {
     const matchedCollections = [];
 
     e.payload.results.forEach((result) => {
+      if( !result.root ) return;
       let thumbnailUrl = utils.getThumbnailFromClientMedia(
         result.clientMedia
       );
