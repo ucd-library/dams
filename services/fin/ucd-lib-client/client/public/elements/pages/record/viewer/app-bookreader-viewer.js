@@ -127,26 +127,30 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     );
     this._updateCurrentPageLabel();
 
-    // clone buttons and reposition them. changing between bookreader items 
-    //  destroys previous original arrow/label elements if append/prepend originals
-    let prevButtonClone = prevButton.cloneNode(true);
-    let currentPageOverrideClone = currentPageOverride.cloneNode(true);
-    let nextButtonClone = nextButton.cloneNode(true);
+    if( !currentPage.parentElement.querySelector('#prev') && 
+        !currentPage.parentElement.querySelector('#next') &&
+        !currentPage.parentElement.querySelector('.BRcurrentpage-override') ) {
+      // clone buttons and reposition them. changing between bookreader items 
+      //  destroys previous original arrow/label elements if append/prepend originals
+      let prevButtonClone = prevButton.cloneNode(true);
+      let currentPageOverrideClone = currentPageOverride.cloneNode(true);
+      let nextButtonClone = nextButton.cloneNode(true);
 
-    prevButtonClone.style.display = "inline-flex";
-    nextButtonClone.style.display = "inline-flex";
-    currentPageOverrideClone.style.display = "inline-block";
-    
-    prevButtonClone.addEventListener("click", this._prevPage.bind(this));
-    nextButtonClone.addEventListener("click", this._nextPage.bind(this));
+      prevButtonClone.style.display = "inline-flex";
+      nextButtonClone.style.display = "inline-flex";
+      currentPageOverrideClone.style.display = "inline-block";
+      
+      prevButtonClone.addEventListener("click", this._prevPage.bind(this));
+      nextButtonClone.addEventListener("click", this._nextPage.bind(this));
 
-    prevButton.style.display = "none";
-    nextButton.style.display = "none";
-    currentPageOverride.style.display = "none";
+      prevButton.style.display = "none";
+      nextButton.style.display = "none";
+      currentPageOverride.style.display = "none";
 
-    currentPage.parentElement.prepend(prevButtonClone);
-    currentPage.parentElement.append(currentPageOverrideClone);
-    currentPage.parentElement.append(nextButtonClone);
+      currentPage.parentElement.prepend(prevButtonClone);
+      currentPage.parentElement.append(currentPageOverrideClone);
+      currentPage.parentElement.append(nextButtonClone);
+    }
 
     this.navUpdated = true;
   }
