@@ -270,6 +270,8 @@ export default function render() {
           <ucd-theme-slim-select
             class="single-collection"
             @change="${(e) => (this.collectionId = e.detail.value)}"
+            @focusin="${this._ssSelectFocusIn}"
+            @blur="${this._ssSelectBlur}"
           >
             <select>
               <option></option>
@@ -303,6 +305,8 @@ export default function render() {
           (c, index) => html`
             <ucd-theme-slim-select
               @change="${this._onCollectionListChange}"
+              @focusin="${this._ssSelectFocusIn}"
+              @blur="${this._ssSelectBlur}"
               data-position="${c.position}"
               class="list"
               .options="${{

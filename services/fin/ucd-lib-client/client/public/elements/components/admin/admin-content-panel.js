@@ -198,6 +198,34 @@ export class AdminContentPanel extends LitElement {
       this.dispatchEvent(new CustomEvent("panel-loaded"));
     });
   }
+
+  /**
+   * @method _ssSelectFocusIn
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectFocusIn(e) {
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    if( ssSingleSelected?.classList.value === 'ss-single-selected ss-open-below' ) {
+      ssSingleSelected.style.backgroundColor = '#FFF4D2'; // gold-30
+      ssMain.style.borderColor = '#FFBF00'; // gold
+    }
+  }
+
+  /**
+   * @method _ssSelectBlur
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectBlur(e) {
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+    ssMain.style.borderColor = '#B0D0ED'; // blue-50
+  }
 }
 
 customElements.define("admin-content-panel", AdminContentPanel);

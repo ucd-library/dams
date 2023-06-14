@@ -113,7 +113,7 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
     selects.forEach((select) => {
       let ssMain = select.shadowRoot.querySelector(".ss-main");
       if (ssMain) {
-        ssMain.style.borderColor = "var(--color-aggie-gold)";
+        ssMain.style.borderColor = "var(--color-aggie-blue-50)";
       }
 
       let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");
@@ -121,7 +121,8 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
         ssSingle.style.border = "none";
         ssSingle.style.height = "49px";
         ssSingle.style.paddingLeft = "1rem";
-        ssSingle.style.backgroundColor = "var(--color-aggie-gold-20)";
+        ssSingle.style.backgroundColor = "var(--color-aggie-blue-50)";
+        ssSingle.style.borderRadius = '0';
         ssSingle.style.fontWeight = "bold";
         ssSingle.style.color = "var(--color-aggie-blue)";
       }
