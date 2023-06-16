@@ -341,7 +341,8 @@ class ClientMedia {
 
     // check if node is of display type
     let displayType = this.getDisplayType(node);
-    if( displayType ) {
+    if( displayType && 
+      definition.DISPLAY_ORDER.DISPLAY_TYPES.includes(displayType) ) {
       this.mediaGroups.add(node);
     }
 
