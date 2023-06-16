@@ -3,6 +3,21 @@ const model = require('./model.js');
 const express = require('express');
 const router = express.Router();
 
+
+router.get(/\/_\/.*/, async (req, res) => {
+  let path = req.path.replace('/_/', '/');
+
+  try {
+    res.json(await model.get(path));
+  } catch(e) {
+    logger.error(e);
+    res.status(500).json({
+      stack : e.stack,
+      error: e.message
+    });
+  }
+});
+
 router.get('/', handleSearch);
 router.post('/', handleSearch);
 

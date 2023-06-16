@@ -388,8 +388,33 @@ class PageSearch extends FinEsDataModel {
     });
   }
 
-  async get() {
-    throw new Error("not implemented for ia-book-reader");
+  async get(id, opts={}, index) {
+    if (!index) index = this.readIndexAlias;
+    id = id.replace(/\/fcr:metadata$/, '');
+    console.log('get', id)
+
+    let result = await this.esSearch({
+        from: 0,
+        size: 1,
+        query: {
+          bool : {
+            must : [
+              {term: {'@graph.@id': id}}
+            ]
+          }
+        }
+      }, 
+      {},
+      index
+    );
+
+    if( result.hits.total.value >= 1 ) {
+      result = result.hits.hits[0]._source;
+    } else {
+      return null;
+    }
+
+    return result;
   }
 
   async all() {

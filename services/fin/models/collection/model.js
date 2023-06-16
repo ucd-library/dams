@@ -1,4 +1,4 @@
-const {dataModels, models} = require('@ucd-lib/fin-service-utils');
+const {dataModels, models, logger} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 const workflowUtils = require('../workflows.js');
@@ -93,7 +93,9 @@ class CollectionsModel extends FinEsDataModel {
         return collection;
       }
 
-      let model = root.image['@id'].replace(/\//, '').split('/')[0];
+      let model = root.image['@id']
+        .replace(/\//, '')
+        .split('/')[0];
       model = (await models.get(model)).model;
 
       let imageGraph = await model.get(
