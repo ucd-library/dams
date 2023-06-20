@@ -294,6 +294,7 @@ export default function render() {
             class="heading-text"
             type="text"
             .value=${this.heading}
+            style="width: -webkit-fill-available;";
             @change="${(e) => (this.heading = e.currentTarget.value)}"
           />
         </div>
@@ -352,7 +353,7 @@ export default function render() {
         <span class="form-label" style="display: block;">Description</span>
         <textarea
           class="description"
-          style="height: 175px; font-size: .9rem"
+          style="height: 175px; font-size: .9rem; width: -webkit-fill-available;"
           .value=${this.description}
           @change="${(e) => (this.description = e.currentTarget.value)}"
         >

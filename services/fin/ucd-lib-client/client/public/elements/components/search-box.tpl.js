@@ -32,6 +32,7 @@ export default function render() {
       button {
         background: var(--color-aggie-gold);
         height: 61px;
+        width: 61px;
         border: none;
         margin: 0;
         padding: 0 10px;

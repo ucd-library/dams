@@ -34,13 +34,13 @@ export default function render() {
         font-weight: bold;
         text-transform: lowercase;
         display: inline-block;
-        margin-right: 12px;
-        margin-top: 15px;
+        margin: 0.5rem;
         cursor: pointer;
         font-size: 0.85rem;
         padding: 0.85rem;
         border-radius: 35px;
         background-color: var(--color-aggie-blue-40);
+
       }
 
       .rm-btn:hover ucdlib-icon {

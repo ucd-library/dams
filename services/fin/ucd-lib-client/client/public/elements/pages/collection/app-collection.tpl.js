@@ -63,6 +63,14 @@ export default function render() {
       margin: auto;
     }
 
+    .collection-header h1 {
+      margin-bottom: 0;
+    }
+
+    .collection-header h3 {
+      margin: 1rem 0;
+    }
+
     a.btn--alt {
       padding-top: 0;
       padding-bottom: 0;
@@ -642,7 +650,7 @@ export default function render() {
       </div>
     </div>
 
-    <div class="collection-highlights">
+    <div class="collection-highlights" ?hidden="${this.highlightedItems.length === 0}">
       <h2>Highlights From This Collection</h2>
       ${ SharedHtml.headerDots() }
       
