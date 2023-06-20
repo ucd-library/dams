@@ -63,6 +63,14 @@ export default function render() {
       margin: auto;
     }
 
+    .collection-header h1 {
+      margin-bottom: 0;
+    }
+
+    .collection-header h3 {
+      margin: 1rem 0;
+    }
+
     a.btn--alt {
       padding-top: 0;
       padding-bottom: 0;
@@ -473,7 +481,7 @@ export default function render() {
     .edit-collections-container .collection-item span {
       display: block;
       text-align: start;
-      padding: 1rem;
+      padding: 1rem 1rem .5rem 1rem;
       font-size: 1rem;
       font-weight: bold;
     }
@@ -526,10 +534,44 @@ export default function render() {
      left: -1px;
     }
     
+    .default-display {
+      background-color: var(--color-aggie-gold-20);
+      margin: 1rem;
+    }
 
-    /* TODO transitions for admin icons and hovering */
+    .default-display h3 {
+      font-style: italic;
+      color: var(--color-aggie-blue);
+      text-align: left;
+      padding: 2rem 0 0 1rem;
+      margin-bottom: 1rem;
+    }
 
+    .default-display span.label {
+      font-weight: bold;
+    }
 
+    .default-item-display,
+    .exceptions {
+      text-align: left;
+      padding-left: 1rem;
+    }
+
+    .default-item-display .default-item-display-fs {
+      border: none; 
+      padding-left: 0; 
+      padding-top: 0; 
+      margin-top: 0;
+      padding-bottom: 0;
+      margin-bottom: 0; 
+      position: relative; 
+      left: -0.5rem;
+      top: -0.5rem;
+    }    
+
+    fieldset label {
+      padding-top: .2rem;
+    }
   </style>
   
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
@@ -608,19 +650,46 @@ export default function render() {
       </div>
     </div>
 
-    <div class="collection-highlights">
+    <div class="collection-highlights" ?hidden="${this.highlightedItems.length === 0}">
       <h2>Highlights From This Collection</h2>
       ${ SharedHtml.headerDots() }
       
       <div class="edit-collections-container" ?hidden="${!this.editMode || !this.isUiAdmin}">
 
-      <fieldset class="radio">      
+      <fieldset class="radio" style="border: none; margin: 0; padding: 0;">      
         <div>
-          <span class="form-label">Item Display</span>
+          <span class="form-label">Highlight Display</span>
           <ul class="list--reset">
-            <li><input id="six" name="radio" type="radio" class="radio" value="6" ?checked="${this.itemDisplayCount === 6}" @change="${this._onItemDisplayChange}"><label for="six">6 (recommended)</label></li>
-            <li><input id="three" name="radio" type="radio" class="radio" value="3" ?checked="${this.itemDisplayCount === 3}" @change="${this._onItemDisplayChange}"><label for="three">3</label></li>
-            <li><input id="zero" name="radio" type="radio" class="radio" value="0" ?checked="${this.itemDisplayCount === 0}" @change="${this._onItemDisplayChange}"><label for="zero">0</label></li>
+            <li>
+              <input id="six" 
+                name="radio" 
+                type="radio" 
+                class="radio" 
+                value="6" 
+                ?checked="${this.itemDisplayCount === 6}" 
+                @change="${this._onItemDisplayChange}">
+              <label for="six">6 (recommended)</label>
+            </li>
+            <li>
+              <input id="three" 
+                name="radio" 
+                type="radio" 
+                class="radio" 
+                value="3" 
+                ?checked="${this.itemDisplayCount === 3}" 
+                @change="${this._onItemDisplayChange}">
+              <label for="three">3</label>
+            </li>
+            <li>
+              <input id="zero" 
+                name="radio" 
+                type="radio" 
+                class="radio" 
+                value="0" 
+                ?checked="${this.itemDisplayCount === 0}" 
+                @change="${this._onItemDisplayChange}">
+              <label for="zero">0</label>
+            </li>
           </ul>
         </div>
       </fieldset>
@@ -628,34 +697,122 @@ export default function render() {
         <div class="card-trio" ?hidden="${this.itemDisplayCount === 0}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-1 item-ark-input" type="text" .value="${this.savedItems[0] ? '/item'+this.savedItems[0]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
+            <input class="item-1 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[0] ? '/item'+this.savedItems[0]['@id'].split('/item')[1] : ''}" 
+              placeholder="/item/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-2 item-ark-input" type="text" .value="${this.savedItems[1] ? '/item'+this.savedItems[1]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
+            <input class="item-2 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[1] ? '/item'+this.savedItems[1]['@id'].split('/item')[1] : ''}" 
+              placeholder="/item/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-3 item-ark-input" type="text" .value="${this.savedItems[2] ? '/item'+this.savedItems[2]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
+            <input class="item-3 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[2] ? '/item'+this.savedItems[2]['@id'].split('/item')[1] : ''}" 
+              placeholder="/item/ark:/..." />
           </div>
         </div>
       
         <div class="card-trio" ?hidden="${this.itemDisplayCount !== 6}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-4 item-ark-input" type="text" .value="${this.savedItems[3] ? '/item'+this.savedItems[3]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
+            <input class="item-4 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[3] ? '/item'+this.savedItems[3]['@id'].split('/item')[1] : ''}" 
+              placeholder="/item/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-5 item-ark-input" type="text" .value="${this.savedItems[4] ? '/item'+this.savedItems[4]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
+            <input class="item-5 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[4] ? '/item'+this.savedItems[4]['@id'].split('/item')[1] : ''}" 
+              placeholder="/item/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
-            <input class="item-6 item-ark-input" type="text" .value="${this.savedItems[5] ? '/item'+this.savedItems[5]['@id'].split('/item')[1] : ''}" placeholder="/item/ark:/..." />
+            <input class="item-6 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[5] ? '/item'+this.savedItems[5]['@id'].split('/item')[1] : ''}" 
+              placeholder="/item/ark:/..." />
+          </div>
+        </div>
+
+        <div class="default-display">
+          <h3>Default Display on Collection Item Pages</h3>
+
+          <div class="default-item-display">
+            <span class="label">Default Item Display</span>
+            <fieldset class="radio default-item-display-fs">
+              <div>
+                <ul class="list--reset" style="padding-inline-start: 0;">
+                  <li>
+                    <input id="two" 
+                      name="radio" 
+                      type="radio" 
+                      class="radio" 
+                      value="two" 
+                      ?checked="${this.itemDisplayDefault === 'two'}" 
+                      @change="${this._onItemDisplayDefaultChange}">
+                    <label for="two">Book Reader - 2 Page</label>
+                  </li>
+                  <li>
+                    <input id="one" 
+                      name="radio" 
+                      type="radio" 
+                      class="radio" 
+                      value="one" 
+                      ?checked="${this.itemDisplayDefault === 'one'}" 
+                      @change="${this._onItemDisplayDefaultChange}">
+                    <label for="one">Book Reader - 1 Page</label>
+                  </li>
+                  <li>
+                    <input id="list" 
+                      name="radio" 
+                      type="radio" 
+                      class="radio" 
+                      value="list" 
+                      ?checked="${this.itemDisplayDefault === 'list'}" 
+                      @change="${this._onItemDisplayDefaultChange}">
+                    <label for="list">Image List</label>
+                  </li>
+                </ul>
+              </div>
+            </fieldset>
+          </div>
+          <div class="exceptions">
+            <span class="label">Exceptions</span>
+            <p style="margin-top: 0.3rem; padding-bottom: 0; margin-bottom: 0;">
+              Checked items in this list will be reset to the default item display when saved. 
+              Display overrides can also be managed directly on an item page.
+            </p>
+            <fieldset style="border: none; padding-left: 0; padding-top: 0; margin-top: 0;">
+              <ul class="list--reset" style="padding-inline-start: 0;">
+                <li>
+                  <label for="checkbox1">
+                    <input id="checkbox1" 
+                      name="checkbox" 
+                      type="checkbox" 
+                      checked="checked">Select all exceptions
+                    </label>
+                  </li>
+
+
+                <!-- TODO loop over items with exceptions set -->
+                <li><label for="checkbox2"><input id="checkbox2" name="checkbox" type="checkbox"> Choice B</label></li>
+                <li><label for="checkbox3"><input id="checkbox3" name="checkbox" type="checkbox"> Choice C</label></li>
+
+
+              </ul>
+            </fieldset>
           </div>
         </div>
       

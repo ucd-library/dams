@@ -72,7 +72,7 @@ return html`
   .marketing-highlight__image {
     position: relative;
     overflow: hidden;
-    margin: 1rem 0;
+    margin: 1rem 0 0.5rem;
   }
 
   .marketing-highlight__image .u-background-image {
@@ -80,8 +80,10 @@ return html`
   }
 
   .marketing-highlight__title {
-    font-size: 1rem;
+    font-size: 1.2rem;
     margin-bottom: 0;
+    padding-top: 0;
+    margin-top: 0;
   }
 
   .marketing-highlight__items {

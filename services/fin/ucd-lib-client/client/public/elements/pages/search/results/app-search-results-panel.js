@@ -62,7 +62,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
 
     this.totalCollections = 0;
     this.total = "0";
-    this.numPerPage = 1;
+    this.numPerPage = 20;
     this.currentIndex = 0;
     this.currentPage = 1;
     this.showCollectionResults = false;

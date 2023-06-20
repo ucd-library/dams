@@ -239,6 +239,12 @@ export default function render() {
         }
       }
 
+      @media (max-width: 768px) {
+        .truncated-text-mobile {
+          display: none;
+        }
+      }
+
       @media (min-width: 975px) {
         .header {
           display: flex;
@@ -284,59 +290,49 @@ export default function render() {
           ></ucdlib-icon>
         </div>
         <div style="flex: 2; margin: auto;">
-          <span style="font-weight: bold"
-            >${this.total} item<span class="truncated-text"> result</span
-            >s</span
-          ><span ?hidden="${this.results.length === 0}">
+          <span style="font-weight: bold">${this.total} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.results.length === 0}">
             from
-            <a href="" @click="${this._scrollToCollections}"
-              >${this.totalCollections} collections</a
-            ></span
-          >
+            <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collections</a></span>
         </div>
       </div>
 
-      <div
-        class="header-pagination"
-        style="flex: 3; display: flex; justify-content: end"
-      >
-        <span style="text-align: right; margin: auto 0; padding-right: .5rem"
-          >Display:</span
-        >
+      <div class="header-pagination"
+        style="flex: 3; display: flex; justify-content: end">
+        <span style="text-align: right; margin: auto 0; padding-right: .5rem">Display:</span>
         <div>
           <ucdlib-icon
             icon="ucdlib-dams:result-display-grid"
             @click="${this._onLayoutToggle}"
             type="grid"
-            class="grid-layout-icon selected-layout"
-          ></ucdlib-icon>
+            class="grid-layout-icon selected-layout">
+          </ucdlib-icon>
         </div>
         <div>
           <ucdlib-icon
             icon="ucdlib-dams:result-display-mosaic"
             @click="${this._onLayoutToggle}"
             type="mosaic"
-            class="mosaic-layout-icon"
-          ></ucdlib-icon>
+            class="mosaic-layout-icon">
+          </ucdlib-icon>
         </div>
         <div>
           <ucdlib-icon
             icon="ucdlib-dams:result-display-list"
             @click="${this._onLayoutToggle}"
             type="list"
-            class="list-layout-icon"
-          ></ucdlib-icon>
+            class="list-layout-icon">
+          </ucdlib-icon>
         </div>
 
         <div class="filler"></div>
 
         <select id="numPerPage" @change="${this._onPageSizeChange}">
           <option value="50">50</option>
-          <option value="20">20</option>
-          <option value="10" selected>10</option>
+          <option value="20" selected>20</option>
+          <option value="10">10</option>
         </select>
-        <div style="margin: 0 10px; font-size: .9rem; margin: auto 0 auto 1rem">
-          items per page
+        <div style="margin: 0 10px; font-size: .875rem; margin: auto 0 auto 1rem">
+          <span class="truncated-text-mobile">items</span> per page
         </div>
       </div>
     </div>

@@ -82,7 +82,7 @@ export default function render() {
       }
 
       .searchContainer {
-        padding: 1rem 0;
+        padding: 1rem 0 0;
         display: flex;
         justify-content: center;
         background-color: var(--color-aggie-blue-30);
@@ -106,6 +106,9 @@ export default function render() {
           text-align: center;
           margin-bottom: 1rem;
           padding-top: 2rem;
+        }
+        .site-name-search a {
+          color: var(--color-aggie-blue) !important;
         }
         app-search-box {
           width: 80%;
@@ -168,7 +171,7 @@ export default function render() {
 
     <div class="searchContainer">
       <div style="margin: 1rem auto 0;">
-        <h2 class="site-name-search">Digital Collections</h2>
+        <h2 class="site-name-search"><a href="/">Digital Collections</a></h2>
         <app-search-box
           id="searchBox"
           @search="${this._onSearch}"
@@ -184,7 +187,7 @@ export default function render() {
 
     <div id="filter-box">
       <app-top-active-filters></app-top-active-filters>
-      <div class="add-filter-container" style="padding: 1rem;">
+      <div class="add-filter-container">
         <div class="add-filter" @click="${this._onExpandFilters}">
           <div class="add">
             <ucdlib-icon

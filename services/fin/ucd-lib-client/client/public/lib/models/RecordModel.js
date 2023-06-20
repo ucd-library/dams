@@ -123,7 +123,7 @@ class RecordModel extends ElasticSearchModel {
           ])
         ),
         "",
-        "10",
+        "20",
       ]);
 
       if (this.lastQuery === query) return;

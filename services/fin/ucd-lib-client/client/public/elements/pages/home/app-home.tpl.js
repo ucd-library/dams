@@ -281,12 +281,20 @@ export default function render() {
     color: var(--color-white);
     text-decoration: underline;
   }
+
+  .priority-links {
+    padding-top: 2rem;
+  }
+
+  .priority-links__item {
+    padding-top: 0;
+  }
+
   .browse-buttons {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-flow: row wrap;
-    padding-top: 40px;
     /* padding-bottom: 4rem; */
     background-color: var(--color-white);
   }
@@ -836,7 +844,7 @@ ${
       )}
 
       <div class="featured-more">
-        <a href="/browse/collections" class="btn btn--primary">Browse all collections</a>
+        <a href="/browse/collections" class="btn btn--primary btn--lg">Browse all collections</a>
       </div>
   </section>
 
@@ -847,7 +855,7 @@ ${
     <div class="about-content">
       <h1>About<br><span class="fw-light">Digital Collections</span></h1>
       ${SharedHtml.headerDots()}
-      <p>
+      <p style="padding-bottom: 1rem;">
         The UC Davis Digital Collections is a locally developed repository designed
         to store and manage the digital assets of UC Davis Library, increasing access
         to previously undiscoverable digital assets.

@@ -50,16 +50,6 @@ class AppCollection extends Mixin(LitElement)
     this._onCollectionUpdate(await this.CollectionModel.get(this.AppStateModel.location.pathname));
   }
 
-  // willUpdate() {
-  //   // this._showAdminPanel();
-  //   // could we check if this.adminRendered is false here to hide the admin section? or possibly recall the showAdmin function?
-  //   if( !this.adminRendered && !this.collectionId ) {
-  //     // this.collectionId = window.location.pathname;
-  //   } else if( !this.adminRendered && this.collectionId ) {
-  //     this._showAdminPanel();
-  //   }
-  // }
-
   /**
    * @method _onAppStateUpdate
    * @description on the App update, the state is determined and by checking
@@ -146,7 +136,7 @@ class AppCollection extends Mixin(LitElement)
     this.displayData = [];
     // this.isAdmin = user.hasRole('admin');
     this.isUiAdmin = user.canEditUi();
-    this.editMode = false;
+    this.editMode = true;
     this.itemDisplayCount = 6;
   }
 

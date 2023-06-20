@@ -105,16 +105,23 @@ export default function render() {
       }
 
       .part-of .collection-info h4 {
-        margin: 0.3rem 0;
+        margin: 0.3rem 0 0;
+        font-size: 1.2rem;
+      }
+
+      .part-of .collection-info h4 a {
+        color: var(--color-aggie-blue);
+        text-decoration: none;
       }
 
       .part-of .collection-info p {
         margin: 0;
       }
 
-      .part-of .collection-info a {
+      .part-of .collection-info span {
         font-weight: 800;
         text-decoration: none;
+        color: var(--color-aggie-blue-80);
       }
 
       #identifierValue a,
@@ -162,8 +169,8 @@ export default function render() {
         <div><img src="${this.collectionImg}" alt="" /></div>
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
-          <h4>${this.collectionName}</h4>
-          <a href="${this.collectionId}">${this.collectionItemCount} items</a>
+          <h4><a href="${this.collectionId}">${this.collectionName}</a></h4>
+          <span>${this.collectionItemCount} items</span>
         </div>
       </div>
 

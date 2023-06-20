@@ -26,7 +26,7 @@ class ElasticSearchModel extends BaseModel {
       text : '',
       filters : {},
       sort : null,
-      limit : 10,
+      limit : 20,
       offset : 0,
       facets : this.facets
     };
@@ -61,7 +61,7 @@ class ElasticSearchModel extends BaseModel {
           searchDoc.sort = part ? JSON.parse(part) : null;
           break;
         case 3:
-          searchDoc.limit = part ? parseInt(part) : 10;
+          searchDoc.limit = part ? parseInt(part) : 20;
           break;
         case 4:
           searchDoc.offset = part ? parseInt(part) : 0;
