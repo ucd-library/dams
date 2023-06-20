@@ -99,6 +99,11 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this._resizeAsync();
   }
 
+  willUpdate() {
+    let search = this.SearchVcModel.getSearch();
+    this.totalCollections = search?.payload?.matchedCollections?.length || 0;
+  }
+
   /**
    * @method renderResults
    * @description renderResults results of search query
@@ -320,36 +325,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     let maxHeight = Math.max.apply(Math, colHeights);
     this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
     this.requestUpdate();
-
-    /*
-    function resizeGridItem(item){
-      grid = document.getElementsByClassName("grid")[0];
-      rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
-      rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
-      rowSpan = Math.ceil((item.querySelector('.content').getBoundingClientRect().height+rowGap)/(rowHeight+rowGap));
-        item.style.gridRowEnd = "span "+rowSpan;
-    }
-
-    function resizeAllGridItems(){
-      allItems = document.getElementsByClassName("item");
-      for(x=0;x<allItems.length;x++){
-        resizeGridItem(allItems[x]);
-      }
-    }
-
-    function resizeInstance(instance){
-      item = instance.elements[0];
-      resizeGridItem(item);
-    }
-
-    window.onload = resizeAllGridItems();
-    window.addEventListener("resize", resizeAllGridItems);
-
-    allItems = document.getElementsByClassName("item");
-    for(x=0;x<allItems.length;x++){
-      imagesLoaded( allItems[x], resizeInstance);
-    }
-    */
   }
 
   /**
@@ -431,17 +406,11 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
         collections.push(result.collectionId["@id"]);
       }
     });
-    this.totalCollections = collections.length;
-  }
 
-  // _onCollectionSearchUpdate(e) {
-  //   if( e.state !== 'loaded' ) return;
-  //   if( !e.payload.results.length ) {
-  //     this.totalCollections = 0;
-  //   } else {
-  //     this.totalCollections = e.payload.results.length;
-  //   }
-  // }
+    this.totalCollections = collections.length;
+    console.log('this.totalCollections', this.totalCollections);
+
+  }
 
   /**
    * @method _onCollectionClicked

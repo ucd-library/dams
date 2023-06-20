@@ -39,13 +39,15 @@
       "type" : "keyword" 
     },
 
-    "@graph.about.name" : {
-      "type" : "text",
-      "analyzer": "autocomplete", 
-      "search_analyzer": "autocomplete_search",
+    "@graph.subjects.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.subjects.name" : {
+      "type" : "keyword",
       "fields": {
-        "raw": { 
-          "type":  "keyword"
+        "text": { 
+          "type":  "text"
         }
       }
     },
@@ -82,6 +84,10 @@
     },
 
     "@graph.fileFormat" : {
+      "type" : "keyword"
+    },
+
+    "@graph.fileFormatSimple" : {
       "type" : "keyword"
     },
 

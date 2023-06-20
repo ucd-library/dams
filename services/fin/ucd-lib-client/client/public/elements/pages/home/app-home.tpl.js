@@ -657,7 +657,7 @@ export default function render() {
 
     <div class="hero-main site-frame">
       <h1 class="color-light">Digital Collections</h1>
-      <div class="sub-heading h4 color-light">Explore digitized items from the <a href="">UC Davis Library</a> collections.</div>
+      <div class="sub-heading h4 color-light">Explore digitized items from the <a href="https://library.ucdavis.edu/">UC Davis Library</a> collections.</div>
       <app-search-box
         id="searchBox"
         @search="${this._onSearch}"

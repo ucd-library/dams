@@ -60,6 +60,23 @@ class Validate {
       }
     }
 
+    // check subjects
+    if( !graph.subjects ) {
+      result.warnings.push('No subjects found');
+    } else {
+      let found = false;
+      for( let subject of graph.subjects ) {
+        if( subject.name ) {
+          found = true;
+        } else {
+          result.comments.push('Subject has no name: '+JSON.stringify(subject));
+        }
+      }
+      if( !found ) {
+        result.warnings.push('No subjects found with a name');
+      }
+    }
+
     // media checks
     if( graph.clientMedia.mediaGroups.length === 0 ) {
       result.errors.push('No media groups found');

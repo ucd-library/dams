@@ -36,7 +36,7 @@ class CollectionVcModel {
       description: rootNode.description,
       title: rootNode.name,
       images,
-      keywords: rootNode.keywords || [],
+      subjects: rootNode.subjects || [],
       callNumber,
       count: rootNode.itemCount,
       yearPublished: rootNode.yearPublished,

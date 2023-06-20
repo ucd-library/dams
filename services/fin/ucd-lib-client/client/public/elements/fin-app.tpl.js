@@ -161,10 +161,9 @@ export default function render() {
       </div>
 
       <div class="main-content">
-        <iron-pages
+        <ucdlib-pages
           selected="${this.page}"
-          attr-for-selected="id"
-          selected-attribute="visible"
+          selectedAttribute="visible"
         >
           <div id="loading" ?hidden="${this.page}">
             <img src="/images/logos/logo-icon.svg" style="max-width: 128px" />
@@ -180,7 +179,7 @@ export default function render() {
           <app-browse id="browse"></app-browse>
           <app-about id="about"></app-about>
           <app-collection id="collection"></app-collection>
-        </iron-pages>
+        </ucdlib-pages>
         <div class="footer site-frame">
           <ucdlib-site-footer>
             <ucdlib-site-footer-column header="Digital Collections">

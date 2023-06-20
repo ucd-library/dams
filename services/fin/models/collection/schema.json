@@ -20,15 +20,15 @@
       }
     },
 
-    "@graph.keywords" : {
-      "type" : "text"
+    "@graph.subjects.@id" : {
+      "type" : "keyword"
     },
 
-    "@graph.about.name" : {
-      "type" : "text",
+    "@graph.subjects.name" : {
+      "type" : "keyword",
       "fields": {
-        "raw": { 
-          "type":  "keyword"
+        "text": { 
+          "type":  "text"
         }
       }
     },

@@ -100,10 +100,10 @@ class CollectionModel extends BaseModel {
       return this.service.search(searchDocument);
     }
 
-    getRecentCollections() {
+    getRecentCollections(limit=3) {
       // TODO: change to 'uploadDate'
       let searchDocument = {
-        limit: 3,
+        limit,
         sort: [{
           '@graph.datePublished': {order : "desc", "unmapped_type": "date"} 
         }]

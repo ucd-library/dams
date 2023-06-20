@@ -37,8 +37,8 @@ class RecordVcModel {
         }
       }
 
-      let keywords = root.about || [];
-      if( !Array.isArray(keywords) ) keywords = [keywords];
+      let subjects = root.subjects || [];
+      if( !Array.isArray(subjects) ) subjects = [subjects];
 
       let images;
       if( e.payload?.clientMedia?.mediaGroups ) {
@@ -61,7 +61,7 @@ class RecordVcModel {
         images,
         date: root.yearPublished || 'Undated',
         publisher: root?.publisher?.name,
-        keywords,
+        subjects,
         callNumber,
         arkDoi: ["?"],
         fedoraLinks: ["?"],

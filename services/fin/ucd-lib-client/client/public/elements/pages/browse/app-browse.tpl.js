@@ -186,9 +186,8 @@ export default function render() {
     <app-browse-by
       id="subject"
       label="Subject"
-      facet-query-name="@graph.about.name.raw"
-      ?hidden="${this.page !== "/browse/subject"}"
-    >
+      facet-query-name="@graph.subjects.name"
+      ?hidden="${this.page !== "/browse/subject"}">
       <img
         class="header-icon"
         slot="header-icon"
@@ -199,8 +198,7 @@ export default function render() {
       id="creator"
       label="Creator"
       facet-query-name="@graph.creator.name"
-      ?hidden="${this.page !== "/browse/creator"}"
-    >
+      ?hidden="${this.page !== "/browse/creator"}">
       <img
         class="header-icon"
         slot="header-icon"
@@ -211,8 +209,7 @@ export default function render() {
       id="format"
       label="Format"
       facet-query-name="@graph.fileFormat"
-      ?hidden="${this.page !== "/browse/format"}"
-    >
+      ?hidden="${this.page !== "/browse/format"}">
       <img
         class="header-icon"
         slot="header-icon"

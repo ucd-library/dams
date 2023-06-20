@@ -621,7 +621,7 @@ export default function render() {
         
         <h1>${this.title}</h1>
         <h3 ?hidden="${!this.callNumber}">Collection #${this.callNumber}</h3>
-        <a href="${this._href}" class="btn--alt btn--round">View ${this.items} items</a>
+        <a href="${this.collectionSearchHref}" class="btn--alt btn--round">View ${this.items} items</a>
       </div>
     </div>
 
@@ -643,7 +643,7 @@ export default function render() {
       </div>
       <div style="margin-bottom: .4rem;" ?hidden="${!this.keywords || !this.keywords.length}">
         <span class="label">Subjects: </span> 
-        ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="">${item}</a>`)}
+        ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="${item.href}">${item.label}</a>`)}
       </div>
       <div style="margin-bottom: 3rem;">
         <span class="label">Finding Aid: </span> <a href="">Online Archive of California</a>

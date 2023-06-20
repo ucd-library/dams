@@ -57,11 +57,6 @@ module.exports = async function(path, graph, headers, utils) {
   });
 
   await utils.add({
-    attr : 'keywords',
-    value : ['schema', 'keywords']
-  });
-
-  await utils.add({
     attr : 'creator',
     value : ['schema', 'creator'],
     type : 'id'
@@ -71,11 +66,6 @@ module.exports = async function(path, graph, headers, utils) {
     attr : 'publisher',
     value : ['schema', 'publisher'],
     type : 'id'
-  });
-
-  await utils.add({
-    attr : 'createdBy',
-    value : ['fedora', 'createdBy']
   });
 
   await utils.add({
@@ -132,16 +122,34 @@ module.exports = async function(path, graph, headers, utils) {
     type : 'date'
   });
 
+  // both schema:keywords and schema:about are used for subjects
   await utils.add({
-    attr : 'lastModifiedBy',
-    value : ['fedora', 'lastModifiedBy']
-  });
-
-  await utils.add({
-    attr : 'about',
+    attr : 'subjects',
     value : ['schema', 'about'],
     type : 'id'
   });
+
+  await utils.add({
+    attr : 'subjects',
+    value : ['schema', 'keywords'],
+    parser : (value) => {
+      if( typeof value === 'string' ) {
+        return {name: value};
+      }
+      return value;
+    }
+  });
+
+  // remove duplicate subjects
+  if( item.subjects && Array.isArray(item.subjects) ) {
+    let subjects = {};
+    item.subjects = item.subjects.filter(subject => {
+      if( !subject.name ) return true;
+      if( subjects[subject.name] ) return false;
+      subjects[subject.name] = true;
+      return true;
+    });
+  }
 
   await utils.add({
     attr : 'datePublished',

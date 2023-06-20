@@ -23,7 +23,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
       collectionItemCount: { type: Number },
       date: { type: String },
       publisher: { type: String },
-      keywords: { type: Array },
+      subjects: { type: Array },
       callNumber: { type: String },
       size: { type: String },
       rights: { type: Object },
@@ -48,7 +48,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
 
     this.date = "";
     this.publisher = "";
-    this.keywords = [];
+    this.subjects = [];
     this.callNumber = "";
     this.collectionImg = "";
     this.collectionId = "";
@@ -97,7 +97,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
     this.collectionName = this.record.collectionName;
     this.date = this.record.date;
     this.publisher = this.record.publisher;
-    this.keywords = this.record.keywords || [];
+    this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
     this.collectionImg = this.record.images?.small?.url                   
                       || this.record.images?.medium?.url 

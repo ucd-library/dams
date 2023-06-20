@@ -4,6 +4,8 @@ import render from "./fin-app.tpl.js";
 // sets globals Mixin and EventInterface
 import "@ucd-lib/cork-app-utils";
 
+import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js'
+
 // styles
 import "./styles/shared-styles";
 
@@ -114,7 +116,10 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
   async _onAppStateUpdate(e) {
     this.drawerOpen = e.filtersDrawerOpen ? true : false;
 
-    if (e.location.page === this.page) return;
+    if (e.location.page === this.currentPage) return;
+    this.currentPage = e.location.page;
+
+    console.log('FinApp._onAppStateUpdate', e);
 
     this.showBreadcrumb = this.BREADCRUMB_PAGES.includes(e.location.page);
     this.showSearchHeader = this.SEARCH_HEADER_PAGES.includes(e.location.page);

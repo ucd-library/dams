@@ -88,17 +88,37 @@ class AppHome extends Mixin(LitElement)
       }
     }
 
-    let d = await this.CollectionModel.getHomepageDefaultCollections();
-    if( d.response.ok && d.body.results.length ) {
-      this.featuredCollections = d.body.results;
+    // filter out collections that don't exist in fcrepo
+    let cardsPanels = this.displayData.filter(d => d.type === 'cards');
+    cardsPanels.forEach(async panel => {
+      let collectionIds = [];
+
+      panel.collectionIds.forEach(collectionId => {
+        if( APP_CONFIG.collectionLabels[collectionId] ) collectionIds.push(collectionId);
+      });
+      panel.collectionIds = collectionIds;
+      
+      // if( panel.collectionIds.length < 3) {
+      //   let data = await this.CollectionModel.getRecentCollections(3 - panel.collectionIds.length + 1);
+      //   if( data.response.ok && data.body.results.length ) {
+      //     panel.collectionIds.push(data.body.results.map((r, index) => { 
+      //       return  { position: index, selected: r.root['@id'] };
+      //     }));
+      //   }
+      // }
+    });
+
+    let data = await this.CollectionModel.getHomepageDefaultCollections();
+    if( data.response.ok && data.body.results.length ) {
+      this.featuredCollections = data.body.results;
       this.featuredCollectionsCt = this.featuredCollections.length;
     }
 
     // get recent collections
-    d = await this.CollectionModel.getRecentCollections();
+    data = await this.CollectionModel.getRecentCollections();
     
-    if( d.response.ok && d.body.results.length ) {
-      this.recentCollections = d.body.results;
+    if( data.response.ok && data.body.results.length ) {
+      this.recentCollections = data.body.results;
     }
 
     // Get hero image options

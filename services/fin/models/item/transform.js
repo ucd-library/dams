@@ -49,12 +49,6 @@ module.exports = async function(path, graph, headers, utils) {
   });
 
   await utils.add({
-    attr : 'about',
-    value : ['schema', 'about'],
-    type : 'id'
-  });
-
-  await utils.add({
     attr : 'alternativeHeadline',
     value : ['schema', 'alternativeHeadline']
   });
@@ -74,11 +68,6 @@ module.exports = async function(path, graph, headers, utils) {
   await utils.add({
     attr : 'contentSize',
     value : ['schema', 'contentSize']
-  });
-
-  await utils.add({
-    attr : 'createdBy',
-    value : ['fedora', 'createdBy']
   });
 
   await utils.add({
@@ -111,6 +100,26 @@ module.exports = async function(path, graph, headers, utils) {
   await utils.add({
     attr : 'fileFormat',
     value : ['ebucore', 'hasMimeType']
+  });
+
+  await utils.add({
+    attr : 'fileFormatSimple',
+    value : ['ebucore', 'hasMimeType'],
+    parser : (value) => {
+      console.log('VALUE', value, value.split('/'));
+      let parts = value.split('/');
+
+      if( parts[0] === 'video' ) return 'video';
+      if( parts[0] === 'audio' ) return 'audio';
+      if( parts[0] === 'image' ) return 'image';
+      
+      if( value === 'text/plain' ) return 'text';
+      if( value === 'application/pdf' ) return 'pdf';
+
+      console.log(parts, value);
+     
+      return null;
+    }
   });
 
   await utils.add({
@@ -153,10 +162,34 @@ module.exports = async function(path, graph, headers, utils) {
     type : 'id'
   });
 
+  // both schema:keywords and schema:about are used for subjects
   await utils.add({
-    attr : 'keywords',
-    value : ['schema', 'keywords']
+    attr : 'subjects',
+    value : ['schema', 'about'],
+    type : 'id'
   });
+
+  await utils.add({
+    attr : 'subjects',
+    value : ['schema', 'keywords'],
+    parser : (value) => {
+      if( typeof value === 'string' ) {
+        return {name: value};
+      }
+      return value;
+    }
+  });
+
+  // remove duplicate subjects
+  if( item.subjects && Array.isArray(item.subjects)) {
+    let subjects = {};
+    item.subjects = item.subjects.filter(subject => {
+      if( !subject.name ) return true;
+      if( subjects[subject.name] ) return false;
+      subjects[subject.name] = true;
+      return true;
+    });
+  }
 
   await utils.add({
     attr : 'language',
@@ -167,11 +200,6 @@ module.exports = async function(path, graph, headers, utils) {
     attr : 'lastModified',
     value : ['fedora', 'lastModified'],
     type : 'date'
-  });
-
-  await utils.add({
-    attr : 'lastModifiedBy',
-    value : ['fedora', 'lastModifiedBy']
   });
 
   await utils.add({

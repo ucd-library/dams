@@ -31,7 +31,8 @@ class AppCollection extends Mixin(LitElement)
       // isAdmin : { type : Boolean },
       isUiAdmin : { type : Boolean },
       editMode : { type : Boolean },
-      itemDisplayCount : { type : Number }
+      itemDisplayCount : { type : Number },
+      collectionSearchHref : {type: String}
     };
   }
 
@@ -81,16 +82,27 @@ class AppCollection extends Mixin(LitElement)
     if( e.state !== 'loaded' ) return;
     if( this.AppStateModel.location.page !== 'collection' ) return;
 
+    let searchObj = this.RecordModel.emptySearchDocument();
+    this.RecordModel.appendKeywordFilter(searchObj, '@graph.isPartOf.@id', e.vcData.id);
+    this.collectionSearchHref = '/search/'+this.RecordModel.searchDocumentToUrl(searchObj);
+
     this.collectionId = e.vcData.id;
 
     this.description = e.vcData.description
     this.title = e.vcData.title;
     
-    // TODO fix, vc data is not being set correctly
-    this.thumbnailUrl = e.vcData.images || '';
+    this.thumbnailUrl = e.vcData.images?.medium?.url || e.vcData.images?.original?.url || ''; 
     
     this.callNumber = e.vcData.callNumber;
-    this.keywords = e.vcData.keywords;
+    this.keywords = (e.vcData.keywords || [])
+      .map(keyword => {
+        let searchObj = this.RecordModel.emptySearchDocument();
+        this.RecordModel.appendKeywordFilter(searchObj, '@graph.keywords', keyword);
+        return {
+          label : keyword,
+          href : '/search/'+this.RecordModel.searchDocumentToUrl(searchObj)
+        }
+      });
     this.items = e.vcData.count;
     this.yearPublished = e.vcData.yearPublished;
 
@@ -374,7 +386,8 @@ class AppCollection extends Mixin(LitElement)
   async _onFileChange(e) {  
     let selectedFilename = e.target.value.split('\\').pop();
     if( !selectedFilename.length ) return;
-  
+
+    
     // replace current thumbnail with new image
     let file = e.target.files[0];
     this.shadowRoot.querySelector('.featured-image').style.backgroundImage = 'url('+window.URL.createObjectURL(file)+')';

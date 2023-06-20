@@ -32,7 +32,6 @@ export default function render() {
 
       .rm-btn {
         font-weight: bold;
-        text-transform: lowercase;
         display: inline-block;
         margin: 0.5rem;
         cursor: pointer;

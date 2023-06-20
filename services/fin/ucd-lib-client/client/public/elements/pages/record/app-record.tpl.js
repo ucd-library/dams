@@ -199,17 +199,15 @@ export default function render() {
       </div>
 
       <div
-        ?hidden="${!this.keywords || !this.keywords.length}"
+        ?hidden="${!this.subjects || !this.subjects.length}"
         class="metadata-row"
-        id="subject"
-      >
+        id="subject">
         <div class="attr">Subjects</div>
         <div class="value" id="subjectValue">
-          ${this.keywords.map(
+          ${this.subjects.map(
             (about, index) =>
               html`${index > 0 ? ", " : ""}<a href="${about["@id"]}"
-                  >${about["name"] || about["@id"]}</a
-                >`
+                  >${about["name"] || about["@id"]}</a>`
           )}
         </div>
       </div>
