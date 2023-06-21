@@ -1,9 +1,10 @@
 import { LitElement} from 'lit';
 
 import render from "./app-normal-checkbox.tpl.js"
-
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 export class AppNormalCheckbox extends Mixin(LitElement)
-    .with(LitCorkUtils) {
+    .with(LitCorkUtils, MainDomElement) {
   
   static get properties() {
     return {

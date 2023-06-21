@@ -96,6 +96,15 @@ export default function render() {
         right: 0;
         background-image: url("https://via.placeholder.com/25");
       }
+
+      @media (max-width: 768px) {
+        .image {
+          margin: auto;
+        }
+        .card-text {
+          text-align: center;
+        }
+      }
     </style>
 
     <!--hidden$="${!this.isImage}" -->

@@ -1,9 +1,10 @@
 import { LitElement } from "lit";
 import "../../../utils/app-range-slider";
 import render from "./app-range-filter.tpl.js";
-
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 export default class AppRangeFilter extends Mixin(LitElement).with(
-  LitCorkUtils
+  LitCorkUtils, MainDomElement
 ) {
   static get properties() {
     return {
@@ -42,10 +43,10 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
   }
 
   resize() {
-    this.shadowRoot.querySelector("#slider")._onResize();
+    document.querySelector("#slider")._onResize();
 
     setTimeout(() => {
-      this.shadowRoot.querySelector("#slider")._onResize();
+      document.querySelector("#slider")._onResize();
     }, 100);
   }
 
@@ -74,8 +75,8 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     this.minValue = e.detail.min;
     this.maxValue = e.detail.max;
 
-    this.shadowRoot.querySelector("#minValueInput").value = this.minValue;
-    this.shadowRoot.querySelector("#maxValueInput").value = this.maxValue;
+    document.querySelector("#minValueInput").value = this.minValue;
+    document.querySelector("#maxValueInput").value = this.maxValue;
 
     this._onRangeNullChange();
   }
@@ -91,7 +92,7 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
       lte: this.maxValue,
     };
 
-    if (this.shadowRoot.querySelector("#unknown").checked) {
+    if (document.querySelector("#unknown").checked) {
       value.includeNull = true;
     }
 
@@ -109,15 +110,15 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
    * @description bound to min/max number inputs.
    */
   _onInputChange() {
-    let min = this.shadowRoot.querySelector("#minValueInput").value;
-    let max = this.shadowRoot.querySelector("#maxValueInput").value;
+    let min = document.querySelector("#minValueInput").value;
+    let max = document.querySelector("#maxValueInput").value;
 
     if (min < this.absMinValue) {
-      this.shadowRoot.querySelector("#minValueInput").value = this.absMinValue;
+      document.querySelector("#minValueInput").value = this.absMinValue;
       min = this.absMinValue;
     }
     if (max > this.absMaxValue) {
-      this.shadowRoot.querySelector("#maxValueInput").value = this.absMaxValue;
+      document.querySelector("#maxValueInput").value = this.absMaxValue;
       max = this.absMaxValue;
     }
     if (min > max) min = max;
@@ -180,11 +181,11 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     // make sure any current values are set correctly
     if (this.minValue < this.absMinValue || !this.currentFilters[this.filter]) {
       this.minValue = this.absMinValue;
-      this.shadowRoot.querySelector("#minValueInput").value = this.minValue;
+      document.querySelector("#minValueInput").value = this.minValue;
     }
     if (this.maxValue > this.absMaxValue || !this.currentFilters[this.filter]) {
       this.maxValue = this.absMaxValue;
-      this.shadowRoot.querySelector("#maxValueInput").value = this.maxValue;
+      document.querySelector("#maxValueInput").value = this.maxValue;
     }
 
     // now set the current filters from search
@@ -193,15 +194,15 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
 
       this.minValue = value.gte;
       this.maxValue = value.lte;
-      this.shadowRoot.querySelector("#minValueInput").value = this.minValue;
-      this.shadowRoot.querySelector("#maxValueInput").value = this.maxValue;
-      this.shadowRoot.querySelector("#unknown").checked = value.includeNull
+      document.querySelector("#minValueInput").value = this.minValue;
+      document.querySelector("#maxValueInput").value = this.maxValue;
+      document.querySelector("#unknown").checked = value.includeNull
         ? true
         : false;
     }
 
     // to trigger slider rerender when filters are removed
-    let rangeSlider = this.shadowRoot.querySelector("app-range-slider");
+    let rangeSlider = document.querySelector("app-range-slider");
     if (rangeSlider) {
       rangeSlider.hasRendered = false;
     }
@@ -219,7 +220,7 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     if (
       this.minValue === this.absMinValue &&
       this.maxValue === this.absMaxValue &&
-      this.shadowRoot.querySelector("#unknown").checked === true
+      document.querySelector("#unknown").checked === true
     ) {
       return false;
     }
@@ -237,7 +238,7 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     if (
       this.minValue !== this.absMinValue ||
       this.maxValue !== this.absMaxValue ||
-      !this.shadowRoot.querySelector("#unknown").checked
+      !document.querySelector("#unknown").checked
     ) {
       selected = true;
     }
@@ -277,7 +278,7 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
   reset() {
     this.minValue = this.absMinValue;
     this.maxValue = this.absMaxValue;
-    this.shadowRoot.querySelector("#unknown").checked = true;
+    document.querySelector("#unknown").checked = true;
 
     this._onRangeNullChange();
   }

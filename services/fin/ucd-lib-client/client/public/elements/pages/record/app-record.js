@@ -1,5 +1,7 @@
 import { LitElement } from "lit";
 import render from "./app-record.tpl.js";
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import { markdown } from "markdown";
 import rightsDefinitions from "../../../lib/rights.json";
@@ -11,7 +13,9 @@ import "./app-fs-media-download";
 import "./viewer/app-media-viewer";
 import "../../components/citation";
 
-class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
+class AppRecord extends Mixin(LitElement)
+  .with(MainDomElement, LitCorkUtils) {
+  
   static get properties() {
     return {
       record: { type: Object },
@@ -247,7 +251,7 @@ class AppRecord extends Mixin(LitElement).with(LitCorkUtils) {
   }
 
   _onBookViewPageChange(e) {
-    let appMediaDownload = this.shadowRoot.querySelector('app-media-download');
+    let appMediaDownload = document.querySelector('app-media-download');
     if( appMediaDownload ) {
       appMediaDownload.brPageChange(e.detail);
     }

@@ -39,10 +39,10 @@ export default function render() {
 
       iron-pages {
         /* flex: 1; */
-        min-height: 250px;
+        /* min-height: 250px;
         display: flex;
         justify-content: center;
-        flex-direction: column;
+        flex-direction: column; */
       }
 
       img {
@@ -195,10 +195,10 @@ export default function render() {
     <div class="wrapper" style="position: relative;">
       <app-image-viewer-lightbox id="lightbox"></app-image-viewer-lightbox>
 
-      <iron-pages
+      <ucdlib-pages
         selected="${this.mediaType}"
         attr-for-selected="id"
-        selected-attribute="visible">
+        selectedAttribute="visible">
         <!-- <app-360-image-viewer id="360"></app-360-image-viewer> -->
         <div id="bagoffiles">
           <iron-icon
@@ -220,7 +220,7 @@ export default function render() {
         </app-bookreader-viewer>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>
-      </iron-pages>
+      </ucdlib-pages>
 
       <div
         class="search-side-panel ${this.brFullscreen

@@ -3,9 +3,11 @@ import { LitElement } from "lit";
 import "./app-range-filter"
 import render from "./app-filter-panel.tpl.js"
 import "./app-facet-filter"
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 export class AppFilterPanel extends Mixin(LitElement)
-    .with(LitCorkUtils) {
+    .with(LitCorkUtils, MainDomElement) {
 
   static get properties() {
     return {
