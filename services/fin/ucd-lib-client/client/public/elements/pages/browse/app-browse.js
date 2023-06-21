@@ -1,10 +1,12 @@
 import { LitElement} from 'lit';
 import render from "./app-browse.tpl.js";
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '../../utils/app-browse-by';
 
 class AppBrowse extends Mixin(LitElement) 
-      .with(LitCorkUtils) {
+  .with(MainDomElement, LitCorkUtils) {
 
   static get properties() {
     return {

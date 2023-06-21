@@ -1,5 +1,7 @@
 import { LitElement, html } from "lit";
 import render from "./fin-app.tpl.js";
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 // sets globals Mixin and EventInterface
 import "@ucd-lib/cork-app-utils";
@@ -21,7 +23,9 @@ import "./components/site/ucdlib-site-footer";
 import "./components/site/ucdlib-site-footer-column";
 import "./components/graphics/dams-watercolor-overlay";
 
-export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
+export class FinApp extends Mixin(LitElement)
+  .with(MainDomElement, LitCorkUtils) {
+  
   static get properties() {
     return {
       page: { type: String },
@@ -183,7 +187,7 @@ export class FinApp extends Mixin(LitElement).with(LitCorkUtils) {
   }
 
   _expandSearchFilters(e) {
-    let appSearch = this.shadowRoot.querySelector("app-search");
+    let appSearch = document.querySelector("app-search");
     if (appSearch) {
       appSearch.expandFilters();
     }

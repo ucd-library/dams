@@ -1,5 +1,7 @@
 import { LitElement} from 'lit';
 import render from "./app-collection.tpl.js";
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 
@@ -9,7 +11,7 @@ import '../../components/citation';
 import user from '../../../lib/utils/user.js';
 
 class AppCollection extends Mixin(LitElement) 
-    .with(LitCorkUtils) {
+  .with(MainDomElement, LitCorkUtils) {
 
   static get properties() {
     return {
@@ -178,7 +180,7 @@ class AppCollection extends Mixin(LitElement)
   _onItemDisplayChange(e) {
     this.itemDisplayCount = parseInt(e.target.value);
     
-    let itemInputs = this.shadowRoot.querySelectorAll('.item-ark-input');
+    let itemInputs = document.querySelectorAll('.item-ark-input');
     itemInputs.forEach((input, index) => {
       if( index+1 > this.itemDisplayCount ) {
         input.value = '';
@@ -213,7 +215,7 @@ class AppCollection extends Mixin(LitElement)
     // parse highlighted items
     this.savedItems = [];
     let newSavedItems = [];
-    let itemInputs = this.shadowRoot.querySelectorAll('.item-ark-input');
+    let itemInputs = document.querySelectorAll('.item-ark-input');
     itemInputs.forEach((input, index) => {
       if( input.value ) {
         newSavedItems.push({
@@ -225,7 +227,7 @@ class AppCollection extends Mixin(LitElement)
     this.savedItems = [...newSavedItems];
     
     this._updateDisplayData();
-    let featuredImage = this.shadowRoot.querySelector('#file-upload').files[0];
+    let featuredImage = document.querySelector('#file-upload').files[0];
     await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, featuredImage);
     
     this.editMode = false;
@@ -390,7 +392,7 @@ class AppCollection extends Mixin(LitElement)
     
     // replace current thumbnail with new image
     let file = e.target.files[0];
-    this.shadowRoot.querySelector('.featured-image').style.backgroundImage = 'url('+window.URL.createObjectURL(file)+')';
+    document.querySelector('.featured-image').style.backgroundImage = 'url('+window.URL.createObjectURL(file)+')';
   }
   
 }

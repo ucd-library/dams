@@ -1,4 +1,6 @@
 import { LitElement} from 'lit';
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "../../utils/app-collection-card";
 
@@ -36,7 +38,7 @@ import render from './app-home.tpl.js';
  * @prop {Object} heroImgCurrent - The currently displayed hero image.
  */
 class AppHome extends Mixin(LitElement)
-  .with(LitCorkUtils) {
+  .with(MainDomElement, LitCorkUtils) {
   
   static get properties() {
     return {
@@ -160,7 +162,7 @@ class AppHome extends Mixin(LitElement)
     if( !this.isUiAdmin ) return;
     // save to fcrepo container
     //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
-    let adminPanel = this.shadowRoot.querySelector('admin-featured-collections');
+    let adminPanel = document.querySelector('admin-featured-collections');
     if( adminPanel ) {
       adminPanel._updatePanelsData();
       this.displayData = adminPanel.panels;

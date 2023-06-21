@@ -1,4 +1,6 @@
 import { LitElement } from "lit";
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "@internetarchive/bookreader/src/BookReader.js";
 
@@ -22,9 +24,9 @@ import render from "./app-bookreader-viewer.tpl.js";
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 import "../../../utils/app-icons";
 
-export default class AppBookReaderViewer extends Mixin(LitElement).with(
-  LitCorkUtils
-) {
+export default class AppBookReaderViewer extends Mixin(LitElement)
+  .with(MainDomElement, LitCorkUtils) {
+
   static get properties() {
     return {
       loading: { type: Boolean },
@@ -83,7 +85,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
       this._renderBookReaderAsync();
       this._movePrevNext();
 
-      let slider = this.shadowRoot.querySelector(".BRpager");
+      let slider = document.querySelector(".BRpager");
       $(slider).on("slidechange", this._updateCurrentPageLabel.bind(this));
 
       window.addEventListener(
@@ -117,12 +119,12 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     //  the slider is baked into the BR code pretty heavily with animations and the dom structure
     //  moving it out of the nav bar breaks functionility, and creating our own slider doesn't play nicely
     //  instead we'll just hide all the other native nav, and restyle the BR slider (jquery ui slider)
-    let prevButton = this.shadowRoot.querySelector("#prev");
-    let nextButton = this.shadowRoot.querySelector("#next");
-    let currentPage = this.shadowRoot.querySelector(".BRcurrentpage");
+    let prevButton = document.querySelector("#prev");
+    let nextButton = document.querySelector("#next");
+    let currentPage = document.querySelector(".BRcurrentpage");
 
     // remove parentheses from label (it's updated async so can't simply replace innerHTML, hide instead)
-    let currentPageOverride = this.shadowRoot.querySelector(
+    let currentPageOverride = document.querySelector(
       ".BRcurrentpage-override"
     );
     this._updateCurrentPageLabel();
@@ -164,8 +166,8 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
   }
 
   _updateCurrentPageLabel() {
-    let currentPage = this.shadowRoot.querySelector(".BRcurrentpage");
-    let currentPageOverride = this.shadowRoot.querySelector(
+    let currentPage = document.querySelector(".BRcurrentpage");
+    let currentPageOverride = document.querySelector(
       ".BRcurrentpage-override"
     );
     let currentPageTrimmed = currentPage.innerHTML
@@ -215,7 +217,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
     });
 
     let options = {
-      el: this.shadowRoot.querySelector("#BookReader"),
+      el: "#BookReader",
       data,
 
       bookTitle: "BookReader Presentation",
@@ -264,15 +266,15 @@ export default class AppBookReaderViewer extends Mixin(LitElement).with(
 
   _onSearchResultsChange(e) {
     let results = e.detail?.props?.results;
-    // this.shadowRoot.querySelector('.search-pagination')
-    let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
+    // document.querySelector('.search-pagination')
+    let nav = document.querySelector("app-media-viewer-nav");
     if (nav) {
       nav.searchResultsCount = results.matches.length;
     }
   }
 
   _onSearchResultsEmpty(e) {
-    let nav = this.shadowRoot.querySelector("app-media-viewer-nav");
+    let nav = document.querySelector("app-media-viewer-nav");
     if (nav) {
       nav.searchResultsCount = 0;
     }
