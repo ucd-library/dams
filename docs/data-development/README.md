@@ -26,7 +26,7 @@ If your are exporting data from the original (v1) version of the DAMS powered by
 
  - [Create Data Development Container](data-dev-container.md)
  - Copy data/metadata to sandbox server
- - Copy data/metadata to `/data` folder
+ - Copy data/metadata to dev container `/data` folder
    - `docker cp [path-to-data] [collection-name]-import:/data`
  - Import data via `fin io import`
  - [Create Metadata Repo](git-metadata-repo.md)
@@ -34,7 +34,7 @@ If your are exporting data from the original (v1) version of the DAMS powered by
 
 ## Updating Metadata
 
-If you are just updating metadata in a collection that is already in DAMS v2.
+If you are just updating metadata in a collection that is already in DAMS v2.  This is MUCH faster than the binary update process below.
 
  - Pull metadata from GitHub `git clone git@github.com:ucd-library/dams-[collection-name]-metadata.git`
  - Fix up metadata

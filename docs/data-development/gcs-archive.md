@@ -18,7 +18,7 @@ docker context use sandbox.dams
 Make sure the service account is added to data dev container
 
 ```bash
-docker cp [path-to-service-account]/service-account.json [collection-name]-import:/data
+docker cp [path-to-service-account]/service-account.json [collection-name]-import:/
 
 docker exec -it [collection-name]-import bash
 
@@ -33,4 +33,4 @@ cd /data
 gsutil -m rsync -c -J -r -y ".git" -n . gs://dams-collections/[collection-name]
 ```
 
-`-n` flag is try run.  Remove to actually sync.  Note this doesn't delete.  See docs here: https://cloud.google.com/storage/docs/gsutil/commands/rsync
+`-n` flag is dry run.  Remove to actually sync.  Note this doesn't delete.  See docs here: https://cloud.google.com/storage/docs/gsutil/commands/rsync
