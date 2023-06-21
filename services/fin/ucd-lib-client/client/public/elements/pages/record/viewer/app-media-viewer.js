@@ -256,7 +256,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
    */
   _onExpandBookView(e) {
     this.brFullscreen = true;
-
+    debugger;
     let brView = document.querySelector("#bookreader");
     if (brView) {
       brView.classList.add("fullscreen");
@@ -274,7 +274,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
         brNav.querySelector("nav > ul").appendChild(li);
 
         // also move search button as first child
-        let brSearch = mediaNav.querySelector(".br-search");
+        let brSearch = mediaNav.shadowRoot.querySelector(".br-search");
         if (brSearch) brNav.prepend(brSearch);
       }
 

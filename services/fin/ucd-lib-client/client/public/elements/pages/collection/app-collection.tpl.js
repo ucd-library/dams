@@ -840,7 +840,7 @@ export default function render() {
 
     </div>
 
-    <app-citation></app-citation>
+    <app-citation .record="${this.citationRoot}"></app-citation>
 
     <!-- <h2 class="admin-heading">Debug ${this.collectionId}</h2>
     <div class="admin-content">

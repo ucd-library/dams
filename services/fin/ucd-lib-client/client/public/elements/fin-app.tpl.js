@@ -184,7 +184,7 @@ export default function render() {
           <ucdlib-site-footer>
             <ucdlib-site-footer-column header="Digital Collections">
               <ul>
-                <li><a href="/#collections">Collections</a></li>
+                <li><a href="/browse/collections">Collections</a></li>
                 <li><a href="/search">Items</a></li>
                 <li><a href="/about">About Digital Collections</a></li>
                 <!-- <li><a href="">FAQ</a></li> -->
