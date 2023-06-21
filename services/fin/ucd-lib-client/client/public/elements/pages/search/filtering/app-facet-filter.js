@@ -4,11 +4,9 @@ import render from './app-facet-filter.tpl.js'
 import './app-normal-checkbox.js';
 
 import clone from "clone"
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 class AppFacetFilter extends Mixin(LitElement)
-  .with(LitCorkUtils, MainDomElement) {
+  .with(LitCorkUtils) {
 
   static get properties() {
     return {
@@ -49,7 +47,7 @@ class AppFacetFilter extends Mixin(LitElement)
 
   resize() {
     requestAnimationFrame(() => {
-      let overflowDiv = document.querySelector('.overflow');
+      let overflowDiv = this.shadowRoot.querySelector('.overflow');
 
       // TODO more testing here, pretty sure 200px is correct but it's possible it's different
       if( overflowDiv && overflowDiv.offsetHeight >= 215 ) {
@@ -78,20 +76,20 @@ class AppFacetFilter extends Mixin(LitElement)
     });
 
     if( Object.keys(e.buckets).length > 50 ) {
-      document.querySelector('#list').style.display = 'block';
-      let top = document.querySelector('#list').scrollTop;
+      this.shadowRoot.querySelector('#list').style.display = 'block';
+      let top = this.shadowRoot.querySelector('#list').scrollTop;
 
       this.bucketsIronList = e.buckets;
       this.buckets = [];
       this.ironListActive = true;
 
       // make sure we don't change scroll position
-      document.querySelector('#list').scrollTop = top;
+      this.shadowRoot.querySelector('#list').scrollTop = top;
       requestAnimationFrame(() => {
-        document.querySelector('#list').scrollTop = top;
+        this.shadowRoot.querySelector('#list').scrollTop = top;
       });
     } else {
-      document.querySelector('#list').style.display = 'none';
+      this.shadowRoot.querySelector('#list').style.display = 'none';
       this.bucketsIronList = [];
       this.buckets = e.buckets;
       this.ironListActive = false;
@@ -163,7 +161,7 @@ class AppFacetFilter extends Mixin(LitElement)
     if( item.empty ) return;
 
     // reset typeahead incase it was active
-    document.querySelector('#typeahead').value = '';
+    this.shadowRoot.querySelector('#typeahead').value = '';
     if( this.originalBuckets ) {
       this.originalBuckets = null;
     }
@@ -199,7 +197,7 @@ class AppFacetFilter extends Mixin(LitElement)
   }
 
   _updateTypeahead() {
-    let text = document.querySelector('#typeahead').value;
+    let text = this.shadowRoot.querySelector('#typeahead').value;
     if( !text ) {
       if( this.originalBuckets ) {
 

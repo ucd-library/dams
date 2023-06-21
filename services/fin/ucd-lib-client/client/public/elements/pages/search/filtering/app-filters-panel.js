@@ -1,8 +1,7 @@
 import { LitElement } from "lit";
 import "@polymer/iron-pages/iron-pages";
 import "./app-filter-panel";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 import render from "./app-filters-panel.tpl.js";
 
 // init facet filters from template
@@ -22,7 +21,7 @@ for (var key in config.elasticSearch.facets) {
   });
 }
 
-class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils, MainDomElement) {
+class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
     return {
       facetFilters: { type: Array },
