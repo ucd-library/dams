@@ -243,6 +243,16 @@ export default function render() {
         .truncated-text-mobile {
           display: none;
         }
+        .grid dams-item-card {
+          flex: 100%;
+          max-width: 100%;
+        }
+        .masonry .item {
+          width: 100%;
+          position: initial;
+          margin: auto;
+          padding-bottom: 3rem;
+        }
       }
 
       @media (min-width: 975px) {

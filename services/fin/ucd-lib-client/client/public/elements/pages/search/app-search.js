@@ -1,11 +1,15 @@
 import { LitElement, html } from "lit";
 import render from "./app-search.tpl.js";
+import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./results/app-search-results-panel";
 import "./filtering/app-filters-panel";
 import "./results/app-search-results-collections";
 
-export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
+export class AppSearch extends Mixin(LitElement)
+  .with(MainDomElement, LitCorkUtils) {
+  
   static get properties() {
     return {
       visible: { type: Boolean },
@@ -64,9 +68,9 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
    */
   _onSearchVcUpdate(e) {
     if (e.state === "error") {
-      return this.shadowRoot.querySelector("#resultsPanel").onError(e);
+      return document.querySelector("#resultsPanel").onError(e);
     } else if (e.state === "loading") {
-      return this.shadowRoot.querySelector("#resultsPanel").onLoading();
+      return document.querySelector("#resultsPanel").onLoading();
     }
 
     if (e.state !== "loaded") return;
@@ -76,7 +80,7 @@ export class AppSearch extends Mixin(LitElement).with(LitCorkUtils) {
     let total = payload.total.value;
     this.results = payload.results;
 
-    this.shadowRoot
+    document
       .querySelector("#resultsPanel")
       .renderResults(this.results, total, e.searchDocument.limit, currentIndex);
   }

@@ -239,6 +239,12 @@ export default function render() {
         padding-bottom: 1rem;
       }
 
+      .BookReader .BRsearch-navigation, 
+      .BRmobileMenu .BRsearch-navigation, 
+      .BRfloat .BRsearch-navigation {
+        display: none;
+      }
+
       @media (max-width: 767px) {
         /* mobile */
         .BRcontrols {
