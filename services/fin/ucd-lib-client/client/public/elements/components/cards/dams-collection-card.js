@@ -57,6 +57,8 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     if( this.collection.images ) {
       let images = this.collection.images;
       this.imgSrc = images.medium ? images.medium.url : images.original.url;
+    } else {
+      this.imgSrc = "/images/tree-bike-illustration.png";
     }
     this.cardTitle = this.collection.title;
     this.itemCt = this.collection.count;

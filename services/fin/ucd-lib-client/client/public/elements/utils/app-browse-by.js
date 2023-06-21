@@ -86,7 +86,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
       }  
     }
 
-    this._loadResults();
+    // this._loadResults();
   }
 
   /**
@@ -178,7 +178,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
    */
   _renderResults() {
     if( this.isCollectionPage ) {
-      this._renderCollections();
+      // this._renderCollections();
       this._updateSideImages();
       return;
     }
@@ -209,10 +209,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
   }
 
   async _searchBrowseByCollections() {
-    // this.sortByOptions.filter(s => s.selected)[0]
-    //  {label: 'A-Z', type: 'key', dir: 'asc', selected: true}
-    //  {label: 'Recent', dir: 'dsc', type: 'key'}
-    //  {label: 'Item Quantity', dir: 'dsc', type: 'count'}
     let sort = {};
     let sortBy = this.sortByOptions.filter(s => s.selected)[0];
     
@@ -235,53 +231,44 @@ export default class AppBrowseBy extends Mixin(LitElement)
     }
 
     this.allResults = await this.CollectionModel.search(searchDocument);
-    this.allResults = this.allResults.body.results;
-    this.collectionResults = [];
-    this.collectionResults.push(...this.allResults.map(r => {
+    this.allResults = this.allResults.body.results.map(r => {
       return {
-        thumbnailUrl : r.data['@graph'][0].thumbnailUrl, 
-        title : r.data.name,
-        count : r.data['@graph'][0].itemCount,
-        id : r.data['@id']
+        thumbnailUrl : r.root.image['@id'], 
+        title : r.root.name,
+        count : r.root.itemCount,
+        id : r.root['@id']
       }
-    }));
+    });
+
+    
+    if( sortBy.type === 'count' ) {
+      this.allResults.sort((a, b) => {
+        if( a[sortBy.type] > b[sortBy.type] ) return (sortBy.dir === 'asc') ? 1 : -1;
+        if( a[sortBy.type] < b[sortBy.type] ) return (sortBy.dir === 'asc') ? -1 : 1;
+        return 0;
+      });
+    } else {
+      // TODO handle sort by date
+
+      // sort by title
+      this.allResults.sort((a, b) => {
+        if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sortBy.dir === 'asc') ? 1 : -1;
+        if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sortBy.dir === 'asc') ? -1 : 1;
+        return 0;   
+      });
+    }
+    
+    this.collectionResults = this.allResults.slice(
+      this.currentIndex, 
+      this.currentIndex + this.resultsPerPage 
+    );
 
     this.totalResults = this.allResults.length;
-  }
 
-  /**
-   * @method _renderCollections
-   * @description render the collections array based on currentPage and sort
-   * params
-   */
-  _renderCollections() {
-    // TODO is sorting already handled by the searchDocument sent to collectionModel.search()? it should be
+    // TODO images not updating, titles/counts are
 
-    // let sort = this.sortByOptions.find(item => item.selected);
-    // if( sort.type === 'count' ) {
-    //   this.collectionResults.sort((a, b) => {
-    //     if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
-    //     if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
-    //     return 0;
-    //   });
-    // } else {
-    //   // TODO handle sort by date
-
-    //   // sort by title
-    //   this.collectionResults.sort((a, b) => {
-    //     if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
-    //     if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
-    //     return 0;   
-    //   });
-    // }
     
-    // this.collectionResults = this.collectionResults.slice(
-    //   this.currentIndex, 
-    //   this.currentIndex + this.resultsPerPage 
-    // );
-
-    this.requestUpdate();
-    this.shadowRoot.querySelectorAll('dams-collection-card').forEach(wc => wc.requestUpdate());
+    // this.shadowRoot.querySelectorAll('dams-collection-card').forEach(c => c.requestUpdate());
   }
 
   /**

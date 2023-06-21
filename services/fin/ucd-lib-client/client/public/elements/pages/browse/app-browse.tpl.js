@@ -186,7 +186,7 @@ export default function render() {
     <app-browse-by
       id="subject"
       label="Subject"
-      facet-query-name="@graph.subjects.name"
+      facet-query-name="@graph.subjects.name.text"
       ?hidden="${this.page !== "/browse/subject"}">
       <img
         class="header-icon"

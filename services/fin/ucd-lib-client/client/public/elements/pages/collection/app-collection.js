@@ -148,7 +148,7 @@ class AppCollection extends Mixin(LitElement)
     this.displayData = [];
     // this.isAdmin = user.hasRole('admin');
     this.isUiAdmin = user.canEditUi();
-    this.editMode = true;
+    this.editMode = false;
     this.itemDisplayCount = 6;
   }
 
