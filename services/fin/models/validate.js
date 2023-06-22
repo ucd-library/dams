@@ -61,11 +61,11 @@ class Validate {
     }
 
     // check subjects
-    if( !graph.subjects ) {
+    if( !graph.root.subjects ) {
       result.warnings.push('No subjects found');
     } else {
       let found = false;
-      for( let subject of graph.subjects ) {
+      for( let subject of graph.root.subjects ) {
         if( subject.name ) {
           found = true;
         } else {

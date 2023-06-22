@@ -1,6 +1,9 @@
 ARG FIN_SERVER_IMAGE
 FROM ${FIN_SERVER_IMAGE}
 
+# TODO: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
+# Ensure crcmod is installed for gsutil
+
 ARG UCD_DAMS_REPO_SERVICE_ROOT=services/fin
 
 # Client Code
