@@ -254,7 +254,7 @@ export default function render() {
           /* pinch to zoom */
           display: none;
         }
-        .layout {
+        /* .layout {
           width: 90%;
           flex-wrap: wrap;
         }
@@ -264,13 +264,13 @@ export default function render() {
 
         .break {
           width: 100%;
-        }
+        } */
 
-        #buttonWrapper.wrap {
+        /* #buttonWrapper.wrap {
           padding-top: 1rem;
           position: relative;
           left: 62vw;
-        }
+        } */
         #thumbnails {
           width: 80% !important;
         }
