@@ -34,7 +34,8 @@ class AppCollection extends Mixin(LitElement)
       isUiAdmin : { type : Boolean },
       editMode : { type : Boolean },
       itemDisplayCount : { type : Number },
-      collectionSearchHref : {type: String}
+      collectionSearchHref : {type: String},
+      citationRoot: { type: Object },
     };
   }
 
@@ -107,6 +108,8 @@ class AppCollection extends Mixin(LitElement)
       });
     this.items = e.vcData.count;
     this.yearPublished = e.vcData.yearPublished;
+    
+    this.citationRoot = e.payload.root;
 
     // try to load from app container first
     if( !this.savedItems.length ) {
@@ -152,6 +155,7 @@ class AppCollection extends Mixin(LitElement)
     this.isUiAdmin = user.canEditUi();
     this.editMode = false;
     this.itemDisplayCount = 6;
+    this.citationRoot = {};
   }
 
   /**

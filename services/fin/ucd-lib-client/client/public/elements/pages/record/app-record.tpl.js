@@ -63,7 +63,7 @@ export default function render() {
       .metadata-row,
       .download-section {
         display: flex;
-        margin: 30px 20px;
+        margin: 0.85rem;
       }
       .metadata-row .attr,
       .download-section .label {
@@ -88,6 +88,8 @@ export default function render() {
       .part-of img {
         max-width: 100%;
         max-height: 100%;
+        height: auto;
+        width: auto;
       }
 
       .part-of div {

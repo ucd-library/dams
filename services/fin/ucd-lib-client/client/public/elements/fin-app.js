@@ -32,7 +32,6 @@ export class FinApp extends Mixin(LitElement)
       appRoutes: { type: Array },
       showSearchHeader: { type: Boolean },
       showBreadcrumb: { type: Boolean },
-      drawerOpen: { type: Boolean },
       localBuildTime: { type: String },
       appVersion: { type: String },
       clientTag: { type: String },
@@ -66,7 +65,6 @@ export class FinApp extends Mixin(LitElement)
     this.appRoutes = APP_CONFIG.appRoutes;
     this.showSearchHeader = false;
     this.showBreadcrumb = false;
-    this.drawerOpen = false;
 
     // App Version variables
     this.showVersion = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH !== "main";
@@ -102,8 +100,11 @@ export class FinApp extends Mixin(LitElement)
       "CollectionModel",
       "RecordModel"
     );
-  }
 
+    // app header event to pass to app-search, to toggle filters in mobile view
+    window.addEventListener('expand-search-filters', this._expandSearchFilters.bind(this));
+  }
+  
   ready() {
     let loadingEle = document.querySelector("#loading");
     if (loadingEle) document.body.removeChild(loadingEle);
@@ -118,12 +119,8 @@ export class FinApp extends Mixin(LitElement)
    * @method _onAppStateUpdate
    */
   async _onAppStateUpdate(e) {
-    this.drawerOpen = e.filtersDrawerOpen ? true : false;
-
     if (e.location.page === this.currentPage) return;
     this.currentPage = e.location.page;
-
-    console.log('FinApp._onAppStateUpdate', e);
 
     this.showBreadcrumb = this.BREADCRUMB_PAGES.includes(e.location.page);
     this.showSearchHeader = this.SEARCH_HEADER_PAGES.includes(e.location.page);
@@ -178,14 +175,11 @@ export class FinApp extends Mixin(LitElement)
   }
 
   /**
-   * @method _toggleDrawer
-   * @description toggles the drawer state.  Listens to
-   * toggle-drawer event from app-search-results-panel
+   * @method _expandSearchFilters
+   * @description expands the search filters.  Listens to
+   * expand-filters event from app-search-results-panel
+   * @param {Object} e event object
    */
-  _toggleDrawer() {
-    this.AppStateModel.set({ filtersDrawerOpen: !this.drawerOpen });
-  }
-
   _expandSearchFilters(e) {
     let appSearch = document.querySelector("app-search");
     if (appSearch) {

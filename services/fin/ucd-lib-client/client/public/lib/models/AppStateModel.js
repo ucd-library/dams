@@ -39,7 +39,7 @@ class AppStateModelImpl extends AppStateModel {
 
     this._sendGA();
 
-    console.log('AppStateModel.set()', update);
+    // console.log('AppStateModel.set()', update);
     return super.set(update);
   }
 
