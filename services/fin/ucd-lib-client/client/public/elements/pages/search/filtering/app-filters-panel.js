@@ -46,7 +46,11 @@ class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @description called from toggle button, dispatches event for app-search to handle hiding drawer;
    */
   _fireToggleDrawer() {
-    this.dispatchEvent(new CustomEvent("toggle-drawer"));
+    this.dispatchEvent(new CustomEvent("toggle-drawer", {
+      bubbles: true,
+      composed: true,
+      detail: 'toggle-drawer'
+    }));
   }
 
   /**
@@ -61,8 +65,12 @@ class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this.RecordModel.setSearchLocation(searchDoc);
   }
 
-  _collapseFilters() {
-    this.dispatchEvent(new CustomEvent("collapse-filters"));
+  _collapseFilters(e) {
+    this.dispatchEvent(new CustomEvent("collapse-filters", {
+      bubbles: true,
+      composed: true,
+      detail: 'collapse-filters'
+    }));
   }
 }
 

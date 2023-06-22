@@ -33,7 +33,6 @@ export class Citation extends LitElement {
 
   async updated() {
     if( !Object.keys(this.record || {}).length || ( this.citations.length && this.recordId === this.record['@id']) ) return;
-    debugger;
 
     this.recordId = this.record['@id'];
     let newCitations = [];

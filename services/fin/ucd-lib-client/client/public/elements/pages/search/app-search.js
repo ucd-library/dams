@@ -51,6 +51,7 @@ export class AppSearch extends Mixin(LitElement)
       let state = this.SearchVcModel.getSearch();
       if( state ) this._onSearchVcUpdate(state);
     }
+    window.addEventListener('collapse-filters', this._onCollapseFilters.bind(this));
   }
 
   /**
@@ -122,17 +123,21 @@ export class AppSearch extends Mixin(LitElement)
     this.wideFiltersPanel = e.detail.value === "info" ? true : false;
     setTimeout(() => {
       requestAnimationFrame(() => {
-        this.$.resultsPanel._resizeAsync();
+        this.querySelector('#resultsPanel')._resizeAsync();
       });
     }, 300);
   }
 
   _onCollapseFilters(e) {
     this.filtersCollapsed = true;
+    this.drawerOpen = false;
+    this.AppStateModel.set({ filtersDrawerOpen: this.drawerOpen });
   }
 
   expandFilters() {
     this.filtersCollapsed = false;
+    this.drawerOpen = true;
+    this.AppStateModel.set({ filtersDrawerOpen: this.drawerOpen });    
   }
 }
 

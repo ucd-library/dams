@@ -144,15 +144,15 @@ export default function render() {
 
       .add-filter p {
         margin: auto;
-        padding-top: 0.7rem;
+        padding-top: 1rem;
         font-size: 0.85rem;
         font-weight: bold;
       }
 
       .add-filter ucdlib-icon {
         fill: var(--color-aggie-gold);
-        padding-top: 0.7rem;
-        padding-left: 0.8rem;
+        padding-top: 1rem;
+        padding-left: 1rem;
       }
 
       .add-filter {
