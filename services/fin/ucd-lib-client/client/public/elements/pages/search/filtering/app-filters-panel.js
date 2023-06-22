@@ -1,8 +1,7 @@
 import { LitElement } from "lit";
 import "@polymer/iron-pages/iron-pages";
 import "./app-filter-panel";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 import render from "./app-filters-panel.tpl.js";
 
 // init facet filters from template
@@ -22,7 +21,7 @@ for (var key in config.elasticSearch.facets) {
   });
 }
 
-class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils, MainDomElement) {
+class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
     return {
       facetFilters: { type: Array },
@@ -47,7 +46,11 @@ class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils, MainDomElemen
    * @description called from toggle button, dispatches event for app-search to handle hiding drawer;
    */
   _fireToggleDrawer() {
-    this.dispatchEvent(new CustomEvent("toggle-drawer"));
+    this.dispatchEvent(new CustomEvent("toggle-drawer", {
+      bubbles: true,
+      composed: true,
+      detail: 'toggle-drawer'
+    }));
   }
 
   /**
@@ -62,8 +65,12 @@ class AppFiltersPanel extends Mixin(LitElement).with(LitCorkUtils, MainDomElemen
     this.RecordModel.setSearchLocation(searchDoc);
   }
 
-  _collapseFilters() {
-    this.dispatchEvent(new CustomEvent("collapse-filters"));
+  _collapseFilters(e) {
+    this.dispatchEvent(new CustomEvent("collapse-filters", {
+      bubbles: true,
+      composed: true,
+      detail: 'collapse-filters'
+    }));
   }
 }
 

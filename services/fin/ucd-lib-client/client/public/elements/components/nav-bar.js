@@ -55,6 +55,17 @@ export class AppNavBar extends LitElement {
     e.preventDefault();
   }
 
+  updated(e) {
+    // debugger;
+    // hide home link if not mobile (width < 768px)
+    if( window.innerWidth > 767 ) {
+      let header = this.shadowRoot.querySelector('ucdlib-header');
+      if( header ) {
+        // header.querySelector('#nav--0').style.display = 'none';
+      }
+    }
+  }
+
   /**
    * @method _onBtnKeyDown
    * @description bound to key down events on main button.  Show

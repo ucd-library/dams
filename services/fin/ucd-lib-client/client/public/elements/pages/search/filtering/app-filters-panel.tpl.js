@@ -112,6 +112,7 @@ export default function render() {
         display: inline-block;
         margin: 0.8rem 0;
         font-weight: 600;
+        font-size: 1.5rem;
       }
       .heading .collapse {
         display: inline-block;
@@ -134,6 +135,7 @@ export default function render() {
       @media (max-width: 767px) {
         .heading {
           display: block;
+          /* margin-top: 52px; */
         }
         :host {
           box-shadow: 0px 3px 6px #00000029;

@@ -22,7 +22,7 @@ export default function render() {
         width: 350px;
         /* transition: width 300ms linear; */
       }
-      app-filters-panel[wide] {
+      app-filters-panel[data-wide] {
         width: 475px;
       }
 
@@ -49,7 +49,7 @@ export default function render() {
         app-filters-panel {
           width: 275px;
         }
-        app-filters-panel[wide] {
+        app-filters-panel[data-wide] {
           width: 415px;
         }
         .filters-container {
@@ -107,7 +107,7 @@ export default function render() {
             ? "off-canvas--left"
             : ""}"
           aria-hidden="${this.filtersCollapsed}"
-          ${this.wideFiltersPanel ? "wide" : ""}
+          data-${this.wideFiltersPanel ? "wide" : "normal"}
           @selected-tab-changed="${this._onFiltersTabUpdate}"
           @collapse-filters="${this._onCollapseFilters}"
         ></app-filters-panel>

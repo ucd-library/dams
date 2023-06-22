@@ -25,7 +25,7 @@ export default function render() {
 </style>
 
 <div>
-  <span ?hidden="${!this.loggedIn}">Logged in as: ${this.user.username}</span>
+  <span ?hidden="${!this.loggedIn}">Logged in as: ${this.user.preferred_username}</span>
   <a ?hidden="${this.loggedIn}" @click="${this._login}">Login</a>
   <div ?hidden="${!this.loggedIn}">
     <a @click="${this._logout}" class="gold">Log Out</a>
