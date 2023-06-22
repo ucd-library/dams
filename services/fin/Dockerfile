@@ -6,6 +6,11 @@ FROM ${FIN_SERVER_IMAGE}
 
 ARG UCD_DAMS_REPO_SERVICE_ROOT=services/fin
 
+# DAMS cli
+COPY cli /dams-cli
+RUN cd /dams-cli && npm install && npm link
+# RUN ln -s /dams-cli/bin/dams.js /usr/local/bin/dams
+
 # Client Code
 RUN mkdir -p ${FIN_SERVICE_ROOT}/ucd-lib-client
 
