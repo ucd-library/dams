@@ -125,7 +125,7 @@ return html`
 
 <ucdlib-header site-name="Digital Collections">
   <ucdlib-primary-nav>
-    <a href="/" class="home-link">Home</a>
+    <a href="/" class="home-link" mobile-only>Home</a>
     <ul link-text="Browse" href="/">
       <li><a href="/browse/collections">Collections</a></li>
       <li><a href="/search">Items</a></li>

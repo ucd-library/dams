@@ -363,7 +363,9 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   _onPageSizeChange(e) {
     this.dispatchEvent(
       new CustomEvent("page-size-change", {
-        detail: parseInt(e.currentTarget.value),
+        detail: { itemsPerPage: parseInt(e.currentTarget.value) },
+        bubbles: true,
+        composed: true
       })
     );
   }
@@ -449,11 +451,14 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Object} e click|keyup event
    */
   _onPaginationChange(e) {
+    debugger
     e.detail.startIndex = e.detail.page * 10 - 10;
     // this.currentPage = e.detail.page - 1;
     this.dispatchEvent(
       new CustomEvent("page-change", {
         detail: e.detail,
+        bubbles: true,
+        composed: true
       })
     );
   }
