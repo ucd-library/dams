@@ -98,7 +98,7 @@ export default function render() {
         font-weight: bold;
       }
 
-      .off-canvas--left {
+      .search-side-panel.off-canvas--left {
         transform: translateX(-105%);
       }
 
