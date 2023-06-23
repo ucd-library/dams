@@ -836,7 +836,7 @@ export default function render() {
         </div>
       </div>
 
-      <a href="" class="btn btn--primary view-all-collections">View all collection items</a>
+      <a href="${this.collectionSearchHref}" class="btn btn--primary view-all-collections">View all collection items</a>
 
     </div>
 

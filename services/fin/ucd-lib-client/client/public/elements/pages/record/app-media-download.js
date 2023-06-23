@@ -72,6 +72,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     this.rootRecord = graph.root;
     this.selectedMedia = selectedMedia;
+    this.clientMedia = clientMedia;
     let sources = [];
 
     let download = selectedMedia.clientMedia?.download?.url || selectedMedia.clientMedia.pages.filter(node => node.page === selectedMediaPage)[0]?.download?.url;
@@ -159,16 +160,24 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = record;
 
+    let pages;
+    let imageList = this.clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
+    if( imageList ) {
+      pages = imageList.clientMedia.pages;
+    } else {
+      pages = selectedMedia.clientMedia.pages;
+    }
+
     if( onePageMode ) {
       // set download href to single page
-      this.href = selectedMedia.clientMedia.pages[currentPage - 1]?.download?.url;  
+      this.href = pages[currentPage - 1]?.download?.url;  
       this.isTwoPageView = false;
     } else {
       this.isTwoPageView = true;      
 
       // set download href to 2 pages for archive download option
-      let image1 = selectedMedia.clientMedia.pages[currentPage - 1]?.download?.url?.replace('/fcrepo/rest', '');
-      let image2 = selectedMedia.clientMedia.pages[currentPage]?.download?.url?.replace('/fcrepo/rest', '');
+      let image1 = pages[currentPage - 1]?.download?.url?.replace('/fcrepo/rest', '');
+      let image2 = pages[currentPage]?.download?.url?.replace('/fcrepo/rest', '');
       let urls = [];
       if( image1 ) urls.push(image1);
       if( image2 ) urls.push(image2);
@@ -199,6 +208,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
           sources = sources.concat(this._getImageSources(media, true));
           this._renderImgFormats(media, null, "FR");
         } else if (mediaType === "ImageList") {
+          debugger;
           this.showImageFormats = true;
           if( media.hasPart && !Array.isArray(media.hasPart) ) media.hasPart = [ media.hasPart ];
           (media.hasPart || []).forEach((img) => {
@@ -206,8 +216,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
             if( !node ) return;
             sources = sources.concat(
               this._getImageSources(node, nativeImageOnly)
-            );
+            );            
           });
+          this._renderImgFormats(media, null, 'FR');
         }
       });
 
@@ -375,6 +386,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _renderImgFormats(imageRecord, selectedFormat, selectedSize) {
     let originalFormat = this._getImageFormat(imageRecord);
+    let imageList = this.clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
+
+    if( imageList && Object.keys(imageList).length && originalFormat === 'pdf' ) return;
     if (!selectedFormat) selectedFormat = originalFormat;
 
     // let formats = config.imageDownload.formats.slice(0);
@@ -474,6 +488,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         urls.push(source.src.replace('/fcrepo/rest', ''));
       }
     }
+
+    debugger;
 
     this.zipConcatenatedPaths = urls.join(',');
     this.zipPaths = urls;

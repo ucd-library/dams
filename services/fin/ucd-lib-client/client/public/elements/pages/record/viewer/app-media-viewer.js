@@ -80,18 +80,26 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
   async _onAppStateUpdate(e) {
     // TODO eventually support mutiple mediaGroups, combine different media types into same viewer/nav?
-    let mediaGroup = e.selectedRecord?.clientMedia?.mediaGroups;
-    if (!mediaGroup || !mediaGroup.length) return;
+    let mediaGroups = e.selectedRecord?.clientMedia?.mediaGroups;
+    if (!mediaGroups || !mediaGroups.length) return;
     // mediaGroup = mediaGroup[0];
 
+    let renderAsBr = false;
     let mediaType;
-    mediaGroup.forEach((media) => {
-      let type = utils.getMediaType(media);
-      if (type) {
-        mediaType = type.toLowerCase().replace(/object/i, "");
-        mediaGroup = media;
-      }
-    });
+
+    // to check for imageList first, otherwise default to pdf for bookreader
+    let mediaGroup = mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
+    if( mediaGroup ) renderAsBr = true;
+
+    if( !mediaGroup ) {
+      mediaGroups.forEach((media) => {
+        let type = utils.getMediaType(media);
+        if (type) {
+          mediaType = type.toLowerCase().replace(/object/i, "");
+          mediaGroup = media;
+        }
+      });
+    }
 
     if (mediaType === "imagelist") {
       mediaType = "image";
@@ -104,10 +112,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
     } else {
       this.bagOfFilesImage = "";
     }
-
-    // TODO hack to test for specific item, but should change to use app container config?
-    let renderAsBr = false;
-    // renderAsBr = e.selectedRecord.clientMedia.root.id === '/item/ark:/87287/d79p96';
 
     if (
       renderAsBr ||
@@ -256,7 +260,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
    */
   _onExpandBookView(e) {
     this.brFullscreen = true;
-    debugger;
+
     let brView = document.querySelector("#bookreader");
     if (brView) {
       brView.classList.add("fullscreen");
