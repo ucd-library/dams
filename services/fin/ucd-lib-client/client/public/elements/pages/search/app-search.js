@@ -52,6 +52,8 @@ export class AppSearch extends Mixin(LitElement)
       if( state ) this._onSearchVcUpdate(state);
     }
     window.addEventListener('collapse-filters', this._onCollapseFilters.bind(this));
+    window.addEventListener("page-change", this._onPaginationChange.bind(this));
+    window.addEventListener("page-size-change", this._onPageSizeChange.bind(this));
   }
 
   /**
@@ -94,7 +96,7 @@ export class AppSearch extends Mixin(LitElement)
    */
   _onPageSizeChange(e) {
     let searchDoc = this.RecordModel.getCurrentSearchDocument();
-    this.RecordModel.setPaging(searchDoc, searchDoc.offset, e.detail);
+    this.RecordModel.setPaging(searchDoc, searchDoc.offset, e.detail.itemsPerPage || searchDoc.limit);
     this.RecordModel.setSearchLocation(searchDoc);
   }
 
