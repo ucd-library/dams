@@ -65,6 +65,11 @@ class Validate {
       result.warnings.push('No subjects found');
     } else {
       let found = false;
+
+      if( !Array.isArray(graph.root.subjects) ) {
+        graph.root.subjects = [graph.root.subjects];
+      }
+
       for( let subject of graph.root.subjects ) {
         if( subject.name ) {
           found = true;
