@@ -26,6 +26,8 @@ main:
                   spec: 
                       template:
                           spec:
+                              parallelism: 4
+                              taskCount: 4
                               template:
                                   spec:
                                       containers:
