@@ -23,6 +23,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
       title: { type: String },
       bounds: { type: Array },
       imageHeight: { type: Number },
+      mediaType: { type: String }
     };
   }
 
@@ -38,6 +39,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.thumbnailUrl = "";
     this.bounds = [];
     this.imageHeight = 0;
+    this.mediaType = '';
 
     this._injectModel("RecordModel");
   }
@@ -53,6 +55,15 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
       this.itemUrl = this.data.id;
       this.thumbnailUrl = this.data.thumbnailUrl;
       if (this.thumbnailUrl) this._renderImage();
+      if (this.data.mediaType === "Image") {
+        this.mediaType = "image";
+      } else if (this.data.mediaType === "Video") {
+        this.mediaType = "video";
+      } else if (this.mediaType === "Audio") {
+        this.mediaType = "audio";
+      } else {
+        this.mediaType = "imageList";
+      }
     } else {
       this._getItem(this.id);
     }

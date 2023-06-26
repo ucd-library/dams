@@ -48,6 +48,10 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
    */
   willUpdate(props) {
     if (this.data.id) {
+
+      debugger;
+      // TODO if single page imagelist, need to not show imageList media icon as it's confusing
+
       this.itemUrl = this.data.id;
       this.thumbnailUrl = this.data.thumbnailUrl;
       this.mediaType = this.data.mediaType;
@@ -69,6 +73,9 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
 
   async _onRecordUpdate(e) {
     if (e.state !== "loaded" || e.id !== this.id) return;
+
+    debugger;
+    // TODO if single page imagelist, need to not show imageList media icon as it's confusing
 
     this.record = e.vcData;
     if( this.record.images ) {

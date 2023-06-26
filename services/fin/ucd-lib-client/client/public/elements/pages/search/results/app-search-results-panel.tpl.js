@@ -74,14 +74,22 @@ export default function render() {
         width: 100%;
       }
 
-      .grid .item {
-        /* visibility: hidden; */
-      }
-
       .grid dams-item-card {
         flex: 30%;
-        padding: 1rem;
-        max-width: 383px;
+        padding: .5rem;
+      }
+
+      @media (max-width: 1260px) {
+        .grid dams-item-card {
+          flex: 38%;
+        }
+
+        /* .masonry .item {
+          width: 38% !important;
+          position: initial !important;
+          margin: auto;
+          padding-bottom: 3rem;
+        } */
       }
 
       .masonry {
@@ -168,7 +176,6 @@ export default function render() {
 
       .collections-content dams-collection-card {
         flex: 33.33%;
-        max-width: 383px;
       }
 
       ucdlib-icon {
@@ -239,6 +246,15 @@ export default function render() {
         }
       }
 
+      @media (max-width: 1260px) {
+        .masonry .item {
+          width: 38% !important;
+          position: initial !important;
+          margin: auto;
+          padding-bottom: 3rem;
+        }
+      }
+
       @media (max-width: 768px) {
         .truncated-text-mobile {
           display: none;
@@ -248,7 +264,7 @@ export default function render() {
           max-width: 100%;
         }
         .masonry .item {
-          width: 100%;
+          width: 100% !important;
           position: initial;
           margin: auto;
           padding-bottom: 3rem;
