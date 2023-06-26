@@ -32,14 +32,14 @@ main:
                                           - image: ${args.jobContainer}
                                             resources:
                                                 requests:
-                                                    memory: "8Gi"
-                                                    cpu: "2000m"
+                                                    memory: "16Gi"
+                                                    cpu: "4000m"
                                                 limits:
-                                                    memory: "8Gi"
-                                                    cpu: "2000m"
+                                                    memory: "16Gi"
+                                                    cpu: "4000m"
                                             command: "node"
                                             args: ${["cli/video-to-stream.js", args.finWorkflowId]}
-                                      timeoutSeconds: 1800
+                                      timeoutSeconds: 7200
                                       serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - convert_video:

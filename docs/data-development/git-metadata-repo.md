@@ -22,9 +22,14 @@ Push your data to GitHub
 
 ```bash
 git init
-git add .
+git add .gitignore #import to do this first!!
+git add --all
 git commit -m "Initial commit"
-git remote add origin
+git branch -M main
+# Note: we are using https here, so you will need to 
+# provide your GitHub username and access token (password)
+# see https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token
+git remote add origin https://github.com/ucd-library/dams-[collection-name]-metadata
 git push -u origin main
 ```
 
