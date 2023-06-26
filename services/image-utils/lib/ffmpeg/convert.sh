@@ -62,6 +62,6 @@ if [ -z "$HAS_AUDIO" ]; then
   rm ${INPUT_FILE};
 fi
 
-if [[ -z $RESOLUTION || $RESOLUTION == '1080px' ]]; then
+if [[ -z $RESOLUTION || $RESOLUTION == '1080p' ]]; then
   cp $SCRIPT_DIR/playlist.m3u8 $OUTPUT_DIR;
 fi

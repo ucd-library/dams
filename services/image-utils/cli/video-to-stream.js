@@ -1,7 +1,7 @@
 const model = require('../lib/model.js');
 
 let [node, file, worflowId, part] = process.argv;
-let partsDef = ['360p', '480px', '720p', '1080p'];
+let partsDef = ['360p', '480p', '720p', '1080p'];
 
 if( part === undefined ) {
   part = process.env.CLOUD_RUN_TASK_INDEX;
