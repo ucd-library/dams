@@ -38,7 +38,7 @@ if [ -z "$HAS_AUDIO" ]; then
   INPUT_FILE=${BASE_DIR}/__tmp_${basename}_w_audio.mp4;
 fi
 
-ffmpeg -hide_banner -y -i ${INPUT_FILE} \
+ffmpeg -threads 4 -hide_banner -y -i ${INPUT_FILE} \
   ${BASE_CONFIG} -b:v 800k -maxrate 856k -bufsize 1200k -b:a 96k -hls_segment_filename ${OUTPUT_DIR}/${basename}_360p.mp4 ${OUTPUT_DIR}/360p.m3u8 \
   ${BASE_CONFIG} -b:v 1400k -maxrate 1498k -bufsize 2100k -b:a 128k -hls_segment_filename ${OUTPUT_DIR}/${basename}_480p.mp4 ${OUTPUT_DIR}/480p.m3u8 \
   ${BASE_CONFIG} -b:v 2800k -maxrate 2996k -bufsize 4200k -b:a 128k -hls_segment_filename ${OUTPUT_DIR}/${basename}_720p.mp4 ${OUTPUT_DIR}/720p.m3u8 \
