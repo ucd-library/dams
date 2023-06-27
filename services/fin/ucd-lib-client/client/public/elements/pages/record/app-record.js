@@ -88,6 +88,8 @@ class AppRecord extends Mixin(LitElement)
     // this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath)); // this causes badness with ie /media/images:4 paths
     this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+
+    this._updateSlimStyles();
   }
 
   /**
@@ -136,6 +138,66 @@ class AppRecord extends Mixin(LitElement)
     this._updateLinks(e.location);
     if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+  }
+
+  _updateSlimStyles() {
+    let select = this.querySelector('ucd-theme-slim-select');
+    if( !select ) return;
+
+    let ssMain = select.shadowRoot.querySelector(".ss-main");
+    if (ssMain) {
+      ssMain.style.border = 'none';
+      ssMain.style.backgroundColor = 'transparent';
+    }
+
+    let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");
+    if (ssSingle) {
+      ssSingle.style.border = "none";
+      ssSingle.style.height = "49px";
+      ssSingle.style.paddingLeft = "1rem";
+      ssSingle.style.backgroundColor = "var(--color-aggie-blue-50)";
+      ssSingle.style.borderRadius = '0';
+      ssSingle.style.fontWeight = "bold";
+      ssSingle.style.color = "var(--color-aggie-blue)";
+    }
+
+    let search = select.shadowRoot.querySelector('.ss-search');
+    if( search ) {
+      search.style.display = "none";
+    }
+  }
+  
+  /**
+   * @method _ssSelectFocus
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectFocus(e) {
+    console.log('focus')
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    if( ssSingleSelected?.classList.value === 'ss-single-selected ss-open-below' ) {
+      ssSingleSelected.style.backgroundColor = '#FFF4D2'; // gold-30
+      ssMain.style.borderColor = '#FFBF00'; // gold
+    } else {
+      ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+      ssMain.style.borderColor = '#B0D0ED'; // blue-50
+    }
+  }
+
+  /**
+   * @method _ssSelectBlur
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectBlur(e) {
+    console.log('blur')
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+    ssMain.style.borderColor = '#B0D0ED'; // blue-50
   }
 
   /**

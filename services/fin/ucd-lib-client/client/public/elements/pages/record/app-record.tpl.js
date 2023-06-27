@@ -154,9 +154,10 @@ export default function render() {
         }
       }
 
-      .admin-edit .left-panel {
+    .admin-edit .left-panel {
       position: absolute;
-      left: 3rem;
+      left: 20%;
+      width: 60%;
       top: calc(170px + 2rem);
       z-index: 500;
     }
@@ -213,22 +214,19 @@ export default function render() {
       z-index: 400;
     }
 
-
     </style>
 
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
     </div>
     <div class="admin-edit" ?hidden="${!this.isUiAdmin}">
       <div class="left-panel" ?hidden="${!this.editMode || !this.isUiAdmin}">
-        <span class="form-label">Item Display:</span>
+        <span class="form-label" style="font-weight: bold;">Item Display:</span>
         <ucd-theme-slim-select
-          class="single-collection"
-          @change="${(e) => (this.collectionId = e.detail.value)}"
-          @focusin="${this._ssSelectFocusIn}"
-          @blur="${this._ssSelectBlur}"
-        >
+          @change="${this._ssSelectBlur}"
+          @focusin="${this._ssSelectFocus}"
+          @click="${this._ssSelectFocus}"
+          @blur="${this._ssSelectBlur}">
           <select>
-            <option></option>
               <option .value=${'default'} ?selected=${true}>
                 Collection Default (Book Reader - 2 Page)
               </option>
