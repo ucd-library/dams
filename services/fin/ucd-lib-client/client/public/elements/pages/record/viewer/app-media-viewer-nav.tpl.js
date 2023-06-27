@@ -151,6 +151,9 @@ export default function render() {
 
       #buttonWrapper {
         z-index: 500;
+      }
+
+      .lightbox #buttonWrapper {
         margin-right: 2rem;
       }
 
@@ -254,23 +257,33 @@ export default function render() {
           /* pinch to zoom */
           display: none;
         }
-        /* .layout {
+
+
+
+        /* this breaks something with bookreader, need to test again if below is uncommented */
+        .layout {
           width: 90%;
           flex-wrap: wrap;
+          justify-content: end;
         }
         .layout.lightbox {
           height: 150px;
         }
 
-        .break {
+        /* .break {
           width: 100%;
         } */
 
-        /* #buttonWrapper.wrap {
+        #buttonWrapper.wrap {
           padding-top: 1rem;
-          position: relative;
-          left: 62vw;
-        } */
+          /* position: relative;
+          left: 62vw; */
+        }
+
+
+
+
+
         #thumbnails {
           width: 80% !important;
         }
@@ -281,82 +294,84 @@ export default function render() {
       class="layout ${this.isLightbox ? "lightbox" : ""} ${this.brFullscreen
         ? "fullscreen"
         : ""}">
-      <div id="navLeft">
-        <ucdlib-icon
-          icon="ucdlib-dams:fa-chevron-left"
-          tabindex="0"
-          icon="chevron-left"
-          alt="Page thumbnails left"
-          ?disabled="${!this.showNavLeft}"
-          ?hidden="${!this.showNavLeft || this.singleImage}"
-          @click="${this._pageLeft}">
-        </ucdlib-icon>
-        <div
-          class="br-search-non-fs"
-          style="min-width: 300px;"
-          ?hidden="${this.brFullscreen || !this.isBookReader}">
+      <div class="icon-nav" style="display: flex; max-width: 90vw;">
+        <div id="navLeft">
+          <ucdlib-icon
+            icon="ucdlib-dams:fa-chevron-left"
+            tabindex="0"
+            icon="chevron-left"
+            alt="Page thumbnails left"
+            ?disabled="${!this.showNavLeft}"
+            ?hidden="${!this.showNavLeft || this.singleImage}"
+            @click="${this._pageLeft}">
+          </ucdlib-icon>
           <div
-            class="zoom ${this.searching ? "searching" : ""}"
-            @click="${this._onSearchToggled}">
-            <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
-          </div>
-          <div
-            class="search-pagination"
-            ?hidden="${this.searchResultsCount === 0}">
-
-            <div id="search-prev"
-              style="padding-left: .5rem; width: 40px;"
-              @click="${this._prevSearchResult}">
-              <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
-            </div>
-
-            <span class="search-results"
-              style="position: relative;
-                bottom: 1rem;
-                font-size: .9rem;
-                font-weight: bold;">
-              ${this.selectedResult} / ${this.searchResultsCount}
-            </span>
-
+            class="br-search-non-fs"
+            style="min-width: 300px;"
+            ?hidden="${this.brFullscreen || !this.isBookReader}">
             <div
-              id="search-next"
-              style="padding-right: .5rem; width: 40px;"
-              @click="${this._nextSearchResult}">
-              <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
+              class="zoom ${this.searching ? "searching" : ""}"
+              @click="${this._onSearchToggled}">
+              <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
+            </div>
+            <div
+              class="search-pagination"
+              ?hidden="${this.searchResultsCount === 0}">
+
+              <div id="search-prev"
+                style="padding-left: .5rem; width: 40px;"
+                @click="${this._prevSearchResult}">
+                <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
+              </div>
+
+              <span class="search-results"
+                style="position: relative;
+                  bottom: 1rem;
+                  font-size: .9rem;
+                  font-weight: bold;">
+                ${this.selectedResult} / ${this.searchResultsCount}
+              </span>
+
+              <div
+                id="search-next"
+                style="padding-right: .5rem; width: 40px;"
+                @click="${this._nextSearchResult}">
+                <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader || this.thumbnails.length < 2}">
-        <div id="thumbnailInnerContainer">
-          ${this.thumbnails.map((item) => html`
-            <a
-              class="thumbnail"
-              href="${item.id}"
-              alt="Page #${item.page}"
-              ?selected="${item.selected}"
-              title="${item.id}"
-              media-id="${item.id}"
-              ?disabled="${item.disabled}"
-              style="background-image:url(${item.src})">
-              <iron-icon icon="fin-icons:${item.icon}" ?hidden="${!item.icon}"></iron-icon>
-            </a>
-          `)}
+        <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader || this.thumbnails.length < 2}">
+          <div id="thumbnailInnerContainer">
+            ${this.thumbnails.map((item) => html`
+              <a
+                class="thumbnail"
+                href="${item.id}"
+                alt="Page #${item.page}"
+                ?selected="${item.selected}"
+                title="${item.id}"
+                media-id="${item.id}"
+                ?disabled="${item.disabled}"
+                style="background-image:url(${item.src})">
+                <iron-icon icon="fin-icons:${item.icon}" ?hidden="${!item.icon}"></iron-icon>
+              </a>
+            `)}
+          </div>
         </div>
-      </div>
 
-      <div id="navRight" ?hidden="${this.singleImage || this.isBookReader}">
-        <ucdlib-icon
-          icon="ucdlib-dams:fa-chevron-right"
-          tabindex="0"
-          icon="chevron-right"
-          alt="Page thumbnails right"
-          ?disabled="${!this.showNavRight}"
-          ?hidden="${!this.showNavRight}"
-          @click="${this._pageRight}"
-        >
-        </ucdlib-icon>
+        <div id="navRight" ?hidden="${this.singleImage || this.isBookReader}">
+          <ucdlib-icon
+            icon="ucdlib-dams:fa-chevron-right"
+            tabindex="0"
+            icon="chevron-right"
+            alt="Page thumbnails right"
+            ?disabled="${!this.showNavRight}"
+            ?hidden="${!this.showNavRight}"
+            @click="${this._pageRight}"
+          >
+          </ucdlib-icon>
+        </div>
       </div>
 
       <div style="flex:1"></div>

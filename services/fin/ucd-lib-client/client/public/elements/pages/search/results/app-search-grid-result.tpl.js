@@ -9,6 +9,10 @@ export default function render() {
         background-color: white;
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
       :host(:hover),
       :host(:focus) {
         /* border: 2px solid var(--default-secondary-color);
@@ -79,7 +83,7 @@ export default function render() {
         background-size: cover;
         background-color: transparent;
         background-position: center center;
-        max-width: 383px;
+        /* max-width: 383px; */
       }
 
       .card-text {
@@ -105,6 +109,25 @@ export default function render() {
           text-align: center;
         }
       }
+
+      .media-type {
+        position: absolute;
+        right: 0.25rem;
+        bottom: 0.25rem;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--color-aggie-blue-80);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      ucdlib-icon {
+        width: 25px;
+        height: 25px;
+        fill: white;
+      }
     </style>
 
     <!--hidden$="${!this.isImage}" -->
@@ -117,6 +140,27 @@ export default function render() {
         onload="this.style.display='block';"
       />
       <div ?hidden="${!this.isVideo}" class="video-thumbnail"></div>
+      <div
+          class="media-type"
+          ?hidden="${!this.mediaType || this.mediaType === "image"}"
+        >
+          <ucdlib-icon
+            ?hidden="${this.mediaType !== "imageList"}"
+            class="vertical-link__image"
+            icon="ucdlib-dams:item-stack-blank"
+          ></ucdlib-icon>
+          <ucdlib-icon
+            style="margin-left: .2rem;"
+            ?hidden="${this.mediaType !== "video"}"
+            class="vertical-link__image"
+            icon="ucdlib-dams:fa-play"
+          ></ucdlib-icon>
+          <ucdlib-icon
+            ?hidden="${this.mediaType !== "audio"}"
+            class="vertical-link__image"
+            icon="ucdlib-dams:fa-volume-high"
+          ></ucdlib-icon>
+        </div>
     </div>
 
     <div class="card-text">

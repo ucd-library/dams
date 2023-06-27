@@ -70,6 +70,7 @@ class SearchVcModel extends BaseModel {
               (g) => g["@id"] === media["@id"]
             )[0];
             let imageCount = 0;
+            if( matchedImageList?.hasPart && !Array.isArray(matchedImageList?.hasPart) ) matchedImageList.hasPart = [matchedImageList?.hasPart];
             if (matchedImageList?.hasPart?.length) {
               imageCount = matchedImageList.hasPart.length;
             }

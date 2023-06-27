@@ -187,6 +187,7 @@ class Utils {
 
   buildIaReaderPages(hasParts, clientMediaIndex) {
     let pages = [];
+    if( !Array.isArray(hasParts) ) hasParts = [hasParts];
     hasParts.forEach((part, index) => {
       let record = clientMediaIndex[part["@id"]];
 

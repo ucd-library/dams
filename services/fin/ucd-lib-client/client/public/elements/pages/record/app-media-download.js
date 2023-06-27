@@ -208,7 +208,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
           sources = sources.concat(this._getImageSources(media, true));
           this._renderImgFormats(media, null, "FR");
         } else if (mediaType === "ImageList") {
-          debugger;
           this.showImageFormats = true;
           if( media.hasPart && !Array.isArray(media.hasPart) ) media.hasPart = [ media.hasPart ];
           (media.hasPart || []).forEach((img) => {
@@ -488,8 +487,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         urls.push(source.src.replace('/fcrepo/rest', ''));
       }
     }
-
-    debugger;
 
     this.zipConcatenatedPaths = urls.join(',');
     this.zipPaths = urls;

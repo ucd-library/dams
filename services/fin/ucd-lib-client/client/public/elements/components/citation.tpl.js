@@ -80,6 +80,7 @@ return html`
     .cite-graphic {
       margin: auto;
       width: 33%;
+      margin-top: 1rem;
     }
 
     .citation .header-dots {
@@ -99,6 +100,7 @@ return html`
       margin-bottom: 1rem;
       font-weight: 600;
       color: var(--default-primary-color);
+      margin-top: 0.5rem;
     }
 
     .cite-collection p {
@@ -123,7 +125,7 @@ return html`
 </style>
 <div class="citation">
   <div class="cite-graphic">
-    <img src="/images/watercolors/citation-watercolor-800px-square.png" width="100%" alt="cite this collection image" />
+    <img src="/images/watercolors/citation-watercolor-800px-landscape.png" width="100%" alt="cite this collection image" />
   </div>
   <div class="cite-collection">
     <h2>Cite This Collection</h2>
@@ -134,14 +136,14 @@ return html`
       ${unsafeHTML(this.selectedCitation.text)}
     </p>
 
-    <!-- <a href="" class="btn btn-apa">APA</a> -->
-    <select class="btn btn-apa" @change="${this._citeChange}">
-      <option value="apa">APA</option>
-      <option value="mla">MLA</option>
-      <option value="chicago">Chicago</option>
-    </select>
-    <div class="btn btn-copy" @click="${this._copyCiteText}">Copy Text</div>
-
+    <div style="display: flex;">
+      <select class="btn btn-apa" @change="${this._citeChange}">
+        <option value="apa">APA</option>
+        <option value="mla">MLA</option>
+        <option value="chicago">Chicago</option>
+      </select>
+      <div class="btn btn-copy" @click="${this._copyCiteText}">Copy Text</div>
+    </div>
   </div>
 </div>
 `;}

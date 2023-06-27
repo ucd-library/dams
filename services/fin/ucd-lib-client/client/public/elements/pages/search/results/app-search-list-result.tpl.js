@@ -25,6 +25,7 @@ export default function render() {
         background-size: contain;
         background-position: center center;
         background-repeat: no-repeat;
+        width: 33%;
       }
 
       .collection-title {
