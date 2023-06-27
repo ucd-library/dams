@@ -152,7 +152,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       return;
     }
 
-    this.renderedMedia = selectedMedia.clientMedia.pages.filter(media => media.page === selectedMediaPage)[0];
+    this.renderedMedia = selectedMedia.clientMedia?.pages?.filter(media => media.page === selectedMediaPage)[0];
     // on first page load, selectedMediaPage is -1, so just show first page from clientMedia.images
     if( !this.renderedMedia ) {
       this.renderedMedia = selectedMedia.clientMedia.images;

@@ -266,14 +266,14 @@ export default function render() {
     .admin-edit .left-panel {
       position: absolute;
       left: 3rem;
-      top: 2rem;
+      top: calc(170px + 2rem);
       z-index: 500;
     }
 
     .admin-edit .right-panel {
       position: absolute;
       right: 3rem;
-      top: 2rem;
+      top: calc(170px + 2rem);
       z-index: 500;
     }
 

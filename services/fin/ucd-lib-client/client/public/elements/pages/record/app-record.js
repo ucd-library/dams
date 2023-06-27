@@ -8,10 +8,14 @@ import rightsDefinitions from "../../../lib/rights.json";
 import citations from "../../../lib/models/CitationsModel";
 import utils from "../../../lib/utils";
 
+import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js";
+
 import "./app-media-download";
 import "./app-fs-media-download";
 import "./viewer/app-media-viewer";
 import "../../components/citation";
+
+import user from '../../../lib/utils/user.js';
 
 class AppRecord extends Mixin(LitElement)
   .with(MainDomElement, LitCorkUtils) {
@@ -35,6 +39,8 @@ class AppRecord extends Mixin(LitElement)
       isBagOfFiles: { type: Boolean },
       arkDoi: { type: Array },
       fedoraLinks: { type: Array },
+      isUiAdmin : { type : Boolean },
+      editMode : { type : Boolean },
       // citations : {type: Array}
       citationRoot: { type: Object },
     };
@@ -66,6 +72,9 @@ class AppRecord extends Mixin(LitElement)
     // this.citations = [];
     this.citationRoot = {};
     this.collectionItemCount = 0;
+
+    this.isUiAdmin = user.canEditUi();
+    this.editMode = false;
 
     this._injectModel(
       "AppStateModel",
@@ -176,6 +185,67 @@ class AppRecord extends Mixin(LitElement)
       '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
     ];
 
+  }
+
+  /**
+   * @method _onEditClicked
+   * @description admin ui, edit button click event
+   * 
+   * @param {Object} e 
+   */
+  _onEditClicked(e) {
+    if( !this.isUiAdmin ) return;
+    this.editMode = true;
+  }
+
+  /**
+   * @method _onSaveClicked
+   * @description admin ui, save button click event
+   * 
+   * @param {Object} e 
+   */
+  async _onSaveClicked(e) {
+    if( !this.isUiAdmin ) return;
+
+    // TODO things
+
+    
+    // parse highlighted items
+    // this.savedItems = [];
+    // let newSavedItems = [];
+    // let itemInputs = document.querySelectorAll('.item-ark-input');
+    // itemInputs.forEach((input, index) => {
+    //   if( input.value ) {
+    //     newSavedItems.push({
+    //       '@id' : input.value,
+    //       position : index+1
+    //     });
+    //   }
+    // });
+    // this.savedItems = [...newSavedItems];
+    
+    // this._updateDisplayData();
+    // let featuredImage = document.querySelector('#file-upload').files[0];
+    // await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, featuredImage);
+    
+    // this.editMode = false;
+
+    // this.requestUpdate(); 
+    // // TODO for some reason this.savedItems isn't updating the view, even with requestUpdate()
+    // //  so the ordering doesn't update until page load
+    // // this._onAppStateUpdate(await this.AppStateModel.get()); // also doesn't work
+    // this.AppStateModel.setLocation(this.collectionId);
+  }
+
+  /**
+   * @method _onCancelEditClicked
+   * @description admin ui, cancel editing button click event
+   * 
+   * @param {Object} e 
+   */
+  _onCancelEditClicked(e) {
+    if( !this.isUiAdmin ) return;
+    this.editMode = false;
   }
 
   /**
