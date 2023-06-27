@@ -33,18 +33,12 @@ export default function render() {
       padding: 0 40px;
     }
 
-    h1 {
-      font-size: 2.5rem;
-    }
-
     h2 {
-      font-size: 2.1rem;
       font-weight: 700;
       color: var(--color-aggie-blue);
     }
 
     h3 {
-      font-size: 1.7rem;
       font-weight: 700;
     }
 
@@ -64,16 +58,17 @@ export default function render() {
     }
 
     .collection-header h1 {
-      margin-bottom: 0;
+      margin: 0.5rem 0;
     }
 
     .collection-header h3 {
-      margin: 1rem 0;
+      margin: 0;
     }
 
     a.btn--alt {
       padding-top: 0;
       padding-bottom: 0;
+      margin-top: 1rem;
       color: white;
     }
 
@@ -167,84 +162,8 @@ export default function render() {
       color: var(--color-aggie-blue);
       padding-top: .3rem;
       padding-bottom: .3rem;
-      margin: 1rem 0 3rem;
+      margin: 3rem 0 3rem;
     }
-
-    /* .citation {
-      background-color: var(--color-aggie-blue-30);
-      display: flex;
-      width: 100vw;
-    }
-
-    .citation a {
-      padding: .3rem;
-    }
-
-    .citation a.btn-copy {
-      background-color: var(--color-aggie-gold);
-    }
-
-    .citation a.btn-copy:hover {
-      background-color: var(--color-aggie-blue);
-      color: var(--color-aggie-gold);
-    }
-
-    .citation a.btn-apa {
-      background-color: var(--color-aggie-blue-50);
-      margin-right: .5rem;
-      min-width: 8ch;
-    }
-
-    .citation a.btn-apa::after {
-      content: ' ';
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 5px solid black;
-      margin-left: 0.8rem;
-    }
-
-    .cite-graphic {
-      margin: auto;
-      width: 33%;
-    }
-
-    .citation .header-dots {
-      margin: 0;
-    }
-
-    .cite-collection {
-      margin: auto;
-      width: 67%;
-      padding: 2rem;
-    }
-
-    .cite-collection h2,
-    .collection-highlights h2 {
-      margin-bottom: .3rem;
-    }
-
-    .cite-collection p {
-      margin-bottom: 3rem;
-    } */
-
-    /* .admin-heading {
-      margin-top: 5rem;
-      text-align: center;
-    }
-
-    .admin-content {
-      border-style: inset;
-      border-color: rgb(235, 243, 250);
-      margin: 2rem;
-    }
-
-    .admin-box-title {
-      text-align: center;
-      font-weight: normal;
-      margin: 0;
-    } */
 
     @media (min-width: 767px) {
       .card-2,
@@ -267,6 +186,7 @@ export default function render() {
       .title-section {
         display: block;
         min-height: 90vh;
+        overflow-y: -webkit-paged-x;
       }
 
       .title-section > div {
@@ -289,36 +209,6 @@ export default function render() {
         padding-top: 0;
       }
     }
-
-    /* .display-editor-root {
-      height: 500px;
-      margin: 2rem;
-    } */
-
-    /* .display-pref-heading {
-      margin: 2rem;
-    } */
-
-    /* input[type=file]::file-selector-button {
-      align-content: center;
-      align-items: center;
-      border-radius: 4px;
-      border-color: $blue;
-      background-color: $blue;
-      border-width: 1px;
-      cursor: pointer;
-      display: inline-flex;
-      font-size: 1.1rem;
-      height: $base-spacing*2;
-      line-height: 1.6rem;
-      text-align: center;
-      white-space: nowrap;
-      width: 100%;
-  } */
-
-    /* .file-upload-container > * {
-      display: block;
-    } */
 
     .file-upload-container ucdlib-icon {
       display: inline-block;
@@ -572,6 +462,7 @@ export default function render() {
     fieldset label {
       padding-top: .2rem;
     }
+
   </style>
   
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
@@ -836,7 +727,7 @@ export default function render() {
         </div>
       </div>
 
-      <a href="${this.collectionSearchHref}" class="btn btn--primary view-all-collections">View all collection items</a>
+      <a href="${this.collectionSearchHref}" class="btn btn--primary btn--lg view-all-collections">View all collection items</a>
 
     </div>
 

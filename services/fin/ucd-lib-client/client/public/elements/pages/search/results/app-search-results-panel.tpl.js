@@ -77,6 +77,7 @@ export default function render() {
       .grid dams-item-card {
         flex: 30%;
         padding: .5rem;
+        max-width: 30%;
       }
 
       @media (max-width: 1260px) {
