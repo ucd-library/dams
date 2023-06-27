@@ -162,7 +162,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.viewer = L.map(this.shadowRoot.querySelector("#viewer"), {
         center: [0, 0],
         crs: L.CRS.Simple,
-        zoom: 0,
+        zoom: 0
       });
     }
     
@@ -173,6 +173,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     if (this.renderedMedia.tiled) {
       let tiledUrl = this.renderedMedia.tiled.iiif + "/info.json";
       this.currentLayer = L.tileLayer.iiif(tiledUrl);
+
     } else {
       let original = this.renderedMedia.original;
 
@@ -211,14 +212,10 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
     // listen to load event to stop spinner
     if( this.renderedMedia.tiled ) {
-      this.currentLayer.on('load', function() {
-        this.loading = false;
-      });
+      this.currentLayer.on('load', this._loaded.bind(this)); 
     } else {      
       let imageElement = this.currentLayer.getElement();
-      imageElement.addEventListener('load', () => {
-        this.loading = false;
-      });
+      imageElement.addEventListener('load', this._loaded.bind(this)); 
     }
 
     // TODO this is a hack to get the viewer to resize correctly
@@ -228,6 +225,12 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
     this.shadowRoot.querySelector('.leaflet-control-attribution').style.display = 'none';
     this.shadowRoot.querySelector(".leaflet-control-container").style.display = 'none';  
+  }
+
+  _loaded() {
+    this.loading = false;
+    let spinner = this.shadowRoot.querySelector('.spinner');
+    if( spinner ) spinner.style.display = 'none';
   }
 
   getImageSize(original) {
@@ -250,7 +253,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @description bound to view nav close event
    */
   _onCloseClicked() {
-    // this.showLightbox = false;
     this.AppStateModel.set({ showLightbox: false });
   }
 
