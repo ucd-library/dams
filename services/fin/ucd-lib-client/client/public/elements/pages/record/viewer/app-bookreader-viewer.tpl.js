@@ -95,6 +95,7 @@ export default function render() {
       .BRcontrols .controls {
         padding-left: 0;
         padding-right: 0;
+        /* flex-direction: row-reverse; */
       }
 
       /* .BRcurrentpage-override  */

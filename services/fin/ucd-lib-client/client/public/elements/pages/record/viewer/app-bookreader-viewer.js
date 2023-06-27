@@ -92,6 +92,23 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
         `BookReader:1PageViewSelected`,
         this._singlePageLoad.bind(this)
       );
+
+      // hide slider / pager if only a single page
+      debugger;
+      let scrubber = document.querySelector('.scrubber');
+      let controls = document.querySelector('.controls');
+      let twoPageToggle = document.querySelector('app-media-viewer-nav')?.shadowRoot?.querySelector('.page-toggle');
+
+      if( this.bookData.pages.length < 2 ) {
+        scrubber.style.display = 'none';
+        controls.style.flexDirection = 'row-reverse';
+        if( twoPageToggle?.style ) twoPageToggle.style.display = 'none';
+
+      } else {
+        scrubber.style.display = '';
+        controls.style.flexDirection = '';
+        if( twoPageToggle?.style ) twoPageToggle.style.display = '';
+      }
     });
   }
 

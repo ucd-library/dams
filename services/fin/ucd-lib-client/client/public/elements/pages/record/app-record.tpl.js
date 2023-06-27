@@ -83,6 +83,7 @@ export default function render() {
         display: flex;
         height: 12rem;
         margin: 3rem 0;
+        background-color: var(--color-aggie-blue-30);
       }
 
       .part-of img {

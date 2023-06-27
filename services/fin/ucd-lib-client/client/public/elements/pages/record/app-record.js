@@ -103,10 +103,6 @@ class AppRecord extends Mixin(LitElement)
     this.publisher = this.record.publisher;
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
-    this.collectionImg = this.record.images?.small?.url                   
-                      || this.record.images?.medium?.url 
-                      || this.record.images?.large?.url
-                      || this.record.images?.original?.url;
 
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
@@ -117,6 +113,10 @@ class AppRecord extends Mixin(LitElement)
   _onCollectionUpdate(e) {
     if (e.state !== "loaded") return;
     this.collectionItemCount = e.vcData?.count || 0;
+    this.collectionImg = e.vcData?.images?.small?.url                   
+                      || e.vcData?.images?.medium?.url 
+                      || e.vcData?.images?.large?.url
+                      || e.vcData?.images?.original?.url;
   }
 
   /**
