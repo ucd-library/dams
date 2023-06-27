@@ -17,10 +17,10 @@ export default function render() {
         color: var(--default-secondary-color);
         text-decoration: none;
       }
-      h2 a:visited {
+      /* h2 a:visited {
         color: var(--default-secondary-color);
         text-decoration: none;
-      }
+      } */
 
       img {
         height: 50px;

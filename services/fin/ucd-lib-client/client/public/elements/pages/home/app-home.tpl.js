@@ -202,7 +202,7 @@ export default function render() {
   }
 
   .vertical-link--circle .vertical-link__figure:after {
-    opacity: 1;
+    opacity: 1 !important;
   }
 
   .about-collections {
@@ -388,7 +388,7 @@ export default function render() {
     width: 9rem;
   }
 
-  .btn--alt {
+  .about-content .btn--alt {
     padding-top: 0;
     padding-bottom: 0;
   }
@@ -490,16 +490,12 @@ export default function render() {
     color: var(--color-white);
   }
 
-  .btn--more-about {
+  .about-content .btn--more-about {
     background-color: var(--color-white);
     color: var(--color-aggie-blue-80);
   }
-  .btn--more-about:visited,
-  .btn--more-about:before {
-    color: var(--color-aggie-blue-80);
-  }
 
-  .btn--more-about:hover {
+  .about-content .btn--more-about:hover {
     color: var(--color-aggie-blue-80);
   }
 
@@ -563,24 +559,6 @@ export default function render() {
   admin-featured-collections {
     padding: 4rem 0;
   }
-
-  /*
-  .mobile-bar {
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    min-height: 3.25rem;
-    background-color: #022851; /* var(--color-aggie-blue);
-  }
-
-  .mobile-bar__nav-toggle {
-    position: relative;
-    display: flex;
-    flex-shrink: 0;
-    margin-right: 1rem;
-    background-color: #13639e; /* var(--color-aggie-blue-80);
-  }
-  */
 
   @media (min-width: 1060px) {
     .hero-top {

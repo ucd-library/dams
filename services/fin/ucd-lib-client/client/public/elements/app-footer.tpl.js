@@ -18,8 +18,7 @@ export default function render() {
         padding: 70px 35px 20px 20px;
       }
 
-      a,
-      a:visited {
+      a {
         cursor: pointer;
         color: var(--inverse-text-color);
         text-decoration: none;
