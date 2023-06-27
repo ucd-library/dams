@@ -37,14 +37,6 @@ export default function render() {
         color: var(--color-grey);
       }
 
-      iron-pages {
-        /* flex: 1; */
-        /* min-height: 250px;
-        display: flex;
-        justify-content: center;
-        flex-direction: column; */
-      }
-
       img {
         max-width: 100%;
       }
