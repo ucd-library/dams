@@ -26,6 +26,8 @@ main:
                   spec: 
                       template:
                           spec:
+                              parallelism: 4
+                              taskCount: 4
                               template:
                                   spec:
                                       containers:
@@ -39,7 +41,7 @@ main:
                                                     cpu: "4000m"
                                             command: "node"
                                             args: ${["cli/video-to-stream.js", args.finWorkflowId]}
-                                      timeoutSeconds: 7200
+                                      timeoutSeconds: 3600
                                       serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - convert_video:
@@ -47,6 +49,8 @@ main:
           args:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
               location: ${location}
+              connector_params:
+                timeout: 7200
           result: job_execution
       - check_job_status:
           switch:

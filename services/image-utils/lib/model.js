@@ -172,7 +172,8 @@ class ImageUtils {
     return resultFiles;
   }
 
-  async runVideoToStream(workflowId) {
+  async runVideoToStream(workflowId, resolution) {
+    console.log('runVideoToStream', workflowId, resolution);
     let workflowInfo = await this.getWorkflowInfo(workflowId);
     
     let localFile = this.getLocalFile(workflowInfo);
@@ -185,7 +186,7 @@ class ImageUtils {
         destination: localFile
       });
 
-    let {stdout, stderr} = await exec(`${__dirname}/ffmpeg/convert.sh ${localFile}`);
+    let {stdout, stderr} = await exec(`${__dirname}/ffmpeg/convert.sh ${localFile} ${resolution}`);
 
     await fs.unlink(localFile);
         
