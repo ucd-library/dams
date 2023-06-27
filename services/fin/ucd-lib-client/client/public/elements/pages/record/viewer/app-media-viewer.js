@@ -89,7 +89,11 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     // to check for imageList first, otherwise default to pdf for bookreader
     let mediaGroup = mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
-    if( mediaGroup ) renderAsBr = true;
+    if( mediaGroup ){
+      mediaType = 'image';
+      let hasPdf = mediaGroups.filter(m => m.clientMedia?.pdf);
+      if( hasPdf.length ) renderAsBr = true;
+    }
 
     if( !mediaGroup ) {
       mediaGroups.forEach((media) => {
@@ -112,6 +116,13 @@ export default class AppMediaViewer extends Mixin(LitElement)
     } else {
       this.bagOfFilesImage = "";
     }
+
+    // debugger;
+    // if /item/ark:/87287/d7rw8x then renderAsBr = false
+    // if( mediaGroup['@id'] === '/item/ark:/87287/d7rw8x/media/images' ) {
+    //   renderAsBr = false;
+    //   mediaType = 'image';
+    // }
 
     if (
       renderAsBr ||
@@ -150,9 +161,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     this.mediaType = mediaType;
-    // this.AppStateModel.setSelectedRecordMedia(
-    //   e.selectedRecord.index[e.location.pathname]
-    // );
   }
 
   _onSearchResultsChange(e) {

@@ -290,17 +290,18 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @description resize masonary layout
    */
   _resize() {
-    if (this.isListLayout) return;
+    if( this.isListLayout ) return;
     let firstDiv = this.shadowRoot
       .querySelector("#layout")
       .querySelector("app-search-grid-result");
-    if (!firstDiv) return;
+    if( !firstDiv ) return;
 
     let ew = this.offsetWidth;
     let w = firstDiv.offsetWidth + 25;
 
     let numCols = Math.max(Math.floor(ew / w), 1);
-    if (numCols > 3) numCols = 3;
+    if( numCols > 3 ) numCols = 3;
+    if( window.innerWidth < 1260 ) numCols = 2;
 
     // this makes sure columns are centered
     let leftOffset = Math.floor((ew - numCols * w) / 2);
@@ -308,6 +309,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     let colHeights = [];
     for (let i = 0; i < numCols; i++) colHeights.push(0);
 
+    if( leftOffset > 20 ) leftOffset = 20;
     let eles = this.shadowRoot
       .querySelector("#layout")
       .querySelectorAll("app-search-grid-result");

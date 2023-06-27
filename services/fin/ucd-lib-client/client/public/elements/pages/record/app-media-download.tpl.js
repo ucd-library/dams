@@ -169,6 +169,11 @@ export default function render() {
           white-space: nowrap;
         }
       }
+
+      #single,
+      #fullset {
+        display: none;
+      }
     </style>
 
     <div id="wrapper">
@@ -190,7 +195,7 @@ export default function render() {
             name="set-size"
             @click="${this._toggleMultipleDownload}"
           />
-          <label for="fullset">All Pages (${this.fullSetCount} files)</label>
+          <label for="fullset">All Pages (${this.fullSetCount})</label>
         </div>
       </div>
     </div>

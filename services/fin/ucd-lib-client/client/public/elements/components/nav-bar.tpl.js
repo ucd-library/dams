@@ -20,7 +20,7 @@ return html`
   h4 {
     padding: 0px 30px;
   }
-  h4 a, h4 a:visited {
+  h4 a {
     text-decoration: none;
     color: var(--color-aggie-gold);
   }

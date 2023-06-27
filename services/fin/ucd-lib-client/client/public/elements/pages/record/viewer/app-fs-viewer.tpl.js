@@ -253,9 +253,9 @@ return html`
     text-transform: uppercase;
     font-weight: bold;
   }
-  .download-button:visited {
+  /* .download-button:visited {
     color: var(--default-primary-color);
-  }
+  } */
 
   a[disabled] {
     opacity: 0.5;
