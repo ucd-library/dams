@@ -16,7 +16,11 @@ if [[ -z "$GCS_BUCKET" ]]; then
 fi
 
 mkdir -p $FUSE_DIR
+
+echo "Activating service account"
 gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
+
+echo "Mounting $GCS_BUCKET to $FUSE_DIR"
 gcsfuse --implicit-dirs -o allow_other $GCS_BUCKET $FUSE_DIR &
 
 # fusermount -u /etc/gcs-fuse/
