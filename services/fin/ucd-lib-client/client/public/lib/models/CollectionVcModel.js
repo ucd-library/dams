@@ -25,7 +25,7 @@ class CollectionVcModel {
     let images;
     if( e.payload?.clientMedia?.mediaGroups ) {
       let groups = e.payload.clientMedia.mediaGroups;
-      let group = groups.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
+      let group = groups.find(g => g.clientMedia?.images);
       if( group ) {
         images = group?.clientMedia?.images;
       }

@@ -113,10 +113,8 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
     selects.forEach((select) => {
       let ssMain = select.shadowRoot.querySelector(".ss-main");
       if (ssMain) {
-        // ssMain.style.borderColor = "var(--color-aggie-blue-50)";
         ssMain.style.border = 'none';
         ssMain.style.backgroundColor = 'transparent';
-
       }
 
       let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");

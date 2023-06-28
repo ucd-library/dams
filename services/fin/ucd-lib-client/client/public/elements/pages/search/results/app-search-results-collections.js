@@ -27,7 +27,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this.currentPage = 1;
     this.paginationTotal = 1;
 
-    this._injectModel('AppStateModel', 'SearchVcModel', 'CollectionModel');
+    this._injectModel('AppStateModel', 'FiltersModel');
   }
 
   willUpdate(e) {
@@ -36,6 +36,25 @@ class AppSearchResultsCollections extends Mixin(LitElement)
       pagination.shadowRoot.querySelector('.pager__item--previous > a').style.backgroundColor = '';
       pagination.shadowRoot.querySelector('.pager__item--next > a').style.backgroundColor = '';
     }
+  }
+
+  /**
+   * @method _onFilterBucketsUpdate
+   * @description called when collection/record search events occur, aggregation query results
+   * @param {Object} e
+   */
+  _onFilterBucketsUpdate(e) {
+    if( e.filter !== '@graph.isPartOf.@id' ) return;
+    // temp remove oac isPartOf records
+    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org'));
+
+    this.results = e.buckets.map(r => {
+      return {
+        '@id' : r.key,
+        // todo other data needed?
+      };
+    });
+    this.showResults = this.results.length > 0;
   }
 
   /**
@@ -49,18 +68,6 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     let id = e.currentTarget.getAttribute('data-id');
     this.AppStateModel.setLocation(id);
   }
-
-  /**
-   * @description _onSearchVcUpdate, fired when record search viewController updates
-   * @param {*} e 
-   */
-  _onSearchVcUpdate(e) {
-    if( e.state !== 'loaded' ) return;
-
-    this.results = e.payload.matchedCollections;
-    this.showResults = this.results.length > 0;
-  }
-
 }
 
 customElements.define('app-search-results-collections', AppSearchResultsCollections);

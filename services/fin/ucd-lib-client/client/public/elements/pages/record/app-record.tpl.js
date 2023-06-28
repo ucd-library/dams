@@ -83,6 +83,7 @@ export default function render() {
         display: flex;
         height: 12rem;
         margin: 3rem 0;
+        background-color: var(--color-aggie-blue-30);
       }
 
       .part-of img {
@@ -152,7 +153,109 @@ export default function render() {
           display: block;
         }
       }
+
+    .admin-edit .left-panel {
+      position: absolute;
+      left: 20%;
+      width: 60%;
+      top: calc(170px + 2rem);
+      z-index: 500;
+    }
+
+    .admin-edit .right-panel {
+      position: absolute;
+      right: 3rem;
+      top: calc(170px + 2rem);
+      z-index: 500;
+    }
+
+    .admin-edit .icon-wrapper {
+      height: 50px;
+      width: 50px;
+      background-color: var(--color-aggie-blue-70);
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: .3rem;
+      cursor: pointer;
+    }
+
+    .admin-edit ucdlib-icon {
+      fill: white;
+      width: 50%;
+      height: 50%;
+      margin: auto;
+      padding-top: 0.6rem;      
+    }
+
+    .admin-edit .icon-wrapper.edit {
+      background-color: var(--color-aggie-blue);
+    }
+
+    .admin-edit .icon-wrapper:hover {
+      background-color: var(--color-aggie-blue);
+    }
+
+    .admin-edit .icon-wrapper.edit:hover {
+      background-color: var(--color-aggie-gold);
+    }
+
+    .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
+      fill: var(--color-aggie-blue);
+    }
+
+    .edit-overlay {
+      background: white;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      opacity: .55;
+      z-index: 400;
+    }
+
     </style>
+
+    <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
+    </div>
+    <div class="admin-edit" ?hidden="${!this.isUiAdmin}">
+      <div class="left-panel" ?hidden="${!this.editMode || !this.isUiAdmin}">
+        <span class="form-label" style="font-weight: bold;">Item Display:</span>
+        <ucd-theme-slim-select
+          @change="${this._ssSelectBlur}"
+          @focusin="${this._ssSelectFocus}"
+          @click="${this._ssSelectFocus}"
+          @blur="${this._ssSelectBlur}">
+          <select>
+              <option .value=${'default'} ?selected=${true}>
+                Collection Default (Book Reader - 2 Page)
+              </option>
+              <option .value=${'2-page'} ?selected=${false}>
+                Book Reader - 2 Page
+              </option>
+              <option .value=${'1-page'} ?selected=${false}>
+                Book Reader - Single Page
+              </option>
+              <option .value=${'list'} ?selected=${false}>
+                Image List
+              </option>
+          </select>
+        </ucd-theme-slim-select>
+      </div>
+
+      <div class="right-panel">
+        <div class="icon-wrapper" ?hidden="${this.editMode || !this.isUiAdmin}" @click="${this._onEditClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
+        </div>
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onSaveClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
+        </div>
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onCancelEditClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+        </div>
+      </div>
+    </div>
+
 
     <app-media-viewer @br-page-change="${this._onBookViewPageChange}"></app-media-viewer>
 

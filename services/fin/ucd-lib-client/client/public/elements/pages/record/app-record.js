@@ -8,10 +8,14 @@ import rightsDefinitions from "../../../lib/rights.json";
 import citations from "../../../lib/models/CitationsModel";
 import utils from "../../../lib/utils";
 
+import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js";
+
 import "./app-media-download";
 import "./app-fs-media-download";
 import "./viewer/app-media-viewer";
 import "../../components/citation";
+
+import user from '../../../lib/utils/user.js';
 
 class AppRecord extends Mixin(LitElement)
   .with(MainDomElement, LitCorkUtils) {
@@ -35,6 +39,8 @@ class AppRecord extends Mixin(LitElement)
       isBagOfFiles: { type: Boolean },
       arkDoi: { type: Array },
       fedoraLinks: { type: Array },
+      isUiAdmin : { type : Boolean },
+      editMode : { type : Boolean },
       // citations : {type: Array}
       citationRoot: { type: Object },
     };
@@ -67,6 +73,9 @@ class AppRecord extends Mixin(LitElement)
     this.citationRoot = {};
     this.collectionItemCount = 0;
 
+    this.isUiAdmin = user.canEditUi();
+    this.editMode = false;
+
     this._injectModel(
       "AppStateModel",
       "RecordModel",
@@ -79,6 +88,8 @@ class AppRecord extends Mixin(LitElement)
     // this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath)); // this causes badness with ie /media/images:4 paths
     this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+
+    this._updateSlimStyles();
   }
 
   /**
@@ -103,10 +114,6 @@ class AppRecord extends Mixin(LitElement)
     this.publisher = this.record.publisher;
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
-    this.collectionImg = this.record.images?.small?.url                   
-                      || this.record.images?.medium?.url 
-                      || this.record.images?.large?.url
-                      || this.record.images?.original?.url;
 
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
@@ -117,6 +124,10 @@ class AppRecord extends Mixin(LitElement)
   _onCollectionUpdate(e) {
     if (e.state !== "loaded") return;
     this.collectionItemCount = e.vcData?.count || 0;
+    this.collectionImg = e.vcData?.images?.small?.url                   
+                      || e.vcData?.images?.medium?.url 
+                      || e.vcData?.images?.large?.url
+                      || e.vcData?.images?.original?.url;
   }
 
   /**
@@ -127,6 +138,66 @@ class AppRecord extends Mixin(LitElement)
     this._updateLinks(e.location);
     if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+  }
+
+  _updateSlimStyles() {
+    let select = this.querySelector('ucd-theme-slim-select');
+    if( !select ) return;
+
+    let ssMain = select.shadowRoot.querySelector(".ss-main");
+    if (ssMain) {
+      ssMain.style.border = 'none';
+      ssMain.style.backgroundColor = 'transparent';
+    }
+
+    let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");
+    if (ssSingle) {
+      ssSingle.style.border = "none";
+      ssSingle.style.height = "49px";
+      ssSingle.style.paddingLeft = "1rem";
+      ssSingle.style.backgroundColor = "var(--color-aggie-blue-50)";
+      ssSingle.style.borderRadius = '0';
+      ssSingle.style.fontWeight = "bold";
+      ssSingle.style.color = "var(--color-aggie-blue)";
+    }
+
+    let search = select.shadowRoot.querySelector('.ss-search');
+    if( search ) {
+      search.style.display = "none";
+    }
+  }
+  
+  /**
+   * @method _ssSelectFocus
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectFocus(e) {
+    console.log('focus')
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    if( ssSingleSelected?.classList.value === 'ss-single-selected ss-open-below' ) {
+      ssSingleSelected.style.backgroundColor = '#FFF4D2'; // gold-30
+      ssMain.style.borderColor = '#FFBF00'; // gold
+    } else {
+      ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+      ssMain.style.borderColor = '#B0D0ED'; // blue-50
+    }
+  }
+
+  /**
+   * @method _ssSelectBlur
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectBlur(e) {
+    console.log('blur')
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+    ssMain.style.borderColor = '#B0D0ED'; // blue-50
   }
 
   /**
@@ -176,6 +247,67 @@ class AppRecord extends Mixin(LitElement)
       '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
     ];
 
+  }
+
+  /**
+   * @method _onEditClicked
+   * @description admin ui, edit button click event
+   * 
+   * @param {Object} e 
+   */
+  _onEditClicked(e) {
+    if( !this.isUiAdmin ) return;
+    this.editMode = true;
+  }
+
+  /**
+   * @method _onSaveClicked
+   * @description admin ui, save button click event
+   * 
+   * @param {Object} e 
+   */
+  async _onSaveClicked(e) {
+    if( !this.isUiAdmin ) return;
+
+    // TODO things
+
+    
+    // parse highlighted items
+    // this.savedItems = [];
+    // let newSavedItems = [];
+    // let itemInputs = document.querySelectorAll('.item-ark-input');
+    // itemInputs.forEach((input, index) => {
+    //   if( input.value ) {
+    //     newSavedItems.push({
+    //       '@id' : input.value,
+    //       position : index+1
+    //     });
+    //   }
+    // });
+    // this.savedItems = [...newSavedItems];
+    
+    // this._updateDisplayData();
+    // let featuredImage = document.querySelector('#file-upload').files[0];
+    // await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, featuredImage);
+    
+    // this.editMode = false;
+
+    // this.requestUpdate(); 
+    // // TODO for some reason this.savedItems isn't updating the view, even with requestUpdate()
+    // //  so the ordering doesn't update until page load
+    // // this._onAppStateUpdate(await this.AppStateModel.get()); // also doesn't work
+    // this.AppStateModel.setLocation(this.collectionId);
+  }
+
+  /**
+   * @method _onCancelEditClicked
+   * @description admin ui, cancel editing button click event
+   * 
+   * @param {Object} e 
+   */
+  _onCancelEditClicked(e) {
+    if( !this.isUiAdmin ) return;
+    this.editMode = false;
   }
 
   /**
