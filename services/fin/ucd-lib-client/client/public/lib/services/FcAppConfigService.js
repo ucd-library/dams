@@ -28,6 +28,23 @@ class FcAppConfigService extends BaseService {
     });
   }
 
+  getItemAppData(id) {
+    return this.request({
+      url : `${this.baseUrl}${id}${id.replace('/item','')}.jsonld.json`,
+      fetchOptions : {
+        headers : {
+          'Accept' : 'application/ld+json',
+          // 'Accept' : 'application/ld+json; profile="http://www.w3.org/ns/json-ld#flattened"',
+          'Prefer' : 'return=representation; omit="http://fedora.info/definitions/fcrepo#ServerManaged"'
+        },
+      },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    });
+  }
+
   async saveCollectionDisplayData(id, displayData, featuredImage) {    
     if( featuredImage ) {
       await fetch(`${this.baseUrl}${id}/featuredImage.jpg`, {
@@ -75,6 +92,24 @@ class FcAppConfigService extends BaseService {
           'Accept' : 'application/json',
           // 'Prefer' : 'handling=lenient',
           'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify(displayData)
+      },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    });
+  }
+
+  async saveItemDisplayData(id, displayData) {
+    debugger;
+    return this.request({
+      url : `${this.baseUrl}${id}${id.replace('/item','')}.jsonld.json`,
+      fetchOptions : {
+        method : 'PUT',
+        headers : {
+          'Content-Type' : 'application/ld+json'
         },
         body : JSON.stringify(displayData)
       },

@@ -313,7 +313,7 @@ export default function render() {
 
     .edit-overlay {
       background: white;
-      position: absolute;
+      position: fixed;
       top: 0;
       right: 0;
       bottom: 0;
@@ -553,7 +553,7 @@ export default function render() {
           <ul class="list--reset">
             <li>
               <input id="six" 
-                name="radio" 
+                name="radio-items-per-page" 
                 type="radio" 
                 class="radio" 
                 value="6" 
@@ -563,7 +563,7 @@ export default function render() {
             </li>
             <li>
               <input id="three" 
-                name="radio" 
+                name="radio-items-per-page" 
                 type="radio" 
                 class="radio" 
                 value="3" 
@@ -573,7 +573,7 @@ export default function render() {
             </li>
             <li>
               <input id="zero" 
-                name="radio" 
+                name="radio-items-per-page" 
                 type="radio" 
                 class="radio" 
                 value="0" 
@@ -647,32 +647,32 @@ export default function render() {
                 <ul class="list--reset" style="padding-inline-start: 0;">
                   <li>
                     <input id="two" 
-                      name="radio" 
+                      name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="two" 
-                      ?checked="${this.itemDisplayDefault === 'two'}" 
-                      @change="${this._onItemDisplayDefaultChange}">
+                      value="Book Reader - 2 Page" 
+                      ?checked="${this.itemDefaultDisplay === 'Book Reader - 2 Page'}" 
+                      @change="${(e) => (this.itemDefaultDisplay = 'Book Reader - 2 Page')}">
                     <label for="two">Book Reader - 2 Page</label>
                   </li>
                   <li>
                     <input id="one" 
-                      name="radio" 
+                      name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="one" 
-                      ?checked="${this.itemDisplayDefault === 'one'}" 
-                      @change="${this._onItemDisplayDefaultChange}">
+                      value="Book Reader - Single Page" 
+                      ?checked="${this.itemDefaultDisplay === 'Book Reader - Single Page'}" 
+                      @change="${(e) => (this.itemDefaultDisplay = 'Book Reader - Single Page')}">
                     <label for="one">Book Reader - 1 Page</label>
                   </li>
                   <li>
                     <input id="list" 
-                      name="radio" 
+                      name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="list" 
-                      ?checked="${this.itemDisplayDefault === 'list'}" 
-                      @change="${this._onItemDisplayDefaultChange}">
+                      value="Image List" 
+                      ?checked="${this.itemDefaultDisplay === 'Image List'}" 
+                      @change="${(e) => (this.itemDefaultDisplay = 'Image List')}">
                     <label for="list">Image List</label>
                   </li>
                 </ul>
@@ -713,15 +713,9 @@ export default function render() {
           ${this.highlightedItems.map((item, index) => html`
             ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
-          ${this.savedItems.map((item, index) => html`
-            ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
-          `)}
         </div>
         <div class="card-trio">
           ${this.highlightedItems.map((item, index) => html`
-            ${index >= 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
-          `)}
-          ${this.savedItems.map((item, index) => html`
             ${index >= 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
         </div>
@@ -732,27 +726,5 @@ export default function render() {
     </div>
 
     <app-citation .record="${this.citationRoot}"></app-citation>
-
-    <!-- <h2 class="admin-heading">Debug ${this.collectionId}</h2>
-    <div class="admin-content">
-      <h4 class="admin-box-title">dbsync</h4> -->
-      <!-- json injected admin data -->
-    <!-- </div> -->
-
-    <!-- <h2 class="display-pref-heading">Admin Display Preferences</h2>
-    <div class="display-editor-root">
-    
-    </div> -->
-    
-    <!-- <div class="file-upload-container">    
-      <label for="file-upload" class="file-upload-label">
-        Upload Featured Image 
-      </label>
-      <input id="file-upload" type="file" accept="image/jpeg" @change="${this._onFileChange}" />
-      <span class="selected-file">
-      </span>
-    </div>
-
-    <a href="" class="btn--alt" style="margin: 0 2rem 2rem 2rem" @click="${this._onSave}">Save</a> -->
 
   `;}

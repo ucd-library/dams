@@ -94,7 +94,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
       );
 
       // hide slider / pager if only a single page
-      debugger;
       let scrubber = document.querySelector('.scrubber');
       let controls = document.querySelector('.controls');
       let twoPageToggle = document.querySelector('app-media-viewer-nav')?.shadowRoot?.querySelector('.page-toggle');

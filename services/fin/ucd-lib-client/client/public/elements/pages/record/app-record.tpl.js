@@ -160,6 +160,8 @@ export default function render() {
       width: 60%;
       top: calc(170px + 2rem);
       z-index: 500;
+      border-bottom: 6px dotted var(--color-aggie-gold);
+      padding-bottom: 1.5rem;
     }
 
     .admin-edit .right-panel {
@@ -205,7 +207,7 @@ export default function render() {
 
     .edit-overlay {
       background: white;
-      position: absolute;
+      position: fixed;
       top: 0;
       right: 0;
       bottom: 0;
@@ -227,16 +229,16 @@ export default function render() {
           @click="${this._ssSelectFocus}"
           @blur="${this._ssSelectBlur}">
           <select>
-              <option .value=${'default'} ?selected=${true}>
-                Collection Default (Book Reader - 2 Page)
+              <option .value=${''} ?selected=${this.itemDisplay === ''}>
+                Collection Default (${this.itemDefaultDisplay})
               </option>
-              <option .value=${'2-page'} ?selected=${false}>
+              <option .value=${'Book Reader - 2 Page'} ?selected=${this.itemDisplay === 'Book Reader - 2 Page'}>
                 Book Reader - 2 Page
               </option>
-              <option .value=${'1-page'} ?selected=${false}>
+              <option .value=${'Book Reader - Single Page'} ?selected=${this.itemDisplay === 'Book Reader - Single Page'}>
                 Book Reader - Single Page
               </option>
-              <option .value=${'list'} ?selected=${false}>
+              <option .value=${'Image List'} ?selected=${this.itemDisplay === 'Image List'}>
                 Image List
               </option>
           </select>

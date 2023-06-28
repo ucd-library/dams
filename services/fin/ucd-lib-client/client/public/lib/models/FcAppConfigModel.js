@@ -140,6 +140,18 @@ class FcAppConfigModel extends BaseModel {
   }
 
   /**
+     * @method getItemAppData
+     * @description load an items application container display data by id
+     * 
+     * @param {String} id item id
+     * 
+     * @returns {Promise} resolves to a jsonld graph
+     */
+  async getItemAppData(id) {
+    return await this.service.getItemAppData(id);
+  }
+
+  /**
    * @method saveCollectionDisplayData
    * @description save a collections display data
    * 
@@ -173,6 +185,19 @@ class FcAppConfigModel extends BaseModel {
    */
   async saveFeaturedCollectionAppData(displayData) {
     return await this.service.saveFeaturedCollectionDisplayData(displayData);
+  }
+
+  /**
+   * @method saveItemDisplayData
+   * @description save an items display data
+   * 
+   * @param {String} id record id
+   * @param {Array} displayData record id
+   * 
+   * @returns {Promise} resolves to record
+   */
+  async saveItemDisplayData(id, displayData) {
+    return await this.service.saveItemDisplayData(id, displayData);
   }
 
 }

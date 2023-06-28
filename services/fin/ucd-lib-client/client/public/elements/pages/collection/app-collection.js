@@ -36,6 +36,7 @@ class AppCollection extends Mixin(LitElement)
       itemDisplayCount : { type : Number },
       collectionSearchHref : {type: String},
       citationRoot: { type: Object },
+      itemDefaultDisplay: { type: String },
     };
   }
 
@@ -44,6 +45,7 @@ class AppCollection extends Mixin(LitElement)
     this.render = render.bind(this);
     this.active = true;
 
+    this.appDataLoaded = false;
     this.reset();
 
     this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'FcAppConfigModel', 'SeoModel');
@@ -82,6 +84,7 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
    async _onCollectionUpdate(e) {
+    console.log('collection update', e)
     if( e.state !== 'loaded' ) return;
     if( this.AppStateModel.location.page !== 'collection' ) return;
 
@@ -112,7 +115,9 @@ class AppCollection extends Mixin(LitElement)
     this.citationRoot = e.payload.root;
 
     // try to load from app container first
-    if( !this.savedItems.length ) {
+    if( this.appDataLoaded && !this.savedItems.length ) {
+      console.log('load recentItems')
+      
       // default to most recent 3 items by year published descending    
       let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, 3);
       if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
@@ -132,6 +137,7 @@ class AppCollection extends Mixin(LitElement)
     // search highlighted collection items
     // this.RecordModel.searchHighlighted(this.collectionId, true, true);
 
+    console.log('collection update finish', e)
     this._updateDisplayData();
   }
 
@@ -156,6 +162,7 @@ class AppCollection extends Mixin(LitElement)
     this.editMode = false;
     this.itemDisplayCount = 6;
     this.citationRoot = {};
+    this.itemDefaultDisplay = 'Book Reader - 2 Page'; // one, list.. for admin pref on BR display type for items in this collection
   }
 
   /**
@@ -270,6 +277,9 @@ class AppCollection extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
+    console.log('parse display data');
+    this.savedItems = [];
+
     // not sure if we'll have transform service to always create same jsonld structure
     // for now just parse out values and set consistent structure
     // try to load from app_config
@@ -298,6 +308,7 @@ class AppCollection extends Mixin(LitElement)
           });
 
           this.savedItems.sort((a,b) => a.position - b.position);
+          this.highlightedItems = [...this.savedItems];
         }
       
         // featured image
@@ -323,16 +334,36 @@ class AppCollection extends Mixin(LitElement)
           this.watercolor = watercolor['http://schema.org/css'][0]['@value'];
         }
 
-        // TODO
+        let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+        if( !graphRoot ) return;
+
         // featured items
-        
+        let items = graphRoot['http://schema.org/exampleOfWork'];
+        if( items ) {
+          if( !Array.isArray(items) ) items = [items];
+          // todo save to this.savedItems?
+          items.forEach((item, index) => {
+            this.savedItems.push({
+              '@id' : '/item' + item['@id']?.split('/item')?.[1],
+              position : index+1
+            });  
+          });
+        }
+        this.highlightedItems = [...this.savedItems];
+
         // featured image
+        this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot['http://schema.org/thumbnailUrl']?.[0]?.['@id']?.split('/fcrepo/rest')?.[1];
 
         // itemDisplayCount
-
+        this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount']?.[0]?.['@value'];
       }
     }
-    
+
+    console.log('this.savedItems', this.savedItems);
+    console.log('this.highlightedItems', this.highlightedItems);
+    console.log('parse display data done');
+
+    this.appDataLoaded = true;
     this._updateDisplayData();
   }
 
@@ -384,6 +415,7 @@ class AppCollection extends Mixin(LitElement)
           "@id" : "info:fedora/application/ucd-lib-client${this.collectionId}/featuredImage.jpg"
       },
       "ucdlib:itemCount" : ${this.itemDisplayCount},
+      "ucdlib:itemDefaultDisplay" : "${this.itemDefaultDisplay}",
       "exampleOfWork" : 
         ${JSON.stringify(this.savedItems)}
     }`);
