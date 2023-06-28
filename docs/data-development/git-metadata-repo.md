@@ -11,6 +11,7 @@ Make sure to add a .gitignore to your root folder:
 ```.gitignore
 *
 !.gitignore
+!LICENSE
 !*/
 !*.jsonld.json
 !*.md
