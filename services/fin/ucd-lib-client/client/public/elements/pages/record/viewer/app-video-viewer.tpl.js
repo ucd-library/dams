@@ -50,6 +50,12 @@ return html`
             outline: 0 !important;
             background: transparent !important;
         }
+
+        @media(max-width: 768px) {
+            :host {
+                width: 90%;
+            }
+        }
     </style>
     
     <div class="container">

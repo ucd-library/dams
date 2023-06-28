@@ -275,7 +275,7 @@ export default function render() {
         } */
 
         #buttonWrapper.wrap {
-          padding-top: 1rem;
+          /* padding-top: 1rem; */
           /* position: relative;
           left: 62vw; */
         }
@@ -382,7 +382,7 @@ export default function render() {
         style="white-space: nowrap"
         ?hidden="${this.isLightbox}"
       >
-        <div @click="${this._onToggleBookView}" ?hidden="${!this.isBookReader}">
+        <div @click="${this._onToggleBookView}" class="page-toggle" ?hidden="${!this.isBookReader}">
           <ucdlib-icon
             icon="ucdlib-dams:fa-book-open"
             ?hidden="${!this.brSinglePage}"

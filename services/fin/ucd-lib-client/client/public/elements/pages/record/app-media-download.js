@@ -75,7 +75,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.clientMedia = clientMedia;
     let sources = [];
 
-    let download = selectedMedia.clientMedia?.download?.url || selectedMedia.clientMedia.pages.filter(node => node.page === selectedMediaPage)[0]?.download?.url;
+    let download = selectedMedia.clientMedia?.download?.url || selectedMedia.clientMedia.pages?.filter(node => node.page === selectedMediaPage)[0]?.download?.url;
     this._setDownloadHref(download);
 
     // find out if the number of download options is greater than 1

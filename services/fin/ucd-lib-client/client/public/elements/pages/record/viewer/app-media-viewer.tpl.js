@@ -37,14 +37,6 @@ export default function render() {
         color: var(--color-grey);
       }
 
-      iron-pages {
-        /* flex: 1; */
-        /* min-height: 250px;
-        display: flex;
-        justify-content: center;
-        flex-direction: column; */
-      }
-
       img {
         max-width: 100%;
       }
@@ -160,6 +152,7 @@ export default function render() {
         overflow-y: scroll;
         padding: 1rem;
         padding-bottom: 0;
+        background-color: var(--color-aggie-gold-40);
       }
 
       #br-search-input {

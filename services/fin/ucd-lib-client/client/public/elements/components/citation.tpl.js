@@ -93,6 +93,7 @@ return html`
       margin: auto;
       width: 67%;
       padding: 2rem;
+      overflow-wrap: break-word;
     }
 
     .cite-collection h2,
