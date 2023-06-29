@@ -41,7 +41,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.render = render.bind(this);
     this.active = true;
 
-    this._injectModel("AppStateModel", "RecordModel");
+    this._injectModel("AppStateModel", "RecordModel", "FcAppConfigModel");
     this.mediaType = "image";
     this.bagOfFilesImage = "";
     this.brFullscreen = false;
@@ -123,6 +123,13 @@ export default class AppMediaViewer extends Mixin(LitElement)
     //   renderAsBr = false;
     //   mediaType = 'image';
     // }
+
+    // finally, check for any overrides at collection/item level for the image viewer
+    let itemId = e.selectedRecord?.graph?.root?.['@id'];
+    let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))[0]['@id'];
+    let displayOverride = await utils.getItemDisplayType(itemId, collectionId, this.FcAppConfigModel);
+
+    debugger;
 
     if (
       renderAsBr ||

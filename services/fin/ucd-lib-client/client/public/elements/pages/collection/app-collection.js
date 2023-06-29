@@ -9,6 +9,7 @@ import "../../components/cards/dams-item-card";
 import '../../components/citation';
 
 import user from '../../../lib/utils/user.js';
+import utils from '../../../lib/utils/index.js';
 
 class AppCollection extends Mixin(LitElement) 
   .with(MainDomElement, LitCorkUtils) {
@@ -280,84 +281,38 @@ class AppCollection extends Mixin(LitElement)
     console.log('parse display data');
     this.savedItems = [];
 
-    // not sure if we'll have transform service to always create same jsonld structure
-    // for now just parse out values and set consistent structure
-    // try to load from app_config
-    let savedDisplayData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${this.collectionId}${this.collectionId.replace('/collection', '')}.jsonld.json`];
-    if( savedDisplayData ) {
-      // watercolor
-      let watercolor = savedDisplayData['graph'].filter(g => g['@id'].indexOf('/application/#') > -1)[0];
-      if( watercolor ) {
-        this.watercolor = watercolor.css;
-      }
+    let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
+    if( !savedDisplayData ) return;
 
-      // featured items
-      let graphRoot = savedDisplayData['graph'].filter(d => d['@id'] === '/application'+this.collectionId)[0];
-      if( graphRoot ) {
-        let items = graphRoot.exampleOfWork;
-        if( items ) {
-          if( !Array.isArray(items) ) items = [items];
-          items.forEach(item => {
-            let match = savedDisplayData['graph'].filter(d => d['@id'] === item)[0];
-            if( match ) {
-              this.savedItems.push({
-                '@id' : match['@id'],
-                position : match['http://schema.org/position']
-              });
-            }
-          });
-
-          this.savedItems.sort((a,b) => a.position - b.position);
-          this.highlightedItems = [...this.savedItems];
-        }
-      
-        // featured image
-        this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot.thumbnailUrl;
-
-        // itemDisplayCount
-        this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount'];
-      }    
-
-    } else {
-      // otherwise ping fcrepo
-      try {
-        savedDisplayData = await this.FcAppConfigModel.getCollectionAppData(this.collectionId);      
-      } catch(e) {
-        console.error(e);
-        return;
-      }
-
-      if( savedDisplayData && savedDisplayData.body ) {
-        savedDisplayData = JSON.parse(savedDisplayData.body);
-        let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
-        if( watercolor ) {
-          this.watercolor = watercolor['http://schema.org/css'][0]['@value'];
-        }
-
-        let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-        if( !graphRoot ) return;
-
-        // featured items
-        let items = graphRoot['http://schema.org/exampleOfWork'];
-        if( items ) {
-          if( !Array.isArray(items) ) items = [items];
-          // todo save to this.savedItems?
-          items.forEach((item, index) => {
-            this.savedItems.push({
-              '@id' : '/item' + item['@id']?.split('/item')?.[1],
-              position : index+1
-            });  
-          });
-        }
-        this.highlightedItems = [...this.savedItems];
-
-        // featured image
-        this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot['http://schema.org/thumbnailUrl']?.[0]?.['@id']?.split('/fcrepo/rest')?.[1];
-
-        // itemDisplayCount
-        this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount']?.[0]?.['@value'];
-      }
+    let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
+    if( watercolor ) {
+      this.watercolor = watercolor['http://schema.org/css'][0]['@value'];
     }
+
+    let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+    if( !graphRoot ) return;
+
+    // featured items
+    let items = graphRoot['http://schema.org/exampleOfWork'];
+    if( items ) {
+      if( !Array.isArray(items) ) items = [items];
+      
+      items.forEach((item, index) => {
+        this.savedItems.push({
+          '@id' : '/item' + item['@id']?.split('/item')?.[1],
+          position : index+1
+        });  
+      });
+    }
+    this.highlightedItems = [...this.savedItems];
+
+    // featured image
+    this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot['http://schema.org/thumbnailUrl']?.[0]?.['@id']?.split('/fcrepo/rest')?.[1];
+
+    // itemDisplayCount
+    this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount']?.[0]?.['@value'];
+
+    this.itemDefaultDisplay = graphRoot['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || this.itemDefaultDisplay;
 
     console.log('this.savedItems', this.savedItems);
     console.log('this.highlightedItems', this.highlightedItems);

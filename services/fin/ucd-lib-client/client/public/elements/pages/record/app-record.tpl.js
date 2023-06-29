@@ -154,7 +154,7 @@ export default function render() {
         }
       }
 
-    .admin-edit .left-panel {
+    app-record .admin-edit .left-panel {
       position: absolute;
       left: 20%;
       width: 60%;
@@ -164,14 +164,14 @@ export default function render() {
       padding-bottom: 1.5rem;
     }
 
-    .admin-edit .right-panel {
+    app-record .admin-edit .right-panel {
       position: absolute;
       right: 3rem;
       top: calc(170px + 2rem);
       z-index: 500;
     }
 
-    .admin-edit .icon-wrapper {
+    app-record .admin-edit .icon-wrapper {
       height: 50px;
       width: 50px;
       background-color: var(--color-aggie-blue-70);
@@ -181,7 +181,7 @@ export default function render() {
       cursor: pointer;
     }
 
-    .admin-edit ucdlib-icon {
+    app-record .admin-edit ucdlib-icon {
       fill: white;
       width: 50%;
       height: 50%;
@@ -189,19 +189,19 @@ export default function render() {
       padding-top: 0.6rem;      
     }
 
-    .admin-edit .icon-wrapper.edit {
+    app-record .admin-edit .icon-wrapper.edit {
       background-color: var(--color-aggie-blue);
     }
 
-    .admin-edit .icon-wrapper:hover {
+    app-record .admin-edit .icon-wrapper:hover {
       background-color: var(--color-aggie-blue);
     }
 
-    .admin-edit .icon-wrapper.edit:hover {
+    app-record .admin-edit .icon-wrapper.edit:hover {
       background-color: var(--color-aggie-gold);
     }
 
-    .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
+    app-record .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
       fill: var(--color-aggie-blue);
     }
 
@@ -265,11 +265,8 @@ export default function render() {
       <h3>${this.name}</h3>
       <div class="copyright">
         <span>&copy;</span>
-        <a
-          href="http://rightsstatements.org/vocab/InC-NC/1.0/"
-          class="copyright-text"
-          >In Copyright - Non-Commercial Use Permitted</a
-        >
+        <a href="http://rightsstatements.org/vocab/InC-NC/1.0/"
+          class="copyright-text">In Copyright - Non-Commercial Use Permitted</a>
       </div>
 
       <div class="part-of">
@@ -286,12 +283,10 @@ export default function render() {
         <div class="download-options">
           <app-media-download
             id="download"
-            ?hidden="${this.isBagOfFiles}"
-          ></app-media-download>
+            ?hidden="${this.isBagOfFiles}"></app-media-download>
           <app-fs-media-download
             id="download"
-            ?hidden="${!this.isBagOfFiles}"
-          ></app-fs-media-download>
+            ?hidden="${!this.isBagOfFiles}"></app-fs-media-download>
         </div>
       </div>
 

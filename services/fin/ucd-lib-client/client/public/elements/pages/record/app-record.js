@@ -46,6 +46,7 @@ class AppRecord extends Mixin(LitElement)
       itemDefaultDisplay: { type: String }, // collection default display
       itemDisplay: { type: String },
       displayData: { type: Object },
+      savedCollectionData: { type: Object },
     };
   }
 
@@ -81,6 +82,7 @@ class AppRecord extends Mixin(LitElement)
     this.isUiAdmin = user.canEditUi();
     this.editMode = false;
     this.displayData = {};
+    this.savedCollectionData = {};
 
     this._injectModel(
       "AppStateModel",
@@ -285,7 +287,16 @@ class AppRecord extends Mixin(LitElement)
     this.itemDisplay = document.querySelector('ucd-theme-slim-select')?.slimSelect?.selected();
     this._updateDisplayData();
     await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
-    
+
+    // TODO save collection data with hasPart pointing to this item
+    if( Object.keys(this.savedCollectionData).length ) {
+      // TEMP hack, also should append to array and not replace
+      this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0]['http://digital.library.ucdavis.edu/schema/itemDisplayExceptions'] 
+        = [{'@id': 'info:fedora/application/ucd-lib-client/item/ark:/87287/d70898/ark:/87287/d70898.jsonld.json'}];
+
+      await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.savedCollectionData);
+    }
+
     this.editMode = false;
 
     this._changeMediaViewerDisplay('');
@@ -309,60 +320,21 @@ class AppRecord extends Mixin(LitElement)
    */
     async _parseDisplayData() {
       console.log('parse display data');
-  
-      // try to load from app_config
-      let savedCollectionData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${this.collectionId}${this.collectionId.replace('/collection', '')}.jsonld.json`];
 
-      if( savedCollectionData ) {
-        // TODO get ucdlib:itemDefaultDisplay
-
-
-      } else {
-        // otherwise ping fcrepo
-        try {
-          savedCollectionData = await this.FcAppConfigModel.getCollectionAppData(this.collectionId);    
-
-        } catch(e) {
-          console.error(e);
-          return;
-        }
-  
-        if( savedCollectionData && savedCollectionData.body ) {
-          savedCollectionData = JSON.parse(savedCollectionData.body);
-          let graphRoot = savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-          this.itemDefaultDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
-          
-        }
+      let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
+      if( savedDisplayData ) {
+        this.savedCollectionData = savedDisplayData;
+        let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+        this.itemDefaultDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
       }
 
-      // actually fetch item display data, not just collection, to set the itemDisplay
-      let savedItemData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${this.renderedRecordId}${this.renderedRecordId.replace('/item', '')}.jsonld.json`];
-      if( savedItemData ) {
-        // TODO get ucdlib:itemDefaultDisplay to set itemDisplay
+      debugger;
+      savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
 
-
-      } else {
-        // otherwise ping fcrepo
-        try {
-          savedItemData = await this.FcAppConfigModel.getItemAppData(this.renderedRecordId); 
-          
-        } catch(e) {
-          console.error(e);
-          return;
-        }
-
-        if( savedItemData && savedItemData.body ) {
-          savedItemData = JSON.parse(savedItemData.body);
-          let graphRoot = savedItemData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-          this.itemDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || '';
-
-        }
-
-
-
+      if( savedDisplayData ) {
+        let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+        this.itemDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || '';  
       }
-
-
 
       console.log('parse display data done');
 

@@ -13,7 +13,7 @@ class FcAppConfigService extends BaseService {
 
   getCollectionAppData(id) {
     return this.request({
-      url : `${this.baseUrl}${id}${id.replace('/collection','')}.jsonld.json`,
+      url : `${this.baseUrl}${id}`,
       fetchOptions : {
         headers : {
           'Accept' : 'application/ld+json',
@@ -30,7 +30,7 @@ class FcAppConfigService extends BaseService {
 
   getItemAppData(id) {
     return this.request({
-      url : `${this.baseUrl}${id}${id.replace('/item','')}.jsonld.json`,
+      url : `${this.baseUrl}${id}`,
       fetchOptions : {
         headers : {
           'Accept' : 'application/ld+json',
@@ -58,7 +58,7 @@ class FcAppConfigService extends BaseService {
     }
     
     return this.request({
-      url : `${this.baseUrl}${id}${id.replace('/collection','')}.jsonld.json`,
+      url : `${this.baseUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {
@@ -105,7 +105,7 @@ class FcAppConfigService extends BaseService {
   async saveItemDisplayData(id, displayData) {
     debugger;
     return this.request({
-      url : `${this.baseUrl}${id}${id.replace('/item','')}.jsonld.json`,
+      url : `${this.baseUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {
