@@ -1,9 +1,11 @@
 const {config, RDF_URIS, gc} = require('@ucd-lib/fin-service-utils');
+const api = require('@ucd-lib/fin-api');
 const fetch = require('node-fetch');
 const {gcs} = gc;
 
 const PDF_IMAGE_PRODUCTS = 'pdf-image-products';
 const IMAGE_PRODUCTS = 'image-products';
+const IMAGE_LIST = 'http://digital.ucdavis.edu/schema#ImageList';
 
 module.exports = async function(path, graph, headers, utils) {
 
@@ -94,6 +96,18 @@ module.exports = async function(path, graph, headers, utils) {
           manifestHash = manifestHash.md5Hash;
         }
       }
+    }
+  }
+
+  // look up parent, if it's an image list, that image list encodesCreativeWork
+  // otherwise it's the item itself
+  let parent = item['@id'].split('/').slice(0, -1).join('/');
+  item.encodesCreativeWork = item['@id'];
+  let parentContainer = await api.head({path: parent});
+  if( parentContainer.last.statusCode === 200 ) {
+    let links = api.parseLinkHeader(parentContainer.last.headers.link);
+    if( links.type && links.type.find(item => item.url === IMAGE_LIST) ) {
+      item.encodesCreativeWork = parent;
     }
   }
 
