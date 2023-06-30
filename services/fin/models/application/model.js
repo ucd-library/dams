@@ -7,6 +7,8 @@ class ApplicationsModel extends FinEsDataModel {
   constructor() {
     super('application');
     this.schema = schema;
+
+    this.REMOVE_TYPES = ['http://digital.ucdavis.edu/schema#FinIoGcsMetadata'];
   }
 
   is(id) {
@@ -14,6 +16,32 @@ class ApplicationsModel extends FinEsDataModel {
     return false;
   }
 
+  update(jsonld) {
+    delete jsonld['@context'];
+
+    jsonld['@graph'] = jsonld['@graph']
+      .filter(node => {
+        let types = node['@type'] || [];
+        if( !Array.isArray(types) ) {
+          types = [types];
+        }
+
+        for( let type of types ) {
+          if( this.REMOVE_TYPES.includes(type) ) {
+            return false;
+          }
+        }
+        return true;
+      })
+
+    jsonld['@graph'].forEach(node => {
+      node['@id'] = node['@id'].replace(/^.*\/fcrepo\/rest/, '');
+    });
+
+    jsonld['@id'] = jsonld['@id'].replace(/\/fcr:metadata$/, '');
+
+    return super.update(jsonld);
+  }
 
 }
 

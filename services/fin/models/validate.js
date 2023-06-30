@@ -34,7 +34,7 @@ class Validate {
 
     if( !graph.data['@graph'] ) {
       result.errors.push('No @graph found');
-    } else {
+    } else if( !node['@shortType'].includes('Collection') ) {
       // check that all nodes are crawlable from root
       let nodeCount = jsonld['@graph'].length;
 

@@ -1,6 +1,6 @@
 # DAMS v1 Data Export Process
 
-This document describes the process for exporting data from DAMS v1.
+This document describes the process for exporting data from DAMS v1 and preparing it for import into DAMS v2.
 
 ## Authenticate
 
