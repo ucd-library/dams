@@ -223,7 +223,7 @@ class Utils {
     try {
       savedData = await fcAppConfigModel.getCollectionAppData(id);  
     } catch( error ) {
-      console.error('Error getting app config collection graph for ' + id, error);
+      console.warn('Error getting app config collection graph for ' + id, error);
     }
     if( savedData && savedData.body ) return JSON.parse(savedData.body);
     
@@ -244,7 +244,7 @@ class Utils {
     try {
       savedData = await fcAppConfigModel.getItemAppData(id);  
     } catch( error ) {
-      console.error('Error getting app config item graph for ' + id, error);
+      console.warn('Error getting app config item graph for ' + id, error);
     }
     if( savedData && savedData.body ) return JSON.parse(savedData.body);
     
@@ -267,7 +267,7 @@ class Utils {
       if( displayType ) return displayType;
 
       let collectionGraph = await this.getAppConfigCollectionGraph(collectionId, fcAppConfigModel);
-      displayType = collectionGraph.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'];
+      displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'];
 
       return displayType;
     }

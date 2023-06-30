@@ -7,6 +7,7 @@ class ApplicationsModel extends FinEsDataModel {
   constructor() {
     super('application');
     this.schema = schema;
+    this.expectGraph = false;
   }
 
   is(id) {

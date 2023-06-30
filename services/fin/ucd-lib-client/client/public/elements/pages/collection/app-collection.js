@@ -85,7 +85,6 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e 
    */
    async _onCollectionUpdate(e) {
-    console.log('collection update', e)
     if( e.state !== 'loaded' ) return;
     if( this.AppStateModel.location.page !== 'collection' ) return;
 
@@ -117,8 +116,6 @@ class AppCollection extends Mixin(LitElement)
 
     // try to load from app container first
     if( this.appDataLoaded && !this.savedItems.length ) {
-      console.log('load recentItems')
-      
       // default to most recent 3 items by year published descending    
       let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, 3);
       if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
@@ -138,7 +135,6 @@ class AppCollection extends Mixin(LitElement)
     // search highlighted collection items
     // this.RecordModel.searchHighlighted(this.collectionId, true, true);
 
-    console.log('collection update finish', e)
     this._updateDisplayData();
   }
 
@@ -278,11 +274,13 @@ class AppCollection extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
-    console.log('parse display data');
     this.savedItems = [];
 
     let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
-    if( !savedDisplayData ) return;
+    if( !savedDisplayData ) {
+      this.appDataLoaded = true;
+      return;
+    }
 
     let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
     if( watercolor ) {
@@ -290,7 +288,10 @@ class AppCollection extends Mixin(LitElement)
     }
 
     let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-    if( !graphRoot ) return;
+    if( !graphRoot ) {
+      this.appDataLoaded = true;
+      return;
+    }
 
     // featured items
     let items = graphRoot['http://schema.org/exampleOfWork'];
@@ -313,10 +314,6 @@ class AppCollection extends Mixin(LitElement)
     this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount']?.[0]?.['@value'];
 
     this.itemDefaultDisplay = graphRoot['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || this.itemDefaultDisplay;
-
-    console.log('this.savedItems', this.savedItems);
-    console.log('this.highlightedItems', this.highlightedItems);
-    console.log('parse display data done');
 
     this.appDataLoaded = true;
     this._updateDisplayData();
@@ -356,7 +353,7 @@ class AppCollection extends Mixin(LitElement)
           "@type" : "@id"
         }
       },
-      "@id" : "collection/${this.collectionId.replace('/collection/', '')}",
+      "@id" : "info:fedora/application/ucd-lib-client${this.collectionId}",
       "watercolors" : [
         {
           "@id" : "info:fedora/application/#${this.watercolor}",

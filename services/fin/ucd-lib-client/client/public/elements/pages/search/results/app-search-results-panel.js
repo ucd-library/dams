@@ -19,7 +19,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     return {
       results: { type: Array }, // array of search results
       totalCollections: { type: Number },
-      // collectionResults : { type: Array }, // array of collection search results
+      collectionResults : { type: Array }, // array of collection search results
       gridMargin: { type: Number }, // size in px's between each masonary layout cell
       isGridLayout: { type: Boolean }, // are we in grid layout
       isListLayout: { type: Boolean },
@@ -80,7 +80,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       "CollectionModel",
       "RecordModel",
       "MediaModel",
-      "SearchVcModel"
+      "SearchVcModel",
+      "FiltersModel"
     );
     this.EventBus().on("show-collection-search-results", (show) =>
       this._updateCollectionResultsVisibility(show)
@@ -97,11 +98,45 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     if (e.location.page !== "search") return;
     this._setSelectedDisplay();
     this._resizeAsync();
+    this.filterDisplayResults();
+  }
+
+  /**
+   * @method _onFilterBucketsUpdate
+   * @description called when collection/record search events occur, aggregation query results
+   * @param {Object} e
+   */
+  _onFilterBucketsUpdate(e) {
+    if( e.filter !== '@graph.isPartOf.@id' ) return;
+    // temp remove oac isPartOf records
+    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org'));
+    
+    this.collectionResults = e.buckets.map(r => {
+      return {
+        '@id' : r.key,
+      };
+    });
+
+    this.totalCollections = this.collectionResults.length || 0;
+    this.filterDisplayResults();
   }
 
   willUpdate() {
     let search = this.SearchVcModel.getSearch();
-    this.totalCollections = search?.payload?.matchedCollections?.length || 0;
+    // this.totalCollections = search?.payload?.matchedCollections?.length || 0;
+  }
+
+  filterDisplayResults() {    
+    // need to respond to filters being clicked for collection
+    // if a single collection is selected in filters, need to only show that collection in this.results
+    let decodedUrl = decodeURIComponent(this.AppStateModel.location.pathname);
+    if( !decodedUrl.includes('@graph.isPartOf.@id') ) {
+      this.collectionResults = [...this.collectionResults];
+      return;
+    } 
+
+    let collectionIds = decodedUrl.split('@graph.isPartOf.@id","or","')[1].split('"]')[0].split(',');
+    this.totalCollections = collectionIds.length;
   }
 
   /**
@@ -398,23 +433,25 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @description _onSearchVcUpdate, fired when record search viewController updates
    * @param {*} e
    */
-  _onSearchVcUpdate(e) {
-    if (e.state !== "loaded") return;
+  // _onSearchVcUpdate(e) {
+  //   if (e.state !== "loaded") return;
 
-    let collections = [];
-    e.payload.results.forEach((result) => {
-      if (
-        result.collectionId &&
-        !collections.includes(result.collectionId["@id"])
-      ) {
-        collections.push(result.collectionId["@id"]);
-      }
-    });
+  //   console.log('e.payload.results', e.payload.results);
 
-    this.totalCollections = collections.length;
-    console.log('this.totalCollections', this.totalCollections);
+  //   let collections = [];
+  //   e.payload.results.forEach((result) => {
+  //     if (
+  //       result.collectionId &&
+  //       !collections.includes(result.collectionId["@id"])
+  //     ) {
+  //       collections.push(result.collectionId["@id"]);
+  //     }
+  //   });
 
-  }
+  //   this.totalCollections = collections.length;
+  //   console.log('this.totalCollections', this.totalCollections);
+
+  // }
 
   /**
    * @method _onCollectionClicked
@@ -453,7 +490,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Object} e click|keyup event
    */
   _onPaginationChange(e) {
-    debugger
     e.detail.startIndex = e.detail.page * 10 - 10;
     // this.currentPage = e.detail.page - 1;
     this.dispatchEvent(

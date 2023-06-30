@@ -328,7 +328,6 @@ class AppRecord extends Mixin(LitElement)
         this.itemDefaultDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
       }
 
-      debugger;
       savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
 
       if( savedDisplayData ) {

@@ -117,7 +117,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
       this.bagOfFilesImage = "";
     }
 
-    // debugger;
     // if /item/ark:/87287/d7rw8x then renderAsBr = false
     // if( mediaGroup['@id'] === '/item/ark:/87287/d7rw8x/media/images' ) {
     //   renderAsBr = false;
@@ -128,8 +127,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
     let itemId = e.selectedRecord?.graph?.root?.['@id'];
     let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))[0]['@id'];
     let displayOverride = await utils.getItemDisplayType(itemId, collectionId, this.FcAppConfigModel);
-
-    debugger;
 
     if (
       renderAsBr ||

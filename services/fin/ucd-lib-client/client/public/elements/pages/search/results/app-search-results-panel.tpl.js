@@ -424,22 +424,5 @@ export default function render() {
       Digital Collections limits results to 10,000. Use keywords and/or filters
       to refine search.
     </div>
-
-    <!-- <div class="collections" ?hidden="${!this.showCollectionResults}">
-  <div>
-    <h3>Collections</h3>
-    <div style="text-align:center" class="collections-content">
-      ${this.collectionResults.map(
-      (res) => html`
-        <dams-collection-card
-          .collection="${res}"
-          data-collectionid="${res.collectionId}"
-          @click=${this._onCollectionClicked}
-        ></dams-collection-card>
-      `
-    )}
-    </div>
-  </div>
-</div> -->
   `;
 }
