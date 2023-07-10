@@ -157,12 +157,23 @@ class FcAppConfigModel extends BaseModel {
    * 
    * @param {String} id collection id
    * @param {Array} displayData record id
-   * @param {Object} file featured image file object
    * 
    * @returns {Promise} resolves to record
    */
-  async saveCollectionDisplayData(id, displayData, featuredImage) {
-    return await this.service.saveCollectionDisplayData(id, displayData, featuredImage);
+  async saveCollectionDisplayData(id, displayData) {
+    return await this.service.saveCollectionDisplayData(id, displayData);
+  }
+
+  /**
+   * @method saveCollectionFeaturedImage
+   * @description save collection featured image
+   * 
+   * @param {String} id collection id
+   * @param {Array} featuredImage record id
+   *  
+   */
+  async saveCollectionFeaturedImage(id, featuredImage) {
+    return await this.service.saveCollectionFeaturedImage(id, featuredImage);
   }
 
   /**

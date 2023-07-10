@@ -261,11 +261,11 @@ export default function render() {
           display: none;
         }
         .grid dams-item-card {
-          flex: 100%;
-          max-width: 100%;
+          flex: 85vw;
+          max-width: 85vw;
         }
         .masonry .item {
-          width: 100% !important;
+          width: 85vw !important;
           position: initial;
           margin: auto;
           padding-bottom: 3rem;

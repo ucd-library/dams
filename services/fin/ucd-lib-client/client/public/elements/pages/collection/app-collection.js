@@ -218,6 +218,8 @@ class AppCollection extends Mixin(LitElement)
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
 
+    this.editMode = false;
+
     // TODO how to handle validation that all 6 featured items are populated? or more like how to alert user
 
     // parse highlighted items
@@ -236,9 +238,11 @@ class AppCollection extends Mixin(LitElement)
     
     this._updateDisplayData();
     let featuredImage = document.querySelector('#file-upload').files[0];
-    await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, featuredImage);
+    await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData);
+    if( featuredImage ) {
+      await this.FcAppConfigModel.saveCollectionFeaturedImage(this.collectionId, featuredImage);
+    }
     
-    this.editMode = false;
 
     this.requestUpdate(); 
     // TODO for some reason this.savedItems isn't updating the view, even with requestUpdate()

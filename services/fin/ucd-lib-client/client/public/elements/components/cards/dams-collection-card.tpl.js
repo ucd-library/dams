@@ -108,14 +108,18 @@ return html`
 
   .marketing-highlight__body.dark h4 {
     color: var(--color-white);
-    font-size: 1.5rem;
+    /* font-size: 1.5rem; */
     text-align: left;
   }
 
   .marketing-highlight__body.dark p {
     color: var(--color-black-30);
-    font-size: 1.1rem;
+    /* font-size: 1.1rem; */
     text-align: left;
+  }
+
+  .marketing-highlight__body.dark {
+    padding-top: 0.5rem;
   }
 
 </style>  

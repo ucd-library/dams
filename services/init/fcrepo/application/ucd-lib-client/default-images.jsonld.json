@@ -1,0 +1,14 @@
+{
+  "@context" : {
+    "@vocab" : "http://schema.org/",
+    "ldp" : "http://www.w3.org/ns/ldp#",
+    "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
+    "ldp:hasMemberRelation" : { "@type" : "@id" },
+    "ldp:membershipResource" : { "@type" : "@id" }
+  },
+  "@id" : "",
+  "@type" : "http://fedora.info/definitions/v4/repository#ArchivalGroup",
+  "name" : "Root of default images containers, can be overridden by images. This container is syncronized by the init service.",
+  "ldp:hasMemberRelation" : "ucdlib:hasResources",
+  "ldp:membershipResource" : "resource"
+}

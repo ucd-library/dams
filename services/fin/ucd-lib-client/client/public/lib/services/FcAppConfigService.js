@@ -45,17 +45,17 @@ class FcAppConfigService extends BaseService {
     });
   }
 
-  async saveCollectionDisplayData(id, displayData, featuredImage) {    
-    if( featuredImage ) {
-      await fetch(`${this.baseUrl}${id}/featuredImage.jpg`, {
-        method : 'PUT',
-        headers : {
-            'Content-Type' : 'image/jpg',
-        },
-        body: featuredImage,
-        duplex: 'half'
-      }); 
-    }
+  async saveCollectionDisplayData(id, displayData) {    
+    // if( featuredImage ) {
+    //   await fetch(`${this.baseUrl}${id}/featuredImage.jpg`, {
+    //     method : 'PUT',
+    //     headers : {
+    //         'Content-Type' : 'image/jpg',
+    //     },
+    //     body: featuredImage,
+    //     duplex: 'half'
+    //   }); 
+    // }
     
     return this.request({
       url : `${this.baseUrl}${id}`,
@@ -71,6 +71,19 @@ class FcAppConfigService extends BaseService {
       onLoad : null,
       onError : null
     });
+  }
+
+  async saveCollectionFeaturedImage(id, featuredImage) {
+    if( featuredImage ) {
+      await fetch(`${this.baseUrl}${id}/featuredImage.jpg`, {
+        method : 'PUT',
+        headers : {
+            'Content-Type' : 'image/jpg',
+        },
+        body: featuredImage,
+        duplex: 'half'
+      }); 
+    }
   }
 
   getFeaturedCollectionAppData() {

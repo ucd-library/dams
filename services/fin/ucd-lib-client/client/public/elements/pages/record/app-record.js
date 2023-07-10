@@ -77,7 +77,7 @@ class AppRecord extends Mixin(LitElement)
     this.citationRoot = {};
     this.collectionItemCount = 0;
     this.itemDefaultDisplay = 'Book Reader - 2 Page';
-    this.itemDisplay = 'Book Reader - 2 Page';
+    this.itemDisplay = '';
 
     this.isUiAdmin = user.canEditUi();
     this.editMode = false;
@@ -289,13 +289,13 @@ class AppRecord extends Mixin(LitElement)
     await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
 
     // TODO save collection data with hasPart pointing to this item
-    if( Object.keys(this.savedCollectionData).length ) {
-      // TEMP hack, also should append to array and not replace
-      this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0]['http://digital.library.ucdavis.edu/schema/itemDisplayExceptions'] 
-        = [{'@id': 'info:fedora/application/ucd-lib-client/item/ark:/87287/d70898/ark:/87287/d70898.jsonld.json'}];
+    // if( Object.keys(this.savedCollectionData).length ) {
+    //   // TEMP hack, also should append to array and not replace
+    //   this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0]['http://digital.library.ucdavis.edu/schema/itemDisplayExceptions'] 
+    //     = [{'@id': 'info:fedora/application/ucd-lib-client/item/ark:/87287/d70898/ark:/87287/d70898.jsonld.json'}];
 
-      await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.savedCollectionData);
-    }
+    //   await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.savedCollectionData);
+    // }
 
     this.editMode = false;
 
@@ -319,8 +319,6 @@ class AppRecord extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
     async _parseDisplayData() {
-      console.log('parse display data');
-
       let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
       if( savedDisplayData ) {
         this.savedCollectionData = savedDisplayData;
@@ -334,8 +332,6 @@ class AppRecord extends Mixin(LitElement)
         let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
         this.itemDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || '';  
       }
-
-      console.log('parse display data done');
 
       this.appDataLoaded = true;
       this._updateDisplayData();
