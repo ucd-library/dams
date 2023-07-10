@@ -88,6 +88,11 @@ export default function render() {
           opacity: 0;
         }
       }
+      @media (max-width: 768px) {
+        .footer.site-frame {
+          padding: 0.5rem;
+        }
+      }
     </style>
 
     <app-search-header

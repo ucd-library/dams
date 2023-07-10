@@ -75,9 +75,9 @@ export default function render() {
       }
 
       .grid dams-item-card {
-        flex: 30%;
-        padding: .5rem;
-        max-width: 30%;
+        flex: 27%;
+        padding: 1.5rem;
+        max-width: 27%;
       }
 
       @media (max-width: 1260px) {
@@ -194,8 +194,8 @@ export default function render() {
         cursor: pointer;
         z-index: 0;
         line-height: 1;
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         -webkit-tap-highlight-color: transparent;
         box-sizing: border-box !important;
@@ -211,7 +211,8 @@ export default function render() {
       .masonry .item {
         display: block;
         position: absolute;
-        width: 30%;
+        width: 27%;
+        padding: 1.5rem;
         /* visibility: hidden; */
         top: 25px;
         left: 25px;
@@ -231,6 +232,10 @@ export default function render() {
         cursor: pointer;
       }
 
+      .header .photo-stack {
+        display: inline-block;
+      }
+
       .header .photo-stack ucdlib-icon {
         fill: var(--color-aggie-blue-60);
       }
@@ -242,8 +247,11 @@ export default function render() {
       @media (max-width: 545px) {
         .grid dams-item-card {
           flex: 100%;
-          padding: 1rem;
+          padding: 1.5rem;
           max-width: 85vw;
+        }
+        .header {
+          padding-left: 0.5rem;
         }
       }
 
@@ -309,23 +317,24 @@ export default function render() {
 
     <div class="header">
       <div class="header-results" style="flex: 2.25; display: flex;">
-        <div style="flex: .25" class="photo-stack">
-          <ucdlib-icon
-            style="cursor: auto;"
-            class="vertical-link__image"
-            icon="ucdlib-dams:photo-stack"
-          ></ucdlib-icon>
-        </div>
-        <div style="flex: 2; margin: auto;">
+        <div style="flex: 2.25; margin: auto;">
+          <div class="photo-stack">
+            <ucdlib-icon
+              style="cursor: auto;"
+              class="vertical-link__image"
+              icon="ucdlib-dams:photo-stack"
+            ></ucdlib-icon>
+          </div>
+          
           <span style="font-weight: bold">${this.total} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.results.length === 0}">
             from
-            <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collections</a></span>
+            <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collection${this.totalCollections > 1 ? 's' : ''}</a></span>
         </div>
       </div>
 
       <div class="header-pagination"
         style="flex: 3; display: flex; justify-content: end">
-        <span style="text-align: right; margin: auto 0; padding-right: .5rem">Display:</span>
+        <span style="text-align: right; margin: auto 0; padding-right: .5rem; padding-left: 5px;">Display:</span>
         <div>
           <ucdlib-icon
             icon="ucdlib-dams:result-display-grid"
@@ -358,7 +367,7 @@ export default function render() {
           <option value="20" selected>20</option>
           <option value="10">10</option>
         </select>
-        <div style="margin: 0 10px; font-size: .875rem; margin: auto 0 auto 1rem">
+        <div style="margin: 0 10px; font-size: .875rem; margin: auto 0 auto 0.5rem">
           <span class="truncated-text-mobile">items</span> per page
         </div>
       </div>

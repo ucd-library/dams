@@ -22,7 +22,6 @@ export default function render() {
       }
 
       .container h3 {
-        font-size: 1.7rem;
         font-weight: 700;
         text-align: center;
         color: var(--color-black-60);
@@ -81,16 +80,30 @@ export default function render() {
         background-image: url(/images/watercolors/blue--1.webp);
         background-size: cover;
         display: flex;
-        height: 12rem;
+        min-height: 12rem;
         margin: 3rem 0;
         background-color: var(--color-aggie-blue-30);
       }
 
-      .part-of img {
+      /* .part-of img {
         max-width: 100%;
         max-height: 100%;
         height: auto;
         width: auto;
+      } */
+
+      .part-of-img-container {
+        overflow: hidden;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .part-of img {
+        position: relative;
+        /* top: calc(-65%); */
       }
 
       .part-of div {
@@ -109,12 +122,15 @@ export default function render() {
 
       .part-of .collection-info h4 {
         margin: 0.3rem 0 0;
-        font-size: 1.2rem;
+        font-weight: 600;
       }
 
       .part-of .collection-info h4 a {
         color: var(--color-aggie-blue);
         text-decoration: none;
+      }
+      .part-of .collection-info h4 a:hover {
+        text-decoration: underline;
       }
 
       .part-of .collection-info p {
@@ -270,7 +286,7 @@ export default function render() {
       </div>
 
       <div class="part-of">
-        <div><img src="${this.collectionImg}" alt="" /></div>
+        <div class="part-of-img-container"><img src="${this.collectionImg}" alt="" /></div>
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
           <h4><a href="${this.collectionId}">${this.collectionName}</a></h4>

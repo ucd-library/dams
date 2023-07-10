@@ -89,7 +89,7 @@ export default function render() {
 
     .featured-image {
       z-index: 50;
-      top: 27%;
+      top: 17%;
       left: 0;
       right: 0;
       bottom: 0;

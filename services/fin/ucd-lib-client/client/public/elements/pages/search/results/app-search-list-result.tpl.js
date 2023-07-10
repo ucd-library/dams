@@ -20,12 +20,14 @@ export default function render() {
       }
 
       .img {
+        flex: 1;
         height: 250px;
         width: var(--grid-cell-width);
         background-size: contain;
         background-position: center center;
         background-repeat: no-repeat;
         width: 33%;
+        /* flex: 33%;         */
       }
 
       .collection-title {
@@ -68,7 +70,7 @@ export default function render() {
 
       .data {
         padding: 0 0 0 2.5rem;
-        flex: 1;
+        flex: 2;
         overflow: hidden;
       }
 
@@ -89,6 +91,7 @@ export default function render() {
         .img {
           height: auto;
           width: 150px;
+          background-position: initial;
         }
 
         .data {
