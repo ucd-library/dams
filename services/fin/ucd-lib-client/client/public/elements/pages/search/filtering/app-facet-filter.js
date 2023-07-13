@@ -95,7 +95,7 @@ class AppFacetFilter extends Mixin(LitElement)
       this.ironListActive = false;
     }
 
-    if( this.buckets.length >= 0 ) {
+    if( this.buckets.length >= 15 ) {
       this.includeTypeahead = true;
     }
 
