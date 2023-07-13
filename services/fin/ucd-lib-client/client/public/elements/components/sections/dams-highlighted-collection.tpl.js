@@ -121,7 +121,13 @@ return html`
   <div class="text-container">
     <div class="title" role="heading" aria-level="2">${this._collectionTitle}</div>
     <div class="subtitle">${this._itemCt} item${this._itemCt === 1 ? "" : "s"}</div>
-    <div class="description">${this._collectionDesc}</div>
+    <div class="description">
+    <ucdlib-md id="md">
+        <ucdlib-md-content>
+          ${this._collectionDesc}
+        </ucdlib-md-content>
+      </ucdlib-md>  
+    </div>
     <a href="${this._href}" class="btn--alt btn--round">Explore this collection</a>
   </div>
 

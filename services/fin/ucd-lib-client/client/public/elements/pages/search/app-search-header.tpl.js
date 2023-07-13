@@ -93,6 +93,7 @@ export default function render() {
         align-items: center;
         background-color: var(--color-aggie-blue-30);
         padding-bottom: 1rem;
+        min-height: 16px;
       }
       .site-name-search {
         display: none;

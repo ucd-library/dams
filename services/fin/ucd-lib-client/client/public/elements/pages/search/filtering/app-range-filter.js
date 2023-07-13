@@ -263,11 +263,13 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
    * @param {Boolean} show should the parent hide or show filter
    */
   _show(show) {
-    this.dispatchEvent(
-      new CustomEvent("update-visibility", {
-        detail: { show },
-      })
-    );
+    requestAnimationFrame(() => {
+      this.dispatchEvent(
+        new CustomEvent("update-visibility", {
+          detail: { show },
+        })
+      );  
+    });
   }
 
   /**

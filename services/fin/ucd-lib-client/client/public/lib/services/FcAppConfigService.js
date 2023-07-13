@@ -13,7 +13,7 @@ class FcAppConfigService extends BaseService {
 
   getCollectionAppData(id) {
     return this.request({
-      url : `${this.baseUrl}${id}${id.replace('/collection','')}.jsonld.json`,
+      url : `${this.baseUrl}${id}`,
       fetchOptions : {
         headers : {
           'Accept' : 'application/ld+json',
@@ -28,20 +28,37 @@ class FcAppConfigService extends BaseService {
     });
   }
 
-  async saveCollectionDisplayData(id, displayData, featuredImage) {    
-    if( featuredImage ) {
-      await fetch(`${this.baseUrl}${id}/featuredImage.jpg`, {
-        method : 'PUT',
+  getItemAppData(id) {
+    return this.request({
+      url : `${this.baseUrl}${id}`,
+      fetchOptions : {
         headers : {
-            'Content-Type' : 'image/jpg',
+          'Accept' : 'application/ld+json',
+          // 'Accept' : 'application/ld+json; profile="http://www.w3.org/ns/json-ld#flattened"',
+          'Prefer' : 'return=representation; omit="http://fedora.info/definitions/fcrepo#ServerManaged"'
         },
-        body: featuredImage,
-        duplex: 'half'
-      }); 
-    }
+      },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    });
+  }
+
+  async saveCollectionDisplayData(id, displayData) {    
+    // if( featuredImage ) {
+    //   await fetch(`${this.baseUrl}${id}/featuredImage.jpg`, {
+    //     method : 'PUT',
+    //     headers : {
+    //         'Content-Type' : 'image/jpg',
+    //     },
+    //     body: featuredImage,
+    //     duplex: 'half'
+    //   }); 
+    // }
     
     return this.request({
-      url : `${this.baseUrl}${id}${id.replace('/collection','')}.jsonld.json`,
+      url : `${this.baseUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {
@@ -54,6 +71,19 @@ class FcAppConfigService extends BaseService {
       onLoad : null,
       onError : null
     });
+  }
+
+  async saveCollectionFeaturedImage(id, featuredImage) {
+    if( featuredImage ) {
+      await fetch(`${this.baseUrl}${id}/featuredImage.jpg`, {
+        method : 'PUT',
+        headers : {
+            'Content-Type' : 'image/jpg',
+        },
+        body: featuredImage,
+        duplex: 'half'
+      }); 
+    }
   }
 
   getFeaturedCollectionAppData() {
@@ -75,6 +105,24 @@ class FcAppConfigService extends BaseService {
           'Accept' : 'application/json',
           // 'Prefer' : 'handling=lenient',
           'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify(displayData)
+      },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    });
+  }
+
+  async saveItemDisplayData(id, displayData) {
+    debugger;
+    return this.request({
+      url : `${this.baseUrl}${id}`,
+      fetchOptions : {
+        method : 'PUT',
+        headers : {
+          'Content-Type' : 'application/ld+json'
         },
         body : JSON.stringify(displayData)
       },

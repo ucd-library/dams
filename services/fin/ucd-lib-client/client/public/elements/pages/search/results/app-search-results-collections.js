@@ -11,6 +11,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
   static get properties() {
     return {
       results : { type : Array },
+      resultsDisplay : { type : Array }, // filtered results
       showResults : { type : Boolean },
       currentPage : { type : Number },
       paginationTotal : { type : Number }
@@ -22,6 +23,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this.active = true;
     this.render = render.bind(this);
 
+    this.resultsDisplay = [];
     this.results = [];
     this.showResults = false;
     this.currentPage = 1;
@@ -36,6 +38,11 @@ class AppSearchResultsCollections extends Mixin(LitElement)
       pagination.shadowRoot.querySelector('.pager__item--previous > a').style.backgroundColor = '';
       pagination.shadowRoot.querySelector('.pager__item--next > a').style.backgroundColor = '';
     }
+  }
+
+  _onAppStateUpdate(e) {
+    if( e.location.page !== 'search' ) return;
+    this.filterDisplayResults();
   }
 
   /**
@@ -55,6 +62,22 @@ class AppSearchResultsCollections extends Mixin(LitElement)
       };
     });
     this.showResults = this.results.length > 0;
+    this.resultsDisplay = [...this.results];
+    this.filterDisplayResults();
+  }
+
+  filterDisplayResults() {    
+    // need to respond to filters being clicked for collection
+    // if a single collection is selected in filters, need to only show that collection in this.results
+    let decodedUrl = decodeURIComponent(this.AppStateModel.location.pathname);
+    if( !decodedUrl.includes('@graph.isPartOf.@id') ) {
+      this.resultsDisplay = [...this.results];
+      return;
+    } 
+
+    // filter this.resultsDisplay to only this.results where @id matches the collection id in the url
+    let collectionIds = decodedUrl.split('@graph.isPartOf.@id","or","')[1].split('"]')[0].split(',');
+    this.resultsDisplay = [...this.results.filter(r => collectionIds.includes(r['@id']))];
   }
 
   /**

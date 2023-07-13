@@ -126,6 +126,13 @@ export function styles() {
     .campus-info span {
       text-align: center;
     }
+
+    @media (max-width: 768px) {
+      #section-columns > * {
+        /* margin: 0; */
+        padding: 0;
+      }
+    }
   `;
 }
 

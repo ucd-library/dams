@@ -5,7 +5,8 @@
         "bucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
         "basePath" : "/application/ucd-lib-client",
         "direction" : "fcrepo-to-gcs",
-        "initDataHydration" : true
+        "initDataHydration" : true,
+        "enabledDeletes" : true
       }
     ]
   },

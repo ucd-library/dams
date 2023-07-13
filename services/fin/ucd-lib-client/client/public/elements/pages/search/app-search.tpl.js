@@ -18,13 +18,12 @@ export default function render() {
         background-color: white;
       }
 
-      app-filters-panel {
+      /* app-filters-panel {
         width: 350px;
-        /* transition: width 300ms linear; */
       }
       app-filters-panel[data-wide] {
         width: 475px;
-      }
+      } */
 
       @keyframes fadeIn {
         from {
@@ -40,13 +39,13 @@ export default function render() {
       } */
 
       .filters-container {
-        width: 350px;
+        /* width: 350px; */
         background-color: var(--color-aggie-blue-40);
         transition: width 300ms linear;
       }
 
       @media (max-width: 1025px) {
-        app-filters-panel {
+        /* app-filters-panel {
           width: 275px;
         }
         app-filters-panel[data-wide] {
@@ -54,7 +53,7 @@ export default function render() {
         }
         .filters-container {
           width: 275px;
-        }
+        } */
       }
 
       /* @media (min-width: 975px) { */
@@ -62,11 +61,40 @@ export default function render() {
         display: block;
       }
       .search-container {
-        display: flex;
+        /* display: flex; */
+        display: grid;
+        grid-template-areas: "first first first second second second second second second second second second";
+        --l-gap: 1.5rem;
+        grid-column-gap: var(--l-gap-override, var(--l-gap));
+        grid-template-columns: repeat(12, 1fr);
+        grid-template-rows: max-content 1fr;
       }
+
+      .filters-container {
+        grid-area: first;
+        min-width: 0;
+        --l-gap: 1.5rem;
+      }
+
+      .search-content {
+        grid-area: second;
+        min-width: 0;
+        --l-gap: 1.5rem;
+      }
+
+      @media (max-width: 1023px) {
+        .search-container {
+          grid-template-areas: "first first first first second second second second second second second second";
+        }
+      }
+
       /* } */
 
       @media (max-width: 767px) {
+        .search-container {
+          display: block;
+        }
+     
         /* mobile */
         app-filters-panel {
           z-index: 1000;

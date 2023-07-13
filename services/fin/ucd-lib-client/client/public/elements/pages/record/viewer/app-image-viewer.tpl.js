@@ -14,6 +14,11 @@ export default function render() {
         height: 600px;
       }
 
+      #img {
+        max-width: 100vw;
+        object-fit: contain;
+      }
+
       [hidden] {
         display: none !important;
       }

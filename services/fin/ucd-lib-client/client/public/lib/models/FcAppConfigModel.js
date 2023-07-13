@@ -140,17 +140,40 @@ class FcAppConfigModel extends BaseModel {
   }
 
   /**
+     * @method getItemAppData
+     * @description load an items application container display data by id
+     * 
+     * @param {String} id item id
+     * 
+     * @returns {Promise} resolves to a jsonld graph
+     */
+  async getItemAppData(id) {
+    return await this.service.getItemAppData(id);
+  }
+
+  /**
    * @method saveCollectionDisplayData
    * @description save a collections display data
    * 
    * @param {String} id collection id
    * @param {Array} displayData record id
-   * @param {Object} file featured image file object
    * 
    * @returns {Promise} resolves to record
    */
-  async saveCollectionDisplayData(id, displayData, featuredImage) {
-    return await this.service.saveCollectionDisplayData(id, displayData, featuredImage);
+  async saveCollectionDisplayData(id, displayData) {
+    return await this.service.saveCollectionDisplayData(id, displayData);
+  }
+
+  /**
+   * @method saveCollectionFeaturedImage
+   * @description save collection featured image
+   * 
+   * @param {String} id collection id
+   * @param {Array} featuredImage record id
+   *  
+   */
+  async saveCollectionFeaturedImage(id, featuredImage) {
+    return await this.service.saveCollectionFeaturedImage(id, featuredImage);
   }
 
   /**
@@ -173,6 +196,19 @@ class FcAppConfigModel extends BaseModel {
    */
   async saveFeaturedCollectionAppData(displayData) {
     return await this.service.saveFeaturedCollectionDisplayData(displayData);
+  }
+
+  /**
+   * @method saveItemDisplayData
+   * @description save an items display data
+   * 
+   * @param {String} id record id
+   * @param {Array} displayData record id
+   * 
+   * @returns {Promise} resolves to record
+   */
+  async saveItemDisplayData(id, displayData) {
+    return await this.service.saveItemDisplayData(id, displayData);
   }
 
 }
