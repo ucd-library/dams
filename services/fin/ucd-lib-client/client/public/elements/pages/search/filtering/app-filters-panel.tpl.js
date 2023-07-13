@@ -152,9 +152,9 @@ export default function render() {
       <h5>Filters</h5>
       <div class="collapse" @click="${this._collapseFilters}">
         <ucdlib-icon
-          icon="ucdlib-dams:fa-xmark"
+          icon="ucdlib-dams:fa-times"
           tabindex="0"
-          icon="fa-xmark"
+          icon="fa-times"
           alt="Collapse filters"
         >
         </ucdlib-icon>

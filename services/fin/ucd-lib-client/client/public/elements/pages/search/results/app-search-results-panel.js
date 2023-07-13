@@ -334,9 +334,9 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     let ew = this.offsetWidth;
     let w = firstDiv.offsetWidth + 25;
 
-    let numCols = Math.max(Math.floor(ew / w), 1);
-    if( numCols > 3 ) numCols = 3;
-    if( window.innerWidth < 1260 ) numCols = 2;
+    let numCols = 3;
+    if( window.innerWidth < 1024 ) numCols = 2;
+    if( window.innerWidth < 768 ) numCols = 1;
 
     // this makes sure columns are centered
     let leftOffset = Math.floor((ew - numCols * w) / 2);

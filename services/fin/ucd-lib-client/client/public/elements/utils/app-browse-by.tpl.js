@@ -134,7 +134,7 @@ export default function render() {
         margin: 0 auto;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        grid-gap: var(--spacing-default);
+        grid-gap: 2rem;
         max-width: 93%;
       }
 

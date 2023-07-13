@@ -20,8 +20,8 @@ export default function render() {
       ucdlib-icon {
         fill: var(--color-aggie-blue-80);
         margin-left: -6px;
-        width: 25px;
-        height: 25px;
+        width: 1.2rem;
+        height: 1.2rem;
         padding: 3px;
       }
 
@@ -31,6 +31,7 @@ export default function render() {
       }
 
       .rm-btn {
+        color: var(--color-aggie-blue);
         font-weight: bold;
         display: inline-block;
         margin: 0.5rem;
@@ -62,7 +63,7 @@ export default function render() {
             tabindex="0"
           >
           <div id="close">
-            <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+            <ucdlib-icon icon="ucdlib-dams:fa-times"></ucdlib-icon>
           </div> ${item.label}
           </div>
         `

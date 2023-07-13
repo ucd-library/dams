@@ -7,7 +7,6 @@ export default function render() {
     <style include="shared-styles">
       :host {
         display: block;
-        /* max-width: 1150px; */
         position: relative;
         margin: 0 5px;
       }
@@ -68,29 +67,15 @@ export default function render() {
       .grid {
         margin: 10px;
         position: relative;
-        display: flex;
+        display: grid;
         flex-direction: row;
         flex-wrap: wrap;
-        width: 100%;
+        width: 95%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .grid dams-item-card {
-        flex: 27%;
         padding: 1.5rem;
-        max-width: 27%;
-      }
-
-      @media (max-width: 1260px) {
-        .grid dams-item-card {
-          flex: 38%;
-        }
-
-        /* .masonry .item {
-          width: 38% !important;
-          position: initial !important;
-          margin: auto;
-          padding-bottom: 3rem;
-        } */
       }
 
       .masonry {
@@ -99,7 +84,7 @@ export default function render() {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        width: 100%;
+        width: 95%;
       }
 
       .list {
@@ -255,7 +240,7 @@ export default function render() {
         }
       }
 
-      @media (max-width: 1260px) {
+      @media (max-width: 1023px) {
         .masonry .item {
           width: 38% !important;
           position: initial !important;
@@ -268,10 +253,7 @@ export default function render() {
         .truncated-text-mobile {
           display: none;
         }
-        .grid dams-item-card {
-          flex: 85vw;
-          max-width: 85vw;
-        }
+        
         .masonry .item {
           width: 85vw !important;
           position: initial;
@@ -287,6 +269,18 @@ export default function render() {
         /* .mobile-header {
           display: none;
         } */
+      }
+
+      @media (max-width: 1023px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 767px) {
+       .grid {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
       }
 
       @media (max-width: 1182px) {

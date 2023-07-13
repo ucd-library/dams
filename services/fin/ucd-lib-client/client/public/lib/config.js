@@ -16,9 +16,9 @@ config.elasticSearch = {
       type : 'facet',
       valueMap : (value) => {
         if( APP_CONFIG.collectionLabels[value] ) {
-          return 'collection: ' + APP_CONFIG.collectionLabels[value];
+          return 'Collection: ' + APP_CONFIG.collectionLabels[value];
         }
-        return 'collection: ' + value;
+        return 'Collection: ' + value;
       }
     },
     '@graph.fileFormatSimple' : {
@@ -29,7 +29,7 @@ config.elasticSearch = {
       label : 'Creator',
       type : 'facet',
       valueMap : (value) => {
-        return 'creator: '+value;
+        return 'Creator: '+value;
       }
     },
     '@graph.subjects.name' : {
@@ -37,7 +37,7 @@ config.elasticSearch = {
       type : 'facet',
       typeahead : 'abouts',
       valueMap : (value) => {
-        return 'subject: '+value;
+        return 'Subject: '+value;
       }
     },
     '@graph.yearPublished' : {
