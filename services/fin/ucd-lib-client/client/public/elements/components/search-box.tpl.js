@@ -53,6 +53,10 @@ export default function render() {
         height: 70%;
         margin: auto;
       }
+
+      #input {
+        border-radius: unset;
+      }
     </style>
     <div class="root search-bar">
       <div class="search-container" style="flex:1">

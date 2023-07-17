@@ -209,6 +209,69 @@ class Utils {
 
     return { pages };
   }
+
+  /**
+   * @method getAppConfigCollectionGraph
+   * @description given an id, get app_config collection graph if exists, or hit the API
+   * 
+   * @param {String} id
+   * @param {Object} fcAppConfigModel reference to model
+   */
+  async getAppConfigCollectionGraph(id, fcAppConfigModel) {
+    let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/collection', '')}.jsonld.json`];
+    if( savedData ) return savedData;
+    try {
+      savedData = await fcAppConfigModel.getCollectionAppData(id);  
+    } catch( error ) {
+      console.warn('Error getting app config collection graph for ' + id, error);
+    }
+    if( savedData && savedData.body ) return JSON.parse(savedData.body);
+    
+    return null;
+  }
+
+  /**
+   * @method getAppConfigItemGraph
+   * @description given an id, get app_config collection graph if exists, or hit the API
+   * 
+   * @param {String} id
+   * @param {Object} fcAppConfigModel reference to model
+   */
+  async getAppConfigItemGraph(id, fcAppConfigModel) {
+    let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/item', '')}.jsonld.json`];
+    if( savedData ) return savedData;
+
+    try {
+      savedData = await fcAppConfigModel.getItemAppData(id);  
+    } catch( error ) {
+      console.warn('Error getting app config item graph for ' + id, error);
+    }
+    if( savedData && savedData.body ) return JSON.parse(savedData.body);
+    
+    return null;     
+  }
+
+  /**
+   * @method getItemDisplayType
+   * @description given an item and collection id, get the app config display type
+   * returns imageList, brOnePage, brTwoPage
+   * 
+   * @param {String} id item id
+   * @param {String} collectionId collection id
+   * @param {Object} fcAppConfigModel reference to model
+   */
+    async getItemDisplayType(id, collectionId, fcAppConfigModel) {
+      let displayType = '';
+      let itemGraph = await this.getAppConfigItemGraph(id, fcAppConfigModel);
+      displayType = itemGraph?.[0]?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'];
+      if( displayType ) return displayType;
+
+      let collectionGraph = await this.getAppConfigCollectionGraph(collectionId, fcAppConfigModel);
+      displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'];
+
+      return displayType;
+    }
+  
 }
 
 module.exports = new Utils();

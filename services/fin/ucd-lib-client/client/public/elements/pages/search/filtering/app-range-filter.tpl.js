@@ -23,15 +23,17 @@ export default function render() {
   .inputs {
     display: flex;
     align-items: center;
+    justify-content: space-around;
   }
 
   input[type="number"] {
     border: 0;
-    width: 75px;
+    width: 3rem;
     height: 61px;
     padding: 0 1rem;
     margin: 0 0.5rem;
     font-size: var(--fs-sm);
+    background: var(--color-aggie-blue-30);
   }
 
   .unknown {

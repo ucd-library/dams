@@ -22,7 +22,6 @@ export default function render() {
       }
 
       .container h3 {
-        font-size: 1.7rem;
         font-weight: 700;
         text-align: center;
         color: var(--color-black-60);
@@ -81,16 +80,30 @@ export default function render() {
         background-image: url(/images/watercolors/blue--1.webp);
         background-size: cover;
         display: flex;
-        height: 12rem;
+        min-height: 12rem;
         margin: 3rem 0;
         background-color: var(--color-aggie-blue-30);
       }
 
-      .part-of img {
+      /* .part-of img {
         max-width: 100%;
         max-height: 100%;
         height: auto;
         width: auto;
+      } */
+
+      .part-of-img-container {
+        overflow: hidden;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .part-of img {
+        position: relative;
+        /* top: calc(-65%); */
       }
 
       .part-of div {
@@ -109,12 +122,15 @@ export default function render() {
 
       .part-of .collection-info h4 {
         margin: 0.3rem 0 0;
-        font-size: 1.2rem;
+        font-weight: 600;
       }
 
       .part-of .collection-info h4 a {
         color: var(--color-aggie-blue);
         text-decoration: none;
+      }
+      .part-of .collection-info h4 a:hover {
+        text-decoration: underline;
       }
 
       .part-of .collection-info p {
@@ -154,22 +170,24 @@ export default function render() {
         }
       }
 
-    .admin-edit .left-panel {
+    app-record .admin-edit .left-panel {
       position: absolute;
       left: 20%;
       width: 60%;
       top: calc(170px + 2rem);
       z-index: 500;
+      border-bottom: 6px dotted var(--color-aggie-gold);
+      padding-bottom: 1.5rem;
     }
 
-    .admin-edit .right-panel {
+    app-record .admin-edit .right-panel {
       position: absolute;
       right: 3rem;
       top: calc(170px + 2rem);
       z-index: 500;
     }
 
-    .admin-edit .icon-wrapper {
+    app-record .admin-edit .icon-wrapper {
       height: 50px;
       width: 50px;
       background-color: var(--color-aggie-blue-70);
@@ -179,7 +197,7 @@ export default function render() {
       cursor: pointer;
     }
 
-    .admin-edit ucdlib-icon {
+    app-record .admin-edit ucdlib-icon {
       fill: white;
       width: 50%;
       height: 50%;
@@ -187,25 +205,25 @@ export default function render() {
       padding-top: 0.6rem;      
     }
 
-    .admin-edit .icon-wrapper.edit {
+    app-record .admin-edit .icon-wrapper.edit {
       background-color: var(--color-aggie-blue);
     }
 
-    .admin-edit .icon-wrapper:hover {
+    app-record .admin-edit .icon-wrapper:hover {
       background-color: var(--color-aggie-blue);
     }
 
-    .admin-edit .icon-wrapper.edit:hover {
+    app-record .admin-edit .icon-wrapper.edit:hover {
       background-color: var(--color-aggie-gold);
     }
 
-    .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
+    app-record .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
       fill: var(--color-aggie-blue);
     }
 
     .edit-overlay {
       background: white;
-      position: absolute;
+      position: fixed;
       top: 0;
       right: 0;
       bottom: 0;
@@ -227,16 +245,16 @@ export default function render() {
           @click="${this._ssSelectFocus}"
           @blur="${this._ssSelectBlur}">
           <select>
-              <option .value=${'default'} ?selected=${true}>
-                Collection Default (Book Reader - 2 Page)
+              <option .value=${''} ?selected=${this.itemDisplay === ''}>
+                Collection Default (${this.itemDefaultDisplay})
               </option>
-              <option .value=${'2-page'} ?selected=${false}>
+              <option .value=${'Book Reader - 2 Page'} ?selected=${this.itemDisplay === 'Book Reader - 2 Page'}>
                 Book Reader - 2 Page
               </option>
-              <option .value=${'1-page'} ?selected=${false}>
+              <option .value=${'Book Reader - Single Page'} ?selected=${this.itemDisplay === 'Book Reader - Single Page'}>
                 Book Reader - Single Page
               </option>
-              <option .value=${'list'} ?selected=${false}>
+              <option .value=${'Image List'} ?selected=${this.itemDisplay === 'Image List'}>
                 Image List
               </option>
           </select>
@@ -263,15 +281,12 @@ export default function render() {
       <h3>${this.name}</h3>
       <div class="copyright">
         <span>&copy;</span>
-        <a
-          href="http://rightsstatements.org/vocab/InC-NC/1.0/"
-          class="copyright-text"
-          >In Copyright - Non-Commercial Use Permitted</a
-        >
+        <a href="http://rightsstatements.org/vocab/InC-NC/1.0/"
+          class="copyright-text">In Copyright - Non-Commercial Use Permitted</a>
       </div>
 
       <div class="part-of">
-        <div><img src="${this.collectionImg}" alt="" /></div>
+        <div class="part-of-img-container"><img src="${this.collectionImg}" alt="" /></div>
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
           <h4><a href="${this.collectionId}">${this.collectionName}</a></h4>
@@ -284,12 +299,10 @@ export default function render() {
         <div class="download-options">
           <app-media-download
             id="download"
-            ?hidden="${this.isBagOfFiles}"
-          ></app-media-download>
+            ?hidden="${this.isBagOfFiles}"></app-media-download>
           <app-fs-media-download
             id="download"
-            ?hidden="${!this.isBagOfFiles}"
-          ></app-fs-media-download>
+            ?hidden="${!this.isBagOfFiles}"></app-fs-media-download>
         </div>
       </div>
 

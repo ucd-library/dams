@@ -1,0 +1,55 @@
+{
+    "browseByImages" : {
+        "subjectPage" : [
+      {
+        "page" : 1,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-lug-D211_5_38-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-lehmann-d76p4c-right-white.png"
+      },
+      {
+        "page" : 2,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-BioAg-AR_012_1467f-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-eastman-B-480-right-white.png"
+      },
+      {
+        "page" : 3,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-eastman-B-1614-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-eastman-B-1614-right-white.png"
+      },
+      {
+        "page" : 4,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-CalAg-d3j34z-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-slater-d33q10-235-right-white.png"
+      }
+    ],
+    "creatorPage" : [
+      {
+        "page" : 1,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-everest-d3d02x-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-eastman-P-2214-right-white.png"
+      },
+      {
+        "page" : 2,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-greene-D192_6_141-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-greene-ruth-D192_7_108-right-white.png"
+      },
+      {
+        "page" : 3,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-campbell-mc022_2_40-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-slater-d3m082-355-white.png"
+      }
+    ],
+    "formatPage" : [
+      {
+        "page" : 1,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-027-Willow_Slough-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-d3031v-1962-right-white.png"
+      },
+      {
+        "page" : 2,
+        "leftImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-d3b979-036-left-white.png",
+        "rightImgUrl" : "/fcrepo/rest/application/ucd-lib-client/images/browse-by/watercolor-d3dt26-221-right-white.png"        
+      }
+    ]
+  }
+}

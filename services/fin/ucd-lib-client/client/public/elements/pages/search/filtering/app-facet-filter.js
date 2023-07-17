@@ -64,9 +64,9 @@ class AppFacetFilter extends Mixin(LitElement)
 
     e.buckets.forEach(item => {
       if( this.notified[item.key] && !item.active ) {
-        this._notifySelected(item.active, item.key);
+        this._notifySelected(item.active, item.key, item.doc_count);
       } else if( !this.notified[item.key] && item.active ) {
-        this._notifySelected(item.active, item.key);
+        this._notifySelected(item.active, item.key, item.doc_count);
       }
       if( APP_CONFIG.collectionLabels[item.key] ) {
         let valueMap = {};
@@ -95,13 +95,19 @@ class AppFacetFilter extends Mixin(LitElement)
       this.ironListActive = false;
     }
 
-    this.dispatchEvent(
-      new CustomEvent('update-visibility', {
-        detail: {
-          show: (e.buckets.length !== 0)
-        }
-      })
-    );
+    if( this.buckets.length >= 15 ) {
+      this.includeTypeahead = true;
+    }
+
+    requestAnimationFrame(() => {
+      this.dispatchEvent(
+        new CustomEvent('update-visibility', {
+          detail: {
+            show: (e.buckets.length !== 0)
+          }
+        })
+      );  
+    });
   }
 
   getBuckets() {
@@ -130,8 +136,9 @@ class AppFacetFilter extends Mixin(LitElement)
    * 
    * @param {Boolean} selected is the filter selected
    * @param {String} key filter key/label
+   * @param {Number} count filter count of search results
    */
-  _notifySelected(selected, key) {
+  _notifySelected(selected, key, count) {
     if( !selected && this.notified[key] ) {
       delete this.notified[key];
     } else if( selected ) {
@@ -141,7 +148,8 @@ class AppFacetFilter extends Mixin(LitElement)
     this.dispatchEvent(
       new CustomEvent(`${selected ? 'add' : 'remove'}-selected`, {
         detail: {
-          label: key
+          label: key,
+          count
         }
       })
     );
@@ -171,7 +179,7 @@ class AppFacetFilter extends Mixin(LitElement)
     this.RecordModel.appendKeywordFilter(searchDoc, this.filter, item.key);
     this.RecordModel.setSearchLocation(searchDoc);
 
-    this._notifySelected(true, item.key);
+    this._notifySelected(true, item.key, item.doc_count);
   }
 
   removeFilter(e) {
@@ -183,7 +191,7 @@ class AppFacetFilter extends Mixin(LitElement)
     this.RecordModel.removeKeywordFilter(searchDoc, this.filter, item.key);
     this.RecordModel.setSearchLocation(searchDoc);
 
-    this._notifySelected(false, item.key);
+    this._notifySelected(false, item.key, item.doc_count);
   }
 
   /**
@@ -217,7 +225,7 @@ class AppFacetFilter extends Mixin(LitElement)
     }
 
     let re = new RegExp('.*'+text.toLowerCase()+'.*', 'i');
-    let buckets = this.originalBuckets.filter(item => item.sortKey.match(re) ? true : false);
+    let buckets = this.originalBuckets.filter(item => item.sortKey.match(re) || item.valueMap?.[item.key]?.match(re) ? true : false);
 
     if( this.ironListActive ) {
       this.bucketsIronList = buckets;

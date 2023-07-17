@@ -56,7 +56,6 @@ export class AppNavBar extends LitElement {
   }
 
   updated(e) {
-    // debugger;
     // hide home link if not mobile (width < 768px)
     if( window.innerWidth > 767 ) {
       let header = this.shadowRoot.querySelector('ucdlib-header');

@@ -14,7 +14,7 @@ export default function render() {
   [hidden] { display: none !important; }
 
   .filter {
-    padding: 4px 5px;
+    padding: 4px 0;
     display: flex;
     align-items: center;
   }
@@ -40,7 +40,7 @@ export default function render() {
     width: 100%;
     box-sizing: border-box;
     padding: 0 5px;
-    background: var( --super-light-background-color);
+    background: var(--color-aggie-blue-30);
     border: none;
     height: 61px;
     padding-left: 1rem;
@@ -68,8 +68,11 @@ export default function render() {
     color: var(--text-disabled);
     flex: 1;
     text-align: right;
-    min-width : 40px;
+    min-width : 1.5rem;
     padding: 0 10px;
+  }
+  .count.has-count {
+    color: black;
   }
 
   .overflow {
@@ -149,7 +152,7 @@ export default function render() {
         ?disabled="${item.disabled}">
       </app-normal-checkbox>
 
-      <div class="count">${item.doc_count}</div>
+      <div class="count ${item.doc_count > 0 ? 'has-count' : ''}">${item.doc_count}</div>
     </div>
   `)}
 </div>
@@ -170,7 +173,7 @@ export default function render() {
         ?disabled="${item.disabled}">
       </app-normal-checkbox>
 
-      <div class="count">${item.doc_count}</div>
+      <div class="count ${item.doc_count > 0 ? 'has-count' : ''}">${item.doc_count}</div>
     </div>
     `)}
   </div>

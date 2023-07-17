@@ -43,6 +43,10 @@ class AppRecord extends Mixin(LitElement)
       editMode : { type : Boolean },
       // citations : {type: Array}
       citationRoot: { type: Object },
+      itemDefaultDisplay: { type: String }, // collection default display
+      itemDisplay: { type: String },
+      displayData: { type: Object },
+      savedCollectionData: { type: Object },
     };
   }
 
@@ -72,20 +76,26 @@ class AppRecord extends Mixin(LitElement)
     // this.citations = [];
     this.citationRoot = {};
     this.collectionItemCount = 0;
+    this.itemDefaultDisplay = 'Book Reader - 2 Page';
+    this.itemDisplay = '';
 
     this.isUiAdmin = user.canEditUi();
     this.editMode = false;
+    this.displayData = {};
+    this.savedCollectionData = {};
 
     this._injectModel(
       "AppStateModel",
       "RecordModel",
       "CollectionModel",
-      "SeoModel"
+      "SeoModel",
+      "FcAppConfigModel"
     );
   }
 
   async firstUpdated() {
     // this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath)); // this causes badness with ie /media/images:4 paths
+    this._onAppStateUpdate(await this.AppStateModel.get());
     this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
 
@@ -134,10 +144,12 @@ class AppRecord extends Mixin(LitElement)
    * @method _onAppStateUpdate
    */
   async _onAppStateUpdate(e) {
-    // if (e.state !== "loaded") return;
+    if( e.location.page !== 'item' ) return;
+
     this._updateLinks(e.location);
     if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+    await this._parseDisplayData();
   }
 
   _updateSlimStyles() {
@@ -257,7 +269,10 @@ class AppRecord extends Mixin(LitElement)
    */
   _onEditClicked(e) {
     if( !this.isUiAdmin ) return;
+    this._updateSlimStyles();
     this.editMode = true;
+    
+    this._changeMediaViewerDisplay('none');
   }
 
   /**
@@ -268,35 +283,23 @@ class AppRecord extends Mixin(LitElement)
    */
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
-
-    // TODO things
-
     
-    // parse highlighted items
-    // this.savedItems = [];
-    // let newSavedItems = [];
-    // let itemInputs = document.querySelectorAll('.item-ark-input');
-    // itemInputs.forEach((input, index) => {
-    //   if( input.value ) {
-    //     newSavedItems.push({
-    //       '@id' : input.value,
-    //       position : index+1
-    //     });
-    //   }
-    // });
-    // this.savedItems = [...newSavedItems];
-    
-    // this._updateDisplayData();
-    // let featuredImage = document.querySelector('#file-upload').files[0];
-    // await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, featuredImage);
-    
-    // this.editMode = false;
+    this.itemDisplay = document.querySelector('ucd-theme-slim-select')?.slimSelect?.selected();
+    this._updateDisplayData();
+    await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
 
-    // this.requestUpdate(); 
-    // // TODO for some reason this.savedItems isn't updating the view, even with requestUpdate()
-    // //  so the ordering doesn't update until page load
-    // // this._onAppStateUpdate(await this.AppStateModel.get()); // also doesn't work
-    // this.AppStateModel.setLocation(this.collectionId);
+    // TODO save collection data with hasPart pointing to this item
+    // if( Object.keys(this.savedCollectionData).length ) {
+    //   // TEMP hack, also should append to array and not replace
+    //   this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0]['http://digital.library.ucdavis.edu/schema/itemDisplayExceptions'] 
+    //     = [{'@id': 'info:fedora/application/ucd-lib-client/item/ark:/87287/d70898/ark:/87287/d70898.jsonld.json'}];
+
+    //   await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.savedCollectionData);
+    // }
+
+    this.editMode = false;
+
+    this._changeMediaViewerDisplay('');
   }
 
   /**
@@ -308,6 +311,77 @@ class AppRecord extends Mixin(LitElement)
   _onCancelEditClicked(e) {
     if( !this.isUiAdmin ) return;
     this.editMode = false;
+
+    this._changeMediaViewerDisplay('');
+  }
+
+    /**
+   * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
+   */
+    async _parseDisplayData() {
+      let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
+      if( savedDisplayData ) {
+        this.savedCollectionData = savedDisplayData;
+        let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+        this.itemDefaultDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
+      }
+
+      savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
+
+      if( savedDisplayData ) {
+        let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+        this.itemDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || '';  
+      }
+
+      this.appDataLoaded = true;
+      this._updateDisplayData();
+    }
+  
+    _updateDisplayData() {
+      this.displayData = JSON.parse(`
+        {
+        "@context" : {
+          "@vocab" : "http://schema.org/",
+          "@base" : "info:fedora/application/item",
+          "fedora" : "http://fedora.info/definitions/v4/repository#",
+          "ldp" : "www.w3.org/ns/ldp#",
+          "schema" : "http://schema.org/",
+          "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
+          "xsd" : "http://www.w3.org/2001/XMLSchema#",
+          "item" : {
+            "@type" : "@id",
+            "@id" : "ucdlib:item"
+          },
+          "ldp:membershipResource" : {
+            "@type" : "@id"
+          },
+          "ldp:hasMemberRelation" : {
+            "@type" : "@id"
+          }
+        },
+        "@id" : "item/${this.renderedRecordId.replace('/item/', '')}",
+        "ucdlib:itemDefaultDisplay" : "${this.itemDisplay}"
+      }`);
+    }
+
+  _changeMediaViewerDisplay(display) {
+    let mediaViewer = this.querySelector('app-media-viewer');
+    if( !mediaViewer ) return;
+    let media = mediaViewer.querySelector('ucdlib-pages');
+    let nav = mediaViewer.querySelector('app-media-viewer-nav');
+
+    if( nav ) nav.style.display = display;
+
+    if( !media ) return;
+    if( display ) {
+      media.style.opacity = 0;
+      media.style.height = '150px';
+      media.style.display = 'block';
+    } else {
+      media.style.opacity = 100;
+      media.style.height = '';
+      media.style.display = 'block';
+    }      
   }
 
   /**

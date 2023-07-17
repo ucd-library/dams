@@ -96,7 +96,7 @@ class AppHome extends Mixin(LitElement)
       let collectionIds = [];
 
       panel.collectionIds.forEach(collectionId => {
-        if( APP_CONFIG.collectionLabels[collectionId] ) collectionIds.push(collectionId);
+        if( APP_CONFIG.collectionLabels[collectionId.selected] ) collectionIds.push(collectionId);
       });
       panel.collectionIds = collectionIds;
       
@@ -120,7 +120,7 @@ class AppHome extends Mixin(LitElement)
     data = await this.CollectionModel.getRecentCollections();
     
     if( data.response.ok && data.body.results.length ) {
-      this.recentCollections = data.body.results;
+      this.recentCollections = data.body.results?.slice(0, 3);
     }
 
     // Get hero image options
@@ -160,6 +160,7 @@ class AppHome extends Mixin(LitElement)
    */
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
+    this.editMode = false;
     // save to fcrepo container
     //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
     let adminPanel = document.querySelector('admin-featured-collections');
@@ -168,7 +169,6 @@ class AppHome extends Mixin(LitElement)
       this.displayData = adminPanel.panels;
     }
     await this.FcAppConfigModel.saveFeaturedCollectionAppData(this.displayData);
-    this.editMode = false;
   }
 
   /**

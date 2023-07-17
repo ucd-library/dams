@@ -9,6 +9,7 @@ import "../../components/cards/dams-item-card";
 import '../../components/citation';
 
 import user from '../../../lib/utils/user.js';
+import utils from '../../../lib/utils/index.js';
 
 class AppCollection extends Mixin(LitElement) 
   .with(MainDomElement, LitCorkUtils) {
@@ -36,6 +37,7 @@ class AppCollection extends Mixin(LitElement)
       itemDisplayCount : { type : Number },
       collectionSearchHref : {type: String},
       citationRoot: { type: Object },
+      itemDefaultDisplay: { type: String },
     };
   }
 
@@ -44,6 +46,7 @@ class AppCollection extends Mixin(LitElement)
     this.render = render.bind(this);
     this.active = true;
 
+    this.appDataLoaded = false;
     this.reset();
 
     this._injectModel('AppStateModel', 'CollectionModel', 'RecordModel', 'FcAppConfigModel', 'SeoModel');
@@ -112,7 +115,7 @@ class AppCollection extends Mixin(LitElement)
     this.citationRoot = e.payload.root;
 
     // try to load from app container first
-    if( !this.savedItems.length ) {
+    if( this.appDataLoaded && !this.savedItems.length ) {
       // default to most recent 3 items by year published descending    
       let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, 3);
       if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
@@ -156,6 +159,7 @@ class AppCollection extends Mixin(LitElement)
     this.editMode = false;
     this.itemDisplayCount = 6;
     this.citationRoot = {};
+    this.itemDefaultDisplay = 'Book Reader - 2 Page'; // one, list.. for admin pref on BR display type for items in this collection
   }
 
   /**
@@ -214,6 +218,8 @@ class AppCollection extends Mixin(LitElement)
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
 
+    this.editMode = false;
+
     // TODO how to handle validation that all 6 featured items are populated? or more like how to alert user
 
     // parse highlighted items
@@ -232,9 +238,11 @@ class AppCollection extends Mixin(LitElement)
     
     this._updateDisplayData();
     let featuredImage = document.querySelector('#file-upload').files[0];
-    await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, featuredImage);
+    await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData);
+    if( featuredImage ) {
+      await this.FcAppConfigModel.saveCollectionFeaturedImage(this.collectionId, featuredImage);
+    }
     
-    this.editMode = false;
 
     this.requestUpdate(); 
     // TODO for some reason this.savedItems isn't updating the view, even with requestUpdate()
@@ -270,69 +278,48 @@ class AppCollection extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
-    // not sure if we'll have transform service to always create same jsonld structure
-    // for now just parse out values and set consistent structure
-    // try to load from app_config
-    let savedDisplayData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${this.collectionId}${this.collectionId.replace('/collection', '')}.jsonld.json`];
-    if( savedDisplayData ) {
-      // watercolor
-      let watercolor = savedDisplayData['graph'].filter(g => g['@id'].indexOf('/application/#') > -1)[0];
-      if( watercolor ) {
-        this.watercolor = watercolor.css;
-      }
+    this.savedItems = [];
 
-      // featured items
-      let graphRoot = savedDisplayData['graph'].filter(d => d['@id'] === '/application'+this.collectionId)[0];
-      if( graphRoot ) {
-        let items = graphRoot.exampleOfWork;
-        if( items ) {
-          if( !Array.isArray(items) ) items = [items];
-          items.forEach(item => {
-            let match = savedDisplayData['graph'].filter(d => d['@id'] === item)[0];
-            if( match ) {
-              this.savedItems.push({
-                '@id' : match['@id'],
-                position : match['http://schema.org/position']
-              });
-            }
-          });
-
-          this.savedItems.sort((a,b) => a.position - b.position);
-        }
-      
-        // featured image
-        this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot.thumbnailUrl;
-
-        // itemDisplayCount
-        this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount'];
-      }    
-
-    } else {
-      // otherwise ping fcrepo
-      try {
-        savedDisplayData = await this.FcAppConfigModel.getCollectionAppData(this.collectionId);      
-      } catch(e) {
-        console.error(e);
-        return;
-      }
-
-      if( savedDisplayData && savedDisplayData.body ) {
-        savedDisplayData = JSON.parse(savedDisplayData.body);
-        let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
-        if( watercolor ) {
-          this.watercolor = watercolor['http://schema.org/css'][0]['@value'];
-        }
-
-        // TODO
-        // featured items
-        
-        // featured image
-
-        // itemDisplayCount
-
-      }
+    let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
+    if( !savedDisplayData ) {
+      this.appDataLoaded = true;
+      return;
     }
-    
+
+    let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
+    if( watercolor ) {
+      this.watercolor = watercolor['http://schema.org/css'][0]['@value'];
+    }
+
+    let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+    if( !graphRoot ) {
+      this.appDataLoaded = true;
+      return;
+    }
+
+    // featured items
+    let items = graphRoot['http://schema.org/exampleOfWork'];
+    if( items ) {
+      if( !Array.isArray(items) ) items = [items];
+      
+      items.forEach((item, index) => {
+        this.savedItems.push({
+          '@id' : '/item' + item['@id']?.split('/item')?.[1],
+          position : index+1
+        });  
+      });
+    }
+    this.highlightedItems = [...this.savedItems];
+
+    // featured image
+    this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot['http://schema.org/thumbnailUrl']?.[0]?.['@id']?.split('/fcrepo/rest')?.[1];
+
+    // itemDisplayCount
+    this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount']?.[0]?.['@value'];
+
+    this.itemDefaultDisplay = graphRoot['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || this.itemDefaultDisplay;
+
+    this.appDataLoaded = true;
     this._updateDisplayData();
   }
 
@@ -370,7 +357,7 @@ class AppCollection extends Mixin(LitElement)
           "@type" : "@id"
         }
       },
-      "@id" : "collection/${this.collectionId.replace('/collection/', '')}",
+      "@id" : "info:fedora/application/ucd-lib-client${this.collectionId}",
       "watercolors" : [
         {
           "@id" : "info:fedora/application/#${this.watercolor}",
@@ -384,6 +371,7 @@ class AppCollection extends Mixin(LitElement)
           "@id" : "info:fedora/application/ucd-lib-client${this.collectionId}/featuredImage.jpg"
       },
       "ucdlib:itemCount" : ${this.itemDisplayCount},
+      "ucdlib:itemDefaultDisplay" : "${this.itemDefaultDisplay}",
       "exampleOfWork" : 
         ${JSON.stringify(this.savedItems)}
     }`);
