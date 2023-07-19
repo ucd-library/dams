@@ -147,7 +147,7 @@ class PageSearch extends FinEsDataModel {
         let pageData = {
           width: parseInt(result?.OBJECT?.$?.width),
           height: parseInt(result?.OBJECT?.$?.height),
-          page: parseInt(node.position) - 1,
+          page: parseInt(node.position),
         };
 
         result?.OBJECT?.HIDDENTEXT?.forEach((item) => {
@@ -286,10 +286,10 @@ class PageSearch extends FinEsDataModel {
     // position is set by container data, should be base 1.  If not set,
     // use the page number from the manifest, which uses base 0
     if (pageManifest.page !== undefined) {
-      node.position = pageManifest.page + 1;
+      node.position = pageManifest.page;
     }
     if (node.position === undefined) {
-      node.position = (pageManifest.page || 0) + 1;
+      node.position = (pageManifest.page || 0);
     }
     node.identifier = node["@id"] + "/" + node.position;
 
