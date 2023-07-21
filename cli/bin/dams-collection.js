@@ -103,7 +103,13 @@ async function crawlAndRemove(finPath, crawled={}) {
   crawled[finPath] = true;
 
   let t = Date.now();
-  let resp = await getMetadata(finPath);
+  let resp;
+  try {
+    resp = await getMetadata(finPath);
+  } catch(e) {
+    console.log(' -> Failed to get metadata: ', e.message);
+    return;
+  }
   console.log('  -> '+(Date.now()-t)+'ms');
 
   if( resp.isArchivalGroup && !finPath.startsWith('/collection') ) {
