@@ -6,15 +6,17 @@ const path = require('path');
 const CliConfig = api.CliConfig;
 
 const CRAWL_PROPERTIES = [
-  'contains', 'hasPart'
+  'http://www.w3.org/ns/ldp#contains', 'http://schema.org/hasPart'
 ]
 const ARCHIVAL_GROUP = "http://fedora.info/definitions/v4/repository#ArchivalGroup";
 
 program
   .command('remove <path>')
   .description('Crawl a collection and remove all references items')
-  .action((finPath, options) => {
-    remove(finPath)
+  .action(async (finPath, options) => {
+    await crawlAndRemove(finPath);
+    await remove('/indirect-containers'+finPath);
+    await remove(finPath);
   });
 
 program
@@ -27,23 +29,21 @@ program
 
 
 async function remove(finPath) {
-  let archiveGroups = await crawl(finPath);
+  let t = Date.now();
+  let resp = await api.delete({
+    path: finPath,
+    permanent : true,
+    jwt : CliConfig.jwt
+  });
 
-  console.log('\nRemoving archive the following archival groups: ', archiveGroups);
-
-  for( let archiveGroup of archiveGroups ) {
-    let resp = await api.delete({
-      path: archiveGroup,
-      permanent : true,
-      jwt : CliConfig.jwt
-    });
-
-    if( resp.last.statusCode !== 204 ) {
-      throw new Error(`Failed to delete ${archiveGroup}: ${resp.last.statusCode} ${resp.last.body}`);
-    }
-
-    console.log('Deleted: ', archiveGroup);
+  if( resp.last.statusCode === 404 ) {
+    return console.log('Ignored Delete, container does not exist 404: ', finPath, (Date.now()-t)+'ms');
   }
+  if( resp.last.statusCode !== 204 ) {
+    throw new Error(`Failed to delete ${finPath}: ${resp.last.statusCode} ${resp.last.body}`);
+  }
+
+  console.log('Deleted: ', finPath, (Date.now()-t)+'ms');
 }
 
 async function exportCollection(finPath, limit) {
@@ -97,27 +97,24 @@ async function exportCollection(finPath, limit) {
 
 
 
-async function crawl(finPath, crawled={}, archiveGroups={}) {
+async function crawlAndRemove(finPath, crawled={}) {
   if( crawled[finPath] ) return;
   console.log('Crawling ', finPath);
   crawled[finPath] = true;
 
+  let t = Date.now();
   let resp = await getMetadata(finPath);
+  console.log('  -> '+(Date.now()-t)+'ms');
 
-  if( resp.isArchivalGroup ) {
-    archiveGroups[finPath] = true;
-  }
-  
   if( resp.isArchivalGroup && !finPath.startsWith('/collection') ) {
-    return Object.keys(archiveGroups);
+    await remove(finPath);
+    return;
   }
 
   let finPaths = getCrawlProperties(resp.data);
   for( let finPath of finPaths ) {
-    await crawl(finPath, crawled, archiveGroups);
-  }
-
-  return Object.keys(archiveGroups);
+    await crawlAndRemove(finPath, crawled);
+  };
 }
 
 function getCrawlProperties(graph) {
@@ -133,7 +130,9 @@ function getCrawlProperties(graph) {
   for( let node of graph ) {
     for( let prop of CRAWL_PROPERTIES ) {
       getValues(node, prop).forEach(value => {
-        props.add(value.split('/fcrepo/rest').pop());
+        props.add(
+          value.split('/fcrepo/rest').pop().replace(/^info:fedora/, '')
+        );
       });
     }
   }
@@ -151,12 +150,10 @@ function getValues(node, prop) {
 }
 
 async function getMetadata(finPath) {
-  let resp = await api.metadata({
+  let resp = await api.get({
     path: finPath,
     jwt : CliConfig.jwt,
-    headers : {
-      Accept : api.GET_JSON_ACCEPT.COMPACTED
-    }
+    fcBasePath : '/fin/rest'
   });
 
   if( resp.last.statusCode !== 200 ) {
@@ -165,10 +162,14 @@ async function getMetadata(finPath) {
 
   let data = JSON.parse(resp.last.body);
   let isArchivalGroup = false;
-  let links = api.parseLinkHeader(resp.last.headers.link);
 
-  if( links.type.find(link => link.url === ARCHIVAL_GROUP ) ) {
-    isArchivalGroup = true;
+  for( let node of data['@graph'] ) {
+    let types = node['@type'] || [];
+    if( !Array.isArray(types) ) types = [types];
+    if( types.includes(ARCHIVAL_GROUP) ) {
+      isArchivalGroup = true;
+      break;
+    }
   }
 
   return {data, isArchivalGroup};
