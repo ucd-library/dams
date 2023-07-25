@@ -59,9 +59,9 @@ async function exportCollection(finPath, limit) {
   }
 
   let node = graph.find(node => node['@type'].includes('http://schema.org/Collection')) || {};
-  parts = getValues(node, 'hasPart')
-    .filter(part => part.match(/\/fcrepo\/rest\//))
-    .map(part => part.split('/fcrepo/rest').pop());
+  parts = getValues(node, 'http://schema.org/hasPart')
+    .filter(part => part.match(/(^info:fedora\/|\/fcrepo\/rest\/)/))
+    .map(part => part.split('/fcrepo/rest').pop().replace(/^info:fedora/, ''));
 
   if( limit ) {
     parts = parts.slice(0, limit);

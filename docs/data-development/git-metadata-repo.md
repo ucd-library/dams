@@ -41,6 +41,7 @@ To pull and merge from GCS, do the following.
  - See [GCS Archive](gcs-archive.md) for instructions on syncing data from GCS coldline storage.  Perform this step first in the /data folder of your [data development container](data-dev-container.md).
  - Next, clone the metadata repo from GitHub.  This will create a new folder in your data development container called `dams-[collection-name]-metadata`.  This folder will contain the metadata from GitHub.
   - `cd /data`
-  - `git clone git@github.com:ucd-library/dams-[collection-name]-metadata.git`
+  - `git clone https://github.com/ucd-library/dams-[collection-name]-metadata.git`
   - `cp -r dams-[collection-name]-metadata/* .`
+  - `cp -r dams-[collection-name]-metadata/.g* .`
   - `rm -rf dams-[collection-name]-metadata`
