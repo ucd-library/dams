@@ -112,10 +112,10 @@ class Validate {
         missingOriginal = true;
       }
 
-      if( missingOriginal ) {
-        result.errors.push('Media has no original image: '+node['@id']);
-        continue;
-      }
+      // if( missingOriginal ) {
+      //   result.errors.push('Media has no original image: '+node['@id']);
+      //   continue;
+      // }
 
       if( !images.large || !images.medium || !images.small ) {
         if( missingOriginal ) {
