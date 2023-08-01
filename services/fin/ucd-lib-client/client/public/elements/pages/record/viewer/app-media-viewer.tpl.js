@@ -209,6 +209,7 @@ export default function render() {
           .fullscreen="${this.brFullscreen}"
           .bookData="${this.bookData}"
           bookItemId="${this.bookItemId}"
+          ?brsinglepage="${this.singlePage}"
           @br-page-change="${this._onBookViewPageChange}">
         </app-bookreader-viewer>
         <app-video-viewer id="video"></app-video-viewer>
@@ -272,7 +273,7 @@ export default function render() {
                   @click="${this._onSearchResultClick}"
                 >
                   <h4 style="margin-bottom: 0">
-                    Page ${result.displayPageNumber.replace("n", "")}
+                    Page ${parseInt(result.displayPageNumber.replace("n", "")) + 1}
                   </h4>
                   <p style="font-size: .9rem; margin-top: .3rem">
                     ${unsafeHTML(
@@ -290,9 +291,9 @@ export default function render() {
 
       <app-media-viewer-nav
         .isBookReader="${this.isBookReader}"
-        .hideZoom="${this.mediaType === "bookreader" ||
-        this.mediaType === "video"}"
+        .hideZoom="${this.mediaType === "bookreader" || this.mediaType === "video"}"
         .searchResults="${this.searchResults}"
+        ?brsinglepage="${this.singlePage}"
         @zoom-in="${this._onZoomIn}"
         @br-bookview-toggle="${this._onToggleBookView}"
         @br-expand-view="${this._onExpandBookView}"

@@ -207,7 +207,7 @@ export default function render() {
 
   .about-collections {
     display: flex;
-    height: 35rem;
+    /* height: 35rem; */
     background-color: var(--color-aggie-blue-80);
     background-image: url(/images/watercolors/watercolor-background-ucd-blue-20opacity.png);
     /* background-position: center;
@@ -372,12 +372,40 @@ export default function render() {
     display: grid;
     grid-gap: var(--spacing-default);
     grid-template-columns: auto;
-    margin-bottom: var(--spacing-sm);
+    /* margin-bottom: var(--spacing-sm); */
+    /* margin-bottom: 2rem 0; */
   }
   .fg-header h3 {
     margin: 0;
   }
-  .featured-more {
+
+  .fg-header.centered {
+    display: block;
+    width: 66%;
+    margin: auto;
+    text-align: center;
+  }
+  .fg-header.centered h3 {
+    margin-bottom: 1rem;
+  }
+
+  .fg-header.left-aligned {
+    display: block;
+    width: 66%;
+    margin: auto;
+    text-align: left;
+  }
+  .fg-header.left-aligned h3 {
+    text-align: left;
+    margin-bottom: 1rem;
+  }
+  .fg-header.left-aligned div {}
+
+  .fg-header.split {}
+  .fg-header.split h3 {}
+  .fg-header.split div {}
+
+  .featured-collections-public .featured-more {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -393,10 +421,13 @@ export default function render() {
     padding-bottom: 0;
   }
 
-  .featured-group {
-    padding-bottom: 2rem;
-  }
+  /* .featured-group {
+    padding: 1rem 0;
+  } */
 
+  .featured-collections-public > * {
+    padding: 1rem 0;
+  }
 
   @media (max-width: 767px) {
     /* mobile */

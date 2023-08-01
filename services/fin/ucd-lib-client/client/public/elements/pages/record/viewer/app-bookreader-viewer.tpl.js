@@ -85,12 +85,14 @@ export default function render() {
 
       .fullscreen .BRcontrols {
         width: 97%;
+        margin: auto;
       }
 
       .BRcontrols {
-        width: 60%;
-        margin: auto;
+        width: calc(60% + 30px);
+        margin: 0 calc(20% - 30px) 0 calc(20%);
       }
+
 
       .BRcontrols .controls {
         padding-left: 0;
@@ -246,10 +248,15 @@ export default function render() {
         display: none;
       }
 
+      .br-mode-1up__root {
+        overflow: hidden;
+      }
+
       @media (max-width: 767px) {
         /* mobile */
         .BRcontrols {
-          width: 90%;
+          width: 92%;
+          margin: 0 0 0 calc(5%);
         }
       }
     </style>

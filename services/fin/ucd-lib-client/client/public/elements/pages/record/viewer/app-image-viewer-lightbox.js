@@ -175,10 +175,13 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.currentLayer = L.tileLayer.iiif(tiledUrl);
 
     } else {
-      let original = this.renderedMedia.original;
+      let image = this.renderedMedia.original || 
+                  this.renderedMedia.large ||
+                  this.renderedMedia.medium ||
+                  this.renderedMedia.small;
 
       // we might not have size
-      let size = await this.getImageSize(original);
+      let size = await this.getImageSize(image);
       
       // determine the pixel dimensions of the image
       let imageWidthInPixels = parseInt(size.width);
@@ -205,7 +208,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       let zoomLevel = 0; // Adjust as needed
       this.viewer.setView([centerLat, centerLon], zoomLevel);
 
-      this.currentLayer = L.imageOverlay(original.url, imageBounds).addTo(this.viewer);
+      this.currentLayer = L.imageOverlay(image.url, imageBounds).addTo(this.viewer);
     }
 
     this.currentLayer.addTo(this.viewer);

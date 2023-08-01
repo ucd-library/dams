@@ -152,10 +152,10 @@ export default function render() {
         .results {
           padding: 2rem 2rem 0;
         }
-        .side-image .left-image,
+        /* .side-image .left-image,
         .side-image .right-image {
           display: none;
-        }
+        } */
         .header,
         .results-footer {
           width: 65%;
@@ -164,10 +164,10 @@ export default function render() {
           margin: 0.5rem 0;
         }
       }
-      @media (max-width: 844px) {
-        .side-image {
+      @media (max-width: 767px) {
+        /* .side-image {
           display: none;
-        }
+        } */
         .results {
           padding: 2rem 5rem 0;
         }
@@ -204,7 +204,8 @@ export default function render() {
           padding: 2rem 1rem 0;
         }
         .header-layout {
-          margin: 0 1rem;
+          margin: auto;
+          width: 60%;
         }
         .results {
           padding: 2rem 1rem 0;

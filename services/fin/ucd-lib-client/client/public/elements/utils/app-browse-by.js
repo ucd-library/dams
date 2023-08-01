@@ -53,7 +53,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
 
     this.reset();
 
-    this._injectModel('BrowseByModel', 'AppStateModel', 'RecordModel', 'CollectionModel');
+    this._injectModel('BrowseByModel', 'AppStateModel', 'RecordModel', 'FcAppConfigModel', 'CollectionModel');
   }
 
   async firstUpdated() {
@@ -66,8 +66,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
         {label : 'Item Quantity', dir : 'dsc', type: 'count'}
       ];
     }
-
-    let browseByImages = APP_CONFIG.fcAppConfig['/application/ucd-lib-client/images/config.json'];
+    
+    let browseByImages = await this.FcAppConfigModel.getDefaultImagesConfig();
     if( browseByImages ) {
       browseByImages = browseByImages.body.browseByImages;
       switch (this.label.toLowerCase()) {
@@ -86,6 +86,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
       }  
     }
 
+    this._updateSideImages();
     // this._loadResults();
   }
 
@@ -240,7 +241,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
       }
     });
 
-    
     if( sortBy.type === 'count' ) {
       this.allResults.sort((a, b) => {
         if( a[sortBy.type] > b[sortBy.type] ) return (sortBy.dir === 'asc') ? 1 : -1;
@@ -248,8 +248,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
         return 0;
       });
     } else {
-      // TODO handle sort by date
-
       // sort by title
       this.allResults.sort((a, b) => {
         if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sortBy.dir === 'asc') ? 1 : -1;
@@ -264,9 +262,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     );
 
     this.totalResults = this.allResults.length;
-
-    // TODO images not updating, titles/counts are
-
     
     // this.shadowRoot.querySelectorAll('dams-collection-card').forEach(c => c.requestUpdate());
   }

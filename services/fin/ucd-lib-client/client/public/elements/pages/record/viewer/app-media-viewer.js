@@ -28,6 +28,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       bagOfFilesImage: { type: String },
       brFullscreen: { type: Boolean },
       brSearchOpen: { type: Boolean },
+      singlePage: { type: Boolean },
       bookData: { type: Object },
       bookItemId: { type: String },
       isBookReader: { type: Boolean },
@@ -46,6 +47,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.bagOfFilesImage = "";
     this.brFullscreen = false;
     this.brSearchOpen = false;
+    this.singlePage = false;
     this.bookData = {};
     this.bookItemId = "";
     this.isBookReader = false;
@@ -79,6 +81,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
   }
 
   async _onAppStateUpdate(e) {
+    this._onRenderMedia(e);
+  }
+
+  async _onRenderMedia(e) {
     // TODO eventually support mutiple mediaGroups, combine different media types into same viewer/nav?
     let mediaGroups = e.selectedRecord?.clientMedia?.mediaGroups;
     if (!mediaGroups || !mediaGroups.length) return;
@@ -123,14 +129,29 @@ export default class AppMediaViewer extends Mixin(LitElement)
     //   mediaType = 'image';
     // }
 
-    // finally, check for any overrides at collection/item level for the image viewer
+    // check for any overrides at collection/item level for the image viewer
     let itemId = e.selectedRecord?.graph?.root?.['@id'];
     let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))[0]['@id'];
-    let displayOverride = await utils.getItemDisplayType(itemId, collectionId, this.FcAppConfigModel);
+    let displayType = await utils.getItemDisplayType(itemId, collectionId, this.FcAppConfigModel);
+    let overrideAsImage = false;
+
+    if( displayType && displayType.includes('Image List') ) {
+      renderAsBr = false;
+      mediaType = 'image';
+      overrideAsImage = true;
+    } else if ( displayType && displayType.includes('Single') ) {
+      renderAsBr = true;
+      mediaType = 'bookreader';
+      this.singlePage = true;
+    } else if ( displayType && displayType.includes('2 Page') ) {
+      renderAsBr = true;
+      mediaType = 'bookreader';
+      this.singlePage = false;
+    }
 
     if (
       renderAsBr ||
-      (mediaGroup.clientMedia && mediaGroup.clientMedia.pdf)
+      (!overrideAsImage && mediaGroup.clientMedia && mediaGroup.clientMedia.pdf)
     ) {
       mediaType = "bookreader";
       this.isBookReader = true;

@@ -25,7 +25,7 @@ export default function render() {
       [hidden] {
         display: none !important;
       }
-
+      
       input {
         padding: 15px;
         display: block;
@@ -119,6 +119,7 @@ export default function render() {
       #navLeft,
       #navRight {
         width: 36px;
+        margin: auto;
       }
 
       iron-icon {
@@ -224,8 +225,8 @@ export default function render() {
         display: inline-block;
         width: 50px;
         height: 50px;
-        margin-left: 25px;
-        margin-top: 12.5px;
+        /* margin-left: 25px; */
+        margin-top: 5px;
       }
 
       .br-search-non-fs div.zoom {

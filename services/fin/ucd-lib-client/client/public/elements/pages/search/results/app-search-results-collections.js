@@ -11,7 +11,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
   static get properties() {
     return {
       results : { type : Array },
-      resultsDisplay : { type : Array }, // filtered results
+      resultsDisplayed : { type : Array }, // filtered results
       showResults : { type : Boolean },
       currentPage : { type : Number },
       paginationTotal : { type : Number }
@@ -23,13 +23,14 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this.active = true;
     this.render = render.bind(this);
 
-    this.resultsDisplay = [];
+    this.resultsDisplayed = [];
     this.results = [];
     this.showResults = false;
     this.currentPage = 1;
     this.paginationTotal = 1;
+    this.resultsPerPage = 6;
 
-    this._injectModel('AppStateModel', 'FiltersModel');
+    this._injectModel('AppStateModel', 'FiltersModel', 'SearchVcModel');
   }
 
   willUpdate(e) {
@@ -43,6 +44,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
   _onAppStateUpdate(e) {
     if( e.location.page !== 'search' ) return;
     this.filterDisplayResults();
+    this._updateResultsDisplayed();
   }
 
   /**
@@ -53,7 +55,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
   _onFilterBucketsUpdate(e) {
     if( e.filter !== '@graph.isPartOf.@id' ) return;
     // temp remove oac isPartOf records
-    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org'));
+    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org') && b.doc_count > 0);
 
     this.results = e.buckets.map(r => {
       return {
@@ -61,9 +63,18 @@ class AppSearchResultsCollections extends Mixin(LitElement)
         // todo other data needed?
       };
     });
-    this.showResults = this.results.length > 0;
-    this.resultsDisplay = [...this.results];
-    this.filterDisplayResults();
+
+    let searchText = this.SearchVcModel.getSearch()?.searchDocument?.text;
+    let searchFilters =  this.SearchVcModel.getSearch()?.searchDocument?.filters || {};
+    if( searchText || ( Object.keys(searchFilters).length && Object.keys(searchFilters).filter(k => k !== '@graph.isPartOf.@id' ).length ) ) {
+      this.showResults = this.results.length > 0;
+      this.results = [...this.results];
+      this.paginationTotal = Math.ceil(this.results.length / this.resultsPerPage);
+      this.filterDisplayResults();   
+    } else {
+      this.showResults = false;
+    }    
+    this._updateResultsDisplayed();
   }
 
   filterDisplayResults() {    
@@ -77,7 +88,13 @@ class AppSearchResultsCollections extends Mixin(LitElement)
 
     // filter this.resultsDisplay to only this.results where @id matches the collection id in the url
     let collectionIds = decodedUrl.split('@graph.isPartOf.@id","or","')[1].split('"]')[0].split(',');
-    this.resultsDisplay = [...this.results.filter(r => collectionIds.includes(r['@id']))];
+    this.results = [...this.results.filter(r => collectionIds.includes(r['@id']))];
+  }
+
+  _updateResultsDisplayed() {
+    let start = (this.currentPage - 1) * this.resultsPerPage;
+    let end = start + this.resultsPerPage;
+    this.resultsDisplayed = this.results.slice(start, end);
   }
 
   /**
@@ -90,6 +107,16 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     if( e.type === 'keyup' && e.which !== 13 ) return;
     let id = e.currentTarget.getAttribute('data-id');
     this.AppStateModel.setLocation(id);
+  }
+
+  /**
+   * @method _onPageClicked
+   * @description called when pagination page is clicked
+   * @param {Object} e
+   */
+  _onPageClicked(e) {
+    this.currentPage = e.detail.page;
+    this._updateResultsDisplayed();
   }
 }
 

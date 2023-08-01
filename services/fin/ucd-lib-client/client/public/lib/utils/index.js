@@ -218,8 +218,9 @@ class Utils {
    * @param {Object} fcAppConfigModel reference to model
    */
   async getAppConfigCollectionGraph(id, fcAppConfigModel) {
-    let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/collection', '')}.jsonld.json`];
-    if( savedData ) return savedData;
+    // let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/collection', '')}.jsonld.json`];
+    // if( savedData ) return savedData;
+    let savedData;
     try {
       savedData = await fcAppConfigModel.getCollectionAppData(id);  
     } catch( error ) {
@@ -238,9 +239,9 @@ class Utils {
    * @param {Object} fcAppConfigModel reference to model
    */
   async getAppConfigItemGraph(id, fcAppConfigModel) {
-    let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/item', '')}.jsonld.json`];
-    if( savedData ) return savedData;
-
+    // let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/item', '')}.jsonld.json`];
+    // if( savedData ) return savedData;
+    let savedData;
     try {
       savedData = await fcAppConfigModel.getItemAppData(id);  
     } catch( error ) {

@@ -109,7 +109,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   _onFilterBucketsUpdate(e) {
     if( e.filter !== '@graph.isPartOf.@id' ) return;
     // temp remove oac isPartOf records
-    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org'));
+    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org') && b.doc_count > 0);
     
     this.collectionResults = e.buckets.map(r => {
       return {
@@ -117,8 +117,14 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       };
     });
 
-    this.totalCollections = this.collectionResults.length || 0;
-    this.filterDisplayResults();
+    let searchText = this.SearchVcModel.getSearch()?.searchDocument?.text;
+    let searchFilters =  this.SearchVcModel.getSearch()?.searchDocument?.filters || {};
+    if( searchText || ( Object.keys(searchFilters).length && Object.keys(searchFilters).filter(k => k !== '@graph.isPartOf.@id' ).length ) ) {
+      this.totalCollections = this.collectionResults.length || 0;
+      this.filterDisplayResults();      
+    } else {
+      this.totalCollections = 0;
+    }
   }
 
   willUpdate() {

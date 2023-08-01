@@ -34,7 +34,7 @@ class AppCollection extends Mixin(LitElement)
       // isAdmin : { type : Boolean },
       isUiAdmin : { type : Boolean },
       editMode : { type : Boolean },
-      itemDisplayCount : { type : Number },
+      itemCount : { type : Number },
       collectionSearchHref : {type: String},
       citationRoot: { type: Object },
       itemDefaultDisplay: { type: String },
@@ -114,28 +114,26 @@ class AppCollection extends Mixin(LitElement)
     
     this.citationRoot = e.payload.root;
 
-    // try to load from app container first
     if( this.appDataLoaded && !this.savedItems.length ) {
-      // default to most recent 3 items by year published descending    
-      let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, 3);
-      if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
-        this.highlightedItems = highlightedItems.body.results.map((item, index) => {
-          return {
-            '@id' : item['@graph'][0]['@id'],
-            description : item['@graph'][0].name,
-            position : index+1,
-            image : item['@graph'][0].thumbnailUrl
-          };
-        });
-      }
+      this.getLatestItems();
     }
 
-    // this._showAdminPanel();
-
-    // search highlighted collection items
-    // this.RecordModel.searchHighlighted(this.collectionId, true, true);
-
     this._updateDisplayData();
+  }
+
+  async getLatestItems() {
+    // default to most recent items by year published descending    
+    let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, this.itemCount);
+    if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
+      this.highlightedItems = highlightedItems.body.results.map((item, index) => {
+        return {
+          '@id' : item['@graph'][0]['@id'],
+          description : item['@graph'][0].name,
+          position : index+1,
+          image : item['@graph'][0].thumbnailUrl
+        };
+      });
+    }
   }
 
   reset() {
@@ -157,7 +155,7 @@ class AppCollection extends Mixin(LitElement)
     // this.isAdmin = user.hasRole('admin');
     this.isUiAdmin = user.canEditUi();
     this.editMode = false;
-    this.itemDisplayCount = 6;
+    this.itemCount = 6;
     this.citationRoot = {};
     this.itemDefaultDisplay = 'Book Reader - 2 Page'; // one, list.. for admin pref on BR display type for items in this collection
   }
@@ -186,11 +184,11 @@ class AppCollection extends Mixin(LitElement)
   }
 
   _onItemDisplayChange(e) {
-    this.itemDisplayCount = parseInt(e.target.value);
+    this.itemCount = parseInt(e.target.value);
     
     let itemInputs = document.querySelectorAll('.item-ark-input');
     itemInputs.forEach((input, index) => {
-      if( index+1 > this.itemDisplayCount ) {
+      if( index+1 > this.itemCount ) {
         input.value = '';
       }
     });
@@ -243,12 +241,9 @@ class AppCollection extends Mixin(LitElement)
       await this.FcAppConfigModel.saveCollectionFeaturedImage(this.collectionId, featuredImage);
     }
     
-
     this.requestUpdate(); 
-    // TODO for some reason this.savedItems isn't updating the view, even with requestUpdate()
-    //  so the ordering doesn't update until page load
-    // this._onAppStateUpdate(await this.AppStateModel.get()); // also doesn't work
     this.AppStateModel.setLocation(this.collectionId);
+    // this._parseDisplayData();
   }
 
   /**
@@ -280,15 +275,19 @@ class AppCollection extends Mixin(LitElement)
   async _parseDisplayData() {
     this.savedItems = [];
 
-    let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
+    let savedDisplayData = await this.FcAppConfigModel.getAdminData(this.collectionId);
+
+    // let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
     if( !savedDisplayData ) {
       this.appDataLoaded = true;
       return;
     }
 
+    savedDisplayData = savedDisplayData.body['@graph'];
+
     let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
     if( watercolor ) {
-      this.watercolor = watercolor['http://schema.org/css'][0]['@value'];
+      this.watercolor = watercolor['css'];
     }
 
     let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
@@ -298,29 +297,41 @@ class AppCollection extends Mixin(LitElement)
     }
 
     // featured items
-    let items = graphRoot['http://schema.org/exampleOfWork'];
+    let items = graphRoot['exampleOfWork'];
     if( items ) {
       if( !Array.isArray(items) ) items = [items];
       
       items.forEach((item, index) => {
         this.savedItems.push({
-          '@id' : '/item' + item['@id']?.split('/item')?.[1],
+          '@id' : '/item' + item.split('/item')?.[1],
           position : index+1
         });  
       });
     }
     this.highlightedItems = [...this.savedItems];
+    if( !this.savedItems.length ) this.getLatestItems();
 
     // featured image
-    this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot['http://schema.org/thumbnailUrl']?.[0]?.['@id']?.split('/fcrepo/rest')?.[1];
+    if( graphRoot['thumbnailUrl']?.split('/fcrepo/rest')?.[1] ) {
+      this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot['thumbnailUrl'].split('/fcrepo/rest')[1];
+    }
 
-    // itemDisplayCount
-    this.itemDisplayCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount']?.[0]?.['@value'];
+    // itemCount
+    this.itemCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount'];
+    if( !(this.itemCount >= 0) ) this.itemCount = 6;
+    // hack for checkboxes occasionally not being selected
+    if( this.itemCount === 0 ) this.querySelector('#zero').checked = true; 
+    if( this.itemCount === 3 ) this.querySelector('#three').checked = true;
+    if( this.itemCount === 6 ) this.querySelector('#six').checked = true;
 
-    this.itemDefaultDisplay = graphRoot['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || this.itemDefaultDisplay;
+    this.itemDefaultDisplay = graphRoot['itemDefaultDisplay'] || this.itemDefaultDisplay;
+    if( this.itemDefaultDisplay === 'Book Reader - 2 Page' ) this.querySelector('#two').checked = true;
+    if( this.itemDefaultDisplay === 'Book Reader - Single Page' ) this.querySelector('#one').checked = true;
+    if( this.itemDefaultDisplay === 'Image List' ) this.querySelector('#list').checked = true;
 
     this.appDataLoaded = true;
     this._updateDisplayData();
+    this.requestUpdate();
   }
 
   _updateDisplayData() {
@@ -370,7 +381,7 @@ class AppCollection extends Mixin(LitElement)
       "thumbnailUrl" : {
           "@id" : "info:fedora/application/ucd-lib-client${this.collectionId}/featuredImage.jpg"
       },
-      "ucdlib:itemCount" : ${this.itemDisplayCount},
+      "ucdlib:itemCount" : ${this.itemCount},
       "ucdlib:itemDefaultDisplay" : "${this.itemDefaultDisplay}",
       "exampleOfWork" : 
         ${JSON.stringify(this.savedItems)}

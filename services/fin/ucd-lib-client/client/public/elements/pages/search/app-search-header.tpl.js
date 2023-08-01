@@ -171,7 +171,7 @@ export default function render() {
     </div>
 
     <div class="searchContainer">
-      <div style="margin: 1rem auto 0;">
+      <div style="margin: 1rem auto 0; max-width: 100%;">
         <h2 class="site-name-search"><a href="/">Digital Collections</a></h2>
         <app-search-box
           id="searchBox"

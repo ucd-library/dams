@@ -60,8 +60,7 @@ export default function render() {
         margin-right: 0.2em;
         position: relative;
         font-size: 3.5em;
-        opacity: 0;
-        animation: showHideDot 2.5s ease-in-out infinite;
+        opacity: 1;
       }
 
       .dot.one {
