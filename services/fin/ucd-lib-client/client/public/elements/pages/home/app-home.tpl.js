@@ -446,10 +446,10 @@ export default function render() {
     .about-collections .tree-illustration img {
       float: none;
       padding: none;
-    }
-    .about-content {
-      padding: 0 2rem 2rem 2rem;
-    }
+    }    
+  }
+  .about-content {
+    padding: 0 2rem 2rem 2rem;
   }
 
   @media (min-width: 768px) {
