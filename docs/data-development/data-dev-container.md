@@ -6,6 +6,12 @@
 docker context create sandbox.dams --docker "host=ssh://user@sandbox.dams.library.ucdavis.edu"
 ```
 
+## Set Docker Remote Context
+
+```bash
+docker context use sandbox.dams
+```
+
 ## Make sure dev container exists
 
 Create docker volume
