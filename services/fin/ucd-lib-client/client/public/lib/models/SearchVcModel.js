@@ -27,7 +27,7 @@ class SearchVcModel extends BaseModel {
 
     // translate RecordGraph's to ui model
     const matchedItems = [];
-    const matchedCollections = [];
+    let matchedCollections = [];
 
     e.payload.results.forEach((result) => {
       if( !result.root ) return;
@@ -100,6 +100,7 @@ class SearchVcModel extends BaseModel {
       });
     });
 
+    // if( e.searchDocument.text === '' ) matchedCollections = [];
     e.payload.results = matchedItems;
     e.payload.matchedCollections = matchedCollections;
     // todo save translated data to store

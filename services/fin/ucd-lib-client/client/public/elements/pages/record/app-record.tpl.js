@@ -174,7 +174,7 @@ export default function render() {
       position: absolute;
       left: 20%;
       width: 60%;
-      top: calc(170px + 2rem);
+      top: calc(170px + 3rem);
       z-index: 500;
       border-bottom: 6px dotted var(--color-aggie-gold);
       padding-bottom: 1.5rem;
@@ -183,7 +183,7 @@ export default function render() {
     app-record .admin-edit .right-panel {
       position: absolute;
       right: 3rem;
-      top: calc(170px + 2rem);
+      top: calc(170px + 3rem);
       z-index: 500;
     }
 

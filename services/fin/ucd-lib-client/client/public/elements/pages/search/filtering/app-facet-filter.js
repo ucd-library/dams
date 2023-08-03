@@ -50,7 +50,7 @@ class AppFacetFilter extends Mixin(LitElement)
       let overflowDiv = this.shadowRoot.querySelector('.overflow');
 
       // TODO more testing here, pretty sure 200px is correct but it's possible it's different
-      if( overflowDiv && overflowDiv.offsetHeight >= 215 ) {
+      if( overflowDiv && overflowDiv.offsetHeight >= 200 ) {
         this.noOverflow = false;
       }
     });

@@ -93,7 +93,7 @@ export class AppFilterPanel extends Mixin(LitElement)
 
     let rangeFilter = this.shadowRoot.querySelector('app-range-filter');
     if( rangeFilter ) {
-      rangeFilter.parentElement.style.display = this.opened ? 'flex' : 'none';
+      rangeFilter.parentElement.style.display = this.opened ? 'block' : 'none';
     }
   }
 

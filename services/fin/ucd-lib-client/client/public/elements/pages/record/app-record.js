@@ -299,7 +299,7 @@ class AppRecord extends Mixin(LitElement)
 
     this.editMode = false;
 
-    this._changeMediaViewerDisplay('');
+    this._changeMediaViewerDisplay('', true);
   }
 
   /**
@@ -360,28 +360,63 @@ class AppRecord extends Mixin(LitElement)
           }
         },
         "@id" : "item/${this.renderedRecordId.replace('/item/', '')}",
-        "ucdlib:itemDefaultDisplay" : "${this.itemDisplay}"
+        "ucdlib:itemDefaultDisplay" : "${this.itemDisplay}",
+        "isPartOf" : {
+          "@id" : "info:fedora/item/${this.renderedRecordId.replace('/item/', '')}"
+        }
       }`);
     }
 
-  _changeMediaViewerDisplay(display) {
+  async _changeMediaViewerDisplay(display, prefChange=false) {
     let mediaViewer = this.querySelector('app-media-viewer');
     if( !mediaViewer ) return;
-    let media = mediaViewer.querySelector('ucdlib-pages');
+    let pages = mediaViewer.querySelector('ucdlib-pages');
     let nav = mediaViewer.querySelector('app-media-viewer-nav');
 
     if( nav ) nav.style.display = display;
 
-    if( !media ) return;
+    if( !pages ) return;
     if( display ) {
-      media.style.opacity = 0;
-      media.style.height = '150px';
-      media.style.display = 'block';
+      pages.style.opacity = 0;
+      pages.style.height = '150px';
+      pages.style.display = 'block';
     } else {
-      media.style.opacity = 100;
-      media.style.height = '';
-      media.style.display = 'block';
-    }      
+      pages.style.opacity = 100;
+      pages.style.height = '';
+      pages.style.display = 'block';
+    }
+
+    // on save display pref, reload media viewer with new image display type
+    if( prefChange ) {
+      // reload media viewer with new image display type
+      let newDisplayType = '';
+      let singlePage = false;
+
+      if( this.itemDisplay.includes('Image List') ) {
+        newDisplayType = 'image';
+      } else if ( this.itemDisplay.includes('Single') ) {
+        newDisplayType = 'bookreader';
+        singlePage = true;
+      } else if ( this.itemDisplay.includes('2 Page') ) {
+        newDisplayType = 'bookreader';
+      }
+
+      if( pages && nav && newDisplayType ) {
+        pages.selected = newDisplayType;
+
+        if( mediaViewer.singlePage !== singlePage ) {
+          mediaViewer.singlePage = singlePage;
+          if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
+            mediaViewer._onToggleBookView();
+          } else {
+            // to reload br if not initiated
+            mediaViewer._onAppStateUpdate(await this.AppStateModel.get());
+          }         
+        }
+        mediaViewer.isBookReader = newDisplayType === 'bookreader';
+        mediaViewer.mediaType = newDisplayType;
+      }
+    }    
   }
 
   /**

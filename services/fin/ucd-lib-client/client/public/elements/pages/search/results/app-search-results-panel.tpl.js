@@ -320,7 +320,7 @@ export default function render() {
             ></ucdlib-icon>
           </div>
           
-          <span style="font-weight: bold">${this.total} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.results.length === 0}">
+          <span style="font-weight: bold">${this.total} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.totalCollections === 0}">
             from
             <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collection${this.totalCollections > 1 ? 's' : ''}</a></span>
         </div>

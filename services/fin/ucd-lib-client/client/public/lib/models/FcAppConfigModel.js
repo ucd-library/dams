@@ -50,6 +50,18 @@ class FcAppConfigModel extends BaseModel {
     this.register('FcAppConfigModel');
   }
 
+  async getDefaultImagesConfig() {
+    return await this.service.getDefaultImagesConfig(); 
+  }
+
+  async getApiAppData() {
+    return await this.service.getApiAppData();
+  }
+
+  async getAdminData(id) {
+    return await this.service.getAdminData(id);
+  }
+
   /**
    * @method getFeaturedCollections
    * @description return any defined featured collections

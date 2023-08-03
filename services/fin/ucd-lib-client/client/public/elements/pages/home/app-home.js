@@ -79,15 +79,10 @@ class AppHome extends Mixin(LitElement)
   async firstUpdated() {
     this.isUiAdmin = user.canEditUi();
 
-    // Get featured collections
-    let displayData = APP_CONFIG.fcAppConfig['/application/ucd-lib-client/featured-collections/config.json'];
-    if( displayData && displayData.body && Array.isArray(displayData.body) ) this.displayData = displayData.body;
-    if( !displayData ) {
-      displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
-      if( displayData && displayData.body ) {
-        if( typeof displayData.body === 'string' ) displayData.body = JSON.parse(displayData.body);
-        this.displayData = displayData.body;
-      }
+    let displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
+    if( displayData && displayData.body ) {
+      if( typeof displayData.body === 'string' ) displayData.body = JSON.parse(displayData.body);
+      this.displayData = displayData.body;
     }
 
     // filter out collections that don't exist in fcrepo

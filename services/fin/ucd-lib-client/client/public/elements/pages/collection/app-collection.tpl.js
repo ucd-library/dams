@@ -266,14 +266,14 @@ export default function render() {
     .admin-edit .left-panel {
       position: absolute;
       left: 3rem;
-      top: calc(170px + 2rem);
+      top: calc(170px + 3rem);
       z-index: 500;
     }
 
     .admin-edit .right-panel {
       position: absolute;
       right: 3rem;
-      top: calc(170px + 2rem);
+      top: calc(170px + 3rem);
       z-index: 500;
     }
 
@@ -541,8 +541,8 @@ export default function render() {
       </div>
     </div>
 
-    <div class="collection-highlights" ?hidden="${this.highlightedItems.length === 0}">
-      <h2>Highlights From This Collection</h2>
+    <div class="collection-highlights">
+      <h2 ?hidden="${(this.highlightedItems.length === 0  || this.itemCount <= 0) && !this.editMode}">Highlights From This Collection</h2>
       ${ SharedHtml.headerDots() }
       
       <div class="edit-collections-container" ?hidden="${!this.editMode || !this.isUiAdmin}">
@@ -557,7 +557,7 @@ export default function render() {
                 type="radio" 
                 class="radio" 
                 value="6" 
-                ?checked="${this.itemDisplayCount === 6}" 
+                ?checked="${this.itemCount === 6}" 
                 @change="${this._onItemDisplayChange}">
               <label for="six">6 (recommended)</label>
             </li>
@@ -567,7 +567,7 @@ export default function render() {
                 type="radio" 
                 class="radio" 
                 value="3" 
-                ?checked="${this.itemDisplayCount === 3}" 
+                ?checked="${this.itemCount === 3}" 
                 @change="${this._onItemDisplayChange}">
               <label for="three">3</label>
             </li>
@@ -577,7 +577,7 @@ export default function render() {
                 type="radio" 
                 class="radio" 
                 value="0" 
-                ?checked="${this.itemDisplayCount === 0}" 
+                ?checked="${this.itemCount === 0}" 
                 @change="${this._onItemDisplayChange}">
               <label for="zero">0</label>
             </li>
@@ -585,7 +585,7 @@ export default function render() {
         </div>
       </fieldset>
 
-        <div class="card-trio" ?hidden="${this.itemDisplayCount === 0}">      
+        <div class="card-trio" ?hidden="${this.itemCount === 0}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-1 item-ark-input" 
@@ -611,7 +611,7 @@ export default function render() {
           </div>
         </div>
       
-        <div class="card-trio" ?hidden="${this.itemDisplayCount !== 6}">      
+        <div class="card-trio" ?hidden="${this.itemCount !== 6}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-4 item-ark-input" 
@@ -708,13 +708,13 @@ export default function render() {
         </div>
       
       </div>
-      <div ?hidden="${this.editMode}">
-        <div class="card-trio">
+      <div ?hidden="${this.editMode}" style="padding: 0 2rem;">
+        <div class="card-trio" ?hidden="${this.itemCount < 3}">
           ${this.highlightedItems.map((item, index) => html`
             ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
         </div>
-        <div class="card-trio">
+        <div class="card-trio" ?hidden="${this.itemCount < 6}">
           ${this.highlightedItems.map((item, index) => html`
             ${index >= 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
