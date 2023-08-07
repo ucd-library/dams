@@ -6,10 +6,8 @@ FROM ${FIN_SERVER_IMAGE}
 
 ARG UCD_DAMS_REPO_SERVICE_ROOT=services/fin
 
-# DAMS cli
-COPY cli /dams-cli
-RUN cd /dams-cli && npm install && npm link
-# RUN ln -s /dams-cli/bin/dams.js /usr/local/bin/dams
+
+
 
 # Client Code
 RUN mkdir -p ${FIN_SERVICE_ROOT}/ucd-lib-client
@@ -20,6 +18,11 @@ COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/ucd-lib-client/package-lock.json .
 RUN npm install 
 RUN npm link @ucd-lib/fin-service-utils
 RUN npm link @ucd-lib/fin-api
+
+# DAMS cli
+COPY cli /dams-cli
+RUN cd /dams-cli && npm install && npm link && npm link @ucd-lib/fin-api
+# RUN ln -s /dams-cli/bin/dams.js /usr/local/bin/damss
 
 # Models 
 WORKDIR ${FIN_SERVICE_ROOT}/models
@@ -46,6 +49,11 @@ RUN npm run dist
 
 WORKDIR ${FIN_SERVICE_ROOT}
 
+# Update fin cache settings
+ENV FIN_CACHE_PREDICATES '/^http://digital.ucdavis.edu/schema#/ http://www.loc.gov/premis/rdf/v1#hasMessageDigest \
+  http://schema.org/isPartOf http://schema.org/hasPart http://schema.org/associatedMedia http://schema.org/encodesCreativeWork'
+
+# Set fin project name for nice label 
 ENV PROJECT_NAME 'dams'
 
 ARG APP_VERSION

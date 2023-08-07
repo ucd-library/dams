@@ -106,7 +106,6 @@ module.exports = async function(path, graph, headers, utils) {
     attr : 'fileFormatSimple',
     value : ['ebucore', 'hasMimeType'],
     parser : (value) => {
-      console.log('VALUE', value, value.split('/'));
       let parts = value.split('/');
 
       if( parts[0] === 'video' ) return 'video';

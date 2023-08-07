@@ -15,6 +15,15 @@ router.get('/all-labels', async (req, res) => {
   }
 });
 
+router.get(/\/edits\/.*/, async (req, res) => {
+  try {
+    let labels = await model.getEdits(req.path.replace(/^\/edits\//, ''));
+    res.json(labels);
+  } catch(e) {
+    res.json(errorResponse(e, 'Error with '+model.id+' edit retrieval'));
+  }
+});
+
 function errorResponse(e, message) {
   logger.error(e);
   return {

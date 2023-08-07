@@ -338,11 +338,9 @@ class AppRecord extends Mixin(LitElement)
     }
   
     _updateDisplayData() {
-      this.displayData = JSON.parse(`
-        {
+      this.displayData = {
         "@context" : {
           "@vocab" : "http://schema.org/",
-          "@base" : "info:fedora/application/item",
           "fedora" : "http://fedora.info/definitions/v4/repository#",
           "ldp" : "www.w3.org/ns/ldp#",
           "schema" : "http://schema.org/",
@@ -359,12 +357,12 @@ class AppRecord extends Mixin(LitElement)
             "@type" : "@id"
           }
         },
-        "@id" : "item/${this.renderedRecordId.replace('/item/', '')}",
-        "ucdlib:itemDefaultDisplay" : "${this.itemDisplay}",
+        "@id" : '',
+        "ucdlib:itemDefaultDisplay" : this.itemDisplay,
         "isPartOf" : {
-          "@id" : "info:fedora/item/${this.renderedRecordId.replace('/item/', '')}"
+          "@id" : `info:fedora${this.renderedRecordId}`
         }
-      }`);
+      }
     }
 
   async _changeMediaViewerDisplay(display, prefChange=false) {

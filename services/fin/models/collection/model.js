@@ -1,4 +1,4 @@
-const {dataModels, models, logger} = require('@ucd-lib/fin-service-utils');
+const {dataModels, models, logger, pg} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 const workflowUtils = require('../workflows.js');
@@ -136,6 +136,18 @@ class CollectionsModel extends FinEsDataModel {
     });
 
     return result.count;
+  }
+
+  /**
+   * 
+   */
+  async getEdits(id) {
+    if( !id.match(/^info:fedora/) ) {
+      if( !id.startsWith('/') ) id = '/'+id;
+      id = 'info:fedora'+id;
+    }
+    let result = await pg.query(`select * from fin_cache.dams_links where collection = $1`, [id]);
+    return result.rows; 
   }
 
   /**
