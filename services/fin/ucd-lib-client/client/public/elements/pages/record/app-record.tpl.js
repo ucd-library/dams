@@ -22,7 +22,7 @@ export default function render() {
       }
 
       .container h3 {
-        font-weight: 700;
+        font-weight: 800;
         text-align: center;
         color: var(--color-black-60);
         margin-bottom: 0.5rem;
