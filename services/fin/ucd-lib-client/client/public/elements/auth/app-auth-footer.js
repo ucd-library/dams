@@ -7,7 +7,8 @@ class AppAuthFooter extends Mixin(LitElement).with(LitCorkUtils) {
   static get properties() {
     return {
       loggedIn : { type : Boolean },
-      user : { type : Object }
+      user : { type : Object },
+      path : { type : String }
     }
   }
 
@@ -25,6 +26,8 @@ class AppAuthFooter extends Mixin(LitElement).with(LitCorkUtils) {
   _onAppStateUpdate(e) {
     this.user = APP_CONFIG.user;
     this.loggedIn = this.user.loggedIn;
+    console.log(e)
+    this.path = e.location.fullpath;
   }
 
   _login() {
