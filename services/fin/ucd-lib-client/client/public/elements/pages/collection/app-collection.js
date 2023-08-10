@@ -335,8 +335,7 @@ class AppCollection extends Mixin(LitElement)
   }
 
   _updateDisplayData() {
-    this.displayData = JSON.parse(`
-      {
+    this.displayData = {
       "@context" : {
         "@vocab" : "http://schema.org/",
         "@base" : "info:fedora/application/collection",
@@ -368,24 +367,24 @@ class AppCollection extends Mixin(LitElement)
           "@type" : "@id"
         }
       },
-      "@id" : "info:fedora/application/ucd-lib-client${this.collectionId}",
+      "@id" : `info:fedora/application/ucd-lib-client${this.collectionId}`,
       "watercolors" : [
         {
-          "@id" : "info:fedora/application/#${this.watercolor}",
-          "css" : "${this.watercolor}",
+          "@id" : `info:fedora/application/#${this.watercolor}`,
+          "css" : this.watercolor,
           "foreground" : "",
           "background" : ""
         }
       ],
-      "name" : "${this.title}",
+      "name" : this.title,
+      isPartOf : [{'@id' : 'info:fedora'+this.collectionId}],
       "thumbnailUrl" : {
-          "@id" : "info:fedora/application/ucd-lib-client${this.collectionId}/featuredImage.jpg"
+          "@id" : `info:fedora/application/ucd-lib-client${this.collectionId}/featuredImage.jpg`
       },
-      "ucdlib:itemCount" : ${this.itemCount},
-      "ucdlib:itemDefaultDisplay" : "${this.itemDefaultDisplay}",
-      "exampleOfWork" : 
-        ${JSON.stringify(this.savedItems)}
-    }`);
+      "ucdlib:itemCount" : this.itemCount,
+      "ucdlib:itemDefaultDisplay" : this.itemDefaultDisplay,
+      "exampleOfWork" : this.savedItems
+    };
   }
 
   async _onFileChange(e) {  

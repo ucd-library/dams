@@ -147,7 +147,25 @@ class CollectionsModel extends FinEsDataModel {
       id = 'info:fedora'+id;
     }
     let result = await pg.query(`select * from fin_cache.dams_links where collection = $1`, [id]);
-    return result.rows; 
+    let rows = result.rows;
+    
+    console.log(id.replace('info:fedora', 'info:fedora/application/ucd-lib-client'));
+    result = await pg.query(`
+      select * from 
+        fin_cache.quads_view 
+      where 
+        fedora_id = $1 and 
+        predicate = 'http://schema.org/isPartOf'`, 
+      [id.replace('info:fedora', 'info:fedora/application/ucd-lib-client')]
+    );
+    if( result.rows.length ) {
+      rows.push({
+        collection : result.rows[0].object,
+        edit : result.rows[0].subject
+      });
+    }
+
+    return rows; 
   }
 
   /**
