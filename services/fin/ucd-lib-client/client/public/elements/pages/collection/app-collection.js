@@ -335,56 +335,14 @@ class AppCollection extends Mixin(LitElement)
   }
 
   _updateDisplayData() {
-    this.displayData = {
-      "@context" : {
-        "@vocab" : "http://schema.org/",
-        "@base" : "info:fedora/application/collection",
-        "fedora" : "http://fedora.info/definitions/v4/repository#",
-        "ldp" : "www.w3.org/ns/ldp#",
-        "schema" : "http://schema.org/",
-        "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
-        "xsd" : "http://www.w3.org/2001/XMLSchema#",
-        "collection" : {
-          "@type" : "@id",
-          "@id" : "ucdlib:collection"
-        },
-        "watercolors" : {
-          "@type" : "@id",
-          "@id" : "ucdlib:watercolors"
-        },
-        "foreground" : {
-          "@type" : "xsd:text",
-          "@id" : "ucdlib:foreground"
-        },
-        "background" : {
-          "@type" : "xsd:text",
-          "@id" : "ucdlib:background"
-        },
-        "ldp:membershipResource" : {
-          "@type" : "@id"
-        },
-        "ldp:hasMemberRelation" : {
-          "@type" : "@id"
-        }
-      },
-      "@id" : `info:fedora/application/ucd-lib-client${this.collectionId}`,
-      "watercolors" : [
-        {
-          "@id" : `info:fedora/application/#${this.watercolor}`,
-          "css" : this.watercolor,
-          "foreground" : "",
-          "background" : ""
-        }
-      ],
-      "name" : this.title,
-      isPartOf : [{'@id' : 'info:fedora'+this.collectionId}],
-      "thumbnailUrl" : {
-          "@id" : `info:fedora/application/ucd-lib-client${this.collectionId}/featuredImage.jpg`
-      },
-      "ucdlib:itemCount" : this.itemCount,
-      "ucdlib:itemDefaultDisplay" : this.itemDefaultDisplay,
-      "exampleOfWork" : this.savedItems
+    let opts = {
+      title : this.title, 
+      watercolor : this.watercolor, 
+      itemCount : this.itemCount, 
+      itemDefaultDisplay : this.itemDefaultDisplay, 
+      savedItems : this.savedItems
     };
+    this.displayData = this.FcAppConfigModel.getCollectionDisplayData(this.collectionId, opts);
   }
 
   async _onFileChange(e) {  

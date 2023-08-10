@@ -70,11 +70,11 @@ export default function render() {
     color: var(--gray-text);
   }
   div[checked] #close {
-    width: 50px;
+    max-width: 35px;
     height: 50px;
     display: inline-flex;
     align-items: center;
-    /* justify-content: center; */
+    justify-content: center;
   }
   ucdlib-icon {
     fill: var(--color-aggie-blue-80);
@@ -89,11 +89,6 @@ export default function render() {
     margin-right: 0.2rem;
   }
 
-  @media (min-width: 768px) {
-    #close {
-      margin-right: 0.7rem;
-    }    
-  }
 </style>
 
 <div ?checked="${this.checked}" ?disabled="${this.disabled}">
