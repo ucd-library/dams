@@ -315,55 +315,31 @@ class AppRecord extends Mixin(LitElement)
     this._changeMediaViewerDisplay('');
   }
 
-    /**
+  /**
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
-    async _parseDisplayData() {
-      let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
-      if( savedDisplayData ) {
-        this.savedCollectionData = savedDisplayData;
-        let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-        this.itemDefaultDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
-      }
-
-      savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
-
-      if( savedDisplayData ) {
-        let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-        this.itemDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || '';  
-      }
-
-      this.appDataLoaded = true;
-      this._updateDisplayData();
+  async _parseDisplayData() {
+    let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
+    if( savedDisplayData ) {
+      this.savedCollectionData = savedDisplayData;
+      let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+      this.itemDefaultDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
     }
-  
-    _updateDisplayData() {
-      this.displayData = {
-        "@context" : {
-          "@vocab" : "http://schema.org/",
-          "fedora" : "http://fedora.info/definitions/v4/repository#",
-          "ldp" : "www.w3.org/ns/ldp#",
-          "schema" : "http://schema.org/",
-          "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
-          "xsd" : "http://www.w3.org/2001/XMLSchema#",
-          "item" : {
-            "@type" : "@id",
-            "@id" : "ucdlib:item"
-          },
-          "ldp:membershipResource" : {
-            "@type" : "@id"
-          },
-          "ldp:hasMemberRelation" : {
-            "@type" : "@id"
-          }
-        },
-        "@id" : '',
-        "ucdlib:itemDefaultDisplay" : this.itemDisplay,
-        "isPartOf" : {
-          "@id" : `info:fedora${this.renderedRecordId}`
-        }
-      }
+
+    savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
+
+    if( savedDisplayData ) {
+      let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+      this.itemDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || '';  
     }
+
+    this.appDataLoaded = true;
+    this._updateDisplayData();
+  }
+
+  _updateDisplayData() {
+    this.displayData = this.FcAppConfigModel.getItemDisplayData(this.renderedRecordId, this.itemDisplay);
+  }
 
   async _changeMediaViewerDisplay(display, prefChange=false) {
     let mediaViewer = this.querySelector('app-media-viewer');

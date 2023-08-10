@@ -14,7 +14,7 @@ export default function render() {
       #close {
         display: inline-block;
         vertical-align: middle;
-        padding-right: 5px;
+        /* padding-right: 5px; */
       }
 
       ucdlib-icon {

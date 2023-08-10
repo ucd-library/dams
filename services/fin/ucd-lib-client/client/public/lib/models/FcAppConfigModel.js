@@ -164,6 +164,74 @@ class FcAppConfigModel extends BaseModel {
   }
 
   /**
+   * @method getCollectionDisplayData
+   * @description returns a formatted jsonld object for a collection
+   * 
+   * @param {String} id collection id
+   * @param {Object} opts options object with properties to save
+   * 
+   * @returns {Promise} resolves to record
+   */
+  getCollectionDisplayData(id, opts={}) {
+    const {
+      title, 
+      watercolor, 
+      itemCount, 
+      itemDefaultDisplay, 
+      savedItems
+    } = opts;
+    return {
+      "@context" : {
+        "@vocab" : "http://schema.org/",
+        "fedora" : "http://fedora.info/definitions/v4/repository#",
+        "ldp" : "www.w3.org/ns/ldp#",
+        "schema" : "http://schema.org/",
+        "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
+        "xsd" : "http://www.w3.org/2001/XMLSchema#",
+        "collection" : {
+          "@type" : "@id",
+          "@id" : "ucdlib:collection"
+        },
+        "watercolors" : {
+          "@type" : "@id",
+          "@id" : "ucdlib:watercolors"
+        },
+        "foreground" : {
+          "@type" : "xsd:text",
+          "@id" : "ucdlib:foreground"
+        },
+        "background" : {
+          "@type" : "xsd:text",
+          "@id" : "ucdlib:background"
+        },
+        "ldp:membershipResource" : {
+          "@type" : "@id"
+        },
+        "ldp:hasMemberRelation" : {
+          "@type" : "@id"
+        }
+      },
+      "@id" : '',
+      "watercolors" : [
+        {
+          "@id" : `info:fedora/application/#${watercolor}`,
+          "css" : watercolor,
+          "foreground" : "",
+          "background" : ""
+        }
+      ],
+      "name" : title,
+      "thumbnailUrl" : {
+          "@id" : `info:fedora/application/ucd-lib-client${id}/featuredImage.jpg`
+      },
+      "ucdlib:itemCount" : itemCount,
+      "ucdlib:itemDefaultDisplay" : itemDefaultDisplay,
+      "exampleOfWork" : 
+        savedItems
+    };
+  }  
+
+  /**
    * @method saveCollectionDisplayData
    * @description save a collections display data
    * 
@@ -208,6 +276,43 @@ class FcAppConfigModel extends BaseModel {
    */
   async saveFeaturedCollectionAppData(displayData) {
     return await this.service.saveFeaturedCollectionDisplayData(displayData);
+  }
+
+  /**
+     * @method getItemDisplayData
+     * @description returns a formatted jsonld object for an item
+     * 
+     * @param {String} id record id
+     * @param {Array} itemDisplay display override
+     * 
+     * @returns {Object} jsonld object
+     */
+  getItemDisplayData(id, itemDisplay) {
+    return {
+      "@context" : {
+        "@vocab" : "http://schema.org/",
+        "fedora" : "http://fedora.info/definitions/v4/repository#",
+        "ldp" : "www.w3.org/ns/ldp#",
+        "schema" : "http://schema.org/",
+        "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
+        "xsd" : "http://www.w3.org/2001/XMLSchema#",
+        "item" : {
+          "@type" : "@id",
+          "@id" : "ucdlib:item"
+        },
+        "ldp:membershipResource" : {
+          "@type" : "@id"
+        },
+        "ldp:hasMemberRelation" : {
+          "@type" : "@id"
+        }
+      },
+      "@id" : '',
+      "ucdlib:itemDefaultDisplay" : itemDisplay,
+      "isPartOf" : {
+        "@id" : `info:fedora${id}`
+      }
+    }
   }
 
   /**

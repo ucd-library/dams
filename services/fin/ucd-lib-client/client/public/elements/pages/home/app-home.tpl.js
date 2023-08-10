@@ -260,6 +260,7 @@ export default function render() {
   .hero-main .sub-heading {
     font-weight: var(--fw-p);
     margin-bottom: 3rem;
+    margin-top: 1rem;
   }
   /* .hero-main .sub-heading a {
     color: var(--color-dams-secondary);
@@ -666,7 +667,7 @@ export default function render() {
 
     <div class="hero-main site-frame">
       <h1 class="color-light">Digital Collections</h1>
-      <div class="sub-heading h4 color-light">Explore digitized items from the <a href="https://library.ucdavis.edu/">UC Davis Library</a> collections.</div>
+      <h4 class="sub-heading h4 color-light">Explore digitized items from the <a href="https://library.ucdavis.edu/">UC Davis Library</a> collections.</h4>
       <app-search-box
         id="searchBox"
         @search="${this._onSearch}"
