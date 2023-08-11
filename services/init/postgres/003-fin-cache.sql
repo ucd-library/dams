@@ -18,13 +18,22 @@ CREATE OR REPLACE VIEW dams_links AS
       item.object as item
     FROM collection_uris cu
     LEFT JOIN quads_view item ON cu.fedora_id = item.subject AND item.predicate = 'http://schema.org/hasPart'
+  ),
+  edits as (
+    SELECT
+      ci.*,
+      edits.subject as edit
+    FROM collection_items ci
+    RIGHT JOIN quads_view edits ON 
+      ci.item = edits.object AND 
+      edits.predicate = 'http://schema.org/isPartOf' AND
+      edits.subject like 'info:fedora/application/ucd-lib-client/item/%'
+    WHERE ci.item IS NOT NULL
   )
-  SELECT
-    ci.*,
-    edits.subject as edit
-  FROM collection_items ci
-  RIGHT JOIN quads_view edits ON 
-    ci.item = edits.object AND 
-    edits.predicate = 'http://schema.org/isPartOf' AND
-    edits.subject like 'info:fedora/application/ucd-lib-client/item/%'
-  WHERE ci.item IS NOT NULL;
+  SELECT 
+    edits.*,
+    item.object as item_default_display
+  FROM edits
+  LEFT JOIN quads_view item ON 
+    edits.edit = item.fedora_id AND 
+    item.predicate = 'http://digital.ucdavis.edu/schema#itemDefaultDisplay';

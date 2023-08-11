@@ -291,7 +291,7 @@ class AppRecord extends Mixin(LitElement)
     // TODO save collection data with hasPart pointing to this item
     // if( Object.keys(this.savedCollectionData).length ) {
     //   // TEMP hack, also should append to array and not replace
-    //   this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0]['http://digital.library.ucdavis.edu/schema/itemDisplayExceptions'] 
+    //   this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0]['http://digital.ucdavis.edu/schema#itemDisplayExceptions'] 
     //     = [{'@id': 'info:fedora/application/ucd-lib-client/item/ark:/87287/d70898/ark:/87287/d70898.jsonld.json'}];
 
     //   await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.savedCollectionData);
@@ -323,14 +323,14 @@ class AppRecord extends Mixin(LitElement)
     if( savedDisplayData ) {
       this.savedCollectionData = savedDisplayData;
       let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-      this.itemDefaultDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
+      this.itemDefaultDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
     }
 
     savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
 
     if( savedDisplayData ) {
       let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-      this.itemDisplay = graphRoot?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'] || '';  
+      this.itemDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || '';  
     }
 
     this.appDataLoaded = true;

@@ -264,11 +264,11 @@ class Utils {
     async getItemDisplayType(id, collectionId, fcAppConfigModel) {
       let displayType = '';
       let itemGraph = await this.getAppConfigItemGraph(id, fcAppConfigModel);
-      displayType = itemGraph?.[0]?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'];
+      displayType = itemGraph?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];
       if( displayType ) return displayType;
 
       let collectionGraph = await this.getAppConfigCollectionGraph(collectionId, fcAppConfigModel);
-      displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.library.ucdavis.edu/schema/itemDefaultDisplay']?.[0]?.['@value'];
+      displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];
 
       return displayType;
     }

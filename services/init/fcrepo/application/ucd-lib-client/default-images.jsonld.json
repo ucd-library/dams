@@ -2,7 +2,7 @@
   "@context" : {
     "@vocab" : "http://schema.org/",
     "ldp" : "http://www.w3.org/ns/ldp#",
-    "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
+    "ucdlib" : "http://digital.ucdavis.edu/schema#",
     "ldp:hasMemberRelation" : { "@type" : "@id" },
     "ldp:membershipResource" : { "@type" : "@id" }
   },

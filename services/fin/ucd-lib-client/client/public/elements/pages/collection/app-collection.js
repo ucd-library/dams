@@ -317,7 +317,7 @@ class AppCollection extends Mixin(LitElement)
     }
 
     // itemCount
-    this.itemCount = graphRoot['http://digital.library.ucdavis.edu/schema/itemCount'];
+    this.itemCount = graphRoot['http://digital.ucdavis.edu/schema#itemCount'];
     if( !(this.itemCount >= 0) ) this.itemCount = 6;
     // hack for checkboxes occasionally not being selected
     if( this.itemCount === 0 ) this.querySelector('#zero').checked = true; 

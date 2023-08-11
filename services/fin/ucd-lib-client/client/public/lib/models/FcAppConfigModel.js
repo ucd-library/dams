@@ -186,7 +186,7 @@ class FcAppConfigModel extends BaseModel {
         "fedora" : "http://fedora.info/definitions/v4/repository#",
         "ldp" : "www.w3.org/ns/ldp#",
         "schema" : "http://schema.org/",
-        "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
+        "ucdlib" : "http://digital.ucdavis.edu/schema#",
         "xsd" : "http://www.w3.org/2001/XMLSchema#",
         "collection" : {
           "@type" : "@id",
@@ -220,6 +220,7 @@ class FcAppConfigModel extends BaseModel {
           "background" : ""
         }
       ],
+      'schema:isPartOf': {'@id': `info:fedora${id}`},
       "name" : title,
       "thumbnailUrl" : {
           "@id" : `info:fedora/application/ucd-lib-client${id}/featuredImage.jpg`
@@ -294,7 +295,7 @@ class FcAppConfigModel extends BaseModel {
         "fedora" : "http://fedora.info/definitions/v4/repository#",
         "ldp" : "www.w3.org/ns/ldp#",
         "schema" : "http://schema.org/",
-        "ucdlib" : "http://digital.library.ucdavis.edu/schema/",
+        "ucdlib" : "http://digital.ucdavis.edu/schema#",
         "xsd" : "http://www.w3.org/2001/XMLSchema#",
         "item" : {
           "@type" : "@id",
