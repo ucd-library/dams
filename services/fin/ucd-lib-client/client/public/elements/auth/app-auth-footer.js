@@ -1,5 +1,4 @@
 import { LitElement } from "lit";
-import AuthInterface from "../interfaces/AuthInterface"
 import render from "./app-auth-footer.tpl.js"
 
 class AppAuthFooter extends Mixin(LitElement).with(LitCorkUtils) {
@@ -26,12 +25,7 @@ class AppAuthFooter extends Mixin(LitElement).with(LitCorkUtils) {
   _onAppStateUpdate(e) {
     this.user = APP_CONFIG.user;
     this.loggedIn = this.user.loggedIn;
-    console.log(e)
     this.path = e.location.fullpath;
-  }
-
-  _login() {
-    this.AuthModel.login();
   }
 
   _logout() {

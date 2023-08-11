@@ -1,7 +1,5 @@
 set search_path=fin_cache,public;
 
-CREATE INDEX IF NOT EXISTS quads_value_idx ON quads(object_value);
-
 CREATE OR REPLACE VIEW dams_links AS
   with collection_ids as (
     SELECT id FROM search_rdf_type WHERE rdf_type_uri = 'http://schema.org/Collection'
