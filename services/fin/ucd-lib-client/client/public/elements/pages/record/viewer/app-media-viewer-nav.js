@@ -310,7 +310,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     if( !item ) return;
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = item;
-  
+
     if ( clientMedia.mediaGroups.length === 1 &&
           selectedMediaPage === -1 ) {
       this.singleImage = true;
@@ -335,7 +335,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
 
     this._resize();
- 
+
     // this.AppStateModel.set({mediaViewerNavLeftMostThumbnail: 0});
   }
 

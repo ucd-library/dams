@@ -19,6 +19,13 @@ class AppStateModelImpl extends AppStateModel {
     if( update.location ) {
       update.lastLocation = clone(this.store.data.location);
 
+      // the lightbox element manages its own state
+      // so if there is any app-state-update event after lightbox has opened,
+      // that means the lightbox has been closed.
+      if ( this.store.data.showLightbox ) {
+        update.showLightbox = false;
+      }
+
       // /collection/* is an alias for a base collection search
       // ^ this might change, since collection in v2 will be a placeholder page with a summary of the collection and links
       // to highlighted items in the collection, and citation copy link section
@@ -33,7 +40,7 @@ class AppStateModelImpl extends AppStateModel {
       //     page = 'record';
       //   }
       // }
-      
+
       update.location.page = page;
     }
 

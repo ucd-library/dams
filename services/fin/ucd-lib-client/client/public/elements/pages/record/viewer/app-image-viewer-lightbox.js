@@ -56,6 +56,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @description bound to AppStateModel app-state-update event
    */
   _onAppStateUpdate(e) {
+    console.log(e);
     if (e.showLightbox && !this.visible) {
       this.show();
     } else if (!e.showLightbox && this.visible) {
@@ -72,9 +73,9 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   _onSelectedRecordUpdate(e) {
     if( !e ) return;
     let {graph, clientMedia, selectedMedia, selectedMediaPage} = e;
-    
+
     let currentMedia = this.record?.selectedMedia || {};
-    if( currentMedia['@id'] === selectedMedia['@id'] && 
+    if( currentMedia['@id'] === selectedMedia['@id'] &&
       selectedMediaPage === this.record?.selectedMediaPage ) {
       return;
     }
@@ -165,7 +166,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
         zoom: 0
       });
     }
-    
+
     if (this.currentLayer) {
       this.viewer.removeLayer(this.currentLayer);
     }
@@ -175,14 +176,14 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.currentLayer = L.tileLayer.iiif(tiledUrl);
 
     } else {
-      let image = this.renderedMedia.original || 
+      let image = this.renderedMedia.original ||
                   this.renderedMedia.large ||
                   this.renderedMedia.medium ||
                   this.renderedMedia.small;
 
       // we might not have size
       let size = await this.getImageSize(image);
-      
+
       // determine the pixel dimensions of the image
       let imageWidthInPixels = parseInt(size.width);
       let imageHeightInPixels = parseInt(size.height);
@@ -215,10 +216,10 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
     // listen to load event to stop spinner
     if( this.renderedMedia.tiled ) {
-      this.currentLayer.on('load', this._loaded.bind(this)); 
-    } else {      
+      this.currentLayer.on('load', this._loaded.bind(this));
+    } else {
       let imageElement = this.currentLayer.getElement();
-      imageElement.addEventListener('load', this._loaded.bind(this)); 
+      imageElement.addEventListener('load', this._loaded.bind(this));
     }
 
     // TODO this is a hack to get the viewer to resize correctly
@@ -227,7 +228,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     }, 1000);
 
     this.shadowRoot.querySelector('.leaflet-control-attribution').style.display = 'none';
-    this.shadowRoot.querySelector(".leaflet-control-container").style.display = 'none';  
+    this.shadowRoot.querySelector(".leaflet-control-container").style.display = 'none';
   }
 
   _loaded() {
@@ -244,9 +245,9 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       img.src = original.url;
       img.onload = () => {
         resolve(original.size = {
-          height : img.naturalHeight, 
+          height : img.naturalHeight,
           width : img.naturalWidth
-        }); 
+        });
       };
     });
   }
