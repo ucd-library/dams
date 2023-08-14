@@ -6,7 +6,7 @@ import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 import { markdown } from "markdown";
 import rightsDefinitions from "../../../lib/rights.json";
 import citations from "../../../lib/models/CitationsModel";
-import utils from "../../../lib/utils";
+import utils from "../../../lib/utils/index.js";
 
 import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js";
 
@@ -16,7 +16,6 @@ import "./viewer/app-media-viewer";
 import "../../components/citation";
 
 import user from '../../../lib/utils/user.js';
-
 class AppRecord extends Mixin(LitElement)
   .with(MainDomElement, LitCorkUtils) {
   
@@ -319,18 +318,35 @@ class AppRecord extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
-    let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
-    if( savedDisplayData ) {
-      this.savedCollectionData = savedDisplayData;
-      let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-      this.itemDefaultDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
+    this.itemDisplay = ''; // default
+    let edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
+    if (!edits.body.length) {
+      this.appDataLoaded = true;
+      return;
+    }
+    edits = edits.body;
+
+    let savedDisplayData;
+    // get collection data if it exists
+    let collectionEdit = edits.filter(e => e.edit.includes(this.collectionId))[0];
+    if( collectionEdit && Object.keys(collectionEdit).length ) {
+      savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
+      if( savedDisplayData ) {
+        this.savedCollectionData = savedDisplayData;
+        let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+        this.itemDefaultDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
+      }
     }
 
-    savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
+    // get item data if it exists
+    let itemEdit = edits.filter(e => e.edit.includes(this.record['@id']))[0]
+    if( itemEdit && Object.keys(itemEdit).length ) {
+      savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
 
-    if( savedDisplayData ) {
-      let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-      this.itemDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || '';  
+      if( savedDisplayData ) {
+        let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+        this.itemDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || '';  
+      }
     }
 
     this.appDataLoaded = true;

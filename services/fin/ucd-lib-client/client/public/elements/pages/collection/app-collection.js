@@ -36,8 +36,9 @@ class AppCollection extends Mixin(LitElement)
       editMode : { type : Boolean },
       itemCount : { type : Number },
       collectionSearchHref : {type: String},
-      citationRoot: { type: Object },
-      itemDefaultDisplay: { type: String },
+      citationRoot : { type: Object },
+      itemDefaultDisplay : { type: String },
+      itemEdits : { type: Array }
     };
   }
 
@@ -158,6 +159,7 @@ class AppCollection extends Mixin(LitElement)
     this.itemCount = 6;
     this.citationRoot = {};
     this.itemDefaultDisplay = 'Book Reader - 2 Page'; // one, list.. for admin pref on BR display type for items in this collection
+    this.itemEdits = [];
   }
 
   /**
@@ -234,11 +236,26 @@ class AppCollection extends Mixin(LitElement)
     });
     this.savedItems = [...newSavedItems];
     
-    this._updateDisplayData();
     let featuredImage = document.querySelector('#file-upload').files[0];
+    this._updateDisplayData(featuredImage);
+
     await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData);
     if( featuredImage ) {
       await this.FcAppConfigModel.saveCollectionFeaturedImage(this.collectionId, featuredImage);
+    }
+
+    // parse checked item exceptions to reset them to collection default display type
+    let itemExceptions = [];
+    let checkboxes = this.querySelectorAll('.exceptions input[name="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      if( !checkbox.checked ) return;
+      
+      let itemId = checkbox.dataset.itemId;
+      if( itemId ) itemExceptions.push(itemId);
+    });
+
+    if( itemExceptions.length ) {
+      await this.FcAppConfigModel.updateItemDisplayExceptions(itemExceptions, this.itemDefaultDisplay);
     }
     
     this.requestUpdate(); 
@@ -270,10 +287,35 @@ class AppCollection extends Mixin(LitElement)
   }
 
   /**
+   * @method _onSelectAllExceptionsChange
+   * @description admin ui, change to 'select all exceptions' checkbox
+   * 
+   * @param {Object} e 
+   */
+  _onSelectAllExceptionsChange(e) {
+    let checked = e.currentTarget.checked;
+    if( !checked ) return;
+    
+    let checkboxes = this.querySelectorAll('.exceptions input[name="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = true;
+    });
+  }
+
+  /**
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
     this.savedItems = [];
+
+    let edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
+    if (!edits.body.length) return;
+    edits = edits.body;
+
+    this.itemEdits = edits.filter(e => !e.edit.includes(this.collectionId));
+
+    let collectionEdit = edits.filter(e => e.edit.includes(this.collectionId))[0];
+    if( !collectionEdit || !Object.keys(collectionEdit).length ) return;
 
     let savedDisplayData = await this.FcAppConfigModel.getAdminData(this.collectionId);
 
@@ -329,18 +371,21 @@ class AppCollection extends Mixin(LitElement)
     if( this.itemDefaultDisplay === 'Book Reader - Single Page' ) this.querySelector('#one').checked = true;
     if( this.itemDefaultDisplay === 'Image List' ) this.querySelector('#list').checked = true;
 
+    this.itemEdits = this.itemEdits.filter(e => e['item_default_display'] !== '' && e['item_default_display'] !== this.itemDefaultDisplay);
     this.appDataLoaded = true;
     this._updateDisplayData();
     this.requestUpdate();
   }
 
-  _updateDisplayData() {
+  _updateDisplayData(newFileUploadName='') {
     let opts = {
       title : this.title, 
       watercolor : this.watercolor, 
       itemCount : this.itemCount, 
       itemDefaultDisplay : this.itemDefaultDisplay, 
-      savedItems : this.savedItems
+      savedItems : this.savedItems,
+      newFileUploadName,
+      thumbnailUrlOverride : this.thumbnailUrlOverride
     };
     this.displayData = this.FcAppConfigModel.getCollectionDisplayData(this.collectionId, opts);
   }

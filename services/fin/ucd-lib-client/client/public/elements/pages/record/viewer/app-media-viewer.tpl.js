@@ -294,6 +294,7 @@ export default function render() {
         .hideZoom="${this.mediaType === "bookreader" || this.mediaType === "video"}"
         .searchResults="${this.searchResults}"
         ?brsinglepage="${this.singlePage}"
+        overrideImageList="${this.overrideImageList}"
         @zoom-in="${this._onZoomIn}"
         @br-bookview-toggle="${this._onToggleBookView}"
         @br-expand-view="${this._onExpandBookView}"
