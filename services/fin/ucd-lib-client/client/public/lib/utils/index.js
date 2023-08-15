@@ -260,16 +260,30 @@ class Utils {
    * @param {String} id item id
    * @param {String} collectionId collection id
    * @param {Object} fcAppConfigModel reference to model
+   * @param {Object} collectionModel reference to model
    */
-    async getItemDisplayType(id, collectionId, fcAppConfigModel) {
+    async getItemDisplayType(id, collectionId, fcAppConfigModel, collectionModel) {
       let displayType = '';
-      let itemGraph = await this.getAppConfigItemGraph(id, fcAppConfigModel);
-      displayType = itemGraph?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];
-      if( displayType ) return displayType;
 
-      let collectionGraph = await this.getAppConfigCollectionGraph(collectionId, fcAppConfigModel);
-      displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];
+      // make sure collection and items have edits before hitting the fcrepo
+      let edits = await collectionModel.getCollectionEdits(collectionId);
+      if (!edits.body.length) return displayType;
+      edits = edits.body;
 
+      // get item data if it exists
+      let itemEdit = edits.filter(e => e.edit.includes(id))[0]
+      if( itemEdit && Object.keys(itemEdit).length ) {
+        let itemGraph = await this.getAppConfigItemGraph(id, fcAppConfigModel);
+        displayType = itemGraph?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];
+        if( displayType ) return displayType;
+      }
+
+      let collectionEdit = edits.filter(e => e.edit.includes(collectionId))[0];
+      if( collectionEdit && Object.keys(collectionEdit).length ) {
+        let collectionGraph = await this.getAppConfigCollectionGraph(collectionId, fcAppConfigModel);
+        displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];  
+      }
+      
       return displayType;
     }
   

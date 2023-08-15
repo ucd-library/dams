@@ -146,6 +146,16 @@ class CollectionModel extends BaseModel {
       AppStateModel.setSelectedCollection(selected);
       AppStateModel.set({searchCollection: selected});
     }
+
+    /**
+     * @method getCollectionEdits
+     * @description get all item edits for a collection
+     * 
+     * @param {String} id collection id
+     */
+    async getCollectionEdits(id) {
+      return this.service.getCollectionEdits(id);
+    }
 }
 
 module.exports = new CollectionModel();
