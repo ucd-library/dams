@@ -29,6 +29,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       brFullscreen: { type: Boolean },
       brSearchOpen: { type: Boolean },
       singlePage: { type: Boolean },
+      overrideImageList: { type: Boolean },
       bookData: { type: Object },
       bookItemId: { type: String },
       isBookReader: { type: Boolean },
@@ -42,7 +43,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.render = render.bind(this);
     this.active = true;
 
-    this._injectModel("AppStateModel", "RecordModel", "FcAppConfigModel");
+    this._injectModel("AppStateModel", "RecordModel", "FcAppConfigModel", "CollectionModel");
     this.mediaType = "image";
     this.bagOfFilesImage = "";
     this.brFullscreen = false;
@@ -51,6 +52,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.bookData = {};
     this.bookItemId = "";
     this.isBookReader = false;
+    this.overrideImageList = false;
     this.searchResults = [];
     this.searchResultsCount = 0;
     this.regexPattern = /\{\{\{.*?\}\}\}/g;
@@ -82,6 +84,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
   async _onAppStateUpdate(e) {
     this._onRenderMedia(e);
+    // if( this.AppStateModel.location.page !== 'item' ) this._onSearchResultsEmpty();
   }
 
   async _onRenderMedia(e) {
@@ -132,18 +135,23 @@ export default class AppMediaViewer extends Mixin(LitElement)
     // check for any overrides at collection/item level for the image viewer
     let itemId = e.selectedRecord?.graph?.root?.['@id'];
     let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))[0]['@id'];
-    let displayType = await utils.getItemDisplayType(itemId, collectionId, this.FcAppConfigModel);
-    let overrideAsImage = false;
+    let displayType = await utils.getItemDisplayType(itemId, collectionId, this.FcAppConfigModel, this.CollectionModel);
+    this.overrideImageList = false;
 
-    if( displayType && displayType.includes('Image List') ) {
+    // default to BR 2 page if no displayType is set
+    if( mediaType === 'image' && !displayType ) {
+      renderAsBr = true;
+      mediaType = 'bookreader';
+      this.singlePage = false;
+    } else if( displayType && displayType.includes('Image List') && ['image', 'bookreader'].includes(mediaType) ) {
       renderAsBr = false;
       mediaType = 'image';
-      overrideAsImage = true;
-    } else if ( displayType && displayType.includes('Single') ) {
+      this.overrideImageList = true;
+    } else if ( displayType && displayType.includes('Single') && mediaType === 'image' ) {
       renderAsBr = true;
       mediaType = 'bookreader';
       this.singlePage = true;
-    } else if ( displayType && displayType.includes('2 Page') ) {
+    } else if ( displayType && displayType.includes('2 Page') && mediaType === 'image' ) {
       renderAsBr = true;
       mediaType = 'bookreader';
       this.singlePage = false;
@@ -151,7 +159,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     if (
       renderAsBr ||
-      (!overrideAsImage && mediaGroup.clientMedia && mediaGroup.clientMedia.pdf)
+      (!this.overrideImageList && mediaGroup.clientMedia && mediaGroup.clientMedia.pdf)
     ) {
       mediaType = "bookreader";
       this.isBookReader = true;

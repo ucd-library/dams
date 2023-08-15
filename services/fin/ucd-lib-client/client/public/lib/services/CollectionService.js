@@ -14,7 +14,7 @@ class CollectionService extends BaseService {
 
   get(id) {
     return this.request({
-      url : `${this.baseUrl}${id.replace('/collection', '')}`, // TODO add back? but we need image for collection cards ?compact=true`,
+      url : `${this.baseUrl}${id.replace('/collection', '')}`,
       checkCached : () => this.store.getCollection(id),
       onLoading : request => this.store.setCollectionLoading(id, request),
       onLoad : result => this.store.setCollectionLoaded(id, new RecordGraph(result.body)),
@@ -96,6 +96,24 @@ class CollectionService extends BaseService {
       },
       onError : e => this.store.setSearchError(searchDocument, e)
     });
+  }
+
+  /**
+   * @method getCollectionEdits
+   * @description get all item edits for a collection
+   * 
+   * @param {String} id collection id
+   */
+  async getCollectionEdits(id) {
+    // /api/collection/edits/collection/ark:/13030/c8pc37z3
+    return this.request({
+      url : `${this.baseUrl}/edits${id}`,
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    });
+
   }
 
 }

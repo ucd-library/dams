@@ -411,12 +411,19 @@ export default function render() {
     }
 
     .list--reset {
-      display: inline-block;
+      margin: 0;
+      padding: 0 0 0 1.25rem;
+      padding-left: 0;
+      list-style: none;
     }
 
     .list--reset > li {
       display: inline-block;
       padding-right: .5rem;
+    }
+
+    .radio label {
+      padding-top: .2rem;
     }
 
     .radio label:before {
@@ -427,6 +434,7 @@ export default function render() {
     .default-display {
       background-color: var(--color-aggie-gold-20);
       margin: 1rem;
+      padding-bottom: 1rem;
     }
 
     .default-display h3 {
@@ -459,8 +467,19 @@ export default function render() {
       top: -0.5rem;
     }    
 
-    fieldset label {
-      padding-top: .2rem;
+    .exceptions fieldset li,
+    .default-item-display fieldset li {
+      padding-top: .5rem;
+    }
+
+    .exceptions fieldset label,
+    .default-item-display fieldset label {
+      display: inline-block;
+    }
+
+    .exceptions fieldset label {
+      font-weight: normal;
+      color: inherit;
     }
 
   </style>
@@ -549,8 +568,8 @@ export default function render() {
 
       <fieldset class="radio" style="border: none; margin: 0; padding: 0;">      
         <div>
-          <span class="form-label">Highlight Display</span>
-          <ul class="list--reset">
+          <span class="form-label">Highlight Display:</span>
+          <ul class="list--reset" style="display: inline;">
             <li>
               <input id="six" 
                 name="radio-items-per-page" 
@@ -679,29 +698,39 @@ export default function render() {
               </div>
             </fieldset>
           </div>
-          <div class="exceptions">
+          <div class="exceptions" ?hidden="${this.itemEdits.length < 1}">
             <span class="label">Exceptions</span>
             <p style="margin-top: 0.3rem; padding-bottom: 0; margin-bottom: 0;">
               Checked items in this list will be reset to the default item display when saved. 
               Display overrides can also be managed directly on an item page.
             </p>
             <fieldset style="border: none; padding-left: 0; padding-top: 0; margin-top: 0;">
-              <ul class="list--reset" style="padding-inline-start: 0;">
-                <li>
-                  <label for="checkbox1">
-                    <input id="checkbox1" 
+              <ul class="list--reset" style="padding-inline-start: 0; width: 100%;">
+                <li style="width: 30%;">
+                  <input id="checkbox-all" 
+                    name="checkbox-all" 
+                    type="checkbox" 
+                    @change="${this._onSelectAllExceptionsChange}">
+                  <label for="checkbox-all">Select all exceptions</label>
+                </li>
+
+                <!-- items with exceptions set -->
+                ${this.itemEdits.map((item, index) => html`
+                  <li style="width: 33%;">
+                    
+                    <input id="checkbox${index}" 
                       name="checkbox" 
-                      type="checkbox" 
-                      checked="checked">Select all exceptions
+                      type="checkbox"
+                      data-item-id="${item.item.split(':fedora')[1]}">
+                    <label for="checkbox${index}">
+                      <a href="${item.item.split(':fedora')[1]}">${item.edit.split('/').pop()}</a>
+                      <span style="font-style: italic;">
+                        (${item['item_default_display']})
+                      </span>
                     </label>
                   </li>
-
-
-                <!-- TODO loop over items with exceptions set -->
-                <li><label for="checkbox2"><input id="checkbox2" name="checkbox" type="checkbox"> Choice B</label></li>
-                <li><label for="checkbox3"><input id="checkbox3" name="checkbox" type="checkbox"> Choice C</label></li>
-
-
+                `)}
+          
               </ul>
             </fieldset>
           </div>
