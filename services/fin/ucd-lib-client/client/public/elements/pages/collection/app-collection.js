@@ -11,7 +11,7 @@ import '../../components/citation';
 import user from '../../../lib/utils/user.js';
 import utils from '../../../lib/utils/index.js';
 
-class AppCollection extends Mixin(LitElement) 
+class AppCollection extends Mixin(LitElement)
   .with(MainDomElement, LitCorkUtils) {
 
   static get properties() {
@@ -23,9 +23,9 @@ class AppCollection extends Mixin(LitElement)
       thumbnailUrl : { type : String },
       thumbnailUrlOverride : { type : String },
       callNumber : { type : String },
-      keywords : { type : Array },    
-      items : { type : Number }, 
-      yearPublished : { type : Number }, 
+      keywords : { type : Array },
+      items : { type : Number },
+      yearPublished : { type : Number },
       highlightedItems : { type : Array },
       savedItems : { type : Array },
       dbsync : { type : Object },
@@ -62,8 +62,8 @@ class AppCollection extends Mixin(LitElement)
    * @method _onAppStateUpdate
    * @description on the App update, the state is determined and by checking
    * the location
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
    async _onAppStateUpdate(e) {
     if( this.AppStateModel.location.page !== 'collection' ) {
@@ -75,15 +75,18 @@ class AppCollection extends Mixin(LitElement)
 
     this.collectionId = e.location.fullpath;
 
-    await this._parseDisplayData();
-    this._onCollectionUpdate(await this.CollectionModel.get(e.location.fullpath));
+    const [displayData, recordData] = await Promise.all([
+      this._parseDisplayData(),
+      this.CollectionModel.get(e.location.fullpath)
+    ]);
+    this._onCollectionUpdate(recordData);
   }
 
   /**
    * @method _onCollectionUpdate
    * @description fired when collection updates
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
    async _onCollectionUpdate(e) {
     if( e.state !== 'loaded' ) return;
@@ -97,9 +100,9 @@ class AppCollection extends Mixin(LitElement)
 
     this.description = e.vcData.description
     this.title = e.vcData.title;
-    
-    this.thumbnailUrl = e.vcData.images?.medium?.url || e.vcData.images?.original?.url || ''; 
-    
+
+    this.thumbnailUrl = e.vcData.images?.medium?.url || e.vcData.images?.original?.url || '';
+
     this.callNumber = e.vcData.callNumber;
     this.keywords = (e.vcData.keywords || [])
       .map(keyword => {
@@ -112,7 +115,7 @@ class AppCollection extends Mixin(LitElement)
       });
     this.items = e.vcData.count;
     this.yearPublished = e.vcData.yearPublished;
-    
+
     this.citationRoot = e.payload.root;
 
     if( this.appDataLoaded && !this.savedItems.length ) {
@@ -123,7 +126,7 @@ class AppCollection extends Mixin(LitElement)
   }
 
   async getLatestItems() {
-    // default to most recent items by year published descending    
+    // default to most recent items by year published descending
     let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, this.itemCount);
     if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
       this.highlightedItems = highlightedItems.body.results.map((item, index) => {
@@ -145,7 +148,7 @@ class AppCollection extends Mixin(LitElement)
     this.thumbnailUrl = '';
     this.thumbnailUrlOverride = '';
     this.callNumber = '';
-    this.keywords = [];    
+    this.keywords = [];
     this.items = 0;
     this.yearPublished = 0;
     this.highlightedItems = [];
@@ -165,8 +168,8 @@ class AppCollection extends Mixin(LitElement)
   /**
    * @method _onDefaultRecordSearchUpdate
    * @description fired from default search
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
   _onDefaultRecordSearchUpdate(e) {
     if( e.state !== 'loaded' || this.highlightedItems.length ) return;
@@ -187,7 +190,7 @@ class AppCollection extends Mixin(LitElement)
 
   _onItemDisplayChange(e) {
     this.itemCount = parseInt(e.target.value);
-    
+
     let itemInputs = document.querySelectorAll('.item-ark-input');
     itemInputs.forEach((input, index) => {
       if( index+1 > this.itemCount ) {
@@ -201,8 +204,8 @@ class AppCollection extends Mixin(LitElement)
   /**
    * @method _onEditClicked
    * @description admin ui, edit button click event
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
   _onEditClicked(e) {
     if( !this.isUiAdmin ) return;
@@ -212,8 +215,8 @@ class AppCollection extends Mixin(LitElement)
   /**
    * @method _onSaveClicked
    * @description admin ui, save button click event
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
@@ -235,7 +238,7 @@ class AppCollection extends Mixin(LitElement)
       }
     });
     this.savedItems = [...newSavedItems];
-    
+
     let featuredImage = document.querySelector('#file-upload').files[0];
     this._updateDisplayData(featuredImage);
 
@@ -249,7 +252,7 @@ class AppCollection extends Mixin(LitElement)
     let checkboxes = this.querySelectorAll('.exceptions input[name="checkbox"]');
     checkboxes.forEach(checkbox => {
       if( !checkbox.checked ) return;
-      
+
       let itemId = checkbox.dataset.itemId;
       if( itemId ) itemExceptions.push(itemId);
     });
@@ -257,8 +260,8 @@ class AppCollection extends Mixin(LitElement)
     if( itemExceptions.length ) {
       await this.FcAppConfigModel.updateItemDisplayExceptions(itemExceptions, this.itemDefaultDisplay);
     }
-    
-    this.requestUpdate(); 
+
+    this.requestUpdate();
     this.AppStateModel.setLocation(this.collectionId);
     // this._parseDisplayData();
   }
@@ -266,8 +269,8 @@ class AppCollection extends Mixin(LitElement)
   /**
    * @method _onCancelEditClicked
    * @description admin ui, cancel editing button click event
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
   _onCancelEditClicked(e) {
     if( !this.isUiAdmin ) return;
@@ -277,8 +280,8 @@ class AppCollection extends Mixin(LitElement)
   /**
    * @method _onWatercolorChanged
    * @description admin ui, change to featured image watercolor
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
   _onWatercolorChanged(e) {
     if( !this.isUiAdmin ) return;
@@ -289,13 +292,13 @@ class AppCollection extends Mixin(LitElement)
   /**
    * @method _onSelectAllExceptionsChange
    * @description admin ui, change to 'select all exceptions' checkbox
-   * 
-   * @param {Object} e 
+   *
+   * @param {Object} e
    */
   _onSelectAllExceptionsChange(e) {
     let checked = e.currentTarget.checked;
     if( !checked ) return;
-    
+
     let checkboxes = this.querySelectorAll('.exceptions input[name="checkbox"]');
     checkboxes.forEach(checkbox => {
       checkbox.checked = true;
@@ -308,8 +311,13 @@ class AppCollection extends Mixin(LitElement)
   async _parseDisplayData() {
     this.savedItems = [];
 
-    let edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
-    if (!edits.body.length) return;
+    let edits;
+    try {
+      edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
+    } catch (error) {
+      console.log('Error retrieving collection edits', error);
+    }
+    if (!edits?.body?.length) return;
     edits = edits.body;
 
     this.itemEdits = edits.filter(e => !e.edit.includes(this.collectionId));
@@ -342,12 +350,12 @@ class AppCollection extends Mixin(LitElement)
     let items = graphRoot['exampleOfWork'];
     if( items ) {
       if( !Array.isArray(items) ) items = [items];
-      
+
       items.forEach((item, index) => {
         this.savedItems.push({
           '@id' : '/item' + item.split('/item')?.[1],
           position : index+1
-        });  
+        });
       });
     }
     this.highlightedItems = [...this.savedItems];
@@ -362,7 +370,7 @@ class AppCollection extends Mixin(LitElement)
     this.itemCount = graphRoot['http://digital.ucdavis.edu/schema#itemCount'];
     if( !(this.itemCount >= 0) ) this.itemCount = 6;
     // hack for checkboxes occasionally not being selected
-    if( this.itemCount === 0 ) this.querySelector('#zero').checked = true; 
+    if( this.itemCount === 0 ) this.querySelector('#zero').checked = true;
     if( this.itemCount === 3 ) this.querySelector('#three').checked = true;
     if( this.itemCount === 6 ) this.querySelector('#six').checked = true;
 
@@ -379,10 +387,10 @@ class AppCollection extends Mixin(LitElement)
 
   _updateDisplayData(newFileUploadName='') {
     let opts = {
-      title : this.title, 
-      watercolor : this.watercolor, 
-      itemCount : this.itemCount, 
-      itemDefaultDisplay : this.itemDefaultDisplay, 
+      title : this.title,
+      watercolor : this.watercolor,
+      itemCount : this.itemCount,
+      itemDefaultDisplay : this.itemDefaultDisplay,
       savedItems : this.savedItems,
       newFileUploadName,
       thumbnailUrlOverride : this.thumbnailUrlOverride
@@ -390,16 +398,16 @@ class AppCollection extends Mixin(LitElement)
     this.displayData = this.FcAppConfigModel.getCollectionDisplayData(this.collectionId, opts);
   }
 
-  async _onFileChange(e) {  
+  async _onFileChange(e) {
     let selectedFilename = e.target.value.split('\\').pop();
     if( !selectedFilename.length ) return;
 
-    
+
     // replace current thumbnail with new image
     let file = e.target.files[0];
     document.querySelector('.featured-image').style.backgroundImage = 'url('+window.URL.createObjectURL(file)+')';
   }
-  
+
 }
 
 customElements.define('app-collection', AppCollection);

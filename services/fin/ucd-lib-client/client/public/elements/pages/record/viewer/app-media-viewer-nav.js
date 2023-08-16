@@ -313,7 +313,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     if( !item ) return;
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = item;
-  
+
     if ( clientMedia.mediaGroups.length === 1 &&
           selectedMediaPage === -1 ) {
       this.singleImage = true;
@@ -332,14 +332,22 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       }
     }
 
+    const ids = [];
     this.thumbnails = thumbnails
       .filter((element) => element !== null)
+      .filter( (element) => {
+        if ( ids.includes(element.id) ) {
+          return false;
+        }
+        ids.push(element.id);
+        return true;
+      })
       // TODO: Filtering out the text based files for now until we get the PDF/text viewer set up correctly
       // .filter((element) => element.icon !== "blank-round");
 
 
     this._resize();
- 
+
     // this.AppStateModel.set({mediaViewerNavLeftMostThumbnail: 0});
   }
 
