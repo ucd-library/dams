@@ -56,7 +56,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @description bound to AppStateModel app-state-update event
    */
   _onAppStateUpdate(e) {
-    console.log(e);
     if (e.showLightbox && !this.visible) {
       this.show();
     } else if (!e.showLightbox && this.visible) {

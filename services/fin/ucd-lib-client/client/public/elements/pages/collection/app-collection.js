@@ -75,9 +75,6 @@ class AppCollection extends Mixin(LitElement)
 
     this.collectionId = e.location.fullpath;
 
-    //await this._parseDisplayData();
-    //this._onCollectionUpdate(await this.CollectionModel.get(e.location.fullpath));
-
     const [displayData, recordData] = await Promise.all([
       this._parseDisplayData(),
       this.CollectionModel.get(e.location.fullpath)
