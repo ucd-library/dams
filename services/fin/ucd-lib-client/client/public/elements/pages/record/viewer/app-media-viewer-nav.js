@@ -332,8 +332,16 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       }
     }
 
+    const ids = [];
     this.thumbnails = thumbnails
       .filter((element) => element !== null)
+      .filter( (element) => {
+        if ( ids.includes(element.id) ) {
+          return false;
+        }
+        ids.push(element.id);
+        return true;
+      })
       // TODO: Filtering out the text based files for now until we get the PDF/text viewer set up correctly
       // .filter((element) => element.icon !== "blank-round");
 
