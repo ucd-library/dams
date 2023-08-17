@@ -19,6 +19,7 @@ fin auth login --headless
 This command will export from Fedora v4 (DAMS v1 uses Fedora v4), run some nice metadata cleanup rules to prepare for DAMS v2 and use the `fin io` config from sandbox.
 
 ```bash
+cd /data
 FCREPO_HOST=https://digital.ucdavis.edu fin io export --from-v1 --f4 --config-host https://sandbox.dams.library.ucdavis.edu /collection/[collection-name] .
 ```
 
