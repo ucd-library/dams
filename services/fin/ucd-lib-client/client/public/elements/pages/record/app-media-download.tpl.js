@@ -132,7 +132,7 @@ export default function render() {
         width: 115px;
       }
 
-      #downloadOptions,
+      /* #downloadOptions, */
       #format {
         min-height: 2.7rem;
         background-color: var(--color-aggie-blue-50);
@@ -141,14 +141,16 @@ export default function render() {
         padding: 0 1.5rem 0 1rem;
       }
 
-      #downloadOptions {
+      /* #downloadOptions {
         max-width: 10rem;
-      }
+      } */
 
       #format {
-        max-width: 5rem;
+        max-width: 6rem;
       }
 
+      #media-format-label,
+      #media-all-format-label,
       #multimedia-format-label {
         font-size: 0.9rem;
         margin-right: 0.75rem;
@@ -177,7 +179,7 @@ export default function render() {
     </style>
 
     <div id="wrapper">
-      <div class="layout" ?hidden="${!this.hasMultipleDownloadMedia}">
+      <div class="layout" ?hidden="${!this.hasMultipleDownloadMedia || this.downloadAllMedia}">
         <div class="radio" style="margin-right: 1rem">
           <input
             id="single"
@@ -195,7 +197,7 @@ export default function render() {
             name="set-size"
             @click="${this._toggleMultipleDownload}"
           />
-          <label for="fullset">All Pages (${this.fullSetCount})</label>
+          <label for="fullset">All Files (${this.fullSetCount})</label>
         </div>
       </div>
     </div>
@@ -204,19 +206,14 @@ export default function render() {
       <div class="layout btns"
         style="margin-bottom: 5px;"
         ?hidden="${!this.selectedMediaHasSources}">
-        <select ?hidden="${this.isMultimedia}"
-          id="downloadOptions"
-          @change="${this._onChangeDownloadOptions}">
-        </select>
         <span id="multimedia-format-label"
           ?hidden="${!this.isMultimedia}">
         </span>
-        <select id="format"
-          @change="${this._onFormatSelected}"
-          ?hidden="${!this.showImageFormats}">
-        </select>
+        <span id="media-format-label"
+          ?hidden="${!this.showDownloadLabel || this.isMultimedia}">
+        </span>
         <a class="downloadBtn"
-          ?hidden="${this.isTwoPageView}"
+          ?hidden="${(this.isTwoPageView && !this.showDownloadLabel) || this.downloadAllMedia}"
           href="${this.href}"
           @click="${this._onDownloadClicked}"
           download
@@ -226,7 +223,7 @@ export default function render() {
           <span> Download </span>
         </a>
         <a class="downloadBtn archive"
-          ?hidden="${!this.isTwoPageView}"
+          ?hidden="${(!this.isTwoPageView || this.showDownloadLabel) && !this.downloadAllMedia}"
           href="${this.archiveHref}"
           @click="${this._onDownloadFullSetClicked}"
           target="_blank"
@@ -238,22 +235,33 @@ export default function render() {
       </div>
     </div>
 
-    <div ?hidden="${this.fullSetSelected || this.isTwoPageView}">
+    <div ?hidden="${(this.fullSetSelected || this.isTwoPageView) && this.selectedMediaHasSources}">
       <div ?hidden="${this.selectedMediaHasSources}">
         <em>No downloadable items available</em>
       </div>
     </div>
 
-    <a class="downloadBtn archive"
-      ?hidden="${!this.fullSetSelected}"
-      href="${this.archiveHref}"
-      @click="${this._onDownloadFullSetClicked}"
-      target="_blank"
-      rel="noopener"
-      download
-      style="white-space: nowrap; text-align: center;">
-      <span> Download </span>
-    </a>
+    <div class="display: flex;">
+      <span id="media-all-format-label"
+        style="display: inline-block;"  
+        ?hidden="${!this.fullSetSelected || !this.showDownloadLabel}">
+        </span>
+      <select id="format"
+        style="display: inline-block"
+        @change="${this._onFormatSelected}"
+        ?hidden="${!this.fullSetSelected || !this.showImageFormats || this.sources.length < 2}">
+      </select>
+      <a class="downloadBtn archive"
+        ?hidden="${!this.fullSetSelected}"
+        href="${this.archiveHref}"
+        @click="${this._onDownloadFullSetClicked}"
+        target="_blank"
+        rel="noopener"
+        download
+        style="white-space: nowrap; text-align: center; display: inline-block;">
+        <span> Download </span>
+      </a>
+    </div>
 
     <!-- <form id="downloadZip" 
       action="/fin/archive" 

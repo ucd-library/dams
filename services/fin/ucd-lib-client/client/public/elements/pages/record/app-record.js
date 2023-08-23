@@ -95,8 +95,8 @@ class AppRecord extends Mixin(LitElement)
   async firstUpdated() {
     // this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath)); // this causes badness with ie /media/images:4 paths
     this._onAppStateUpdate(await this.AppStateModel.get());
-    this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
-    this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+    if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
+    if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
 
     this._updateSlimStyles();
   }
@@ -318,6 +318,8 @@ class AppRecord extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
+    if( !this.collectionId ) return;
+
     this.itemDisplay = ''; // default
     let edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
     if (!edits.body.length) {
