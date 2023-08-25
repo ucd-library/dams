@@ -213,7 +213,7 @@ export default function render() {
           ?hidden="${!this.showDownloadLabel || this.isMultimedia}">
         </span>
         <a class="downloadBtn"
-          ?hidden="${(this.isTwoPageView && !this.showDownloadLabel) || this.downloadAllMedia}"
+          ?hidden="${(this.isTwoPageView || this.downloadAllMedia) && this.sources.length > 1}"
           href="${this.href}"
           @click="${this._onDownloadClicked}"
           download
@@ -223,7 +223,7 @@ export default function render() {
           <span> Download </span>
         </a>
         <a class="downloadBtn archive"
-          ?hidden="${(!this.isTwoPageView || this.showDownloadLabel) && !this.downloadAllMedia}"
+          ?hidden="${(!this.isTwoPageView && !this.downloadAllMedia) || this.sources.length === 1}"
           href="${this.archiveHref}"
           @click="${this._onDownloadFullSetClicked}"
           target="_blank"

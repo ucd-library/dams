@@ -230,7 +230,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.zipName = this.rootRecord.name
         .replace(/[^a-zA-Z0-9]/g, "-")
         .toLowerCase();
-      this.archiveHref = '/fin/archive?paths=' + sources.map(s => s.url).join(',') + (this.zipName ? '&name='+this.zipName : '');
+      this.archiveHref = '/fin/archive?paths=' + sources.map(s => s.url.replace('/fcrepo/rest', '')).join(',') + (this.zipName ? '&name='+this.zipName : '');
     } else if( this.AppStateModel.location.fullpath === this.rootRecord['@id'] ) {
       // first image from imageList if exists, or mediaObject first download
       this.href = imageList?.clientMedia?.download?.[0]?.url || firstMediaDownload;
@@ -258,7 +258,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       
     });
 
-    console.log('setting showDownloadLabel to true');
     this.showDownloadLabel = true;
     this.shadowRoot.querySelector("#media-format-label").innerHTML = 'image' + (mutlipart ? 's' : '') + ' (' + formats.join(', ') + ')';
   }
