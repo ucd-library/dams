@@ -44,7 +44,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.active = true;
 
     this._injectModel("AppStateModel", "RecordModel", "FcAppConfigModel", "CollectionModel");
-    this.mediaType = "image";
+    this.mediaType = "";
     this.bagOfFilesImage = "";
     this.brFullscreen = false;
     this.brSearchOpen = false;

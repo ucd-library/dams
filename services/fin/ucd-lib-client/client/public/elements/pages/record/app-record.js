@@ -95,8 +95,8 @@ class AppRecord extends Mixin(LitElement)
   async firstUpdated() {
     // this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath)); // this causes badness with ie /media/images:4 paths
     this._onAppStateUpdate(await this.AppStateModel.get());
-    this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
-    this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+    if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
+    if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
 
     this._updateSlimStyles();
   }
@@ -241,9 +241,9 @@ class AppRecord extends Mixin(LitElement)
         imagePath = media['@id'];
       }
 
-    } else if (mediaGroup?.['@shortType']?.includes('ImageList')) {
+    } 
+    if (!imagePath && mediaGroup?.['@shortType']?.includes('ImageList')) {
       imagePath = mediaGroup.clientMedia?.images?.original?.url || path;
-
     } else {
       imagePath = selectedRecord.selectedMedia?.['@id'];
     }
@@ -253,6 +253,8 @@ class AppRecord extends Mixin(LitElement)
       imagePath.replace('/fcrepo/rest', '')
     ];
 
+    debugger;
+    
     this.fedoraLinks = [
       '/fcrepo/rest'+ path.replace('/fcrepo/rest', ''),
       '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
@@ -318,6 +320,8 @@ class AppRecord extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
+    if( !this.collectionId ) return;
+
     this.itemDisplay = ''; // default
     let edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
     if (!edits.body.length) {
