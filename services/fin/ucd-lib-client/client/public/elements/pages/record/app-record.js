@@ -241,9 +241,9 @@ class AppRecord extends Mixin(LitElement)
         imagePath = media['@id'];
       }
 
-    } else if (mediaGroup?.['@shortType']?.includes('ImageList')) {
+    } 
+    if (!imagePath && mediaGroup?.['@shortType']?.includes('ImageList')) {
       imagePath = mediaGroup.clientMedia?.images?.original?.url || path;
-
     } else {
       imagePath = selectedRecord.selectedMedia?.['@id'];
     }
@@ -253,6 +253,8 @@ class AppRecord extends Mixin(LitElement)
       imagePath.replace('/fcrepo/rest', '')
     ];
 
+    debugger;
+    
     this.fedoraLinks = [
       '/fcrepo/rest'+ path.replace('/fcrepo/rest', ''),
       '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'

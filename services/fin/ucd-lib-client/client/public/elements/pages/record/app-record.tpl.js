@@ -345,7 +345,7 @@ export default function render() {
       <div class="metadata-row">
         <div class="attr">Fedora Link</div>
         <div class="value" id="fedoraValue">
-          ${this.fedoraLinks.map((link) => html`<a href="${link}">${link}</a>`)}
+          ${this.fedoraLinks.map((link) => html`<a href="${link}">${link.replace('/fcr:metadata', '')}</a>`)}
         </div>
       </div>
     </div>
