@@ -1,7 +1,7 @@
-const {dataModels, ActiveMqClient, config} = require('@ucd-lib/fin-service-utils');
+const {dataModels, MessagingClients, config} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
-const {ActiveMqStompClient} = ActiveMqClient;
+const {RabbitMqClient, MessageWrapper} = MessagingClients;
 const workflowUtils = require('../workflows.js');
 const validate = require('../validate.js');
 
@@ -14,7 +14,7 @@ class ItemsModel extends FinEsDataModel {
   }
 
   connect() {
-    this.activemq = new ActiveMqStompClient('item');
+    this.messaging = new RabbitMqClient('item');
   }
 
   is(id) {
@@ -36,7 +36,7 @@ class ItemsModel extends FinEsDataModel {
 
     if( !jsonld['@graph'] ) return result;
 
-    if( !this.activemq ) {
+    if( !this.messaging ) {
       await this.connect();
     }
 
@@ -57,10 +57,10 @@ class ItemsModel extends FinEsDataModel {
     }
 
     for( let id of reindex ) {
-      await this.activemq.sendMessage(
-        {'@id' : id},
-        {'edu.ucdavis.library.eventType' : 'Reindex'}
-      );
+      await this.messaging.sendMessage(MessageWrapper.createMessage(
+        ['http://digital.ucdavis.edu/schema#ReindexEvent'],
+        {'@id': id}
+      ));
     }
 
     let node = jsonld['@graph'][0];
