@@ -1,5 +1,7 @@
 import { LitElement } from 'lit';
-import render from "./app-share-btn.tpl.js"
+import render from "./app-share-btn.tpl.js";
+
+import './app-toast-popup.js';
 
 
 const BASE_SHARE_LINKS = {
@@ -24,7 +26,7 @@ export default class AppShareBtn extends Mixin(LitElement)
     this.active = true;
 
     this.visible = false;
-    this._injectModel('AppStateModel', 'MediaModel');
+    this._injectModel('AppStateModel', 'MediaModel', 'RecordModel');
   }
 
   /**
@@ -48,6 +50,8 @@ export default class AppShareBtn extends Mixin(LitElement)
   async _onCopyLink(e) {
     try {
       await navigator.clipboard.writeText(window.location.href);
+      let toastPopup = this.shadowRoot.querySelector('app-toast-popup');
+      if( toastPopup ) toastPopup.showPopup();
     } catch (err) {
       console.error('Failed to copy url: ', err);
     }

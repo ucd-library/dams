@@ -202,4 +202,5 @@ export default function render() {
   @click="${this._onShareSelected}">
 </ucdlib-icon>
 
+<app-toast-popup></app-toast-popup>
 `;}
