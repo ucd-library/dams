@@ -146,5 +146,6 @@ return html`
       <div class="btn btn-copy" @click="${this._copyCiteText}">Copy Text</div>
     </div>
   </div>
+  <app-toast-popup></app-toast-popup>
 </div>
 `;}

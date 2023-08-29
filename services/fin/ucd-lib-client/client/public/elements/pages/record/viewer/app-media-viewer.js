@@ -400,9 +400,12 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if (searchInput) {
       searchInput.value = "";
     }
+
     this.searchResults = [];
     this.searchResultsCount = 0;
     this._onBRSearch({ currentTarget: { value: "" } });
+
+    if( e.detail.closeSearch ) this.brSearchOpen = false;
   }
 
   _onBRSearchGoToResult(e) {

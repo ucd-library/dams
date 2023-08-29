@@ -252,8 +252,6 @@ class AppRecord extends Mixin(LitElement)
       path,
       imagePath.replace('/fcrepo/rest', '')
     ];
-
-    debugger;
     
     this.fedoraLinks = [
       '/fcrepo/rest'+ path.replace('/fcrepo/rest', ''),

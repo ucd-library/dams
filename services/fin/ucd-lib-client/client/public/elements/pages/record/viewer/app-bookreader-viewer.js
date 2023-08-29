@@ -77,6 +77,14 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     if (e.location.page !== 'item') {
       this.bookData = {};
       this.iaInitialized = false;
+
+      this.dispatchEvent(new CustomEvent('br-cancel-search', {
+        detail: {
+          onePageMode: this.onePage,
+          closeSearch: true,
+        },
+      }));
+
     }
   }
 
