@@ -338,14 +338,14 @@ export default function render() {
       <div class="metadata-row" id="identifier">
         <div class="attr">ARK / DOI</div>
         <div class="value" id="identifierValue">
-          ${this.arkDoi.map((link) => html`<a href="${link}">${link}</a>`)}
+          ${this.arkDoi.map((link) => html`<a href="${link}">${link.replace('/item', '')}</a>`)}
         </div>
       </div>
 
       <div class="metadata-row">
         <div class="attr">Fedora Link</div>
         <div class="value" id="fedoraValue">
-          ${this.fedoraLinks.map((link) => html`<a href="${link}">${link}</a>`)}
+          ${this.fedoraLinks.map((link) => html`<a href="${link}">${link.replace('/fcr:metadata', '')}</a>`)}
         </div>
       </div>
     </div>

@@ -80,8 +80,9 @@ export default function render() {
         line-height: 1.2;
       }
 
-      .title-section {
+      app-browse .title-section {
         text-align: center;
+        border: none;
       }
 
       .header-icon {

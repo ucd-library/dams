@@ -7,11 +7,11 @@ This document describes the process for exporting data from DAMS v1 and preparin
 First, login to both `https://digital.ucdavis.edu` and `https://sandbox.dams.library.ucdavis.edu`.  If you are on your laptop, you can ditch the `--headless` flags.  But it is recommened you develop on `sandbox`.
 
 ```bash
-fin config set host https://sandbox.dams.library.ucdavis.edu
-fin auth login --headless
-
 fin config set host https://digital.ucdavis.edu
 fin auth login --headless --service-name cas
+
+fin config set host https://sandbox.dams.library.ucdavis.edu
+fin auth login --headless
 ```
 
 ## Export Collection
@@ -19,8 +19,8 @@ fin auth login --headless --service-name cas
 This command will export from Fedora v4 (DAMS v1 uses Fedora v4), run some nice metadata cleanup rules to prepare for DAMS v2 and use the `fin io` config from sandbox.
 
 ```bash
-fin config set host https://digital.ucdavis.edu
-fin io export --from-v1 --f4 --config-host https://sandbox.dams.library.ucdavis.edu /collection/[collection-name] .
+cd /data
+FCREPO_HOST=https://digital.ucdavis.edu fin io export --from-v1 --f4 --config-host https://sandbox.dams.library.ucdavis.edu /collection/[collection-name] .
 ```
 
 ## Cleanup data

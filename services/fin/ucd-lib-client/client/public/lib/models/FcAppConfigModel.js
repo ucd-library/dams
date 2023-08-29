@@ -180,7 +180,7 @@ class FcAppConfigModel extends BaseModel {
       itemDefaultDisplay, 
       savedItems
     } = opts;
-    return {
+    let data = {
       "@context" : {
         "@vocab" : "http://schema.org/",
         "fedora" : "http://fedora.info/definitions/v4/repository#",
@@ -222,14 +222,21 @@ class FcAppConfigModel extends BaseModel {
       ],
       'schema:isPartOf': {'@id': `info:fedora${id}`},
       "name" : title,
-      "thumbnailUrl" : {
-          "@id" : `info:fedora/application/ucd-lib-client${id}/featuredImage.jpg`
-      },
       "ucdlib:itemCount" : itemCount,
       "ucdlib:itemDefaultDisplay" : itemDefaultDisplay,
-      "exampleOfWork" : 
-        savedItems
+      "exampleOfWork" : savedItems,
+      "isPartOf" : {
+        "@id" : `info:fedora${id}`
+      }
     };
+
+    if( opts.newFileUploadName || opts.thumbnailUrlOverride ) {
+      data['thumbnailUrl'] = {
+        "@id" : `info:fedora/application/ucd-lib-client${id}/featuredImage.jpg`
+      };
+    }
+
+    return data;
   }  
 
   /**
@@ -284,7 +291,7 @@ class FcAppConfigModel extends BaseModel {
      * @description returns a formatted jsonld object for an item
      * 
      * @param {String} id record id
-     * @param {Array} itemDisplay display override
+     * @param {String} itemDisplay display override
      * 
      * @returns {Object} jsonld object
      */
@@ -313,6 +320,21 @@ class FcAppConfigModel extends BaseModel {
       "isPartOf" : {
         "@id" : `info:fedora${id}`
       }
+    }
+  }
+
+  /**
+     * @method getItemDisplayData
+     * @description returns a formatted jsonld object for an item
+     * 
+     * @param {Array} itemExceptions array of record ids
+     * 
+     * @returns {Object} jsonld object
+     */
+  async updateItemDisplayExceptions(itemExceptions) {
+    for( let itemId of itemExceptions ) {
+      let newDisplayData = this.getItemDisplayData(itemId, '');
+      await this.service.saveItemDisplayData(itemId, newDisplayData);
     }
   }
 

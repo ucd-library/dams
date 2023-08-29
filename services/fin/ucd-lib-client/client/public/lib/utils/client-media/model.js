@@ -107,16 +107,16 @@ class ClientMedia {
 
       if( !node.clientMedia.download ) {
         if( displayType !== 'imagelist' ) {
-          node.clientMedia.download = {
+          node.clientMedia.download = [{
             url : '/fcrepo/rest'+node['@id']
-          }
+          }];
         } else {
-          node.clientMedia.download = {
+          node.clientMedia.download = [{
             archive : {
               binary : true,
               metadata : false
             }
-          }
+          }];
         }
       }
     }
@@ -216,6 +216,10 @@ class ClientMedia {
       return 0;
     });
 
+    node.clientMedia.download = node.clientMedia.pages.map(page => {
+      return page.download;      
+    });
+
     if( !node.clientMedia.images ) {
       node.clientMedia.images = node.clientMedia.pages[0];
     }
@@ -246,9 +250,10 @@ class ClientMedia {
     }
 
     if( !node.clientMedia.download ) {
-      node.clientMedia.download = {
-        url : '/fcrepo/rest'+node['@id']
-      }
+      node.clientMedia.download = [{
+        url : '/fcrepo/rest'+node['@id'],
+        label : 'pdf'
+      }];
     }
   }
 
@@ -278,8 +283,9 @@ class ClientMedia {
 
     if( !node.clientMedia.download ) {
       node.clientMedia.download = {
-        url : node.clientMedia.images.original.url
-      }
+        url : node.clientMedia.images.original.url,
+        label : node.clientMedia.images.original.url.split('.').pop()
+      };
     }
   }
 

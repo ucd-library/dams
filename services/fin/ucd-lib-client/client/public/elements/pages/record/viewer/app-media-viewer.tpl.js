@@ -210,7 +210,8 @@ export default function render() {
           .bookData="${this.bookData}"
           bookItemId="${this.bookItemId}"
           ?brsinglepage="${this.singlePage}"
-          @br-page-change="${this._onBookViewPageChange}">
+          @br-page-change="${this._onBookViewPageChange}"
+          @br-cancel-search="${this._onClearSearch}">
         </app-bookreader-viewer>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>
@@ -290,10 +291,12 @@ export default function render() {
       </div>
 
       <app-media-viewer-nav
+        ?hidden="${!this.mediaType}"
         .isBookReader="${this.isBookReader}"
         .hideZoom="${this.mediaType === "bookreader" || this.mediaType === "video"}"
         .searchResults="${this.searchResults}"
         ?brsinglepage="${this.singlePage}"
+        overrideImageList="${this.overrideImageList}"
         @zoom-in="${this._onZoomIn}"
         @br-bookview-toggle="${this._onToggleBookView}"
         @br-expand-view="${this._onExpandBookView}"

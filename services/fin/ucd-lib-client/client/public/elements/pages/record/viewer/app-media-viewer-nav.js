@@ -26,6 +26,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       hideZoom: { type: Boolean },
       brSinglePage: { type: Boolean },
       brFullscreen: { type: Boolean },
+      overrideImageList: { type: Boolean },
       singleImage: { type: Boolean },
       mediaList: { type: Array },
       showOpenLightbox: { type: Boolean },
@@ -58,6 +59,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.isBookReader = false;
     this.hideZoom = false;
     this.brSinglePage = false;
+    this.overrideImageList = false;
     this.brFullscreen = false;
     this.singleImage = false;
     this.mediaList = [];
@@ -116,6 +118,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     this.leftMostThumbnail = e.mediaViewerNavLeftMostThumbnail;
     this._resize();
+    // if( this.AppStateModel.location.page !== 'item' ) this._onSearchResultsEmpty();
   }
 
   /**
@@ -310,7 +313,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     if( !item ) return;
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = item;
-  
+
     if ( clientMedia.mediaGroups.length === 1 &&
           selectedMediaPage === -1 ) {
       this.singleImage = true;
@@ -319,23 +322,32 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     let thumbnails = [];
     for( let node of clientMedia.mediaGroups ) {
-      if( !node.clientMedia.pages ) {
+      if( !node.clientMedia.pages && !this.overrideImageList ) {
         thumbnails.push(this._renderThumbnail(selectedMedia, node.clientMedia.images, selectedMediaPage));
         continue;
       }
+      if( !node.clientMedia.pages ) continue;
       for( let page of node.clientMedia.pages ) {
         thumbnails.push(this._renderThumbnail(selectedMedia, page, selectedMediaPage));
       }
     }
 
+    const ids = [];
     this.thumbnails = thumbnails
       .filter((element) => element !== null)
+      .filter( (element) => {
+        if ( ids.includes(element.id) ) {
+          return false;
+        }
+        ids.push(element.id);
+        return true;
+      })
       // TODO: Filtering out the text based files for now until we get the PDF/text viewer set up correctly
       // .filter((element) => element.icon !== "blank-round");
 
 
     this._resize();
- 
+
     // this.AppStateModel.set({mediaViewerNavLeftMostThumbnail: 0});
   }
 
