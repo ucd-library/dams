@@ -210,7 +210,8 @@ export default function render() {
           .bookData="${this.bookData}"
           bookItemId="${this.bookItemId}"
           ?brsinglepage="${this.singlePage}"
-          @br-page-change="${this._onBookViewPageChange}">
+          @br-page-change="${this._onBookViewPageChange}"
+          @br-cancel-search="${this._onClearSearch}">
         </app-bookreader-viewer>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>
