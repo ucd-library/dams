@@ -187,8 +187,13 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.archiveHref = '/fin/archive?paths=' + this.sources.map(s => s.url.replace('/fcrepo/rest', '')).join(',') + (this.zipName ? '&name='+this.zipName : '');
 
     this.downloadAllMedia = true;
-
-    let formats = this.sources.map(s => s.url.split('.').pop());
+    let formats = [];
+    this.sources.forEach((source) => {
+      let format = source.url.split('.').pop();
+      if( !formats.includes(format) ) {
+        formats.push(format);
+      }
+    });
     this.shadowRoot.querySelector("#media-format-label").innerHTML = 'image' + ' (' + formats.join(', ') + ')';
   }
 

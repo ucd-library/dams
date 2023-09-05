@@ -49,6 +49,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     this.height = 634;
     this.onePage = false;
     this.fullscreen = false;
+    this.viewportMultiplier = 3.7;
 
     window.addEventListener(
       "BookReader:SearchCallback",
@@ -68,7 +69,8 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   }
 
   willUpdate(e) {
-    if (this.bookData?.pages) {
+    if( this.AppStateModel.location.page !== 'item' ) return;
+    if( this.bookData?.pages ) {
       this._renderBookReader();
     }
   }
@@ -122,18 +124,9 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   _singlePageLoad(e) {
     setTimeout(() => {
       if (!this.zoomed) {
-        // this is annoying, but the ia-bookmarks.js > setBREventListeners() has a timeout of 100ms on render, if no timeout used here it tries to zoom before rendering
-        this.br.zoom(1);
-        this.br.zoom(1);
-        this.br.zoom(1);
-        this.br.zoom(1);
-        this.br.zoom(1);
-        this.br.zoom(1);
-        this.br.zoom(1);
-        this.br.zoom(1);
-
         this.br.resize();
         this.zoomed = true;
+
       }
     }, 25);
   }
@@ -182,11 +175,39 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   }
 
   _prevPage() {
-    this.br.left();
+    // if( !this.onePage ) {
+      this.br.left();
+    //   return;
+    // }
+
+    // this.pageIndex = (this.pageIndex || 0) - 1;
+    // if( this.pageIndex < 0 ) this.pageIndex = 0;
+    // let brMode1up = this.querySelector('br-mode-1up');
+    // if( !brMode1up ) {
+    //   // this should be impossible, but just in case
+    //   this.br.left();
+    //   return;
+    // }
+    
+    // brMode1up.scrollTop = brMode1up.worldUnitsToVisiblePixels(brMode1up.pageTops[this.pageIndex]);
   }
 
   _nextPage() {
-    this.br.right();
+    // if( !this.onePage ) {
+      this.br.right();
+    //   return;
+    // }
+
+    // this.pageIndex = (this.pageIndex || 0) + 1;
+    // if( this.pageIndex > this.br.data.length - 1 ) this.pageIndex = this.br.data.length - 1;
+    // let brMode1up = this.querySelector('br-mode-1up');
+    // if( !brMode1up ) {
+    //   // this should be impossible, but just in case
+    //   this.br.right();
+    //   return;
+    // }
+
+    // brMode1up.scrollTop = brMode1up.worldUnitsToVisiblePixels(brMode1up.pageTops[this.pageIndex]);
   }
 
   _updateCurrentPageLabel() {
@@ -200,6 +221,8 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
     if( currentPageOverride ) currentPageOverride.innerHTML = currentPageTrimmed;
 
+    // console.log('emitting event for br-page-change, currentPage', parseInt(currentPageTrimmed.split(' ')[0]));
+
     // emit event to notify app-media-download which pages to download
     // (single page mode would be 1 file, two page mode would be the 2 files being viewed)
     this.dispatchEvent(new CustomEvent('br-page-change', {
@@ -208,12 +231,14 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
         currentPage: parseInt(currentPageTrimmed.split(' ')[0])
       },
     }));
+    // this.pageIndex = parseInt(currentPageTrimmed.split(' ')[0]) - 1;
   }
 
   _toggleBookView() {
     this.onePage = !this.onePage;
     this.br.switchMode(this.onePage ? 1 : 2);
     this._updateCurrentPageLabel(); // trigger ui change to media download
+    this.br.resize();
   }
 
   _zoomIn(e, amount = 1) {
@@ -229,6 +254,9 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     this.iaInitialized = true;
     let data = [];
 
+    let maxHeight = 0;
+    let maxWidth = 0;
+
     this.bookData.pages.forEach((bd) => {
       data.push([
         {
@@ -238,8 +266,17 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
           ocr: bd.ocr?.url
         },
       ]);
-    });
 
+      if( bd[bd.ocr?.imageSize]?.size?.width > maxWidth ) maxWidth = bd[bd.ocr?.imageSize]?.size?.width;
+      if( bd[bd.ocr?.imageSize]?.size?.height > maxHeight ) maxHeight = bd[bd.ocr?.imageSize]?.size?.height;
+    });
+    
+    // adjust viewport based on image dimensions
+    if( window.innerWidth < maxWidth ) {
+      let height = window.innerWidth / maxWidth * maxHeight + 15;
+      document.querySelector('#BookReader').style.height = height + 'px';
+    }
+    
     let options = {
       el: "#BookReader",
       data,
@@ -269,23 +306,48 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
       server: window.location.host,
       searchInsideUrl: "/api/page-search/ia",
 
-      // controls zoom levels
-      reductionFactors: [
-        { reduce: 3000, autofit: null },
-        { reduce: 3500, autofit: null },
-        { reduce: 4500, autofit: null },
-        { reduce: 5500, autofit: null },
-        { reduce: 7000, autofit: null },
-        { reduce: 8500, autofit: null },
-        { reduce: 10000, autofit: "auto" },
-      ],
+      getPageWidth: (index) => {
+        let containerWidth = document.querySelector('#BookReader').offsetWidth;
+        let containerHeight = document.querySelector('#BookReader').offsetHeight;
 
+        let imageWidth = data[index]?.[0]?.width;        
+        let imageHeight = data[index]?.[0]?.height;
+
+        let widthRatio = containerWidth / imageWidth;
+        let heightRatio = containerHeight / imageHeight;
+        
+        let scaleRatio = Math.min(widthRatio, heightRatio);
+        
+        let newWidth = Math.floor(imageWidth * scaleRatio);
+
+        return newWidth * this.viewportMultiplier;
+      },
+      getPageHeight: (index) => {
+        let containerWidth = document.querySelector('#BookReader').offsetWidth;
+        let containerHeight = document.querySelector('#BookReader').offsetHeight;
+
+        let imageWidth = data[index]?.[0]?.width;        
+        let imageHeight = data[index]?.[0]?.height;
+
+        let widthRatio = containerWidth / imageWidth;
+        let heightRatio = containerHeight / imageHeight;
+        
+        let scaleRatio = Math.min(widthRatio, heightRatio);
+        
+        let newHeight = Math.floor(imageHeight * scaleRatio);
+
+        return newHeight * this.viewportMultiplier;
+      },
+
+      padding: 20,
       ui: "full", // embed, full (responsive)
     };
-
+    if( this.attributes.brsinglepage ) this.onePage = true;
     this.br = new UcdBookReader(options);
-    
     this.br.init();
+    this.br.switchMode(this.onePage ? 1 : 2);
+    this.br.resize();
+    this.requestUpdate();
   }
 
   _onSearchResultsChange(e) {
