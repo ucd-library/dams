@@ -29,7 +29,7 @@ class AppConfig {
   }
 
   handleMessage(msg) {
-    let id = msg.getRootId();
+    let id = msg.getFinId();
 
     if (!id.match(this.ROOT_PATH)) return;
 
