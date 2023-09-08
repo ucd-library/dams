@@ -75,25 +75,9 @@ class AppFacetFilter extends Mixin(LitElement)
       }
     });
 
-    if( Object.keys(e.buckets).length > 50 ) {
-      this.shadowRoot.querySelector('#list').style.display = 'block';
-      let top = this.shadowRoot.querySelector('#list').scrollTop;
-
-      this.bucketsIronList = e.buckets;
-      this.buckets = [];
-      this.ironListActive = true;
-
-      // make sure we don't change scroll position
-      this.shadowRoot.querySelector('#list').scrollTop = top;
-      requestAnimationFrame(() => {
-        this.shadowRoot.querySelector('#list').scrollTop = top;
-      });
-    } else {
-      this.shadowRoot.querySelector('#list').style.display = 'none';
-      this.bucketsIronList = [];
-      this.buckets = e.buckets;
-      this.ironListActive = false;
-    }
+    this.bucketsIronList = [];
+    this.buckets = e.buckets;
+    this.ironListActive = false;
 
     if( this.buckets.length >= 15 ) {
       this.includeTypeahead = true;

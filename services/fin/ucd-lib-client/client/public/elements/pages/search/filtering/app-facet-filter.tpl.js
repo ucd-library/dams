@@ -138,26 +138,6 @@ export default function render() {
     @keyup="${this._onTypeaheadKeyup}" />
 </div>
 
-<!-- used for large lists -->
-<div id="list">
-  ${this.bucketsIronList.map((item, index) => html`
-    <div class="filter">
-      <app-normal-checkbox
-        type="${item.label}"
-        index="${index}"
-        value="${item.key}"
-        .label-map="${item.valueMap}"
-        ?checked="${item.active}" 
-        @change="${this._toggleFilter}"
-        ?disabled="${item.disabled}">
-      </app-normal-checkbox>
-
-      <div class="count ${item.doc_count > 0 ? 'has-count' : ''}">${item.doc_count}</div>
-    </div>
-  `)}
-</div>
-
-<!-- used for small lists -->
 <div class="overflow" ?no-overflow="${this.noOverflow}">
   <div>  
     ${this.buckets.map((item, index) => html`
