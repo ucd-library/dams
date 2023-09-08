@@ -64,7 +64,7 @@ return html`
   </div>
 
   <ucd-theme-pagination
-    ?hidden="${!this.showResults}"
+    ?hidden="${this.paginationTotal < 2}"
     current-page=${this.currentPage}
     max-pages=${this.paginationTotal}
     @page-change=${this._onPageClicked}>

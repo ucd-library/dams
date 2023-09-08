@@ -9,7 +9,7 @@ export default function render() {
       }
       .search-container {
         background-color: var(--super-light-background-color);
-        min-height: 60vh;
+        /* min-height: 60vh; */
         display: block;
       }
       .search-content {
