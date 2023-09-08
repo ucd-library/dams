@@ -77,6 +77,11 @@ export default function render() {
         border-top: 5px dotted var(--color-dams-secondary);
       }
 
+      .results.collection {
+        border-bottom: none;
+        border-top: none;
+      }
+
       .results > .table > * {
         display: flex;
         box-sizing: border-box;
@@ -140,9 +145,18 @@ export default function render() {
         padding: 2rem 2rem 0;
       }
 
-      /* .results-footer > * {
-        margin: 0 3rem;
-      } */
+      .header-dots,
+      .footer-dots {
+        display: none;
+      }
+
+      .header-dots.collection,
+      .footer-dots.collection {
+        display: block;
+        border-bottom: 5px dotted var(--color-dams-secondary); 
+        width: 650px;
+        margin: 0 auto;
+      }
 
       @media (max-width: 1310px) {
         .header,
@@ -167,6 +181,10 @@ export default function render() {
         h1 {
           font-size: 2rem;
           font-weight: 600;
+        }
+        .header-dots.collection,
+        .footer-dots.collection {
+          width: 500px;
         }
       }
 
@@ -196,6 +214,10 @@ export default function render() {
         /* .results-footer > * {
           margin: auto;
         } */
+        .header-dots.collection,
+        .footer-dots.collection {
+          width: 400px;
+        }
       }
     </style>
 
@@ -227,6 +249,7 @@ export default function render() {
           )}
         </div>
       </div>
+      <div class="header-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
     </div>
 
     <div class="body">
@@ -238,7 +261,7 @@ export default function render() {
         />
       </div>
 
-      <div class="results">
+      <div class="results ${this.isCollectionPage ? 'collection' : ''}">
         <div class="table" ?hidden="${this.isCollectionPage}">
           <h5>
             <div>${this.label}</div>
@@ -280,6 +303,7 @@ export default function render() {
     </div>
 
     <div class="results-footer">
+      <div class="footer-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
       <ucd-theme-pagination
         ?hidden="${this.totalPages < 2}"
         current-page=${this.currentPage}
