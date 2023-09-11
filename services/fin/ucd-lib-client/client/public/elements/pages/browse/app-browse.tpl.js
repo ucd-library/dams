@@ -86,7 +86,7 @@ export default function render() {
       }
 
       .header-icon {
-        width: 135px;
+        width: 6rem;
       }
     </style>
 
