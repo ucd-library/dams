@@ -124,7 +124,7 @@ return html`
 </style>
 
 <ucdlib-header site-name="Digital Collections">
-  <ucdlib-primary-nav>
+  <ucdlib-primary-nav hover-delay="200">
     <a href="/" class="home-link" mobile-only>Home</a>
     <ul link-text="Browse" href="/browse">
       <li><a href="/browse/collections">Collections</a></li>
