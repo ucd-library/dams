@@ -198,7 +198,6 @@ export default function render() {
           font-size: 0.9rem;
         }
         .sort > div:first-child {
-          flex: 0 0 100%;
           text-align: center;
         }
         .header {
@@ -217,6 +216,29 @@ export default function render() {
         .header-dots.collection,
         .footer-dots.collection {
           width: 400px;
+        }
+
+        .side-image {
+          display: none;
+        }
+        .body {
+          width: 90%;
+          margin: auto;
+        }
+        .results {
+          padding: 2rem 0;
+        }
+        .results h5, .results .list-item {
+          padding: 0;
+        }
+        .table-heading {
+          font-size: 1.2rem;
+        }
+      }
+
+      @media (max-width: 500px) {
+        .header-layout {
+          width: 90%;
         }
       }
     </style>
@@ -264,8 +286,8 @@ export default function render() {
       <div class="results ${this.isCollectionPage ? 'collection' : ''}">
         <div class="table" ?hidden="${this.isCollectionPage}">
           <h5>
-            <div>${this.label}</div>
-            <div>Items</div>
+            <div class="table-heading">${this.label}</div>
+            <div class="table-heading">Items</div>
           </h5>
 
           ${this.results.map(
@@ -308,7 +330,8 @@ export default function render() {
         ?hidden="${this.totalPages < 2}"
         current-page=${this.currentPage}
         max-pages=${this.totalPages}
-        @page-change=${this._onPageClicked}>
+        @page-change=${this._onPageClicked}
+        xs-screen>
       </ucd-theme-pagination>
     </div>
   `;

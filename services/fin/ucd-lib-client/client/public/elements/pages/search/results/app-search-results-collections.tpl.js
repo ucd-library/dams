@@ -67,6 +67,7 @@ return html`
     ?hidden="${this.paginationTotal < 2}"
     current-page=${this.currentPage}
     max-pages=${this.paginationTotal}
-    @page-change=${this._onPageClicked}>
+    @page-change=${this._onPageClicked}
+    xs-screen>
   </ucd-theme-pagination>
 `;}
