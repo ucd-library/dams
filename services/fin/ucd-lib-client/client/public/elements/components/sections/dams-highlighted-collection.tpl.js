@@ -67,7 +67,7 @@ return html`
   }
   .description {
     color: var(--color-p);
-    font-size: var(--fs-p);
+    /* font-size: var(--fs-p); */
     font-weight: var(--fw-p);
     margin-bottom: 40px;
   }

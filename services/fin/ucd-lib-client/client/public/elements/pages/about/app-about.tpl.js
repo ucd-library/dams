@@ -33,7 +33,7 @@ export default function render() {
 
       .text-container {
         margin: 0;
-        padding: 50px 10px 50px 10px;
+        padding: 0 10px 50px 10px;
       }
 
       h1, h4 {
