@@ -77,10 +77,7 @@ class AppCollection extends Mixin(LitElement)
 
     this.collectionId = e.location.fullpath;
 
-    const [displayData, recordData] = await Promise.all([
-      this._parseDisplayData(),
-      this.CollectionModel.get(e.location.fullpath)
-    ]);
+    const recordData = await this.CollectionModel.get(e.location.fullpath);
     this._onCollectionUpdate(recordData);
   }
 
@@ -106,6 +103,12 @@ class AppCollection extends Mixin(LitElement)
 
     if( !this.thumbnailUrlOverride ) {
       this.thumbnailUrl = e.vcData.images?.medium?.url || e.vcData.images?.original?.url || '';
+    }
+
+    if( !this.watercolor ) {
+      this.watercolor = 'rose';
+      this.watercolorBgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-back-white.jpg';
+      this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';  
     }
 
     this.callNumber = e.vcData.callNumber;
