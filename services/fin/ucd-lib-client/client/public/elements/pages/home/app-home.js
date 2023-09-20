@@ -4,6 +4,7 @@ import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "../../utils/app-collection-card";
 
+import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md';
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-iconset/ucdlib-iconset";
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-icons/ucdlib-icons';
