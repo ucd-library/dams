@@ -157,6 +157,12 @@ export default class AppMediaViewer extends Mixin(LitElement)
       this.singlePage = false;
     }
 
+    // single page images should use normal image viewer
+    if( mediaGroup['@shortType'].includes('ImageObject') ) {
+      renderAsBr = false;
+      mediaType = 'image';
+    }
+
     if (
       renderAsBr ||
       (!this.overrideImageList && mediaGroup.clientMedia && mediaGroup.clientMedia.pdf)
@@ -166,7 +172,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       let brData;
       if (renderAsBr && !mediaGroup.clientMedia?.pdf?.manifest) {
         this.bookData = utils.buildIaReaderPages(
-          mediaGroup.hasPart,
+          mediaGroup.hasPart || mediaGroup,
           e.selectedRecord?.clientMedia?.index
         );
       } else {

@@ -42,22 +42,22 @@ export default function render() {
       font-weight: 700;
     }
 
-    .title-section {
+    app-collection .title-section {
       display: flex;
       min-height: 42vw;
     }
 
-    .title-section > div {
+    app-collection .title-section > div {
       flex: 1;
       padding: 2rem;
       width: 50%;
     }
 
-    .collection-header {
+    app-collection .collection-header {
       margin: auto;
     }
 
-    .collection-header h1 {
+    app-collection .collection-header h1 {
       margin: 0.5rem 0;
     }
 
@@ -183,13 +183,13 @@ export default function render() {
 
     @media (max-width: 600px) {
       
-      .title-section {
+      app-collection .title-section {
         display: block;
         min-height: 90vh;
         overflow-y: -webkit-paged-x;
       }
 
-      .title-section > div {
+      app-collection .title-section > div {
         width: 80%;
         margin: auto;
         height: 30vh;
@@ -609,24 +609,24 @@ export default function render() {
             <span>Item ARK ID</span>
             <input class="item-1 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[0] ? '/item'+this.savedItems[0]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[0] ? this.savedItems[0]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-2 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[1] ? '/item'+this.savedItems[1]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[1] ? this.savedItems[1]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-3 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[2] ? '/item'+this.savedItems[2]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[2] ? this.savedItems[2]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
         </div>
       
@@ -635,32 +635,34 @@ export default function render() {
             <span>Item ARK ID</span>
             <input class="item-4 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[3] ? '/item'+this.savedItems[3]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[3] ? this.savedItems[3]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-5 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[4] ? '/item'+this.savedItems[4]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[4] ? this.savedItems[4]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-6 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[5] ? '/item'+this.savedItems[5]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[5] ? this.savedItems[5]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
         </div>
 
         <div class="default-display">
-          <h3>Default Display on Collection Item Pages</h3>
+          <h3>Display Settings for Collection Item Pages</h3>
 
           <div class="default-item-display">
-            <span class="label">Default Item Display</span>
+            <span class="label" style="display: block;">Default Display for Multipage Items</span>
+            <span style="font-style: italic; margin-bottom: 0.5rem; display: inline-block;">Single page items and multimedia are not affected by these settings.</span>
+            
             <fieldset class="radio default-item-display-fs">
               <div>
                 <ul class="list--reset" style="padding-inline-start: 0;">
@@ -706,7 +708,7 @@ export default function render() {
             </p>
             <fieldset style="border: none; padding-left: 0; padding-top: 0; margin-top: 0;">
               <ul class="list--reset" style="padding-inline-start: 0; width: 100%;">
-                <li style="width: 30%;">
+                <li style="width: 33%; padding-right: 0;">
                   <input id="checkbox-all" 
                     name="checkbox-all" 
                     type="checkbox" 
@@ -716,7 +718,7 @@ export default function render() {
 
                 <!-- items with exceptions set -->
                 ${this.itemEdits.map((item, index) => html`
-                  <li style="width: 33%;">
+                  <li style="width: 33%; padding-right: 0;">
                     
                     <input id="checkbox${index}" 
                       name="checkbox" 

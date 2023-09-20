@@ -194,6 +194,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         formats.push(format);
       }
     });
+
     this.shadowRoot.querySelector("#media-format-label").innerHTML = 'image' + ' (' + formats.join(', ') + ')';
   }
 
@@ -255,10 +256,11 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let formats = [];
     let mutlipart = false;
     this.sources.forEach((source) => {
-      if( formats.includes(source.label) ) {
+      let format = source.label || source.url.split('.').pop();
+      if( formats.includes(format) ) {
         mutlipart = true
-      } else if( !formats.includes(source.label) && source.label !== 'pdf') {
-        formats.push(source.label);
+      } else if( !formats.includes(format) && format !== 'pdf') {
+        formats.push(format);
       }
       
     });
@@ -276,8 +278,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
   _renderDownloadAllFormats() {
     let formats = [];
     this.sources.forEach((source) => {
-      if( !formats.includes(source.label)) {
-        formats.push(source.label);
+      let format = source.label || source.url.split('.').pop();
+      if( !formats.includes(format)) {
+        formats.push(format);
       }
     });
 
@@ -360,7 +363,10 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( this.brCurrentPage && !this.fullSetSelected ) {
       // bookreader and viewing single page, need to get 1/2 pages for zip
       sources = this.sources.filter(s => s.label !== 'pdf');
-      let image1 = sources[this.brCurrentPage - 1]?.url?.replace('/fcrepo/rest', '');
+      let image1;
+      if( this.brCurrentPage > 1 ) {
+        image1 = sources[this.brCurrentPage - 1]?.url?.replace('/fcrepo/rest', '');
+      }
       let image2 = sources[this.brCurrentPage]?.url?.replace('/fcrepo/rest', '');
       if( image1 ) urls.push(image1);
       if( image2 && this.isTwoPageView ) urls.push(image2);

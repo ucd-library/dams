@@ -62,7 +62,7 @@ export default function render() {
         line-height: 1.2;
       }
 
-      .title-section {
+      app-about .title-section {
         text-align: center;
         border-bottom: dotted 5px var(--default-secondary-color);
       }
