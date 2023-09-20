@@ -264,9 +264,12 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       }
       
     });
-
+    
     this.showDownloadLabel = true;
-    this.shadowRoot.querySelector("#media-format-label").innerHTML = 'image' + (mutlipart ? 's' : '') + ' (' + formats.join(', ') + ')';
+    let imageLabel = 'image';
+    if( mutlipart ) imageLabel += 's';
+    if( formats.length ) imageLabel += ' (' + formats.join(', ') + ')';
+    this.shadowRoot.querySelector("#media-format-label").innerHTML = imageLabel;
   }
 
   /**
@@ -298,6 +301,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.showDownloadLabel = false;
     } else {
       this.showDownloadLabel = true;
+    
       this.shadowRoot.querySelector("#media-format-label").innerHTML = formats.includes('pdf') ? 'pdf' : 'image (' + formats.join(', ') + ')';
       this.shadowRoot.querySelector("#media-all-format-label").innerHTML = formats.includes('pdf') ? 'pdf' : 'images (' + formats.join(', ') + ')';      
     }
