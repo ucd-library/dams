@@ -11,7 +11,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       record: { type: Object },
       media: { type: Object },
       loading: { type: Boolean },
-      height: { type: Number },
+      height: { type: String },
       hasMultipleImages: { type: Boolean },
     };
   }
@@ -25,7 +25,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     this.record = {};
     this.media = {};
     this.loading = false;
-    this.height = 600;
+    this.height = '600px';
     this.hasMultipleImages = false;
   }
 
@@ -47,8 +47,8 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     if( !e ) return;
     let {graph, clientMedia, selectedMedia, selectedMediaPage} = e;
 
-    let mediaType = utils.getMediaType(selectedMedia);
-    if (mediaType !== "ImageList" && mediaType !== "ImageObject") return;
+    this.mediaType = utils.getMediaType(selectedMedia);
+    if (this.mediaType !== "ImageList" && this.mediaType !== "ImageObject") return;
 
     this.loading = true;
 
@@ -73,6 +73,13 @@ export default class AppImageViewer extends Mixin(LitElement).with(
         // we might not have size
         let size = await this.getImageSize(this.media.original);
         srcset += `${this.media.original.url} ${size.width}w`;
+
+        // calculate height based on width of screen for single image items
+        if( this.mediaType === 'ImageObject' ) {
+          let maxHeight = 600;
+          let optimalImageHeight = (size.height / size.width * window.innerWidth);
+          this.height = optimalImageHeight > maxHeight ? maxHeight + 'px' : optimalImageHeight + 'px';     
+        }   
       }
 
       let sizes = "600px";

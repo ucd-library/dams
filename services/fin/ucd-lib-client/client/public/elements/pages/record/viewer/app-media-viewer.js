@@ -158,7 +158,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     // single page images should use normal image viewer
-    if( mediaGroup['@shortType'].includes('ImageObject') ) {
+    if( mediaGroup['@shortType'].includes('ImageObject') || mediaGroup.clientMedia?.pages?.length === 1 ) {
       renderAsBr = false;
       mediaType = 'image';
     }

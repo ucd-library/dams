@@ -108,8 +108,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.isMultimedia = this.downloadOptions[0]?.fileFormat?.includes('video');
 
     if( this.isMultimedia ) {
-      let format = this.downloadOptions[0].fileFormat;
-      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = (format.split('/')[0] + ' (' + format.split('/')[1] + ')').toLowerCase();
+      let download = this.downloadOptions[0];
+      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = download.fileFormatSimple + ' (' + bytes(download.fileSize).toLowerCase() + ')';
         this.showImageFormats = false;
     } else {
       // check if the only main source with pages is pdf,
@@ -254,21 +254,21 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _renderDownloadSingleFormat() {
     let formats = [];
-    let mutlipart = false;
     this.sources.forEach((source) => {
       let format = source.label || source.url.split('.').pop();
       if( formats.includes(format) ) {
-        mutlipart = true
       } else if( !formats.includes(format) && format !== 'pdf') {
         formats.push(format);
       }
       
     });
     
+    let fileSize = this.sources.find(s => s.url === this.href)?.fileSize;
     this.showDownloadLabel = true;
-    let imageLabel = 'image';
-    if( mutlipart ) imageLabel += 's';
-    if( formats.length ) imageLabel += ' (' + formats.join(', ') + ')';
+    let imageLabel = '';
+    if( formats.length ) imageLabel += formats.join(', ') + ' ';
+    if( fileSize ) imageLabel += '(' + bytes(fileSize).toLowerCase() + ')';
+
     this.shadowRoot.querySelector("#media-format-label").innerHTML = imageLabel;
   }
 
@@ -280,30 +280,44 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _renderDownloadAllFormats() {
     let formats = [];
+    let hasPdf = false;
     this.sources.forEach((source) => {
       let format = source.label || source.url.split('.').pop();
-      if( !formats.includes(format)) {
-        formats.push(format);
+      if( format === 'pdf' ) hasPdf = true;
+      let matchedFileType = formats.filter(f => f.format === format)[0];
+
+      if( matchedFileType ) {
+        // update fileSize
+        matchedFileType.fileSize += source.fileSize;
+      } else {
+        formats.push({
+          format,
+          fileSize : source.fileSize
+        });
       }
     });
 
-    if( formats.includes('pdf') && formats.length > 1 ) {
+    if( hasPdf && formats.length > 1 ) {
       // show dropdown to select pdf vs image
       this.showImageFormats = true;
       this.shadowRoot.querySelector("#format").innerHTML = '';
       
       formats.forEach((format) => {
         let option = document.createElement("option");
-        option.innerHTML = format;
-        option.value = format;
+        option.innerHTML = format.format + ' (' + bytes(format.fileSize).toLowerCase() + ')';
+        option.value = format.format;
         this.shadowRoot.querySelector("#format").appendChild(option);
       });
       this.showDownloadLabel = false;
     } else {
       this.showDownloadLabel = true;
     
-      this.shadowRoot.querySelector("#media-format-label").innerHTML = formats.includes('pdf') ? 'pdf' : 'image (' + formats.join(', ') + ')';
-      this.shadowRoot.querySelector("#media-all-format-label").innerHTML = formats.includes('pdf') ? 'pdf' : 'images (' + formats.join(', ') + ')';      
+      let imageLabel = '';
+      if( formats.length ) imageLabel += formats.map(f => f.format).join(', ') + ' ';
+      imageLabel += '(' + bytes(formats.reduce(((a, r) => a + r.fileSize), 0)).toLowerCase() + ')';
+      
+      this.shadowRoot.querySelector("#media-format-label").innerHTML = imageLabel;
+      this.shadowRoot.querySelector("#media-all-format-label").innerHTML = imageLabel;      
     }
   }
 
