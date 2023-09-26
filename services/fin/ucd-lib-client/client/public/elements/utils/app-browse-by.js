@@ -87,7 +87,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
     }
 
     this._updateSideImages();
-    // this._loadResults();
+    this._loadResults();
   }
 
   /**
@@ -140,10 +140,12 @@ export default class AppBrowseBy extends Mixin(LitElement)
    * @param {Object} e event object if called from _onAppStateUpdate
    */
   async _loadResults(e) {
+    this.resultsPerPage = this.isCollectionPage ? 15 : 30;
+
     if( this.totalResults === 0 ) {
       this.loading = true;
       if( this.isCollectionPage ) { 
-        this._searchBrowseByCollections();        
+        await this._searchBrowseByCollections();        
       } else {
         this.allResults = await this.BrowseByModel.getFacets(this.facetQueryName);
         this.totalResults = this.allResults.payload.length;
@@ -179,8 +181,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
    */
   _renderResults() {
     if( this.isCollectionPage ) {
-      // this._renderCollections();
-      this._updateSideImages();
+      this._renderCollections();
       return;
     }
 
@@ -202,6 +203,44 @@ export default class AppBrowseBy extends Mixin(LitElement)
     }
     
     this.results = this.allResults.payload.slice(
+      this.currentIndex, 
+      this.currentIndex + this.resultsPerPage 
+    );
+
+    this._updateSideImages();
+  }
+
+  /**
+   * @method _renderCollections
+   * @description render the results array of collections based on currentPage and sort
+   * params
+   */
+  _renderCollections() {
+    let sort = this.sortByOptions.find(item => item.selected);
+    
+    if( this.sortedAs !== sort.type ) {
+      if( sort.type === 'count' ) {
+        this.allResults.sort((a, b) => {
+          if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
+          if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
+          return 0;
+        });
+      } else {
+        // sort by title
+        this.allResults.sort((a, b) => {
+          if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
+          if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
+          return 0;   
+        });
+      }
+    }  
+
+    this.collectionResults = this.allResults.slice(
+      this.currentIndex, 
+      this.currentIndex + this.resultsPerPage 
+    );
+    
+    this.results = this.allResults.slice(
       this.currentIndex, 
       this.currentIndex + this.resultsPerPage 
     );

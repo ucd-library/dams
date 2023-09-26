@@ -20,11 +20,11 @@ return html`
 
     [hidden] { display: none !important; }
 
-    h4 {
+    h3 {
       color: var(--color-aggie-gold);
       font-weight: 700;
       margin: 0;
-      padding: 3rem 3rem 0.5rem 4rem;
+      padding: 3rem 3rem 0.5rem 4.5%;
     }
 
     .card-grid {
@@ -52,7 +52,7 @@ return html`
 
   <div class="collections" ?hidden="${!this.showResults}">
     <div>
-      <h4>Collections Relevant to Your Search (${this.resultsDisplayed.length})</h4>
+      <h3>Collections Relevant to Your Search (${this.resultsDisplayed.length})</h3>
       <div style="text-align:center" class="collections-content">
         <div class="card-grid">
           ${this.resultsDisplayed.map(res => html`
@@ -64,9 +64,10 @@ return html`
   </div>
 
   <ucd-theme-pagination
-    ?hidden="${!this.showResults}"
+    ?hidden="${this.paginationTotal < 2}"
     current-page=${this.currentPage}
     max-pages=${this.paginationTotal}
-    @page-change=${this._onPageClicked}>
+    @page-change=${this._onPageClicked}
+    xs-screen>
   </ucd-theme-pagination>
 `;}

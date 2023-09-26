@@ -118,7 +118,7 @@ export default function render() {
       }
       @media (max-width: 450px) {
         app-search-box {
-          width: 60%;
+          width: 90%;
           margin: 0 auto;
         }
       }

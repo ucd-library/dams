@@ -134,11 +134,12 @@ export default function render() {
 
       /* #downloadOptions, */
       #format {
-        min-height: 2.7rem;
+        min-height: 3rem;
         background-color: var(--color-aggie-blue-50);
         font-size: 0.9rem;
         font-weight: bold;
         padding: 0 1.5rem 0 1rem;
+        min-width: 35%;
       }
 
       /* #downloadOptions {
@@ -241,7 +242,7 @@ export default function render() {
       </div>
     </div>
 
-    <div class="display: flex;">
+    <div style="display: flex;">
       <span id="media-all-format-label"
         style="display: inline-block;"  
         ?hidden="${!this.fullSetSelected || !this.showDownloadLabel}">

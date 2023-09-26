@@ -826,9 +826,12 @@ ${
             ? html`
                 <div class="featured-group">
                   <div class="fg-header ${data.placement}">
-                    <!-- TODO style based on placement class -->
                     <h3 class="heading--primary">${data.heading}</h3>
-                    <div>${data.description}</div>
+                    <ucdlib-md id="md">
+                      <ucdlib-md-content>
+                        ${data.description}
+                      </ucdlib-md-content>
+                    </ucdlib-md>
                   </div>
                 </div>
               `

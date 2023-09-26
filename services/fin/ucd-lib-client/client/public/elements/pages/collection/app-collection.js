@@ -30,6 +30,8 @@ class AppCollection extends Mixin(LitElement)
       savedItems : { type : Array },
       dbsync : { type : Object },
       watercolor : { type : String },
+      watercolorBgUrl : { type : String },
+      watercolorFgUrl : { type : String },
       displayData : { type : Array },
       // isAdmin : { type : Boolean },
       isUiAdmin : { type : Boolean },
@@ -75,10 +77,7 @@ class AppCollection extends Mixin(LitElement)
 
     this.collectionId = e.location.fullpath;
 
-    const [displayData, recordData] = await Promise.all([
-      this._parseDisplayData(),
-      this.CollectionModel.get(e.location.fullpath)
-    ]);
+    const recordData = await this.CollectionModel.get(e.location.fullpath);
     this._onCollectionUpdate(recordData);
   }
 
@@ -92,6 +91,7 @@ class AppCollection extends Mixin(LitElement)
     if( e.state !== 'loaded' ) return;
     if( this.AppStateModel.location.page !== 'collection' ) return;
 
+    await this._parseDisplayData();
     let searchObj = this.RecordModel.emptySearchDocument();
     this.RecordModel.appendKeywordFilter(searchObj, '@graph.isPartOf.@id', e.vcData.id);
     this.collectionSearchHref = '/search/'+this.RecordModel.searchDocumentToUrl(searchObj);
@@ -101,7 +101,15 @@ class AppCollection extends Mixin(LitElement)
     this.description = e.vcData.description
     this.title = e.vcData.title;
 
-    this.thumbnailUrl = e.vcData.images?.medium?.url || e.vcData.images?.original?.url || '';
+    if( !this.thumbnailUrlOverride ) {
+      this.thumbnailUrl = e.vcData.images?.medium?.url || e.vcData.images?.original?.url || '';
+    }
+
+    if( !this.watercolor ) {
+      this.watercolor = 'rose';
+      this.watercolorBgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-back-white.jpg';
+      this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';  
+    }
 
     this.callNumber = e.vcData.callNumber;
     this.keywords = (e.vcData.keywords || [])
@@ -154,7 +162,9 @@ class AppCollection extends Mixin(LitElement)
     this.highlightedItems = [];
     this.savedItems = [];
     this.dbsync = {};
-    this.watercolor = 'rose';
+    this.watercolor = '';
+    this.watercolorBgUrl = '';
+    this.watercolorFgUrl = '';
     this.displayData = [];
     // this.isAdmin = user.hasRole('admin');
     this.isUiAdmin = user.canEditUi();
@@ -286,6 +296,9 @@ class AppCollection extends Mixin(LitElement)
   _onWatercolorChanged(e) {
     if( !this.isUiAdmin ) return;
     this.watercolor = e.target.classList[0];
+    this.watercolorBgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-back-white.jpg';
+    this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';
+
     this._updateDisplayData();
   }
 
@@ -338,7 +351,11 @@ class AppCollection extends Mixin(LitElement)
     let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
     if( watercolor ) {
       this.watercolor = watercolor['css'];
+    } else {
+      this.watercolor = 'rose';
     }
+    this.watercolorBgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-back-white.jpg';
+    this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';
 
     let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
     if( !graphRoot ) {

@@ -74,8 +74,10 @@ class SearchVcModel extends BaseModel {
             if (matchedImageList?.hasPart?.length) {
               imageCount = matchedImageList.hasPart.length;
             }
-            mediaType = imageCount + " pages, Image";
-            break;
+            if( imageCount > 0 ) {
+              mediaType = imageCount + ' page' + (imageCount > 1 ? 's' : '')  + ', Image';
+              break;
+            }
           } else {
             let matchedAssociatedMedia = result.clientMedia.graph.filter(
               (g) => g["@id"] === result.root.associatedMedia["@id"]

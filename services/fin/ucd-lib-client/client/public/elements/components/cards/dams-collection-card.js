@@ -39,7 +39,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     this.href = "";
     this.darkBg = false;
 
-    this._injectModel("CollectionModel");
+    this._injectModel("CollectionModel", "FcAppConfigModel");
   }
 
   async updated(props) {
@@ -50,11 +50,14 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     }
   }
 
-  _onCollectionUpdate(e) {
+  async _onCollectionUpdate(e) {
     if (e.state !== "loaded" || e.id !== this.id) return;
 
     this.collection = e.vcData;
-    if( this.collection.images ) {
+    let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.id, this.FcAppConfigModel);
+    if (overriddenFeatureImage) {
+      this.imgSrc = overriddenFeatureImage;
+    } else if( this.collection.images ) {
       let images = this.collection.images;
       this.imgSrc = images.medium ? images.medium.url : images.original.url;
     } else {

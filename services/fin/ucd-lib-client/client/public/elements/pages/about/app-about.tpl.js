@@ -33,7 +33,7 @@ export default function render() {
 
       .text-container {
         margin: 0;
-        padding: 50px 10px 50px 10px;
+        padding: 0 10px 50px 10px;
       }
 
       h1, h4 {
@@ -62,7 +62,7 @@ export default function render() {
         line-height: 1.2;
       }
 
-      .title-section {
+      app-about .title-section {
         text-align: center;
         border-bottom: dotted 5px var(--default-secondary-color);
       }

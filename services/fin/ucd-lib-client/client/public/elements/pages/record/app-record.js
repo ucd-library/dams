@@ -130,13 +130,19 @@ class AppRecord extends Mixin(LitElement)
     this._updateLinks(this.AppStateModel.location, record);
   }
 
-  _onCollectionUpdate(e) {
+  async _onCollectionUpdate(e) {
     if (e.state !== "loaded") return;
     this.collectionItemCount = e.vcData?.count || 0;
-    this.collectionImg = e.vcData?.images?.small?.url                   
-                      || e.vcData?.images?.medium?.url 
-                      || e.vcData?.images?.large?.url
-                      || e.vcData?.images?.original?.url;
+
+    let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.collectionId, this.FcAppConfigModel);
+    if (overriddenFeatureImage) {
+      this.collectionImg = overriddenFeatureImage;
+    } else {
+      this.collectionImg = e.vcData?.images?.small?.url                   
+      || e.vcData?.images?.medium?.url 
+      || e.vcData?.images?.large?.url
+      || e.vcData?.images?.original?.url;
+    }
   }
 
   /**

@@ -367,6 +367,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   }
 
   search(queryTerm) {
+    if( !this.br ) return;
     this.br.bookId = this.bookItemId;
     this.br.search(queryTerm);
   }

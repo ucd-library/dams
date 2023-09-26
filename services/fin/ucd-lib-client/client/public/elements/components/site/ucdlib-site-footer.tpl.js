@@ -132,6 +132,12 @@ export function styles() {
         /* margin: 0; */
         padding: 0;
       }
+      ucdlib-site-footer-column a {
+        padding-left: 0;
+      }
+      h2 {
+        margin-left: 0;
+      }
     }
   `;
 }

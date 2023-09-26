@@ -414,9 +414,11 @@ export default function render() {
     </div>
 
     <ucd-theme-pagination
+      ?hidden="${this.paginationTotal < 2}"
       current-page=${this.currentPage}
       max-pages=${this.paginationTotal}
-      @page-change=${this._onPaginationChange}>
+      @page-change=${this._onPaginationChange}
+      xs-screen>
     </ucd-theme-pagination>
 
     <div

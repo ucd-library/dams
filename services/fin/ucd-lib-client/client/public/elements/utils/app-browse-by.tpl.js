@@ -25,7 +25,6 @@ export default function render() {
         flex-direction: column;
         align-items: center;
         padding-bottom: 1.5rem;
-        border-bottom: 5px dotted var(--color-dams-secondary);
         margin: 0 3rem;
       }
 
@@ -72,7 +71,15 @@ export default function render() {
         width: 100%;
         box-sizing: border-box;
         flex: 2;
-        padding: 2rem 10rem 0;
+        padding: 2rem;
+        z-index: 10;
+        border-bottom: 5px dotted var(--color-dams-secondary);
+        border-top: 5px dotted var(--color-dams-secondary);
+      }
+
+      .results.collection {
+        border-bottom: none;
+        border-top: none;
       }
 
       .results > .table > * {
@@ -103,12 +110,6 @@ export default function render() {
         color: var(--color-aggie-blue);
       }
 
-      .dotted-line-break {
-        border-bottom: 5px dotted var(--color-dams-secondary);
-        padding-top: 2rem;
-        margin: 0 1rem;
-      }
-
       ucd-theme-pagination {
         justify-content: center;
         display: flex;
@@ -126,7 +127,7 @@ export default function render() {
       .right-image {
         width: 37.5vw;
         position: absolute;
-        right: -12.5vw;
+        right: -14.3vw;
         top: 0;
       }
 
@@ -144,18 +145,20 @@ export default function render() {
         padding: 2rem 2rem 0;
       }
 
-      /* .results-footer > * {
-        margin: 0 3rem;
-      } */
+      .header-dots,
+      .footer-dots {
+        display: none;
+      }
+
+      .header-dots.collection,
+      .footer-dots.collection {
+        display: block;
+        border-bottom: 5px dotted var(--color-dams-secondary); 
+        width: 650px;
+        margin: 0 auto;
+      }
 
       @media (max-width: 1310px) {
-        .results {
-          padding: 2rem 2rem 0;
-        }
-        /* .side-image .left-image,
-        .side-image .right-image {
-          display: none;
-        } */
         .header,
         .results-footer {
           width: 65%;
@@ -165,12 +168,6 @@ export default function render() {
         }
       }
       @media (max-width: 767px) {
-        /* .side-image {
-          display: none;
-        } */
-        .results {
-          padding: 2rem 5rem 0;
-        }
         .header,
         .results-footer {
           width: auto;
@@ -185,6 +182,10 @@ export default function render() {
           font-size: 2rem;
           font-weight: 600;
         }
+        .header-dots.collection,
+        .footer-dots.collection {
+          width: 500px;
+        }
       }
 
       @media (max-width: 767px) {
@@ -197,7 +198,6 @@ export default function render() {
           font-size: 0.9rem;
         }
         .sort > div:first-child {
-          flex: 0 0 100%;
           text-align: center;
         }
         .header {
@@ -207,15 +207,39 @@ export default function render() {
           margin: auto;
           width: 60%;
         }
-        .results {
-          padding: 2rem 1rem 0;
-        }
         .results-footer {
           padding: 2rem 1rem 0;
         }
         /* .results-footer > * {
           margin: auto;
         } */
+        .header-dots.collection,
+        .footer-dots.collection {
+          width: 400px;
+        }
+
+        .side-image {
+          display: none;
+        }
+        .body {
+          width: 90%;
+          margin: auto;
+        }
+        .results {
+          padding: 2rem 0;
+        }
+        .results h5, .results .list-item {
+          padding: 0;
+        }
+        .table-heading {
+          font-size: 1.2rem;
+        }
+      }
+
+      @media (max-width: 500px) {
+        .header-layout {
+          width: 90%;
+        }
       }
     </style>
 
@@ -247,6 +271,7 @@ export default function render() {
           )}
         </div>
       </div>
+      <div class="header-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
     </div>
 
     <div class="body">
@@ -258,11 +283,11 @@ export default function render() {
         />
       </div>
 
-      <div class="results">
+      <div class="results ${this.isCollectionPage ? 'collection' : ''}">
         <div class="table" ?hidden="${this.isCollectionPage}">
           <h5>
-            <div>${this.label}</div>
-            <div>Items</div>
+            <div class="table-heading">${this.label}</div>
+            <div class="table-heading">Items</div>
           </h5>
 
           ${this.results.map(
@@ -289,17 +314,6 @@ export default function render() {
             )}
           </div>
         </div>
-
-        <div class="results-footer">
-          <div class="dotted-line-break"></div>
-
-          <ucd-theme-pagination
-            current-page=${this.currentPage}
-            max-pages=${this.totalPages}
-            @page-change=${this._onPageClicked}
-          >
-          </ucd-theme-pagination>
-        </div>
       </div>
       <div class="side-image ${this.isCollectionPage ? "no-flex" : ""}">
         <img
@@ -308,6 +322,17 @@ export default function render() {
           src="${this.rightImgUrl}"
         />
       </div>
+    </div>
+
+    <div class="results-footer">
+      <div class="footer-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
+      <ucd-theme-pagination
+        ?hidden="${this.totalPages < 2}"
+        current-page=${this.currentPage}
+        max-pages=${this.totalPages}
+        @page-change=${this._onPageClicked}
+        xs-screen>
+      </ucd-theme-pagination>
     </div>
   `;
 }

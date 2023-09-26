@@ -58,8 +58,8 @@ export default function render() {
 
     <div class="spinner" ?hidden="${!this.loading}"></div>
 
-    <div class="layout" style="line-height: 0">
-      <img ?hidden="${this.loading}" id="img" />
+    <div class="layout" style="line-height: 0; height: ${this.height}">
+      <img ?hidden="${this.loading}" id="img" style="height: ${this.height}" />
     </div>
   `;
 }

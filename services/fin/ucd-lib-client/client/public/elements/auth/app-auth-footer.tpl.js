@@ -22,10 +22,19 @@ export default function render() {
     border-radius: 4px;
     color: var(--color-white);
   }
+  span.logged-in-as {
+    padding: var(--spacing-half);
+  }
+  @media (max-width: 768px) {
+    .gold,
+    span.logged-in-as {
+      padding-left: 0;
+    }
+  }
 </style>
 
 <div>
-  <span ?hidden="${!this.loggedIn}">Logged in as: ${this.user.preferred_username}</span>
+  <span class="logged-in-as" ?hidden="${!this.loggedIn}">Logged in as: ${this.user.preferred_username}</span>
   <a ?hidden="${this.loggedIn}" href="/auth/login?redirectUrl=${this.path}">Login</a>
   <div ?hidden="${!this.loggedIn}">
     <a @click="${this._logout}" class="gold">Log Out</a>
