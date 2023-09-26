@@ -50,7 +50,7 @@ return html`
 
   </style>
 
-  <div class="collections" ?hidden="${!this.showResults}">
+  <div class="collections collections-in-search" ?hidden="${!this.showResults}">
     <div>
       <h3>Collections Relevant to Your Search (${this.resultsDisplayed.length})</h3>
       <div style="text-align:center" class="collections-content">
