@@ -57,7 +57,7 @@ class AppCollection extends Mixin(LitElement)
 
   async firstUpdated() {
     this._onAppStateUpdate(await this.AppStateModel.get());
-    this._onCollectionUpdate(await this.CollectionModel.get(this.AppStateModel.location.pathname));
+    // this._onCollectionUpdate(await this.CollectionModel.get(this.AppStateModel.location.pathname));
   }
 
   /**
@@ -78,16 +78,16 @@ class AppCollection extends Mixin(LitElement)
     this.collectionId = e.location.fullpath;
 
     const recordData = await this.CollectionModel.get(e.location.fullpath);
-    this._onCollectionUpdate(recordData);
+    this.onCollectionUpdate(recordData);
   }
 
   /**
-   * @method _onCollectionUpdate
+   * @method onCollectionUpdate
    * @description fired when collection updates
    *
    * @param {Object} e
    */
-   async _onCollectionUpdate(e) {
+   async onCollectionUpdate(e) {
     if( e.state !== 'loaded' ) return;
     if( this.AppStateModel.location.page !== 'collection' ) return;
 
@@ -134,6 +134,9 @@ class AppCollection extends Mixin(LitElement)
   }
 
   async getLatestItems() {
+    if( this.loadingLatestItems || this.highlightedItems.length ) return;
+
+    this.loadingLatestItems = true;
     // default to most recent items by year published descending
     let highlightedItems = await this.RecordModel.getRecentItems(this.collectionId, this.itemCount);
     if( highlightedItems.response.ok && highlightedItems.body.results.length ) {
@@ -146,6 +149,7 @@ class AppCollection extends Mixin(LitElement)
         };
       });
     }
+    this.loadingLatestItems = false;
   }
 
   reset() {
@@ -181,22 +185,25 @@ class AppCollection extends Mixin(LitElement)
    *
    * @param {Object} e
    */
-  _onDefaultRecordSearchUpdate(e) {
-    if( e.state !== 'loaded' || this.highlightedItems.length ) return;
+  // _onDefaultRecordSearchUpdate(e) {
+  //   if( e.state !== 'loaded' || this.highlightedItems.length ) return;
 
-    if( e.payload && e.payload.results ) {
-      this.highlightedItems = e.payload.results.map((rg, index) => {
-        return {
-          '@id' : rg.root['@id'],
-          description : rg.root.name,
-          position : index+1,
-          image : '' // rg.root.image.url
-        };
-      })
-    }
+  //   if( e.payload && e.payload.results ) {
+  //     debugger;
 
-    this._updateDisplayData();
-  }
+  //     this.highlightedItems = e.payload.results.map((rg, index) => {
+  //       return {
+  //         '@id' : rg.root['@id'],
+  //         description : rg.root.name,
+  //         position : index+1,
+  //         image : '' // rg.root.image.url
+  //       };
+  //     });
+  //     console.log('this.highlightedItems in _onDefaultRecordSearchUpdate', this.highlightedItems);
+  //   }
+
+  //   this._updateDisplayData();
+  // }
 
   _onItemDisplayChange(e) {
     this.itemCount = parseInt(e.target.value);
@@ -242,7 +249,7 @@ class AppCollection extends Mixin(LitElement)
     itemInputs.forEach((input, index) => {
       if( input.value ) {
         newSavedItems.push({
-          '@id' : input.value,
+          '@id' : '/item'+input.value.trim(),
           position : index+1
         });
       }
@@ -322,10 +329,9 @@ class AppCollection extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
-    this.savedItems = [];
-
     let edits;
     try {
+      console.log('calling getCollectionEdits endpoint');
       edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
     } catch (error) {
       console.log('Error retrieving collection edits', error);
@@ -348,7 +354,7 @@ class AppCollection extends Mixin(LitElement)
 
     savedDisplayData = savedDisplayData.body['@graph'];
 
-    let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('/application/#') > -1)[0];
+    let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('#watercolor') > -1)[0];
     if( watercolor ) {
       this.watercolor = watercolor['css'];
     } else {
@@ -357,30 +363,34 @@ class AppCollection extends Mixin(LitElement)
     this.watercolorBgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-back-white.jpg';
     this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';
 
-    let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+    let graphRoot = savedDisplayData.filter(d => d['@id'] === '/application/ucd-lib-client' + this.collectionId)[0];
     if( !graphRoot ) {
       this.appDataLoaded = true;
       return;
     }
 
+    this.savedItems = [];
     // featured items
     let items = graphRoot['exampleOfWork'];
     if( items ) {
       if( !Array.isArray(items) ) items = [items];
-
       items.forEach((item, index) => {
+        let position = savedDisplayData.find(i => i['@id'] === item)?.['http://schema.org/position'];
         this.savedItems.push({
           '@id' : '/item' + item.split('/item')?.[1],
-          position : index+1
+          position : position || index+1
         });
       });
+      this.savedItems.sort((a, b) => a.position - b.position);
     }
+
     this.highlightedItems = [...this.savedItems];
     if( !this.savedItems.length ) this.getLatestItems();
 
     // featured image
-    if( graphRoot['thumbnailUrl']?.split('/fcrepo/rest')?.[1] ) {
-      this.thumbnailUrlOverride = '/fcrepo/rest'+ graphRoot['thumbnailUrl'].split('/fcrepo/rest')[1];
+    let featuredImage = graphRoot['contains']?.split('/fcrepo/rest')?.[1];
+    if( featuredImage ) {
+      this.thumbnailUrlOverride = '/fcrepo/rest'+ featuredImage;
     }
 
     // itemCount
