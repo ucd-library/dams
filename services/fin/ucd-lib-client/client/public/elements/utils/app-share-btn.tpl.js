@@ -150,7 +150,7 @@ export default function render() {
     background-color: #3b5998;
   }
   .circle.twitter {
-    background-color: #55acee;
+    background-color: black;
   }
   .circle.pinterest {
     background-color: #cb2027;
@@ -161,7 +161,7 @@ export default function render() {
   }
 </style>
 
-<div id="popup" ?hidden="${!this.visible}">
+<div id="popup" ?hidden="${!this.visible}" @click="${this._clickPopop}">
   <div class="layout">
       <div class="icon">
         <div class="circle copy"
@@ -182,9 +182,9 @@ export default function render() {
     <div class="icon">
         <div class="circle twitter" id="twitter"
           @click="${this._onSocialIconClick}">
-          <ucdlib-icon icon="ucdlib-dams:fa-twitter"></ucdlib-icon>
+          <ucdlib-icon icon="ucdlib-dams:fa-x-twitter"></ucdlib-icon>
         </div>
-      <span>Twitter</span>
+      <span>X (Twitter)</span>
     </div>
     <div class="icon">
       <div class="circle pinterest" id="pinterest"

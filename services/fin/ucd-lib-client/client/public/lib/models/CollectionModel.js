@@ -176,7 +176,7 @@ class CollectionModel extends BaseModel {
       if( !savedDisplayData ) return;
 
       savedDisplayData = savedDisplayData.body['@graph'];
-      let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
+      let graphRoot = savedDisplayData.filter(d => d['@id'] === '/application/ucd-lib-client' + id)[0];
       if( !graphRoot ) return;
 
       if( graphRoot['thumbnailUrl']?.split('/fcrepo/rest')?.[1] ) {

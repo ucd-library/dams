@@ -368,6 +368,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     let maxHeight = Math.max.apply(Math, colHeights);
     this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
     this.requestUpdate();
+    window.scrollTo(0, 0);
   }
 
   /**

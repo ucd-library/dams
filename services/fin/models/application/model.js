@@ -16,7 +16,8 @@ class ApplicationsModel extends FinEsDataModel {
     return false;
   }
 
-  update(jsonld) {
+  async update(jsonld, index) {
+    if( !index ) index = this.writeIndexAlias;
     delete jsonld['@context'];
 
     jsonld['@graph'] = jsonld['@graph']
@@ -39,7 +40,12 @@ class ApplicationsModel extends FinEsDataModel {
     });
 
     jsonld['@id'] = jsonld['@id'].replace(/\/fcr:metadata$/, '');
-
+    try {
+      await this.client.delete({
+        index,
+        id : jsonld['@id']
+      });
+    } catch(e) {}
     return super.update(jsonld);
   }
 

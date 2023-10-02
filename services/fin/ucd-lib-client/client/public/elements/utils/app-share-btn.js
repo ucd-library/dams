@@ -30,6 +30,19 @@ export default class AppShareBtn extends Mixin(LitElement)
   }
 
   /**
+   * @method _onAppStateUpdate
+   * @description bound to AppStateModel app-state-update event
+   * 
+   * @param {Object} e app-state-update event
+   * 
+  */
+  _onAppStateUpdate(e) {
+    if( e.location.page !== 'item' ) {
+      this.visible = false;
+    }
+  }
+
+  /**
    * @method _onShareSelected
    * @description bound to main icon, toggles popup when clicked
    * 
@@ -38,6 +51,10 @@ export default class AppShareBtn extends Mixin(LitElement)
   _onShareSelected(e) {
     this.visible = !this.visible;
     e.preventDefault();
+    e.stopPropagation();
+  }
+
+  _clickPopop(e) {
     e.stopPropagation();
   }
 
@@ -72,12 +89,21 @@ export default class AppShareBtn extends Mixin(LitElement)
 
     let url = BASE_SHARE_LINKS[id];
     let qso = {};
-    let name = (media.name || media.title || record.name || record.title);
-
+    let name = (media.name || media.title || record.name || record.title || record.graph.root.name);
+    
     if( id === 'pinterest' ) {  
-      let path = this.MediaModel.getImgPath(media)
+      let path;
+      let images = record.clientMedia?.mediaGroups?.[0]?.clientMedia?.images;
+      if( images?.originalMedia?.missing || !images?.originalMedia?.url ) {
+        path = images?.large?.url ||
+                images?.medium?.url ||
+                images?.small?.url;
+      } else {
+        path = images?.originalMedia?.url;
+      }
+
       if( path ) {
-        qso.media = window.location.protocol+'//'+window.location.host+this.MediaModel.getImgUrl(path);
+        qso.media = window.location.protocol+'//'+window.location.host+path;
       }
       qso.description = name;
       qso.url = window.location.href;

@@ -95,6 +95,15 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     let start = (this.currentPage - 1) * this.resultsPerPage;
     let end = start + this.resultsPerPage;
     this.resultsDisplayed = this.results.slice(start, end);
+
+    let collections = this.shadowRoot.querySelector(".collections-in-search");
+    if (collections) {
+      window.scrollTo({
+        top: window.scrollY + collections.getBoundingClientRect().y - 100,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
   }
 
   /**
