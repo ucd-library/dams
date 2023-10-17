@@ -14,7 +14,7 @@
     "@ucd-lib/cork-app-state": "^2.0.0",
     "@ucd-lib/cork-app-utils": "^5.1.1",
     "@ucd-lib/fin-service-utils": "file:../../../node-utils",
-    "@ucd-lib/theme-elements": "^1.2.6",
+    "@ucd-lib/theme-elements": "^1.2.7",
     "@ucd-lib/theme-sass": "^5.0.16",
     "bytes": "^3.0.0",
     "citeproc": "^2.1.200",
