@@ -79,13 +79,15 @@ class CollectionService extends BaseService {
     if( !opts.compact ) opts.compact = true;
 
     searchDocument.textFields = config.elasticSearch.textFields.collection;
+    searchDocument.limit = 1000;
+
     return this.request({
       url : this.baseUrl,
       qs : opts,
       json : true,
       fetchOptions : {
         method : 'POST',
-        body : JSON.searchDocument
+        body : searchDocument
       },
       onLoading : promise => this.store.setSearchLoading(searchDocument, promise),
       onLoad : result => {

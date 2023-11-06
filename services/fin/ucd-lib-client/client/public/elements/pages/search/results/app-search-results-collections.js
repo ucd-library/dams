@@ -33,14 +33,6 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this._injectModel('AppStateModel', 'FiltersModel', 'SearchVcModel');
   }
 
-  willUpdate(e) {
-    let pagination = this.shadowRoot.querySelector('ucd-theme-pagination');
-    if( pagination ) {
-      pagination.shadowRoot.querySelector('.pager__item--previous > a').style.backgroundColor = '';
-      pagination.shadowRoot.querySelector('.pager__item--next > a').style.backgroundColor = '';
-    }
-  }
-
   _onAppStateUpdate(e) {
     if( e.location.page !== 'search' ) return;
     this.filterDisplayResults();
@@ -104,6 +96,8 @@ class AppSearchResultsCollections extends Mixin(LitElement)
         behavior: "smooth",
       });
     }
+    
+    this.requestUpdate();
   }
 
   /**

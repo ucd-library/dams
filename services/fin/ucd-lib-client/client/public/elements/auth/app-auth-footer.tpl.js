@@ -16,6 +16,7 @@ export default function render() {
     display: block;
     padding: var(--spacing-half);
     text-decoration: underline;
+    padding-left: 0;
   }
   a:hover {
     background-color: var(--color-aggie-blue-80);
