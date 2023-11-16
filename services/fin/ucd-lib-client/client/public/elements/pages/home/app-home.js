@@ -35,7 +35,7 @@ import render from './app-home.tpl.js';
  * @prop {Object[]} recentCollections - Array of recently uploaded collections.
  * @prop {Boolean} showCollectionGroup - Displays the featured multi-collection section.
  * @prop {Object} textTrio - ApplicationTextContainer for the collection group.
- * @prop {Object} heroImgOptions - Data options for the hero image (src, collection name, etc)
+ * @prop {Array} heroImgOptions - Data options for the hero image (src, collection name, etc)
  * @prop {Object} heroImgCurrent - The currently displayed hero image.
  */
 class AppHome extends Mixin(LitElement)
@@ -48,8 +48,13 @@ class AppHome extends Mixin(LitElement)
       recentCollections: {type: Array},
       showCollectionGroup: {type: Boolean},
       textTrio: {type: Object},
-      heroImgOptions: {type: Object},
+      heroImgOptions: {type: Array},
       heroImgCurrent: {type: Object},
+      heroUrl: {type: String},
+      heroItemLabel: {type: String},
+      heroItemUrl: {type: String},
+      heroCollectionLabel: {type: String},
+      heroCollectionUrl: {type: String},
       editMode: {type: Boolean},
       displayData: {type: Array},
       isUiAdmin: {type: Boolean}
@@ -65,8 +70,13 @@ class AppHome extends Mixin(LitElement)
     this.showCollectionGroup = false;
     this.recentCollections = [];
     this.textTrio = {};
-    this.heroImgOptions = {};
+    this.heroImgOptions = [];
     this.heroImgCurrent = {};
+    this.heroUrl = '';
+    this.heroItemLabel = '';
+    this.heroItemUrl = '';
+    this.heroCollectionLabel = '';
+    this.heroCollectionUrl = '';
     this.displayData = [];
     this.editMode = false;
     this.isUiAdmin = false;
@@ -80,31 +90,26 @@ class AppHome extends Mixin(LitElement)
   async firstUpdated() {
     this.isUiAdmin = user.canEditUi();
 
-    let displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
-    if( displayData && displayData.body ) {
-      if( typeof displayData.body === 'string' ) displayData.body = JSON.parse(displayData.body);
-      this.displayData = displayData.body;
-    }
-
-    // filter out collections that don't exist in fcrepo
-    let cardsPanels = this.displayData.filter(d => d.type === 'cards');
-    cardsPanels.forEach(async panel => {
-      let collectionIds = [];
-
-      panel.collectionIds.forEach(collectionId => {
-        if( APP_CONFIG.collectionLabels[collectionId.selected] ) collectionIds.push(collectionId);
+    try {
+      let displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
+      if( displayData && displayData.body ) {
+        if( typeof displayData.body === 'string' ) displayData.body = JSON.parse(displayData.body);
+        this.displayData = displayData.body;
+      }
+  
+      // filter out collections that don't exist in fcrepo
+      let cardsPanels = this.displayData.filter(d => d.type === 'cards');
+      cardsPanels.forEach(async panel => {
+        let collectionIds = [];
+  
+        panel.collectionIds.forEach(collectionId => {
+          if( APP_CONFIG.collectionLabels[collectionId.selected] ) collectionIds.push(collectionId);
+        });
+        panel.collectionIds = collectionIds;
       });
-      panel.collectionIds = collectionIds;
-      
-      // if( panel.collectionIds.length < 3) {
-      //   let data = await this.CollectionModel.getRecentCollections(3 - panel.collectionIds.length + 1);
-      //   if( data.response.ok && data.body.results.length ) {
-      //     panel.collectionIds.push(data.body.results.map((r, index) => { 
-      //       return  { position: index, selected: r.root['@id'] };
-      //     }));
-      //   }
-      // }
-    });
+    } catch(e) {
+      console.warn('No featured collections admin data found', e);
+    }
 
     let data = await this.CollectionModel.getHomepageDefaultCollections();
     if( data.response.ok && data.body.results.length ) {
@@ -119,8 +124,21 @@ class AppHome extends Mixin(LitElement)
       this.recentCollections = data.body.results?.slice(0, 3);
     }
 
-    // Get hero image options
-    this.heroImgOptions = this.FcAppConfigModel.getHomepageHeroOptions();
+    // Get random hero image options
+    let featuredImages = await this.FcAppConfigModel.getDefaultImagesConfig();
+    this.heroImgOptions = featuredImages?.body?.featuredImages;
+
+    let i = Math.floor(Math.random() *  this.heroImgOptions.length);
+    let src = this.heroImgOptions[i];
+
+    this.heroUrl = src.imageUrl;
+    this.heroItemLabel = src.itemName;
+    this.heroItemUrl = src.itemLink;
+    this.heroCollectionLabel = src.collectionName;
+    this.heroCollectionUrl = src.collectionLink;
+
+    if( this.heroItemLabel.length > 75 ) this.heroItemLabel = this.heroItemLabel.substring(0, 75) + '...';
+    if( this.heroCollectionLabel.length > 75 ) this.heroCollectionLabel = this.heroCollectionLabel.substring(0, 75) + '...';
 
     this.requestUpdate();
   }
@@ -131,10 +149,9 @@ class AppHome extends Mixin(LitElement)
    * @param {CustomEvent} e 
    */
   _onHeroChange(e) {
-    let img = e.target._selectedSrc;
-    if ( !img ) return;
-    this.heroImgCurrent = this.heroImgOptions[img];
-
+    let imageUrl = e.target._selectedSrc;
+    if ( !imageUrl ) return;
+    this.heroImgCurrent = this.heroImgOptions.filter(i => i.imageUrl === imageUrl)[0];
   }
 
   /**

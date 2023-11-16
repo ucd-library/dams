@@ -150,6 +150,9 @@ export default function render() {
     color:white;
     text-decoration: underline;
   }
+  .hero-main .sub-search a:hover {
+    text-decoration: none;
+  }
   #watercolor{
     background-color:transparent;
     height: 8rem;
@@ -228,6 +231,7 @@ export default function render() {
     align-items: center;
     margin-bottom: 4rem;
     margin-top: 20px;
+    padding: 0 5%;
   }
   .hero-top-left img {
     height: 1.58rem;
@@ -274,7 +278,8 @@ export default function render() {
   }
   .hero-main .sub-search {
     color: var(--color-white);
-    font-weight: var(--fw-extrabold);
+    font-weight: bold;
+    font-style: italic;
     font-size: .875rem;
     margin-bottom: 2rem;
   }
@@ -405,6 +410,10 @@ export default function render() {
   .fg-header.split {}
   .fg-header.split h3 {}
   .fg-header.split div {}
+
+  .featured-collections-public {
+    padding: 0 5%;
+  }
 
   .featured-collections-public .featured-more {
     display: flex;
@@ -589,7 +598,7 @@ export default function render() {
   }
 
   admin-featured-collections {
-    padding: 4rem 0;
+    padding: 4rem 5%;
   }
 
   @media (min-width: 1060px) {
@@ -639,9 +648,19 @@ export default function render() {
     }
   }
 
+  .hero-main.site-frame,
+  .recent.site-frame {
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .hero-top-right a {
+    text-decoration: none;
+  }
+
 </style>
 
-<dams-hero .srcOptions="${Object.keys(this.heroImgOptions)}" @src-change="${
+<dams-hero .srcOptions="${this.heroImgOptions}" selected-src-url="${this.heroUrl}" @src-change="${
     this._onHeroChange
   }">
   <div class="hero-content">
@@ -650,7 +669,6 @@ export default function render() {
       <ucd-theme-primary-nav>
         <a href=/browse>Browse</a>
         <a href="/about">About</a>
-        <!-- <a href="#">FAQ</a> -->
       </ucd-theme-primary-nav>
     </ucd-theme-header>
 
@@ -660,8 +678,6 @@ export default function render() {
         <a href="/browse">Browse</a>
         <span class="dot"></span>
         <a href="/about">About</a>
-        <!-- <span class="dot"></span> -->
-        <!-- <a href="#">FAQ</a> -->
       </div>
     </div>
 
@@ -675,7 +691,7 @@ export default function render() {
         <iron-icon icon="fin-icons:search" class="search-icon" slot="button-content"></iron-icon>
       </app-search-box>
       <div class="sub-search">
-        Featured Image: |
+        Featured Image: <a href="${this.heroItemUrl}">${this.heroItemLabel}</a> | <a href="${this.heroCollectionUrl}">${this.heroCollectionLabel}</a>
       </div>
     </div>
   </div>

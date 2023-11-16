@@ -121,7 +121,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
       if( !imageList && pdf ) {
         this.showDownloadLabel = true;
-        this._noSinglePageDownload();
+        // this._noSinglePageDownload();
+        this._renderDownloadSingleFormat();
         return;
       }
     }
@@ -156,11 +157,14 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     if( onePageMode ) {
       // set download href to single page
-      this.href = pages[currentPage - 1]?.download?.url;  
+      let href = pages[currentPage - 1]?.download?.url;  
       this.isTwoPageView = false;
-      if( !this.href ) {
+      if( !href ) {
         // no download besides pdf for selected page, show all files download with options
-        this._noSinglePageDownload();
+        // this._noSinglePageDownload();
+        this._renderDownloadSingleFormat();
+      } else {
+        this.href = href;
       }
     } else {
       this.isTwoPageView = true;      
@@ -175,7 +179,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         this._setZipPaths(urls);
       } else {
         // no download besides pdf for selected page, show all files download with options
-        this._noSinglePageDownload();
+        // this._noSinglePageDownload();
+        this._renderDownloadSingleFormat();
       }
     }
   }
@@ -254,18 +259,24 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _renderDownloadSingleFormat() {
     let formats = [];
+    let singlePdf = false;
     this.sources.forEach((source) => {
       let format = source.label || source.url.split('.').pop();
-      if( formats.includes(format) ) {
-      } else if( !formats.includes(format) && format !== 'pdf') {
+      // if( formats.includes(format) ) {
+      // } else 
+      if( !formats.includes(format) && format !== 'pdf') {
         formats.push(format);
       }
-      
+      if( format === 'pdf' ) {
+        singlePdf = true;
+      }
     });
-    
+
+    if( singlePdf && formats.length > 0 ) singlePdf = false; 
+
     let fileSize = this.sources.find(s => s.url === this.href)?.fileSize;
     this.showDownloadLabel = true;
-    let imageLabel = '';
+    let imageLabel = singlePdf ? 'pdf ' : '';
     if( formats.length ) imageLabel += formats.join(', ') + ' ';
     if( fileSize ) imageLabel += '(' + bytes(fileSize).toLowerCase() + ')';
 
@@ -369,7 +380,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       : false;
     
     let selectedFormat = this.shadowRoot.querySelector("#format").value;
-    let sources = this.sources.filter(s => s.label === selectedFormat);
+    let sources = this.sources.filter(s => s.label === selectedFormat || !selectedFormat);
     let urls = [];
 
     if( this.fullSetSelected ) {

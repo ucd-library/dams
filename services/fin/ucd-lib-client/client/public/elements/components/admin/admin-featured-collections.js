@@ -32,23 +32,28 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
    * @description Lit lifecycle method called when element is first updated
    */
   async firstUpdated() {
-    // get any saved featured collections
-    let displayData =
-      APP_CONFIG.fcAppConfig[
-        "/application/ucd-lib-client/featured-collections/config.json"
-      ];
-    if (displayData && displayData.body && Array.isArray(displayData.body) ) {
-      this.panels = displayData.body;
-    }
-    if (!displayData) {
-      displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
-      if (displayData && displayData.body) {
-        if( typeof displayData.body === 'string' ) {
-          displayData.body = JSON.parse(displayData.body);
-        }
+    try {
+      // get any saved featured collections
+      let displayData =
+        APP_CONFIG.fcAppConfig[
+          "/application/ucd-lib-client/featured-collections/config.json"
+        ];
+      if (displayData && displayData.body && Array.isArray(displayData.body) ) {
         this.panels = displayData.body;
       }
+      if (!displayData) {
+        displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
+        if (displayData && displayData.body) {
+          if( typeof displayData.body === 'string' ) {
+            displayData.body = JSON.parse(displayData.body);
+          }
+          this.panels = displayData.body;
+        }
+      }
+    } catch (e) {
+      console.warn('No featured collections admin data found', e);
     }
+
   }
 
   /**

@@ -23,9 +23,6 @@ export default function render() {
     border-radius: 4px;
     color: var(--color-white);
   }
-  span.logged-in-as {
-    padding: var(--spacing-half);
-  }
   @media (max-width: 768px) {
     .gold,
     span.logged-in-as {
