@@ -83,13 +83,13 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this.results = [...this.results.filter(r => collectionIds.includes(r['@id']))];
   }
 
-  _updateResultsDisplayed() {
+  _updateResultsDisplayed(scrollTo=false) {
     let start = (this.currentPage - 1) * this.resultsPerPage;
     let end = start + this.resultsPerPage;
     this.resultsDisplayed = this.results.slice(start, end);
 
     let collections = this.shadowRoot.querySelector(".collections-in-search");
-    if (collections) {
+    if (collections && scrollTo) {
       window.scrollTo({
         top: window.scrollY + collections.getBoundingClientRect().y - 100,
         left: 0,
@@ -119,7 +119,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
    */
   _onPageClicked(e) {
     this.currentPage = e.detail.page;
-    this._updateResultsDisplayed();
+    this._updateResultsDisplayed(true);
   }
 }
 

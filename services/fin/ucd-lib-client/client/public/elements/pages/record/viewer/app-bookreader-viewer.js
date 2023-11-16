@@ -79,6 +79,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     if (e.location.page !== 'item') {
       this.bookData = {};
       this.iaInitialized = false;
+      this.onePage = false;
 
       this.dispatchEvent(new CustomEvent('br-cancel-search', {
         detail: {
@@ -272,8 +273,9 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     });
     
     // adjust viewport based on image dimensions
+    let pad = window.screen.width > 800 ? 25 : 55;
     if( window.innerWidth < maxWidth ) {
-      let height = window.innerWidth / maxWidth * maxHeight + 15;
+      let height = window.innerWidth / maxWidth * maxHeight + pad;
       document.querySelector('#BookReader').style.height = height + 'px';
     }
     
@@ -381,6 +383,11 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
   onSearchPrevNext(matchIndex) {
     this.br._searchPluginGoToResult(matchIndex, false);
+  }
+
+  destroy() {
+    let br = this.querySelector('#BookReader');
+    if( br ) br.innerHTML = '';
   }
 }
 

@@ -83,7 +83,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
   }
 
   async _onAppStateUpdate(e) {
-    this._onRenderMedia(e);
+    if( this.AppStateModel.location.page === 'item' ) this._onRenderMedia(e);
+    if( this.AppStateModel.location.page !== 'item' ) this._clearMedia();
     // if( this.AppStateModel.location.page !== 'item' ) this._onSearchResultsEmpty();
   }
 
@@ -200,6 +201,14 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     this.mediaType = mediaType;
+  }
+
+  _clearMedia() {
+    let imageViewer = this.querySelector("app-image-viewer");
+    let bookreaderViewer = this.querySelector("app-bookreader-viewer");    
+
+    if( imageViewer ) imageViewer.destroy();
+    if( bookreaderViewer ) bookreaderViewer.destroy();
   }
 
   _onSearchResultsChange(e) {

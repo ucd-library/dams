@@ -108,6 +108,10 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       };
     });
   }
+
+  destroy() {
+    this.shadowRoot.querySelector("#img").srcset = '';
+  }
 }
 
 customElements.define("app-image-viewer", AppImageViewer);
