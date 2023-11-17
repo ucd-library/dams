@@ -18,11 +18,6 @@ export default function render() {
     text-decoration: underline;
     padding-left: 0;
   }
-  a:hover {
-    background-color: var(--color-aggie-blue-80);
-    border-radius: 4px;
-    color: var(--color-white);
-  }
   @media (max-width: 768px) {
     .gold,
     span.logged-in-as {
