@@ -48,11 +48,15 @@ return html`
       }
     }
 
+    .collections-in-search {
+      padding-bottom: 35px;
+    }
+
   </style>
 
-  <div class="collections" ?hidden="${!this.showResults}">
+  <div class="collections collections-in-search" ?hidden="${!this.showResults}">
     <div>
-      <h3>Collections Relevant to Your Search (${this.resultsDisplayed.length})</h3>
+      <h3>Collections Relevant to Your Search (${this.results.length})</h3>
       <div style="text-align:center" class="collections-content">
         <div class="card-grid">
           ${this.resultsDisplayed.map(res => html`
@@ -61,13 +65,15 @@ return html`
         </div>  
       </div>
     </div>
+    <ucd-theme-pagination
+      ?hidden="${this.paginationTotal < 2}"
+      current-page=${this.currentPage}
+      max-pages=${this.paginationTotal}
+      @page-change=${this._onPageClicked}
+      xs-screen
+      darkmode>
+    </ucd-theme-pagination>
   </div>
 
-  <ucd-theme-pagination
-    ?hidden="${this.paginationTotal < 2}"
-    current-page=${this.currentPage}
-    max-pages=${this.paginationTotal}
-    @page-change=${this._onPageClicked}
-    xs-screen>
-  </ucd-theme-pagination>
+  
 `;}

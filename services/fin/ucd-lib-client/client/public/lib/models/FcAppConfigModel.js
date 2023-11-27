@@ -214,7 +214,7 @@ class FcAppConfigModel extends BaseModel {
       "@id" : '',
       "watercolors" : [
         {
-          "@id" : `info:fedora/application/#${watercolor}`,
+          "@id" : `info:fedora/application/ucd-lib-client${id}#watercolor`,
           "css" : watercolor,
           "foreground" : "",
           "background" : ""

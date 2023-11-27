@@ -33,14 +33,6 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this._injectModel('AppStateModel', 'FiltersModel', 'SearchVcModel');
   }
 
-  willUpdate(e) {
-    let pagination = this.shadowRoot.querySelector('ucd-theme-pagination');
-    if( pagination ) {
-      pagination.shadowRoot.querySelector('.pager__item--previous > a').style.backgroundColor = '';
-      pagination.shadowRoot.querySelector('.pager__item--next > a').style.backgroundColor = '';
-    }
-  }
-
   _onAppStateUpdate(e) {
     if( e.location.page !== 'search' ) return;
     this.filterDisplayResults();
@@ -95,6 +87,17 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     let start = (this.currentPage - 1) * this.resultsPerPage;
     let end = start + this.resultsPerPage;
     this.resultsDisplayed = this.results.slice(start, end);
+
+    let collections = this.shadowRoot.querySelector(".collections-in-search");
+    if (collections) {
+      window.scrollTo({
+        top: window.scrollY + collections.getBoundingClientRect().y - 100,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
+    
+    this.requestUpdate();
   }
 
   /**

@@ -90,6 +90,13 @@ class AppRecord extends Mixin(LitElement)
       "SeoModel",
       "FcAppConfigModel"
     );
+
+    window.addEventListener('click', () => this._onPageClick());
+  }
+
+  _onPageClick(e) {
+    let appShareBtn = this.querySelector('app-media-viewer-nav')?.shadowRoot?.querySelector('app-share-btn');
+    if( appShareBtn ) appShareBtn.visible = false;
   }
 
   async firstUpdated() {
@@ -341,6 +348,7 @@ class AppRecord extends Mixin(LitElement)
       savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
       if( savedDisplayData ) {
         this.savedCollectionData = savedDisplayData;
+        // let graphRoot = this.savedCollectionData.filter(d => d['@id'] === '/application/ucd-lib-client' + this.collectionId)[0];
         let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
         this.itemDefaultDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
       }
@@ -352,6 +360,7 @@ class AppRecord extends Mixin(LitElement)
       savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
 
       if( savedDisplayData ) {
+        // let graphRoot = savedDisplayData.filter(d => d['@id'] === '/application/ucd-lib-client' + this.collectionId)[0];
         let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
         this.itemDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || '';  
       }

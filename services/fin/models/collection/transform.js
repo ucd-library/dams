@@ -1,3 +1,4 @@
+const {config} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 
 const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
@@ -192,6 +193,8 @@ module.exports = async function(path, graph, headers, utils) {
       item._.graphId = item['@id'];
     }
 
+    item.clientMedia ||= {};
+
     // check for completed ia reader workflow
     if( headers.link.workflow ) {
       let pdfImageProducts = headers.link.workflow.find(item => PDF_IMAGE_PRODUCTS === item.type);
@@ -252,4 +255,14 @@ module.exports = async function(path, graph, headers, utils) {
   }
 
   return graph;
+}
+
+function getGatewayUrl(url='') {
+  if( url.startsWith('http') ) {
+    url = new URL(url);
+    return config.gateway.host+url.pathname+url.search;
+  } else if( url.startsWith('/fcrepo/rest') ) {
+    return config.gateway.host+url;
+  }
+  return config.gateway.host+'/fcrepo/rest'+url;
 }
