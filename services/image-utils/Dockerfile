@@ -3,7 +3,7 @@ FROM ${FIN_SERVER_IMAGE} as fin-server
 FROM tesseractshadow/tesseract4re:latest
 
 RUN apt-get update && apt-get install -y curl imagemagick zip unzip \
-    poppler-utils wget xz-utils
+    poppler-utils wget xz-utils gcc g++ make
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get update && apt-get install -y nodejs
 COPY policy.xml /etc/ImageMagick-6/policy.xml
