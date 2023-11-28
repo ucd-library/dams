@@ -117,7 +117,7 @@ export default function render() {
       }
 
       .downloadBtn {
-        padding: 0.75rem 0;
+        padding: 13px 0;
         font-size: 0.9rem;
         min-width: 6rem;
         text-transform: none;
@@ -132,21 +132,13 @@ export default function render() {
         width: 115px;
       }
 
-      /* #downloadOptions, */
       #format {
-        min-height: 3rem;
+        height: 50px;
         background-color: var(--color-aggie-blue-50);
         font-size: 0.9rem;
         font-weight: bold;
         padding: 0 1.5rem 0 1rem;
         min-width: 35%;
-      }
-
-      /* #downloadOptions {
-        max-width: 10rem;
-      } */
-
-      #format {
         max-width: 6rem;
       }
 
@@ -156,7 +148,7 @@ export default function render() {
         font-size: 0.9rem;
         margin-right: 0.75rem;
         font-weight: bold;
-        padding: 0.55rem 1rem;
+        padding: 11px 1rem;
         border: solid 2px var(--color-aggie-blue-50);
       }
 

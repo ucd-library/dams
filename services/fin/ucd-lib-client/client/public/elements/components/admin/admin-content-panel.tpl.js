@@ -294,7 +294,7 @@ export default function render() {
             class="heading-text"
             type="text"
             .value=${this.heading}
-            style="width: -webkit-fill-available;";
+            style="width: -webkit-fill-available; font-size: 0.9rem;";
             @change="${(e) => (this.heading = e.currentTarget.value)}"
           />
         </div>
