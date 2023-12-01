@@ -15,6 +15,7 @@ config.ocr = {
     deskew : '40%',
     // trim : '+repage',
     filter : 'catrom',
+    layers : 'flatten',
     // 'sigmoidal-contrast' : '10,50%',
     quality : 100,
     resize : (IA_BOOK_SIZE*OCR_TO_IA_BOOK_SCALE)+'x',
@@ -40,7 +41,8 @@ config.imageSizes = {
       imageMagick : {
         resize : Math.floor(IA_BOOK_SIZE/4)+'x',
         quality : 90,
-        alpha : config.ocr.imageMagick.alpha
+        alpha : config.ocr.imageMagick.alpha,
+        layers : 'flatten'
       }
     },
     medium : {
@@ -48,7 +50,8 @@ config.imageSizes = {
       imageMagick : {
         resize : Math.floor(IA_BOOK_SIZE/2)+'x',
         quality : 90,
-        alpha : config.ocr.imageMagick.alpha
+        alpha : config.ocr.imageMagick.alpha,
+        layers : 'flatten'
       }
     },
     large : {
@@ -60,6 +63,7 @@ config.imageSizes = {
         fill : config.ocr.imageMagick.fill,
         alpha : config.ocr.imageMagick.alpha,
         quality : 90,
+        layers : 'flatten'
       }
     },
     tiled : {
@@ -71,7 +75,8 @@ config.imageSizes = {
         compress : 'JPEG',
         alpha : 'remove',
         resize : '3072x',
-        quality : 90
+        quality : 90,
+        layers : 'flatten'
       }
     }
   }
