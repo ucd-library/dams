@@ -45,7 +45,7 @@ main:
                                             command: "node"
                                             args: ${["cli/process-image.js", args.finWorkflowId]}
                                             # imagePullPolicy: "Always"
-                                      timeoutSeconds: 600
+                                      timeoutSeconds: 3600
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - process_image:
@@ -53,6 +53,8 @@ main:
           args:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
               location: ${location}
+              connector_params:
+                timeout: 7200
           result: job_execution
       - check_job_status:
           switch:
