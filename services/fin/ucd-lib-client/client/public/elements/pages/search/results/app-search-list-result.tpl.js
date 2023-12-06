@@ -120,7 +120,7 @@ export default function render() {
 
           <div class="collection-details">
             <p><span class="label">Collection:</span> ${this.collection}</p>
-            <p><span class="label">Creator:</span> ${this.creator}</p>
+            <p ?hidden="${!this.creator}"><span class="label">Creator:</span> ${this.creator}</p>
             <p><span class="label">Date:</span> ${this.date}</p>
             <p><span class="label">Format:</span> ${this.format}</p>
           </div>

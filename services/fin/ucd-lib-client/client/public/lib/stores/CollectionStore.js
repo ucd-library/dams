@@ -52,6 +52,9 @@ class CollectionStore extends BaseStore {
   }
 
   _setSearchState(state) {
+    if( state.state === this.STATE.LOADED ) {
+      vcModel.renderCollections(state);
+    }
     this.data.search = state;
     this.emit(this.events.COLLECTION_SEARCH_UPDATE, this.data.search);
   }

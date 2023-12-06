@@ -65,6 +65,7 @@ class AppRecord extends Mixin(LitElement)
     this.callNumber = "";
     this.collectionImg = "";
     this.collectionId = "";
+    this.renderedCollectionId = "";
 
     this.size = "";
     this.rights = {};
@@ -118,7 +119,7 @@ class AppRecord extends Mixin(LitElement)
     if (e.state !== "loaded") return;
 
     let record = e.vcData;
-    if( !record ) return;
+    if( !record || this.renderedRecordId === record['@id'] ) return;
 
     this.renderedRecordId = record["@id"];
     this.record = record;
@@ -138,8 +139,11 @@ class AppRecord extends Mixin(LitElement)
   }
 
   async _onCollectionUpdate(e) {
-    if (e.state !== "loaded") return;
+    if( e.state !== "loaded" || e.id === this.renderedCollectionId ) return;
+
     this.collectionItemCount = e.vcData?.count || 0;
+    this.renderedCollectionId = e.id;
+    this.collectionId = e.id;
 
     let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.collectionId, this.FcAppConfigModel);
     if (overriddenFeatureImage) {
@@ -158,9 +162,12 @@ class AppRecord extends Mixin(LitElement)
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) return;
 
-    this._updateLinks(e.location);
     if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
+
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+
+    this._updateLinks(e.location);
+    
     await this._parseDisplayData();
   }
 

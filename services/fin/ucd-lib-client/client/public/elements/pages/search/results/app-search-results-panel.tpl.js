@@ -243,9 +243,6 @@ export default function render() {
       @media (max-width: 1023px) {
         .masonry .item {
           width: 38% !important;
-          position: initial !important;
-          margin: auto;
-          padding-bottom: 3rem;
         }
       }
 

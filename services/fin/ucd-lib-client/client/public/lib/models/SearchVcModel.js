@@ -89,6 +89,7 @@ class SearchVcModel extends BaseModel {
         }
       }
       if (mediaType) mediaType = mediaType.replace("Object", "");
+
       matchedItems.push({
         id: result.root["@id"],
         collectionId,
@@ -97,7 +98,7 @@ class SearchVcModel extends BaseModel {
         mediaType,
         collection: result.root.publisher ? result.root.publisher.name : "", // for detail display
         creator: result.root.creator ? result.root.creator.name : "", // for detail display
-        date: result.root.yearPublished, // for detail display
+        date: result.root.yearPublished || 'Undated', // for detail display
         format: [mediaType], // for detail display
       });
     });

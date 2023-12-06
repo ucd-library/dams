@@ -224,7 +224,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Event} e HTML click event
    */
   _onLayoutToggle(e) {
-    let type = e.currentTarget.getAttribute("type");
+    let type = e?.currentTarget?.getAttribute("type") || 'mosaic';
     if (type === "grid") {
       this.isGridLayout = true;
       this.isListLayout = false;
@@ -270,9 +270,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     }
     this._setSelectedDisplay();
 
-    // if( !this.isListLayout ) {
     requestAnimationFrame(() => this._resize());
-    // }
   }
 
   _setSelectedDisplay() {
@@ -330,44 +328,48 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @method _resize
    * @description resize masonary layout
    */
-  _resize() {
-    if( this.isListLayout ) return;
-    let firstDiv = this.shadowRoot
-      .querySelector("#layout")
-      .querySelector("app-search-grid-result");
-    if( !firstDiv ) return;
+  async _resize() {
+    if( !this.isListLayout ) {
+      let firstDiv = this.shadowRoot
+        .querySelector("#layout")
+        .querySelector("app-search-grid-result");
+      if( !firstDiv ) return;
 
-    let ew = this.offsetWidth;
-    let w = firstDiv.offsetWidth + 25;
+      await this.updateComplete;
 
-    let numCols = 3;
-    if( window.innerWidth < 1024 ) numCols = 2;
-    if( window.innerWidth < 768 ) numCols = 1;
+      let ew = this.offsetWidth;
+      let w = firstDiv.offsetWidth + 25;
 
-    // this makes sure columns are centered
-    let leftOffset = Math.floor((ew - numCols * w) / 2);
+      let numCols = 3;
+      if( window.innerWidth < 1024 ) numCols = 2;
+      if( window.innerWidth < 768 ) numCols = 1;
 
-    let colHeights = [];
-    for (let i = 0; i < numCols; i++) colHeights.push(0);
+      // this makes sure columns are centered
+      let leftOffset = Math.floor((ew - numCols * w) / 2);
 
-    if( leftOffset > 20 ) leftOffset = 20;
-    let eles = this.shadowRoot
-      .querySelector("#layout")
-      .querySelectorAll("app-search-grid-result");
-    for (let i = 0; i < eles.length; i++) {
-      let col = this._findMinCol(colHeights);
-      let cheight = colHeights[col];
+      let colHeights = [];
+      for (let i = 0; i < numCols; i++) colHeights.push(0);
 
-      eles[i].style.left = leftOffset + col * w + "px";
-      eles[i].style.top = cheight + "px";
-      // eles[i].style.visibility = 'visible';
+      if( leftOffset > 20 ) leftOffset = 20;
+      let eles = this.shadowRoot
+        .querySelector("#layout")
+        .querySelectorAll("app-search-grid-result");
 
-      colHeights[col] += eles[i].offsetHeight + 25;
+      for (let i = 0; i < eles.length; i++) {
+        let col = this._findMinCol(colHeights);
+        let cheight = colHeights[col];
+
+        eles[i].style.left = leftOffset + col * w + "px";
+        eles[i].style.top = cheight + "px";
+        // eles[i].style.visibility = 'visible';
+
+        colHeights[col] += eles[i].offsetHeight + 25;
+      }
+
+      let maxHeight = Math.max.apply(Math, colHeights);
+      this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
     }
 
-    let maxHeight = Math.max.apply(Math, colHeights);
-    this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
-    this.requestUpdate();
     window.scrollTo(0, 0);
   }
 
