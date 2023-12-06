@@ -52,11 +52,18 @@ class Validate {
           }
 
           if( missing.length ) {
-            result.warnings.push('Not all nodes are crawlable from root: '+missing.join(', '));
+            result.warnings.push({
+              label : 'Not all nodes are crawlable from root',
+              id: missing
+            });
           }
         }
       } catch(e) { 
-        result.errors.push('Error validating crawlable nodes: '+e.message+' '+e.stack);
+        result.errors.push({
+          label : 'Error validating crawlable nodes',
+          message : e.message,
+          stack : e.stack
+        });
       }
     }
 
@@ -74,7 +81,10 @@ class Validate {
         if( subject.name ) {
           found = true;
         } else {
-          result.comments.push('Subject has no name: '+JSON.stringify(subject));
+          result.comments.push({
+            label : 'Subject has no name', 
+            id : subject['@id']
+          });
         }
       }
       if( !found ) {
@@ -90,17 +100,26 @@ class Validate {
     // check that all media groups have images
     for( let node of graph.clientMedia.mediaGroups ) {
       if( !node.clientMedia ) {
-        result.errors.push('Media group has no clientMedia: '+node['@id']);
+        result.errors.push({
+          label : 'Media group has no clientMedia',
+          id : node['@id']
+        });
         continue;
       }
 
       // check for a download
       if( !node.clientMedia.download ) {
-        result.errors.push('Media group has no download: '+node['@id']);
+        result.errors.push({
+          label : 'Media group has no download',
+          id : node['@id']
+        });
       }
 
       if( !node.clientMedia.images ) {
-        result.errors.push('Media group has no images: '+node['@id']);
+        result.errors.push({
+          label : 'Media group has no images',
+          id : node['@id']
+        });
         continue;
       }
       let images = node.clientMedia.images;
@@ -119,25 +138,42 @@ class Validate {
 
       if( !images.large || !images.medium || !images.small ) {
         if( missingOriginal ) {
-          result.errors.push('Media group is missing sized image and has no original: '+node['@id']);
+          result.errors.push({
+            label : 'Media group is missing sized image and has no original',
+            id : node['@id']
+          });
         } else {
-          result.warnings.push('Media group is missing sized image: '+node['@id']);
+          result.warnings.push({
+            label : 'Media group is missing sized image',
+            id : node['@id']
+          });
         }
       }
 
       if( !images.ocr ) {
-        result.warnings.push('Image is missing ocr file: '+node['@id']);
+        result.warnings.push({
+          label : 'Image is missing ocr file',
+          id : node['@id']
+        });
       }
 
       let pdf = node.clientMedia.pdf;
       if( !pdf && node.fileFormat && node.fileFormat.includes('pdf') ) {
-        result.errors.push('No pdf client media found for: '+node['@id']);
+        result.errors.push({
+          label : 'No pdf client media found for',
+          id : node['@id']
+        });
       }
       if( pdf && pdf.manifest ) {
         let url = config.server.url+pdf.manifest;
         let hResp = await fetch(config.gateway.host+pdf.manifest, {method: 'HEAD'});
         if( hResp.status !== 200 ) {
-          result.errors.push('Pdf client media manifest is not available; node='+node['@id']+' manifest='+url+' status='+hResp.status);
+          result.errors.push({
+            label : 'Pdf client media manifest is not available',
+            id : node['@id'],
+            manifest : url,
+            status : hResp.status
+          });
         }
       }
 

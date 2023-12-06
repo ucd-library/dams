@@ -58,7 +58,7 @@ class ItemsModel extends FinEsDataModel {
 
     for( let id of reindex ) {
       await this.messaging.sendMessage(MessageWrapper.createMessage(
-        ['http://digital.ucdavis.edu/schema#ReindexEvent'],
+        ['http://digital.ucdavis.edu/schema#Reindex'],
         {'@id': id}
       ));
     }
