@@ -107,7 +107,6 @@ class CollectionService extends BaseService {
    * @param {String} id collection id
    */
   async getCollectionEdits(id) {
-    // /api/collection/edits/collection/ark:/13030/c8pc37z3
     return this.request({
       url : `${this.baseUrl}/edits${id}`,
       checkCached : () => null,

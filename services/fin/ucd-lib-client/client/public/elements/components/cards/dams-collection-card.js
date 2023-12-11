@@ -33,6 +33,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
 
     this.collection = {};
     this.id = "";
+    this.renderedId = "";
     this.imgSrc = "";
     this.cardTitle = "";
     this.itemCt = 0;
@@ -43,15 +44,14 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
   }
 
   async updated(props) {
-    if (props.has("id") && this.id ) {
-      this._onCollectionUpdate(
-        await this.CollectionModel.get(this.id)
-      );
+    if (props.has("id") && this.id && this.id !== this.renderedId ) {
+      await this.CollectionModel.get(this.id)
     }
+    if( !this.imgSrc ) this.imgSrc = "/images/tree-bike-illustration.png";
   }
 
   async _onCollectionUpdate(e) {
-    if (e.state !== "loaded" || e.id !== this.id) return;
+    if( e.state !== "loaded" || e.id !== this.id || this.renderedId === this.id ) return;
 
     this.collection = e.vcData;
     let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.id, this.FcAppConfigModel);
@@ -67,6 +67,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     this.itemCt = this.collection.count;
     this.href = this.collection.id;
     this.darkBg = this.attributes["data-dark-bg"] ? true : false;
+    this.renderedId = this.id;
   }
 }
 

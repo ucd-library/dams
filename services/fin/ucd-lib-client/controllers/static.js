@@ -56,6 +56,7 @@ module.exports = async (app) => {
         user : user,
         appRoutes : config.client.appRoutes,
         // recordCount: (await records.rootCount()).count,
+        featuredImages : config.client.featuredImages,
         env : config.client.env,
         fcAppConfig : appConfig.config
       });

@@ -28,6 +28,8 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
     super();
     this.render = render.bind(this);
     this.collection = {};
+    this.collectionId = "";
+    this.renderedCollectionid = "";
     this.imageRight = false;
     this.collectionTitle = "";
     this.imgSrc = "";
@@ -60,7 +62,8 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
         : this.collection.associatedMedia.thumbnailUrl;
       this._itemCt = this.collection.associatedMedia.recordCount;
       this._href = this.collection.associatedMedia["@id"];
-    } else if (this.collectionId) {
+    } else if (this.collectionId && this.collectionId !== this.renderedCollectionid) {
+      this.renderedCollectionid = this.collectionId;
       this._getCollection(this.collectionId);
     }
   }

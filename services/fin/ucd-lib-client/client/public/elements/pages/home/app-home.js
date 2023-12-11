@@ -75,8 +75,8 @@ class AppHome extends Mixin(LitElement)
     this.heroUrl = '';
     this.heroItemLabel = '';
     this.heroItemUrl = '';
-    this.heroCollectionLabel = '';
-    this.heroCollectionUrl = '';
+    this.heroCollectionLabel = '...';
+    this.heroCollectionUrl = '...';
     this.displayData = [];
     this.editMode = false;
     this.isUiAdmin = false;
@@ -90,11 +90,18 @@ class AppHome extends Mixin(LitElement)
   async firstUpdated() {
     this.isUiAdmin = user.canEditUi();
 
+    this._setFeaturedImage();
+
     try {
       let displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
       if( displayData && displayData.body ) {
         if( typeof displayData.body === 'string' ) displayData.body = JSON.parse(displayData.body);
         this.displayData = displayData.body;
+
+        let adminPanel = document.querySelector('admin-featured-collections');
+        if( adminPanel ) {
+          adminPanel.loadAdminData(this.displayData);
+        }
       }
   
       // filter out collections that don't exist in fcrepo
@@ -111,22 +118,18 @@ class AppHome extends Mixin(LitElement)
       console.warn('No featured collections admin data found', e);
     }
 
-    let data = await this.CollectionModel.getHomepageDefaultCollections();
-    if( data.response.ok && data.body.results.length ) {
-      this.featuredCollections = data.body.results;
-      this.featuredCollectionsCt = this.featuredCollections.length;
-    }
-
     // get recent collections
-    data = await this.CollectionModel.getRecentCollections();
+    let data = await this.CollectionModel.getRecentCollections();
     
     if( data.response.ok && data.body.results.length ) {
       this.recentCollections = data.body.results?.slice(0, 3);
     }
 
-    // Get random hero image options
-    let featuredImages = await this.FcAppConfigModel.getDefaultImagesConfig();
-    this.heroImgOptions = featuredImages?.body?.featuredImages;
+    this.requestUpdate();
+  }
+
+  _setFeaturedImage() {
+    this.heroImgOptions = (APP_CONFIG.featuredImages || []);
 
     let i = Math.floor(Math.random() *  this.heroImgOptions.length);
     let src = this.heroImgOptions[i];
@@ -139,8 +142,6 @@ class AppHome extends Mixin(LitElement)
 
     if( this.heroItemLabel.length > 75 ) this.heroItemLabel = this.heroItemLabel.substring(0, 75) + '...';
     if( this.heroCollectionLabel.length > 75 ) this.heroCollectionLabel = this.heroCollectionLabel.substring(0, 75) + '...';
-
-    this.requestUpdate();
   }
 
   /**

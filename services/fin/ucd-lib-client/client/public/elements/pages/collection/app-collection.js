@@ -179,32 +179,6 @@ class AppCollection extends Mixin(LitElement)
     this.itemEdits = [];
   }
 
-  /**
-   * @method _onDefaultRecordSearchUpdate
-   * @description fired from default search
-   *
-   * @param {Object} e
-   */
-  // _onDefaultRecordSearchUpdate(e) {
-  //   if( e.state !== 'loaded' || this.highlightedItems.length ) return;
-
-  //   if( e.payload && e.payload.results ) {
-  //     debugger;
-
-  //     this.highlightedItems = e.payload.results.map((rg, index) => {
-  //       return {
-  //         '@id' : rg.root['@id'],
-  //         description : rg.root.name,
-  //         position : index+1,
-  //         image : '' // rg.root.image.url
-  //       };
-  //     });
-  //     console.log('this.highlightedItems in _onDefaultRecordSearchUpdate', this.highlightedItems);
-  //   }
-
-  //   this._updateDisplayData();
-  // }
-
   _onItemDisplayChange(e) {
     this.itemCount = parseInt(e.target.value);
 

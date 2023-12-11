@@ -757,124 +757,93 @@ export default function render() {
     (graph) =>
       html`
         <dams-collection-card
-          data-id="${graph.root['@id']}"
+          img-src="${graph.vcData.images?.[0] || ''}"
+          card-title="${graph.vcData.title || ''}"
+          item-ct="${graph.vcData.count ? graph.vcData.count : 0}"
+          href="${graph.vcData.id}"
         ></dams-collection-card>
       `
   )}
   </div>
 </section>
 
-${
-  this.featuredCollectionsCt > 0 || 1 == 1
-    ? html`
-
-  <section class="featured site-frame">
-    <div class="right-panel">
-      <div class="icon-wrapper" ?hidden="${
-        this.editMode || !this.isUiAdmin
-      }" @click="${this._onEditClicked}">
-        <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
-      </div>
-      <div class="icon-wrapper edit" ?hidden="${
-        !this.editMode || !this.isUiAdmin
-      }" @click="${this._onSaveClicked}">
-        <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
-      </div>
-      <div class="icon-wrapper edit" ?hidden="${
-        !this.editMode || !this.isUiAdmin
-      }" @click="${this._onCancelEditClicked}">
-        <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
-      </div>
+<section class="featured site-frame">
+  <div class="right-panel">
+    <div class="icon-wrapper" ?hidden="${
+      this.editMode || !this.isUiAdmin
+    }" @click="${this._onEditClicked}">
+      <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
     </div>
-    <h1>Featured <span class="fw-light">Collections</span></h1>
-    <div style="text-align:center;">
-      <img class="splat-stars" src="/images/watercolors/watercolor-splat-homepage-stars.png">
-      <!-- <dams-watercolor-overlay
-          overlay-template="stars">
-      </dams-watercolor-overlay> -->
-    </div>
-
-    <admin-featured-collections ?hidden="${
+    <div class="icon-wrapper edit" ?hidden="${
       !this.editMode || !this.isUiAdmin
-    }"></admin-featured-collections>
-    <!-- <div class="featured-collections-editor" ?hidden="${!this.editMode}">
+    }" @click="${this._onSaveClicked}">
+      <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
+    </div>
+    <div class="icon-wrapper edit" ?hidden="${
+      !this.editMode || !this.isUiAdmin
+    }" @click="${this._onCancelEditClicked}">
+      <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+    </div>
+  </div>
+  <h1>Featured <span class="fw-light">Collections</span></h1>
+  <div style="text-align:center;">
+    <img class="splat-stars" src="/images/watercolors/watercolor-splat-homepage-stars.png">
+  </div>
 
-
-      <div class="editor-row-control">
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${
-        this._onUpArrayClicked
-      }">
-          <ucdlib-icon icon="ucdlib-dams:fa-arrow-up"></ucdlib-icon>
-        </div>
-        <div class="icon-wrapper edit" style="margin-left: .3rem;" ?hidden="${!this
-          .editMode}" @click="${this._onDownArrayClicked}">
-          <ucdlib-icon icon="ucdlib-dams:fa-arrow-down"></ucdlib-icon>
-        </div>
-        <div class="dots flex-expand"></div>
-        <div style="background-color: var(--color-aggie-blue-40); height: 75px">
-          <img src="/images/icons/dams-admin-collection-single.svg" style="width: 150px" />
-        </div>
-        <div class="dots flex-expand"></div>
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${
-        this._onTrashClicked
-      }">
-          <ucdlib-icon icon="ucdlib-dams:fa-trash"></ucdlib-icon>
-        </div>
-      </div>
-
-
-    </div> -->
-
-    <div class="featured-collections-public" ?hidden="${this.editMode}">
-      ${this.displayData.map(
-        (data) => html`
-          ${data.type === "single"
-            ? html`
-                <dams-highlighted-collection
-                  collection-id="${data.collectionId}"
-                  collection-desc="${data.description}"
-                  ?image-right="${data.placement === "right"}"
-                >
-                </dams-highlighted-collection>
-              `
-            : ""}
-          ${data.type === "text"
-            ? html`
-                <div class="featured-group">
-                  <div class="fg-header ${data.placement}">
-                    <h3 class="heading--primary">${data.heading}</h3>
-                    <ucdlib-md id="md">
-                      <ucdlib-md-content>
-                        ${data.description}
-                      </ucdlib-md-content>
-                    </ucdlib-md>
-                  </div>
+  <admin-featured-collections ?hidden="${
+    !this.editMode || !this.isUiAdmin
+  }"></admin-featured-collections>
+  
+  <div class="featured-collections-public" ?hidden="${this.editMode}">
+    ${this.displayData.map(
+      (data) => html`
+        ${data.type === "single"
+          ? html`
+              <dams-highlighted-collection
+                collection-id="${data.collectionId}"
+                collection-desc="${data.description}"
+                ?image-right="${data.placement === "right"}"
+              >
+              </dams-highlighted-collection>
+            `
+          : ""}
+        ${data.type === "text"
+          ? html`
+              <div class="featured-group">
+                <div class="fg-header ${data.placement}">
+                  <h3 class="heading--primary">${data.heading}</h3>
+                  <ucdlib-md id="md">
+                    <ucdlib-md-content>
+                      ${data.description}
+                    </ucdlib-md-content>
+                  </ucdlib-md>
                 </div>
-              `
-            : ""}
-          ${data.type === "cards"
-            ? html`
-                <div
-                  class="card-trio ${data.collectionIds.length === 3
-                    ? "three-total"
-                    : ""}"
-                >
-                  ${data.collectionIds.map(
-                    (collection) => html`
-                      <dams-collection-card
-                        data-id="${collection.selected}"
-                      ></dams-collection-card>
-                    `
-                  )}
-                </div>
-              `
-            : ""}
-        `
-      )}
+              </div>
+            `
+          : ""}
+        ${data.type === "cards"
+          ? html`
+              <div
+                class="card-trio ${data.collectionIds.length === 3
+                  ? "three-total"
+                  : ""}"
+              >
+                ${data.collectionIds.map(
+                  (collection) => html`
+                    <dams-collection-card
+                      data-id="${collection.selected}"
+                    ></dams-collection-card>
+                  `
+                )}
+              </div>
+            `
+          : ""}
+      `
+    )}
 
-      <div class="featured-more">
-        <a href="/browse/collections" class="btn btn--primary btn--lg">Browse all collections</a>
-      </div>
+    <div class="featured-more">
+      <a href="/browse/collections" class="btn btn--primary btn--lg">Browse all collections</a>
+    </div>
   </section>
 
   <section class="about-collections">
@@ -892,10 +861,5 @@ ${
       <a href="/about" class="btn--more-about btn--alt btn--round">More about this project</a>
     </div>
   </section>
-
-`
-    : html``
-}
-
 `;
 }
