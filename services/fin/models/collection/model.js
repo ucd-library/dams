@@ -147,7 +147,18 @@ class CollectionsModel extends FinEsDataModel {
       id = 'info:fedora'+id;
     }
     let result = await pg.query(`select * from fin_cache.dams_links where collection = $1`, [id]);
-    let rows = result.rows;
+    
+    let resp = {
+      collection : id,
+      defaults : {},
+      edits : [],
+    };
+    
+    resp.edits = result.rows.map(row => {
+      delete row.collection;
+      delete row.edit;
+      return row;
+    });
     
     result = await pg.query(`
       select 
@@ -164,14 +175,10 @@ class CollectionsModel extends FinEsDataModel {
       [id.replace('info:fedora', 'info:fedora/application/ucd-lib-client')]
     );
     if( result.rows.length ) {
-      rows.push({
-        collection : result.rows[0].object,
-        edit : result.rows[0].subject,
-        item_default_display : result.rows[0].item_default_display
-      });
+      resp.defaults.item_default_display = result.rows[0].item_default_display;
     }
 
-    return rows; 
+    return resp; 
   }
 
   /**
