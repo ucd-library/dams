@@ -150,11 +150,11 @@ class CollectionsModel extends FinEsDataModel {
     
     let resp = {
       collection : id,
-      defaults : {},
-      edits : [],
+      edits : null,
+      itemOverrides : [],
     };
     
-    resp.edits = result.rows.map(row => {
+    resp.itemOverrides = result.rows.map(row => {
       delete row.collection;
       delete row.edit;
       return row;
@@ -162,20 +162,16 @@ class CollectionsModel extends FinEsDataModel {
     
     result = await pg.query(`
       select 
-        qv.*, 
-        display.object as item_default_display
+        count(*) as count 
       from 
         fin_cache.quads_view qv
-      left join fin_cache.quads_view display on 
-        display.fedora_id = qv.fedora_id and 
-        display.predicate = 'http://digital.ucdavis.edu/schema#itemDefaultDisplay'
       where 
-        qv.fedora_id = $1 and 
-        qv.predicate = 'http://schema.org/isPartOf'`, 
+        qv.fedora_id = $1 and
+        object != ''`, 
       [id.replace('info:fedora', 'info:fedora/application/ucd-lib-client')]
     );
-    if( result.rows.length ) {
-      resp.defaults.item_default_display = result.rows[0].item_default_display;
+    if( result.rows.length &&  result.rows[0].count > 0 ) {
+      resp.edits = id.replace('info:fedora', 'info:fedora/application/ucd-lib-client');
     }
 
     return resp; 

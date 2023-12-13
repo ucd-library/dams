@@ -265,23 +265,20 @@ class Utils {
     async getItemDisplayType(id, collectionId, fcAppConfigModel, collectionModel) {
       let displayType = '';
 
-      // make sure collection and items have edits before hitting the fcrepo
       let edits = await collectionModel.getCollectionEdits(collectionId);
-      if (!edits.body.length) return displayType;
+      if( !Object.keys(edits?.body).length ) return displayType;
       edits = edits.body;
 
-      // get item data if it exists
-      let itemEdit = edits.filter(e => e.edit.includes(id))[0]
-      if( itemEdit && Object.keys(itemEdit).length ) {
-        let itemGraph = await this.getAppConfigItemGraph(id, fcAppConfigModel);
-        displayType = itemGraph?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];
-        if( displayType ) return displayType;
+      displayType = 'Book Reader - 2 Page';
+      if( edits?.edits ) {
+        let collectionGraph = await this.getAppConfigCollectionGraph(collectionId, fcAppConfigModel);
+        displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];
       }
 
-      let collectionEdit = edits.filter(e => e.edit.includes(collectionId))[0];
-      if( collectionEdit && Object.keys(collectionEdit).length ) {
-        let collectionGraph = await this.getAppConfigCollectionGraph(collectionId, fcAppConfigModel);
-        displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];  
+      // get item data if it exists
+      let itemEdit = edits.itemOverrides.filter(e => e.item.includes(id))[0];
+      if( itemEdit && Object.keys(itemEdit).length ) {
+        displayType = itemEdit['item_default_display'];
       }
       
       return displayType;

@@ -725,7 +725,7 @@ export default function render() {
                       type="checkbox"
                       data-item-id="${item.item.split(':fedora')[1]}">
                     <label for="checkbox${index}">
-                      <a href="${item.item.split(':fedora')[1]}">${item.edit.split('/').pop()}</a>
+                      <a href="${item.item.split(':fedora')[1]}">${item.item.split('/').pop()}</a>
                       <span style="font-style: italic;">
                         (${item['item_default_display']})
                       </span>

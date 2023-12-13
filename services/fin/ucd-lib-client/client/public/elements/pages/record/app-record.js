@@ -340,37 +340,29 @@ class AppRecord extends Mixin(LitElement)
   async _parseDisplayData() {
     if( !this.collectionId ) return;
 
-    this.itemDisplay = ''; // default
     let edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
-    if (!edits.body.length) {
+    if( !Object.keys(edits?.body).length ) {
       this.appDataLoaded = true;
       return;
     }
     edits = edits.body;
 
-    let savedDisplayData;
-    // get collection data if it exists
-    let collectionEdit = edits.filter(e => e.edit.includes(this.collectionId))[0];
-    if( collectionEdit && Object.keys(collectionEdit).length ) {
-      savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
+    this.itemDefaultDisplay = 'Book Reader - 2 Page';
+    if( edits?.edits ) {
+      // fetch collection override
+      let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
       if( savedDisplayData ) {
         this.savedCollectionData = savedDisplayData;
-        // let graphRoot = this.savedCollectionData.filter(d => d['@id'] === '/application/ucd-lib-client' + this.collectionId)[0];
         let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-        this.itemDefaultDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || 'Book Reader - 2 Page';
+        this.itemDefaultDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || this.itemDefaultDisplay;
       }
     }
+    this.itemDisplay = this.itemDefaultDisplay;
 
     // get item data if it exists
-    let itemEdit = edits.filter(e => e.edit.includes(this.record['@id']))[0]
+    let itemEdit = edits.itemOverrides.filter(e => e.item.includes(this.record['@id']))[0];
     if( itemEdit && Object.keys(itemEdit).length ) {
-      savedDisplayData = await utils.getAppConfigItemGraph(this.renderedRecordId, this.FcAppConfigModel);
-
-      if( savedDisplayData ) {
-        // let graphRoot = savedDisplayData.filter(d => d['@id'] === '/application/ucd-lib-client' + this.collectionId)[0];
-        let graphRoot = savedDisplayData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-        this.itemDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || '';  
-      }
+      this.itemDisplay = itemEdit['item_default_display'] || this.itemDisplay;
     }
 
     this.appDataLoaded = true;
