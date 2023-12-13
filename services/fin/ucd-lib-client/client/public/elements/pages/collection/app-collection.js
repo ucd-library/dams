@@ -310,13 +310,12 @@ class AppCollection extends Mixin(LitElement)
     } catch (error) {
       console.log('Error retrieving collection edits', error);
     }
-    if (!edits?.body?.length) return;
+    if( !Object.keys(edits?.body).length ) return;
     edits = edits.body;
 
-    this.itemEdits = edits.filter(e => !e.edit.includes(this.collectionId));
+    this.itemEdits = edits.itemOverrides || [];
 
-    let collectionEdit = edits.filter(e => e.edit.includes(this.collectionId))[0];
-    if( !collectionEdit || !Object.keys(collectionEdit).length ) return;
+    if( !edits.edits ) return;
 
     let savedDisplayData = await this.FcAppConfigModel.getAdminData(this.collectionId);
 
