@@ -392,6 +392,8 @@ class AppRecord extends Mixin(LitElement)
       pages.style.display = 'block';
     }
 
+    if( mediaViewer.mediaType === 'video' ) return;
+
     // on save display pref, reload media viewer with new image display type
     if( prefChange ) {
       // reload media viewer with new image display type
