@@ -43,9 +43,11 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     this._injectModel("CollectionModel", "FcAppConfigModel");
   }
 
-  async updated(props) {
+  async updated(props) {    
     if (props.has("id") && this.id && this.id !== this.renderedId ) {
-      await this.CollectionModel.get(this.id)
+      this._onCollectionUpdate(await this.CollectionModel.get(this.id));
+    } else if( props.has("href") && !this.id ) {
+      this.id = this.href;
     }
     if( !this.imgSrc ) this.imgSrc = "/images/tree-bike-illustration.png";
   }

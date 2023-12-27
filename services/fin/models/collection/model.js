@@ -154,7 +154,7 @@ class CollectionsModel extends FinEsDataModel {
       itemOverrides : [],
     };
     
-    resp.itemOverrides = result.itemOverrides.map(row => {
+    resp.itemOverrides = (result.itemOverrides || []).map(row => {
       delete row.collection;
       delete row.edit;
       return row;
@@ -162,10 +162,11 @@ class CollectionsModel extends FinEsDataModel {
     
     result = await pg.query(`
       select 
-        count(*) as count, 
+        count(*) as count 
       from 
-        qv.fedora_id = $1 and 
+        fin_cache.quads_view qv
       where
+        qv.fedora_id = $1 and
         object != ''`, 
       [id.replace('info:fedora', 'info:fedora/application/ucd-lib-client')]
     );

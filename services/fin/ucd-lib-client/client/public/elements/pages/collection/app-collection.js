@@ -104,6 +104,9 @@ class AppCollection extends Mixin(LitElement)
     if( !this.thumbnailUrlOverride ) {
       this.thumbnailUrl = e.vcData.images?.medium?.url || e.vcData.images?.original?.url || '';
     }
+    if( !this.thumbnailUrl ) {
+      this.thumbnailUrl = '/images/tree-bike-illustration.png';
+    }
 
     if( !this.watercolor ) {
       this.watercolor = 'rose';
