@@ -25,6 +25,7 @@ return html`
   dams-watercolor {
     display: block;
     height: 8rem;
+    margin-bottom: -1px; /* hack to ensure we don't get line at bottom */
   }
   
 </style>

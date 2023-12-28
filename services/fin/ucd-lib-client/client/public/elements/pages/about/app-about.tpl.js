@@ -94,9 +94,9 @@ export default function render() {
         Custom microservices are implemented using a Fedora (API-X) extension method as a general 
         methodology. The User Interface was built with web-components anticipating a need for 
         UI flexibility as the digital collection grows. For a more detailed explanation of 
-        the development, see our 
-        <a href="https://github.com/UCDavisLibrary/fin-server/wiki/Fin-Server-Overview">Fin Server Overview</a> or
-        <a href="https://github.com/UCDavisLibrary/fin-server/blob/master/docs/README.md">Developer Documentation.</a>
+        the development, see our code repositories:
+        <a href="https://github.com/ucd-library/fin/blob/main/docs/README.md">Fin Server</a> or
+        <a href="https://github.com/ucd-library/dams">DAMS Fin Implementation.</a>
       </p>
       
       <h4>Contact</h4>
