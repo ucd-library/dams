@@ -15,20 +15,20 @@ class FcAppConfigService extends BaseService {
   getDefaultImagesConfig() {
     return this.request({
       url : `${this.baseFcrepoUrl}/default-images/config.json`,
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
+      checkCached : () => this.store.data.defaultImages,
+      onLoading : request => this.store.setDefaultImagesConfigLoading(request),
+      onLoad : config => this.store.setDefaultImagesConfig(config),
+      onError : error => this.store.setDefaultImagesConfigError(error)
     });
   }
 
   getApiApplication() {
     return this.request({
       url : `${this.baseApiUrl}`,
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
+      checkCached : () => this.store.data.apiApplication,
+      onLoading : request => this.store.setApiApplicationLoading(request),
+      onLoad : data => this.store.setApiApplication(data),
+      onError : error => this.store.setApiApplicationError(error)
     });
   }
 
@@ -52,10 +52,10 @@ class FcAppConfigService extends BaseService {
           'Prefer' : 'return=representation; omit="http://fedora.info/definitions/fcrepo#ServerManaged"'
         },
       },
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
+      checkCached : () => this.store.data.collectionAppData[id],
+      onLoading : request => this.store.setCollectionAppDataLoading(id, request),
+      onLoad : data => this.store.setCollectionAppData(id, data),
+      onError : error => this.store.setCollectionAppDataError(id, error)
     });
   }
 
@@ -69,10 +69,10 @@ class FcAppConfigService extends BaseService {
           'Prefer' : 'return=representation; omit="http://fedora.info/definitions/fcrepo#ServerManaged"'
         },
       },
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
+      checkCached : () => this.store.data.itemAppData[id],
+      onLoading : request => this.store.setItemAppDataLoading(id, request),
+      onLoad : data => this.store.setItemAppData(id, data),
+      onError : error => this.store.setItemAppDataError(id, error)
     });
   }
 

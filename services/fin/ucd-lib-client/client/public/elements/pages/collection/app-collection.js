@@ -313,8 +313,11 @@ class AppCollection extends Mixin(LitElement)
     } catch (error) {
       console.log('Error retrieving collection edits', error);
     }
-    if( !Object.keys(edits?.body).length ) return;
-    edits = edits.body;
+
+  
+    if( edits.state !== 'loaded' ) return;
+    if( !Object.keys(edits.payload).length ) return;
+    edits = edits.payload;
 
     this.itemEdits = edits.itemOverrides || [];
 

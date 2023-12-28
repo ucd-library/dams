@@ -165,12 +165,12 @@ class CollectionModel extends BaseModel {
       } catch (error) {
         console.log('Error retrieving collection edits', error);
       }
-      if (!edits?.body?.length) return;
-      edits = edits.body;
+      if (!Object.keys(edits.payload).length) return;
+      edits = edits.payload;
 
 
-      let collectionEdit = edits.filter(e => e.edit.includes(id))[0];
-      if( !collectionEdit || !Object.keys(collectionEdit).length ) return;
+      let collectionEdit = edits.edits;
+      if( !collectionEdit ) return;
 
       let savedDisplayData = await fcAppConfigModel.getAdminData(id);
       if( !savedDisplayData ) return;
@@ -193,7 +193,13 @@ class CollectionModel extends BaseModel {
      * @param {String} id collection id
      */
     async getCollectionEdits(id) {
-      return this.service.getCollectionEdits(id);
+      let state = await this.service.getCollectionEdits(id);
+
+      if( state && state.request ) {
+        await state.request;
+      }
+
+      return this.store.data.edits[id];
     }
 }
 

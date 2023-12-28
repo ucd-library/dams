@@ -54,6 +54,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
 
   async _onCollectionUpdate(e) {
     if( e.state !== "loaded" || e.id !== this.id || this.renderedId === this.id ) return;
+    this.renderedId = this.id;
 
     this.collection = e.vcData;
     let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.id, this.FcAppConfigModel);
@@ -69,7 +70,6 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     this.itemCt = this.collection.count;
     this.href = this.collection.id;
     this.darkBg = this.attributes["data-dark-bg"] ? true : false;
-    this.renderedId = this.id;
   }
 }
 

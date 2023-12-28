@@ -370,7 +370,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
     }
 
-    window.scrollTo(0, 0);
+    // JM scrolling on resize can be very bad
+    // window.scrollTo(0, 0);
   }
 
   /**

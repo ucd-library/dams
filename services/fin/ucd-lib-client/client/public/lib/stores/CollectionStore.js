@@ -8,6 +8,7 @@ class CollectionStore extends BaseStore {
 
     this.data = {
       byId : {},
+      edits : {},
       overview : {
         state : this.STATE.INIT
       },
@@ -134,6 +135,35 @@ class CollectionStore extends BaseStore {
       vcModel.renderCollection(state);
     }
     this.data.byId[state.id] = state;
+    this.emit(this.events.COLLECTION_UPDATE, state);
+  }
+
+  setCollectionEditLoading(id, promise) { 
+    this._setCollectionEditState({
+      id,
+      state: this.STATE.LOADING,
+      request : promise
+    });
+  }
+
+  setCollectionEditLoaded(id, edit) {
+    this._setCollectionEditState({
+      id,
+      payload: edit,
+      state: this.STATE.LOADED,
+    });
+  }
+
+  setCollectionEditError(id, error) {
+    this._setCollectionEditState({
+      id,
+      state: this.STATE.ERROR,
+      error
+    });
+  }
+
+  _setCollectionEditState(state) {
+    this.data.edits[state.id] = state;
     this.emit(this.events.COLLECTION_UPDATE, state);
   }
 

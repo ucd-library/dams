@@ -51,11 +51,20 @@ class FcAppConfigModel extends BaseModel {
   }
 
   async getDefaultImagesConfig() {
-    return await this.service.getDefaultImagesConfig(); 
+    let resp = await this.service.getDefaultImagesConfig();
+    if( resp && resp.state === 'loading' ) {
+      await resp.request;
+    }
+    return this.store.data.defaultImages;
   }
 
   async getApiAppData() {
-    return await this.service.getApiAppData();
+    let resp = await this.service.getApiAppData();
+    if( resp && resp.state === 'loading' ) {
+      await resp.request;
+    }
+
+    return this.store.data.apiApplication;
   }
 
   async getAdminData(id) {
@@ -148,7 +157,11 @@ class FcAppConfigModel extends BaseModel {
      * @returns {Promise} resolves to a jsonld graph
      */
   async getCollectionAppData(id) {
-    return await this.service.getCollectionAppData(id);
+    let resp = await this.service.getCollectionAppData(id);
+    if( resp && resp.state === 'loading' ) {
+      await resp.request;
+    }
+    return this.store.data.collectionAppData[id];
   }
 
   /**
@@ -160,7 +173,11 @@ class FcAppConfigModel extends BaseModel {
      * @returns {Promise} resolves to a jsonld graph
      */
   async getItemAppData(id) {
-    return await this.service.getItemAppData(id);
+    let resp = await this.service.getItemAppData(id);
+    if( resp && resp.state === 'loading' ) {
+      await resp.request;
+    }
+    return this.store.data.itemAppData[id];
   }
 
   /**

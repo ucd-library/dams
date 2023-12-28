@@ -341,11 +341,11 @@ class AppRecord extends Mixin(LitElement)
     if( !this.collectionId ) return;
 
     let edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
-    if( !Object.keys(edits?.body).length ) {
+    if( !Object.keys(edits.payload).length ) {
       this.appDataLoaded = true;
       return;
     }
-    edits = edits.body;
+    edits = edits.payload;
 
     this.itemDefaultDisplay = 'Book Reader - 2 Page';
     if( edits?.edits ) {

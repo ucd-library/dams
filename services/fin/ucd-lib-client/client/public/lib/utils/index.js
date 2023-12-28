@@ -266,8 +266,8 @@ class Utils {
       let displayType = '';
 
       let edits = await collectionModel.getCollectionEdits(collectionId);
-      if( !Object.keys(edits?.body).length ) return displayType;
-      edits = edits.body;
+      if( !Object.keys(edits?.payload).length ) return displayType;
+      edits = edits.payload;
 
       displayType = 'Book Reader - 2 Page';
       if( edits?.edits ) {

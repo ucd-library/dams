@@ -88,14 +88,15 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     let end = start + this.resultsPerPage;
     this.resultsDisplayed = this.results.slice(start, end);
 
-    let collections = this.shadowRoot.querySelector(".collections-in-search");
-    if (collections && scrollTo) {
-      window.scrollTo({
-        top: window.scrollY + collections.getBoundingClientRect().y - 100,
-        left: 0,
-        behavior: "smooth",
-      });
-    }
+    console.warn('Not calling collection base scrolling: TODO');
+    // let collections = this.shadowRoot.querySelector(".collections-in-search");
+    // if (collections && scrollTo) {
+    //   window.scrollTo({
+    //     top: window.scrollY + collections.getBoundingClientRect().y - 100,
+    //     left: 0,
+    //     behavior: "smooth",
+    //   });
+    // }
     
     this.requestUpdate();
   }
