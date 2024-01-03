@@ -13,7 +13,7 @@ class ClientMedia {
     this.id = id;
     this.opts = opts;
 
-
+    this.missingNodes = new Set();
 
     // if( graph.node ) graph = graph.node; 
     if( graph['@graph'] ) graph = graph['@graph'];
@@ -302,11 +302,17 @@ class ClientMedia {
    **/
   getNode(node) {
     if( typeof node === 'string' ) {
+      if( this.index[node] === undefined ) {
+        this.missingNodes.add(node);
+      }
       return this.index[node];
     }
 
     // TODO talk with Justin, this is a hack for /collection/sherry-lehmann
     // the image "/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg" is an object with an id but doesn't exist as a graph in this.index graph
+    if( this.index[node['@id']] === undefined ) {
+      this.missingNodes.add(node['@id']);
+    }
     return this.index[node['@id']]; // || node;
   }
 
@@ -342,7 +348,10 @@ class ClientMedia {
    */
   _crawlMedia(node, crawled={}) {
     node = this.getNode(node);
-    if( !node ) return; 
+    if( !node ) {
+      console.warn('Could not find media node for ', node);
+      return;
+    } 
 
     // make sure no cycles
     if( crawled[node['@id']] ) return;

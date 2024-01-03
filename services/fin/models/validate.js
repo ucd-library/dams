@@ -92,6 +92,16 @@ class Validate {
       }
     }
 
+    // check that all nodes in graph exist.  The mediaModel keeps track of
+    // these when crawling
+    let missingNodes = Array.from(graph.clientMedia.missingNodes);
+    if( missingNodes.length ) {
+      result.errors.push({
+        label : 'Missing media graph nodes',
+        id : missingNodes
+      });
+    }
+
     // media checks
     if( graph.clientMedia.mediaGroups.length === 0 ) {
       result.errors.push('No media groups found');
