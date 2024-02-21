@@ -17,8 +17,23 @@ return html`
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    color: var(--color-white);
+    position: relative;
+    z-index: 1;
   }
+  .image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    animation: fadein 1s ease-in-out;
+    z-index: -1;
+  }
+  @keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
   ::slotted(*) {
     color: var(--color-white) !important;
   }
@@ -29,7 +44,9 @@ return html`
   }
   
 </style>
-<div class="container" style="${styleMap(this.getContainerStyles())}">
+
+<div class="container" style="${styleMap(this.getContainerStyles())}">  
+  <div class="image"></div>
   <slot></slot>
   ${this.watercolor ? html`
     <dams-watercolor 

@@ -55,6 +55,19 @@ export default class DamsHero extends Mixin(LitElement)
     return this.selectedSrcUrl;
   }
 
+  updated(changedProperties) {
+    if( changedProperties.has('selectedSrcUrl') && this.selectedSrcUrl.length > 0 ) {
+      let img = new Image();
+      img.src = this.selectedSrcUrl;
+
+      img.onload = () => {
+        let element = this.shadowRoot.querySelector('.image');
+        element.style.backgroundImage += 'var(--gradient-ag-putah), url(' + img.src + ')';
+        element.style.opacity = '1';
+      };
+    }
+  }
+
   /**
    * @method _setSrc
    * @description Sets the background image src property.
@@ -71,8 +84,18 @@ export default class DamsHero extends Mixin(LitElement)
 
     let i = Math.floor(Math.random() *  this.srcOptions.length);
     let src = this.srcOptions[i];
-
     this.selectedSrcUrl = src.imageUrl;
+
+    let img = new Image();
+    img.src = this.selectedSrcUrl;
+
+    img.onload = () => {
+      let element = this.shadowRoot.querySelector('.image');
+      element.style.backgroundImage += 'var(--gradient-ag-putah), url(' + img.src + ')';
+      element.style.opacity = '1';
+    };
+
+    
     this.dispatchEvent(this._srcChange);
   }
 
@@ -86,7 +109,6 @@ export default class DamsHero extends Mixin(LitElement)
     let styles = {
       'background-image': 'var(--gradient-ag-putah)'
     };
-    if ( this.selectedSrcUrl ) styles['background-image'] += `, url(${this.selectedSrcUrl})`;
     return styles;
   }
 
