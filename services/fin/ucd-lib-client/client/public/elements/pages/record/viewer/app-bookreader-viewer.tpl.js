@@ -252,6 +252,10 @@ export default function render() {
         overflow: hidden;
       }
 
+      .BRwordElement {
+        color: transparent !important; /* transparent / red */
+      }
+
       @media (max-width: 767px) {
         /* mobile */
         .BRcontrols {
