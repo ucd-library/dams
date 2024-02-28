@@ -128,6 +128,53 @@ module.exports = function patchSearch(BookReader) {
     this.textSelectionPlugin?.stopPageFlip(this.refs.$brContainer);
   };
 
+  /**
+ * Flip the right page over onto the left
+ */
+  BookReader.prototype.right = async function() {
+    if ('rl' != this.pageProgression) {
+      await this.next();
+    } else {
+      await this.prev();
+    }
+  };
+
+  /**
+   * Flip the left page over onto the right
+   */
+  BookReader.prototype.left = async function() {
+    if ('rl' != this.pageProgression) {
+      await this.prev();
+    } else {
+      await this.next();
+    }
+  };
+
+  BookReader.prototype.next = async function({triggerStop = true} = {}) {
+    if (this.constMode2up == this.mode) {
+      if (triggerStop) this.trigger(BookReader.eventNames.stop);
+      await this._modes.mode2Up.mode2UpLit.flipAnimation('next');
+    } else {
+      if (this.firstIndex < this.book.getNumLeafs() - 1) {
+        this.jumpToIndex(this.firstIndex + 1);
+      }
+    }
+  };
+  
+  BookReader.prototype.prev = async function({triggerStop = true} = {}) {
+    const isOnFrontPage = this.firstIndex < 1;
+    if (isOnFrontPage) return;
+  
+    if (this.constMode2up == this.mode) {
+      if (triggerStop) this.trigger(BookReader.eventNames.stop);
+      await this._modes.mode2Up.mode2UpLit.flipAnimation('prev');
+    } else {
+      if (this.firstIndex >= 1) {
+        this.jumpToIndex(this.firstIndex - 1);
+      }
+    }
+  };
+
   function _prepareMode1Up(mode) {
     const startLeaf = mode.br.currentIndex();
     mode.$brContainer

@@ -171,16 +171,14 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     this.navUpdated = true;
   }
 
-  _prevPage() {
+  async _prevPage() {
+    await this.br.left();    
     this.br.resize();
-    this.br.left();    
   }
 
-  _nextPage() {
-    // TODO this .resize() doesn't seem to work on the first flip, but subsequent flips work.
-    // .right() updates litelement using an animation so the page isn't flipped when the function returns
+  async _nextPage() {
+    await this.br.right();
     this.br.resize();
-    this.br.right();
   }
 
   _updateCurrentPageLabel() {
