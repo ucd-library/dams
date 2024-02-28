@@ -4,18 +4,12 @@ import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "@internetarchive/bookreader/src/BookReader.js";
 
-// TODO - fix this, docs say search modifies mobile nav so that plugin needs to be loaded first. but is that true?
-// import "@internetarchive/bookreader/src/plugins/plugin.mobile_nav.js";
-
 // this just adds functionality to BookReader.prototype
 import "@internetarchive/bookreader/src/plugins/search/plugin.search.js";
 
 import BookReader from "@internetarchive/bookreader/src/plugins/plugin.text_selection.js";
+import { PageContainer } from '@internetarchive/bookreader/src/BookReader/PageContainer.js';
 
-/*
- * bookreader forces https and not allowing ports, and we need an event emited when slider search results are clicked.
- * submitting IA pr to fix, for now overriding 2 prototype functions
- */
 import bookreaderPatch from "./app-bookreader.patch-search.js";
 const UcdBookReader = bookreaderPatch(BookReader);
 
@@ -93,9 +87,11 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
   _renderBookReader() {
     requestAnimationFrame(() => {
-      this._renderBookReaderAsync();
-      this._movePrevNext();
+      try {
+        this._renderBookReaderAsync();
+      } catch (e) {}
 
+      this._movePrevNext();
       let slider = document.querySelector(".BRpager");
       $(slider).on("slidechange", this._updateCurrentPageLabel.bind(this));
 
@@ -175,40 +171,14 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     this.navUpdated = true;
   }
 
-  _prevPage() {
-    // if( !this.onePage ) {
-      this.br.left();
-    //   return;
-    // }
-
-    // this.pageIndex = (this.pageIndex || 0) - 1;
-    // if( this.pageIndex < 0 ) this.pageIndex = 0;
-    // let brMode1up = this.querySelector('br-mode-1up');
-    // if( !brMode1up ) {
-    //   // this should be impossible, but just in case
-    //   this.br.left();
-    //   return;
-    // }
-    
-    // brMode1up.scrollTop = brMode1up.worldUnitsToVisiblePixels(brMode1up.pageTops[this.pageIndex]);
+  async _prevPage() {
+    await this.br.left();    
+    this.br.resize();
   }
 
-  _nextPage() {
-    // if( !this.onePage ) {
-      this.br.right();
-    //   return;
-    // }
-
-    // this.pageIndex = (this.pageIndex || 0) + 1;
-    // if( this.pageIndex > this.br.data.length - 1 ) this.pageIndex = this.br.data.length - 1;
-    // let brMode1up = this.querySelector('br-mode-1up');
-    // if( !brMode1up ) {
-    //   // this should be impossible, but just in case
-    //   this.br.right();
-    //   return;
-    // }
-
-    // brMode1up.scrollTop = brMode1up.worldUnitsToVisiblePixels(brMode1up.pageTops[this.pageIndex]);
+  async _nextPage() {
+    await this.br.right();
+    this.br.resize();
   }
 
   _updateCurrentPageLabel() {
@@ -222,8 +192,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
     if( currentPageOverride ) currentPageOverride.innerHTML = currentPageTrimmed;
 
-    // console.log('emitting event for br-page-change, currentPage', parseInt(currentPageTrimmed.split(' ')[0]));
-
     // emit event to notify app-media-download which pages to download
     // (single page mode would be 1 file, two page mode would be the 2 files being viewed)
     this.dispatchEvent(new CustomEvent('br-page-change', {
@@ -232,7 +200,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
         currentPage: parseInt(currentPageTrimmed.split(' ')[0])
       },
     }));
-    // this.pageIndex = parseInt(currentPageTrimmed.split(' ')[0]) - 1;
   }
 
   _toggleBookView() {
@@ -252,33 +219,40 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
   _renderBookReaderAsync() {
     if( this.iaInitialized || !this.bookData.pages ) return;
+
     this.iaInitialized = true;
     let data = [];
-
-    let maxHeight = 0;
+    let minHeight = 9999;
     let maxWidth = 0;
 
     this.bookData.pages.forEach((bd) => {
+      let width = Number(bd[bd.ocr?.imageSize]?.size?.width || 0)
+      let height = Number(bd[bd.ocr?.imageSize]?.size?.height || 0);
+      if( width > maxWidth ) maxWidth = width;
+      if( height < minHeight ) minHeight = height;
+
       data.push([
         {
-          width: bd[bd.ocr?.imageSize]?.size?.width,
-          height: bd[bd.ocr?.imageSize]?.size?.height,
+          width,
+          height,
           uri: bd[bd.ocr?.imageSize]?.url,
           ocr: bd.ocr?.url
         },
       ]);
-
-      if( bd[bd.ocr?.imageSize]?.size?.width > maxWidth ) maxWidth = bd[bd.ocr?.imageSize]?.size?.width;
-      if( bd[bd.ocr?.imageSize]?.size?.height > maxHeight ) maxHeight = bd[bd.ocr?.imageSize]?.size?.height;
     });
     
     // adjust viewport based on image dimensions
     let pad = window.screen.width > 800 ? 25 : 55;
     if( window.innerWidth < maxWidth ) {
-      let height = window.innerWidth / maxWidth * maxHeight + pad;
+      // scale height to max possible height from all pages
+      let height = window.innerWidth / maxWidth * minHeight + pad;
       document.querySelector('#BookReader').style.height = height + 'px';
     }
-    
+
+    let port = '';
+    if( window.location.host.match(/:\d+$/) ) {
+      port = ':' + window.location.host.split(':')[1];
+    }
     let options = {
       el: "#BookReader",
       data,
@@ -287,12 +261,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
       // thumbnail is optional, but it is used in the info dialog
       thumbnail: data[0].uri,
-
-      // Metadata is optional, but it is used in the info dialog
-      metadata: [
-        { label: "Title", value: "Open Library BookReader Presentation" },
-        { label: "Author", value: "Internet Archive" },
-      ],
 
       plugins: {
         textSelection: {
@@ -306,51 +274,127 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
       showToolbar: false,
       server: window.location.host,
-      searchInsideUrl: "/api/page-search/ia",
+      searchInsideUrl: port+"/api/page-search/ia",
+      searchInsideProtocol: window.location.protocol.replace(":", ""),
 
-      getPageWidth: (index) => {
-        let containerWidth = document.querySelector('#BookReader').offsetWidth;
-        let containerHeight = document.querySelector('#BookReader').offsetHeight;
+      // ppi: 200,
 
-        let imageWidth = data[index]?.[0]?.width;        
-        let imageHeight = data[index]?.[0]?.height;
+      // using _calcPageWidth/Height does scale images successfully, however breaks plugins
+      // can same calc be made in patch-search.js to fix plugins?
+      // getPageWidth: (index) => {
+      //   let w = this._calcPageWidth(data, index);
+      //   // let w = this._calcPageSize(data, index, 'width');
+      //   // console.log('getPageWidth', w);
+      //   return w;
+      // },
+      // getPageHeight: (index) => {
+      //   // method 1, doesn't work because it's scaling image to fit container but not scaling svg/ocr text selection layers
+      //   let h = this._calcPageHeight(data, index);
 
-        let widthRatio = containerWidth / imageWidth;
-        let heightRatio = containerHeight / imageHeight;
-        
-        let scaleRatio = Math.min(widthRatio, heightRatio);
-        
-        let newWidth = Math.floor(imageWidth * scaleRatio);
-
-        return newWidth * this.viewportMultiplier;
-      },
-      getPageHeight: (index) => {
-        let containerWidth = document.querySelector('#BookReader').offsetWidth;
-        let containerHeight = document.querySelector('#BookReader').offsetHeight;
-
-        let imageWidth = data[index]?.[0]?.width;        
-        let imageHeight = data[index]?.[0]?.height;
-
-        let widthRatio = containerWidth / imageWidth;
-        let heightRatio = containerHeight / imageHeight;
-        
-        let scaleRatio = Math.min(widthRatio, heightRatio);
-        
-        let newHeight = Math.floor(imageHeight * scaleRatio);
-
-        return newHeight * this.viewportMultiplier;
-      },
+      //   // method 2, use max width/height of image to scale, but not scale over height of container
+      //   // let h = this._calcPageSize(data, index, 'height');
+      //   // console.log('getPageHeight', h);
+      //   return h;
+      // },
 
       padding: 20,
       ui: "full", // embed, full (responsive)
     };
+
     if( this.attributes.brsinglepage ) this.onePage = true;
     this.br = new UcdBookReader(options);
+
     this.br.init();
     this.br.switchMode(this.onePage ? 1 : 2);
     this.br.resize();
     this.requestUpdate();
   }
+
+  // _calcPageSize(data, index, returnType) {
+  //   let containerWidth = document.querySelector('#BookReader').offsetWidth;
+  //   let containerHeight = document.querySelector('#BookReader').offsetHeight;
+
+  //   let imageWidth = data[index]?.[0]?.width || data.width || 0;     
+  //   let imageHeight = data[index]?.[0]?.height || data.height || 0;
+
+  //   let hScaled, wScaled;
+  //   if( imageHeight > imageWidth ) {
+  //     hScaled = containerHeight;
+  //     wScaled = imageWidth * (containerHeight / imageHeight);
+  //   } else {
+  //     wScaled = containerWidth;
+  //     hScaled = imageHeight * (containerWidth / imageWidth);
+  //   }
+
+  //   if( returnType === 'width' ) return wScaled;
+  //   if( returnType === 'height' ) return hScaled;
+  //   throw new Error('returnType must be width or height');
+  // }
+
+  // _calcPageWidth(data, index) {
+  //   // if( index === 1 ) console.log('IN _calcPageWidth FOR INDEX 1');
+
+  //   // first get the width and height of the #BookReader container
+  //   let containerWidth = document.querySelector('#BookReader').offsetWidth;
+  //   let containerHeight = document.querySelector('#BookReader').offsetHeight;
+
+  //   // if( index === 1 ) console.log({ containerHeight, containerWidth });
+    
+  //   // get the width and height of the image
+  //   let imageWidth = data[index]?.[0]?.width || data.width || 0;     
+  //   let imageHeight = data[index]?.[0]?.height || data.height || 0;
+
+  //   // if( index === 1 ) console.log({ imageWidth, imageHeight });
+
+  //   // calc scale ratio by dividing container size by image size
+  //   let widthRatio = containerWidth / imageWidth;
+  //   let heightRatio = containerHeight / imageHeight;
+
+  //   // if( index === 1 ) console.log({ widthRatio, heightRatio });
+
+  //   // use the smaller of the two ratios to scale the image
+  //   let scaleRatio = Math.min(widthRatio, heightRatio);
+    
+  //   // scale the image width by the ratio
+  //   let newWidth = Math.floor(imageWidth * scaleRatio);
+
+  //   // if( index === 1 ) console.log({ scaleRatio, newWidth });
+
+  //   // don't scale image for wider screens
+  //   if( window.innerWidth > 800 ) {
+  //     return imageWidth;
+  //   }
+
+  //   // if( index === 1 ) console.log({ returnedWidth: newWidth * this.viewportMultiplier });
+
+  //   // return imageWidth; // this works for normal view, not when scaling for mobile
+  //   return newWidth * this.viewportMultiplier; // this scales well with mobile and desktop orientations, but breaks text selection plugin and search plugin
+  // }
+
+  // _calcPageHeight(data, index) {
+  //   let containerWidth = document.querySelector('#BookReader').offsetWidth;
+  //   let containerHeight = document.querySelector('#BookReader').offsetHeight;
+
+  //   let imageWidth = data[index]?.[0]?.width || data.width || 0;     
+  //   let imageHeight = data[index]?.[0]?.height || data.height || 0;
+  //   // console.log('imageHeight before scaling: ', imageHeight);
+
+  //   let widthRatio = containerWidth / imageWidth;
+  //   let heightRatio = containerHeight / imageHeight;
+    
+  //   let scaleRatio = Math.min(widthRatio, heightRatio);
+    
+  //   let newHeight = Math.floor(imageHeight * scaleRatio);
+  //   // console.log('imageHeight after scaling: ', newHeight * this.viewportMultiplier);
+
+  //   if( window.innerWidth > 800 ) {
+  //     // don't scale image for wider screens
+  //     return imageHeight;
+  //   }
+
+  //   // return imageHeight; // this works for normal view, not when scaling for mobile
+  //   return newHeight * this.viewportMultiplier; // this scales well with mobile and desktop orientations, but breaks text selection plugin and search plugin
+  // }
 
   _onSearchResultsChange(e) {
     let results = e.detail?.props?.results;

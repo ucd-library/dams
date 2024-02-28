@@ -138,7 +138,7 @@ class PageSearch extends FinEsDataModel {
         }
       }
 
-      let matchWords = Array.from(terms).map((term) => new RegExp(term, "i"));
+      let matchWords = Array.from(terms).map((term) => new RegExp(term));
 
       let node = result["@graph"][0];
       parseString(node.content, (error, result) => {
@@ -147,7 +147,7 @@ class PageSearch extends FinEsDataModel {
         let pageData = {
           width: parseInt(result?.OBJECT?.$?.width),
           height: parseInt(result?.OBJECT?.$?.height),
-          page: parseInt(node.position),
+          page: parseInt(node.position) - 1,
         };
 
         result?.OBJECT?.HIDDENTEXT?.forEach((item) => {
