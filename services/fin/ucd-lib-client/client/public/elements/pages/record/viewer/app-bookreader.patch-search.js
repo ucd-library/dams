@@ -54,7 +54,7 @@ module.exports = function patchSearch(BookReader) {
 
     // Scroll/flash in the ui
     const $boxes = await poll(() => $(`rect.match-index-${match.matchIndex}`), { until: result => result.length > 0 });
-    if ($boxes.length) {
+    if ($boxes && $boxes.length) {
       $boxes.css('animation', 'none');
       $boxes[0].scrollIntoView({
         // Only vertically center the highlight if we're in 1up or in full screen. In
