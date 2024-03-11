@@ -223,13 +223,19 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     this.iaInitialized = true;
     let data = [];
     let minHeight = 9999;
-    let maxWidth = 0;
+    let offsetHeight = document.querySelector('#BookReader').offsetHeight;
+    let offsetWidth = document.querySelector('#BookReader').offsetWidth;
+    console.log({ offsetHeight, offsetWidth });
 
     this.bookData.pages.forEach((bd) => {
       let width = Number(bd[bd.ocr?.imageSize]?.size?.width || 0)
       let height = Number(bd[bd.ocr?.imageSize]?.size?.height || 0);
-      if( width > maxWidth ) maxWidth = width;
-      if( height < minHeight ) minHeight = height;
+      let widthRatio = offsetWidth / width;
+      let heightRatio = offsetHeight / height;
+      let scaleRatio = Math.min(widthRatio, heightRatio);
+      if( height * scaleRatio < minHeight ) {
+        minHeight = height * scaleRatio;
+      }
 
       data.push([
         {
@@ -241,12 +247,9 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
       ]);
     });
     
-    // adjust viewport based on image dimensions
-    let pad = window.screen.width > 800 ? 25 : 55;
-    if( window.innerWidth < maxWidth ) {
-      // scale height to max possible height from all pages
-      let height = window.innerWidth / maxWidth * minHeight + pad;
-      document.querySelector('#BookReader').style.height = height + 'px';
+    // adjust br viewport based on image dimensions
+    if( offsetHeight > minHeight ) {
+      document.querySelector('#BookReader').style.height = minHeight + 'px';
     }
 
     let port = '';
