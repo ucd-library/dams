@@ -363,7 +363,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
         document.querySelector(".wrapper").append(mediaNav);
       }
 
-      brView.br.twoPage.autofit = true;
+      // if br onePage, need to autofit scale. twoPage already resets
+      brView.br._modes.mode1Up.mode1UpLit.scale = 1;
       brView.br.resize();
     }
   }

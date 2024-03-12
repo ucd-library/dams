@@ -62,7 +62,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   }
 
   async _renderImg() {
-    debugger;
     if( this.media ) {
       // there could be gcs errors where only some of the images are available, or only the original
       let srcset = '';
