@@ -26,7 +26,7 @@ return html`
     left: 0;
     right: 0;
     bottom: 0;
-    animation: fadein 1s ease-in-out;
+    animation: fadein 1.5s ease-in-out;
     z-index: -1;
   }
   @keyframes fadein {

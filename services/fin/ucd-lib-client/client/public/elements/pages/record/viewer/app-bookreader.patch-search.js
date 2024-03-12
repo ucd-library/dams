@@ -218,16 +218,61 @@ module.exports = function patchSearch(BookReader) {
   }
 
   function _computePageTops(pages, spacing) {
-    // calc height of images in inches
-    // get max height and width of images
+    console.log({spacing})
+    /*
+    // try 1
+    // calc height of images in inches.. get max height and width of images
+    // 502 x 582 container px
     let minHeight = Math.min(...pages.map(page => page.height));
     let maxWidth = Math.max(...pages.map(page => page.width));
-    let height = this.offsetWidth / maxWidth * minHeight - 40;
+
+    let height = this.offsetWidth / maxWidth * minHeight - 55;
 
     // hack for mobile resolutions
-    let widthOver500 = window.innerWidth - 500;
-    if( widthOver500 < 0 ) widthOver500 = 0;
-    let pageHeightInches = (pages[0]?.ppi || 500) / (height - widthOver500);
+    // let widthOver500 = window.innerWidth - 500;
+    // if( widthOver500 < 0 ) widthOver500 = 0;
+    // let pageHeightInches = (pages[0]?.ppi || 500) / (height - widthOver500);
+    let pageHeightInches = height / this.coordSpace.screenDPI; // (pages[0]?.ppi || 500);
+
+    const result = {};
+    let top = spacing;
+    for (const page of pages) {
+      result[page.index] = top;
+      top += pageHeightInches + spacing;
+      // top += page.heightInches + spacing;
+    }
+    console.log(result);
+    return result;
+    */
+
+    
+    // calc height of images in inches.. get max height and width of images
+    // container width/height in px
+    const widthOffset = this.offsetWidth;
+    const heightOffset = this.offsetHeight;
+    console.log({ widthOffset, heightOffset });
+
+    // hack to scale up spacing for smaller screens
+    let diffFrom700 = 700 - widthOffset;
+    if( widthOffset < 700 ) {
+      spacing = spacing + (diffFrom700 * 0.005);
+    }
+
+    // image width/height in px
+    // loop pages array and get min height that a width will fit in container
+    let minHeight = 9999;
+    pages.forEach(page => {
+      let width = page.width;
+      let height = page.height;
+      let widthRatio = widthOffset / width;
+      let heightRatio = heightOffset / height;
+      let scaleRatio = Math.min(widthRatio, heightRatio);
+      if( height * scaleRatio < minHeight ) {
+        minHeight = height * scaleRatio;
+      }
+    });
+
+    let pageHeightInches = minHeight / this.coordSpace.screenDPI;
 
     const result = {};
     let top = spacing;
@@ -235,10 +280,48 @@ module.exports = function patchSearch(BookReader) {
       result[page.index] = top;
       top += pageHeightInches + spacing;
     }
+    console.log(result);
     return result;
+    
+
+    /*
+    // try 3, works for portrait images but not landscape or alternating
+    // TODO need height to be smaller if width doesn't fit in container
+    // calc height of images in inches.. get max height and width of images
+    // 502 x 582 container px
+
+    // calc height of images in inches.. get max height and width of images    
+    let maxHeight = Math.max(...pages.map(page => page.height));
+    let maxWidth = Math.max(...pages.map(page => page.width));
+
+    // container width/height in px
+    const widthOffset = this.offsetWidth;
+    const heightOffset = this.offsetHeight;
+
+    // scale to fit container
+    let widthRatio = widthOffset / maxWidth;
+    let heightRatio = heightOffset / maxHeight;
+    let scaleRatio = Math.min(widthRatio, heightRatio);
+
+    let height = maxHeight * scaleRatio;
+    let pageHeightInches = height / this.coordSpace.screenDPI;
+
+    const result = {};
+    let top = spacing;
+    for (const page of pages) {
+      result[page.index] = top;
+      top += pageHeightInches + spacing;
+      // top += page.heightInches + spacing;
+    }
+    console.log(result);
+    return result;
+    */
   }
 
   function _mode1UpRenderPage(page, litElement) {
+    /*
+    // try 1
+    // broken, in combination with computePageTops and app-bookreader-viewer height resizing
     // adjust width/height to be max possible width/height possible in container
     const wToR = litElement.coordSpace.worldUnitsToRenderedPixels;
     const wToV = litElement.coordSpace.worldUnitsToVisiblePixels;
@@ -260,6 +343,66 @@ module.exports = function patchSearch(BookReader) {
     const left = Math.max(litElement.SPACING_IN, (containerWidth - (page.widthInches * scaleRatio)) / 2);
 
     // pageTops updated above in _computePageTops()
+    const top = litElement.pageTops[page.index];
+
+    const transform = `translate(${wToR(left)}px, ${wToR(top)}px)`;
+    
+    const pageContainerEl = litElement.createPageContainer(page)
+      .update({
+        dimensions: {
+          width: width * scaleRatio,
+          height: height * scaleRatio,
+          top: 0,
+          left: 0,
+        },
+        reduce: page.width / wToV(page.widthInches),
+      }).$container[0];
+
+    pageContainerEl.style.transform = transform;
+    pageContainerEl.classList.toggle('BRpage-visible', litElement.visiblePages.includes(page));
+    return pageContainerEl;
+    */
+
+    // try 2
+    // in combination with computePageTops and app-bookreader-viewer height resizing
+    // find min height where width will fit in container
+    let minHeight = 9999;
+    (page.book?.br?.data || []).forEach(page => {
+      let width = page[0].width;
+      let height = page[0].height;
+      let widthRatio = litElement.offsetWidth / width;
+      let heightRatio = litElement.offsetHeight / height;
+      let scaleRatio = Math.min(widthRatio, heightRatio);
+      if( height * scaleRatio < minHeight ) {
+        minHeight = height * scaleRatio;
+      }
+    });
+
+    const wToR = litElement.coordSpace.worldUnitsToRenderedPixels;
+    const wToV = litElement.coordSpace.worldUnitsToVisiblePixels;
+    const containerWidth = litElement.coordSpace.visiblePixelsToWorldUnits(litElement.htmlDimensionsCacher.clientWidth);
+
+    // image width/height in px
+    let width = wToR(page.widthInches);
+    let height = wToR(page.heightInches);
+
+    if( height > minHeight ) {
+      height = minHeight;
+      width = wToR(page.widthInches) * (minHeight / wToR(page.heightInches));
+    }
+    
+    // container width/height in px
+    const widthOffset = litElement.offsetWidth;
+    const heightOffset = litElement.offsetHeight;
+ 
+    // calc max width/height possible
+    let widthRatio = widthOffset / width;
+    let heightRatio = heightOffset / height;
+    let scaleRatio = Math.min(widthRatio, heightRatio);
+    
+    const left = Math.max(litElement.SPACING_IN / 2, (containerWidth - (page.widthInches * scaleRatio)) / 2);
+
+    // pageTops is updated above in _computePageTops()
     const top = litElement.pageTops[page.index];
 
     const transform = `translate(${wToR(left)}px, ${wToR(top)}px)`;

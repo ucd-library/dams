@@ -70,6 +70,10 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   }
 
   _onAppStateUpdate(e) {
+    if (window.innerWidth < 801) {
+      this.onePage = true;
+    }
+
     if (e.location.page !== 'item') {
       this.bookData = {};
       this.iaInitialized = false;
@@ -81,14 +85,13 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
           closeSearch: true,
         },
       }));
-
     }
   }
 
-  _renderBookReader() {
+  _renderBookReader(forceRender=false) {
     requestAnimationFrame(() => {
       try {
-        this._renderBookReaderAsync();
+        this._renderBookReaderAsync(forceRender);
       } catch (e) {}
 
       this._movePrevNext();
@@ -217,19 +220,29 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     this.br.zoom(amount);
   }
 
-  _renderBookReaderAsync() {
-    if( this.iaInitialized || !this.bookData.pages ) return;
+  _renderBookReaderAsync(forceRender=false) {
+    if( (this.iaInitialized || !this.bookData.pages) && !forceRender ) return;
 
     this.iaInitialized = true;
     let data = [];
     let minHeight = 9999;
-    let maxWidth = 0;
+    let offsetHeight = 634;
+    if( forceRender && this.fullscreen ) {
+      offsetHeight = window.innerHeight;      
+    }
+    this.height = offsetHeight;
+    let offsetWidth = document.querySelector('#BookReader').offsetWidth;
+    console.log({ offsetHeight, offsetWidth });
 
     this.bookData.pages.forEach((bd) => {
       let width = Number(bd[bd.ocr?.imageSize]?.size?.width || 0)
       let height = Number(bd[bd.ocr?.imageSize]?.size?.height || 0);
-      if( width > maxWidth ) maxWidth = width;
-      if( height < minHeight ) minHeight = height;
+      let widthRatio = offsetWidth / width;
+      let heightRatio = offsetHeight / height;
+      let scaleRatio = Math.min(widthRatio, heightRatio);
+      if( height * scaleRatio < minHeight ) {
+        minHeight = height * scaleRatio;
+      }
 
       data.push([
         {
@@ -241,12 +254,9 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
       ]);
     });
     
-    // adjust viewport based on image dimensions
-    let pad = window.screen.width > 800 ? 25 : 55;
-    if( window.innerWidth < maxWidth ) {
-      // scale height to max possible height from all pages
-      let height = window.innerWidth / maxWidth * minHeight + pad;
-      document.querySelector('#BookReader').style.height = height + 'px';
+    // adjust br viewport based on image dimensions
+    if( offsetHeight > minHeight ) {
+      document.querySelector('#BookReader').style.height = minHeight + 'px';
     }
 
     let port = '';

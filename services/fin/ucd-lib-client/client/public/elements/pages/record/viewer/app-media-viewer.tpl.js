@@ -58,26 +58,26 @@ export default function render() {
         border: none;
       }
 
-      .overflow::-webkit-scrollbar {
+      .search-side-panel .overflow::-webkit-scrollbar {
         width: 10px;
       }
-      .overflow::-webkit-scrollbar-track {
+      .search-side-panel .overflow::-webkit-scrollbar-track {
         background: var(--color-aggie-gold-70);
         /* border-left: 4px solid var(--color-aggie-gold-70);
         border-right: 4px solid var(--color-aggie-gold-70); */
       }
-      .overflow[no-overflow]::-webkit-scrollbar-track {
+      .search-side-panel .overflow[no-overflow]::-webkit-scrollbar-track {
         background: transparent;
         border: none;
       }
-      .overflow::-webkit-scrollbar-thumb {
+      .search-side-panel .overflow::-webkit-scrollbar-thumb {
         border-radius: 6px;
         background: var(--color-aggie-gold);
       }
 
       /* basic support for FF. Chrome/Safari should support -webkit styles above */
       @supports (scrollbar-color: red blue) {
-        * {
+        .search-side-panel * {
           scrollbar-color: var(--color-aggie-gold) var(--color-aggie-gold-70);
           scrollbar-width: thin;
         }

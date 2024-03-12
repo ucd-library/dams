@@ -147,7 +147,7 @@ class PageSearch extends FinEsDataModel {
         let pageData = {
           width: parseInt(result?.OBJECT?.$?.width),
           height: parseInt(result?.OBJECT?.$?.height),
-          page: parseInt(node.position) - 1,
+          page: parseInt(node.position),
         };
 
         result?.OBJECT?.HIDDENTEXT?.forEach((item) => {
