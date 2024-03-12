@@ -88,10 +88,10 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     }
   }
 
-  _renderBookReader() {
+  _renderBookReader(forceRender=false) {
     requestAnimationFrame(() => {
       try {
-        this._renderBookReaderAsync();
+        this._renderBookReaderAsync(forceRender);
       } catch (e) {}
 
       this._movePrevNext();
@@ -220,13 +220,17 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     this.br.zoom(amount);
   }
 
-  _renderBookReaderAsync() {
-    if( this.iaInitialized || !this.bookData.pages ) return;
+  _renderBookReaderAsync(forceRender=false) {
+    if( (this.iaInitialized || !this.bookData.pages) && !forceRender ) return;
 
     this.iaInitialized = true;
     let data = [];
     let minHeight = 9999;
     let offsetHeight = 634;
+    if( forceRender && this.fullscreen ) {
+      offsetHeight = window.innerHeight;      
+    }
+    this.height = offsetHeight;
     let offsetWidth = document.querySelector('#BookReader').offsetWidth;
     console.log({ offsetHeight, offsetWidth });
 

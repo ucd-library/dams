@@ -33,7 +33,7 @@ export default function render() {
       }
 
       #BookReader {
-        height: 634px;
+        /* min-height: 634px; */
         background-color: transparent;
       }
 
@@ -268,7 +268,7 @@ export default function render() {
     <button class="zooms-in" @click="${this._zoomIn}">Zoom In</button>
     <button class="zooms-out" @click="${this._zoomOut}">Zoom Out</button>
 
-    <div id="BookReader" ?fullscreen=${this.fullscreen}></div>
+    <div style="height: ${this.height}px" id="BookReader" ?fullscreen=${this.fullscreen}></div>
 
     <div id="prev" @click="${this._prevPage}">
       <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
