@@ -226,7 +226,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     this.iaInitialized = true;
     let data = [];
     let minHeight = 9999;
-    let offsetHeight = document.querySelector('#BookReader').offsetHeight;
+    let offsetHeight = 634;
     let offsetWidth = document.querySelector('#BookReader').offsetWidth;
     console.log({ offsetHeight, offsetWidth });
 
