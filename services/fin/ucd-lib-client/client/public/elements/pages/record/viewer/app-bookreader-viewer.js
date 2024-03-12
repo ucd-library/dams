@@ -70,6 +70,10 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   }
 
   _onAppStateUpdate(e) {
+    if (window.innerWidth < 801) {
+      this.onePage = true;
+    }
+
     if (e.location.page !== 'item') {
       this.bookData = {};
       this.iaInitialized = false;
@@ -81,7 +85,6 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
           closeSearch: true,
         },
       }));
-
     }
   }
 
