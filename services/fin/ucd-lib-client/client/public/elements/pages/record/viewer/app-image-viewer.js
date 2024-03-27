@@ -80,6 +80,8 @@ export default class AppImageViewer extends Mixin(LitElement).with(
           let optimalImageHeight = (size.height / size.width * window.innerWidth);
           this.height = optimalImageHeight > maxHeight ? maxHeight + 'px' : optimalImageHeight + 'px';     
         }   
+      } else {
+        this.height = '600px';
       }
 
       let sizes = "600px";

@@ -138,7 +138,7 @@ class PageSearch extends FinEsDataModel {
         }
       }
 
-      let matchWords = Array.from(terms).map((term) => new RegExp(term, "i"));
+      let matchWords = Array.from(terms).map((term) => new RegExp(term));
 
       let node = result["@graph"][0];
       parseString(node.content, (error, result) => {

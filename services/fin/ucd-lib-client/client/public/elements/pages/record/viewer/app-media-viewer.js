@@ -325,20 +325,28 @@ export default class AppMediaViewer extends Mixin(LitElement)
         .classList.add("fullscreen");
       document.body.style.overflow = "hidden";
 
-      let mediaNav = document.querySelector("app-media-viewer-nav");
-      let brNav = brView.querySelector(".BRfooter");
-      if (mediaNav && brNav) {
-        // append media nav in brNav to display inline
-        let li = document.createElement("li");
-        li.appendChild(mediaNav);
-        brNav.querySelector("nav > ul").appendChild(li);
-
-        // also move search button as first child
-        let brSearch = mediaNav.shadowRoot.querySelector(".br-search");
-        if (brSearch) brNav.prepend(brSearch);
+      if( brView.onePage ) {
+        // need to recalc pagetops and render for mode1
+        brView._renderBookReader(true);
       }
 
-      brView.br.resize();
+      requestAnimationFrame(() => {
+        let mediaNav = document.querySelector("app-media-viewer-nav");
+        let brNav = brView.querySelector(".BRfooter");
+        if (mediaNav && brNav) {
+          // append media nav in brNav to display inline
+          let li = document.createElement("li");
+          li.appendChild(mediaNav);
+          brNav.querySelector("nav > ul").appendChild(li);
+  
+          // also move search button as first child
+          let brSearch = mediaNav.shadowRoot.querySelector(".br-search");
+          if (brSearch) brNav.prepend(brSearch);
+        }
+  
+        brView.br.resize();
+      });
+      
     }
   }
 
@@ -363,7 +371,13 @@ export default class AppMediaViewer extends Mixin(LitElement)
         document.querySelector(".wrapper").append(mediaNav);
       }
 
-      brView.br.twoPage.autofit = true;
+      // if br onePage, need to autofit scale. twoPage already resets
+      if( brView.onePage ) {
+        brView.fullscreen = false;
+        brView.br._modes.mode1Up.mode1UpLit.scale = 1;
+        // need to recalc pagetops and render for mode1
+        brView._renderBookReader(true);
+      }
       brView.br.resize();
     }
   }
