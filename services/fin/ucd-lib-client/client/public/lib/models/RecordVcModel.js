@@ -60,6 +60,7 @@ class RecordVcModel {
         clientMedia: clientMedia,
         images,
         date: root.yearPublished || 'Undated',
+        description: root.description || '',
         publisher: root?.publisher?.name,
         subjects,
         callNumber,

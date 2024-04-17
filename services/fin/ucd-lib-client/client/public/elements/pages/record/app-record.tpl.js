@@ -311,6 +311,11 @@ export default function render() {
         <div class="value" id="dateValue">${this.date}</div>
       </div>
 
+      <div ?hidden="${!this.description || !this.description.length}" class="metadata-row">
+        <div class="attr">Description</div>
+        <div class="value" id="descriptionValue">${this.description}</div>
+      </div>
+
       <div ?hidden="${!this.publisher}" class="metadata-row" id="publisher">
         <div class="attr">Publisher</div>
         <div class="value" id="publisherValue">${this.publisher}</div>
