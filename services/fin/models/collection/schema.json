@@ -54,6 +54,14 @@
       "type": "text"
     },
 
+    "@graph.about" : {
+      "type": "text"
+    },
+
+    "@graph.keywords" : {
+      "type": "text"
+    },
+
     "@graph.itemCount" : {
       "type": "integer"
     },

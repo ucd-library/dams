@@ -22,6 +22,10 @@
       }
     },
 
+    "@graph.about" : {
+      "type" : "text"
+    },
+
     "@graph.identifier" : {
       "type" : "text",
       "fields": {
@@ -102,6 +106,10 @@
           "type":  "keyword"
         }
       }
+    },
+
+    "@graph.description" : {
+      "type": "text"
     },
 
     "@graph.alternativeHeadline" : {
