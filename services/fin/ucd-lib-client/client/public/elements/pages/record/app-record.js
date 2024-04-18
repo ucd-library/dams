@@ -28,6 +28,7 @@ class AppRecord extends Mixin(LitElement)
       collectionImg: { type: String },
       collectionId: { type: String },
       collectionItemCount: { type: Number },
+      description: { type: String },
       date: { type: String },
       publisher: { type: String },
       subjects: { type: Array },
@@ -66,6 +67,7 @@ class AppRecord extends Mixin(LitElement)
     this.collectionImg = "";
     this.collectionId = "";
     this.renderedCollectionId = "";
+    this.description = "";
 
     this.size = "";
     this.rights = {};
@@ -127,6 +129,7 @@ class AppRecord extends Mixin(LitElement)
     this.currentRecordId = this.record["@id"];
     this.name = this.record.name;
     this.collectionName = this.record.collectionName;
+    this.description = this.record.description;
     this.date = this.record.date;
     this.publisher = this.record.publisher;
     this.subjects = this.record.subjects || [];
