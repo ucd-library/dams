@@ -53,7 +53,6 @@ export class AppSearch extends Mixin(LitElement)
     }
     window.addEventListener('collapse-filters', this._onCollapseFilters.bind(this));
     window.addEventListener("page-change", this._onPaginationChange.bind(this));
-    window.addEventListener("page-size-change", this._onPageSizeChange.bind(this));
   }
 
   /**
@@ -89,18 +88,6 @@ export class AppSearch extends Mixin(LitElement)
   }
 
   /**
-   * @method _onPageSizeChange
-   * @description fired when then user selects a new page size
-   *
-   * @param {Object} e
-   */
-  _onPageSizeChange(e) {
-    let searchDoc = this.RecordModel.getCurrentSearchDocument();
-    this.RecordModel.setPaging(searchDoc, searchDoc.offset, e.detail.itemsPerPage || searchDoc.limit);
-    this.RecordModel.setSearchLocation(searchDoc);
-  }
-
-  /**
    * @method _onPaginationChange
    * @description fired when pagination button is clicked
    *
@@ -108,7 +95,7 @@ export class AppSearch extends Mixin(LitElement)
    */
   _onPaginationChange(e) {
     let searchDoc = this.RecordModel.getCurrentSearchDocument();
-    this.RecordModel.setPaging(searchDoc, e.detail.startIndex);
+    this.RecordModel.setPaging(searchDoc, e.detail.startIndex, e.detail.itemsPerPage || searchDoc.limit);
     this.RecordModel.setSearchLocation(searchDoc);
   }
 
