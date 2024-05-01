@@ -251,7 +251,7 @@ class AppRecord extends Mixin(LitElement)
     let imagePath = '';
 
     // check if we are on a specific /media path
-    let isMediaUrl = location.pathname; // path.indexOf('/media') > -1;
+    let isMediaUrl = path.indexOf('/media') > -1;
     if( isMediaUrl ) {
       // find media in graph
       let media = selectedRecord.clientMedia.graph
@@ -263,10 +263,10 @@ class AppRecord extends Mixin(LitElement)
         // path = media['@id'].split('/media')[0];
         imagePath = media['@id'];
       }
-
     } 
+
     if (!imagePath && mediaGroup?.['@shortType']?.includes('ImageList')) {
-      imagePath = mediaGroup.clientMedia?.images?.original?.url || path;
+      imagePath = mediaGroup.encodesCreativeWork?.['@id'] || mediaGroup.clientMedia?.images?.original?.url || path;
     } else {
       imagePath = selectedRecord.selectedMedia?.['@id'];
     }
@@ -275,7 +275,7 @@ class AppRecord extends Mixin(LitElement)
       path,
       imagePath.replace('/fcrepo/rest', '')
     ];
-    
+
     this.fedoraLinks = [
       '/fcrepo/rest'+ path.replace('/fcrepo/rest', ''),
       '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
