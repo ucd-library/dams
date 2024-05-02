@@ -331,7 +331,8 @@ export default function render() {
         current-page=${this.currentPage}
         max-pages=${this.totalPages}
         @page-change=${this._onPageClicked}
-        xs-screen>
+        xs-screen
+        ellipses>
       </ucd-theme-pagination>
     </div>
   `;
