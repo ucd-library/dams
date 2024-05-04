@@ -2,7 +2,7 @@
   "sync" : {
     "containers" : [
       {
-        "bucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
+        "bucket" : "{{GCS_CLIENT_MEDIA_BUCKET}}",
         "basePath" : "/application/ucd-lib-client",
         "direction" : "fcrepo-to-gcs",
         "initDataHydration" : true,
@@ -12,11 +12,11 @@
   },
   "access" : [
     { 
-      "bucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
+      "bucket" : "{{GCS_CLIENT_MEDIA_BUCKET}}",
       "basePath" : "/item"
     },
     { 
-      "bucket" : "dams-client-media-{{GCS_BUCKET_ENV}}",
+      "bucket" : "{{GCS_CLIENT_MEDIA_BUCKET}}",
       "basePath" : "/collection"
     }
   ]
