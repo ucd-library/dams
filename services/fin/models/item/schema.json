@@ -120,6 +120,10 @@
       "type": "text"
     },
 
+    "@graph.damsEdits.exists" : {
+      "type": "boolean"
+    },
+
     "@graph._.updated" : {
       "type" : "date"
     },

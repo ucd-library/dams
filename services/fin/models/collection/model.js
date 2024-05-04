@@ -12,6 +12,7 @@ class CollectionsModel extends FinEsDataModel {
     // we lookup item counts for a collection by querying the item index
     // since this is used for a write op, we need to use the write alias
     this.itemAlias = 'item-write';
+    this.itemReadAlias = 'item-read';
     this.collectionType = 'http://schema.org/Collection';
 
     this.schema = schema;
@@ -142,38 +143,94 @@ class CollectionsModel extends FinEsDataModel {
    * 
    */
   async getEdits(id) {
-    if( !id.match(/^info:fedora/) ) {
-      if( !id.startsWith('/') ) id = '/'+id;
-      id = 'info:fedora'+id;
-    }
-    let result = await pg.query(`select * from fin_cache.dams_links where collection = $1`, [id]);
+    // if( !id.match(/^info:fedora/) ) {
+    if( !id.startsWith('/') ) id = '/'+id;
+    //   if( !id.startsWith('/') ) id = '/'+id;
+    //   id = 'info:fedora'+id;
+    // }
+    // let result = await pg.query(`select * from fin_cache.dams_links where collection = $1`, [id]);
+
+    let result = await this.client.search({
+      index : this.itemReadAlias,
+      body: {
+        _source: ["@graph.damsEdits", '@id'],
+        query: {
+          bool : {
+            must : [
+              {term: {"@graph.damsEdits.exists": true}},
+              {term: {'@graph.isPartOf.@id': id}}
+            ]
+          }
+        }
+      }
+    });
+
+    let itemOverrides = (result?.hits?.hits || []).map(hit => {
+      let item = hit._source['@graph'][0];
+      let keys = Object.keys(item.damsEdits);
+      keys.splice(keys.indexOf('exists'), 1);
+
+      let props = {};
+      for( let key of keys ) {
+        props[key] = item.damsEdits[key].value;
+      }
+
+      return Object.assign(props, {item : hit._source['@id']});
+    });
 
     let resp = {
       collection : id,
       edits : null,
-      itemOverrides : [],
+      itemOverrides,
     };
     
-    resp.itemOverrides = (result.rows || []).map(row => {
-      delete row.collection;
-      delete row.edit;
-      return row;
-    });
+    // resp.itemOverrides = (result.rows || []).map(row => {
+    //   delete row.collection;
+    //   delete row.edit;
+    //   return row;
+    // });
     
-    result = await pg.query(`
-      select 
-        count(*) as count 
-      from 
-        fin_cache.quads_view qv
-      where
-        qv.fedora_id = $1 and
-        object != ''`, 
-      [id.replace('info:fedora', 'info:fedora/application/ucd-lib-client')]
-    );
+    result = await this.client.search({
+      index : this.readIndexAlias,
+      body: {
+        _source: ["@graph.damsEdits"],
+        query: {
+          bool : {
+            must : [
+              {term: {'@graph.@id': id}}
+            ]
+          }
+        }
+      }
+    });
 
-    if( result.rows.length && result.rows[0].count > 0 ) {
-      resp.edits = id.replace('info:fedora', 'info:fedora/application/ucd-lib-client');
+    if( result.hits.hits.length ) {
+      let collection = result.hits.hits[0]._source['@graph'];
+      if( collection && collection.length && collection[0].damsEdits ) {
+        let keys = Object.keys(collection[0].damsEdits);
+        let props = {};
+        for( let key of keys ) {
+          props[key] = collection[0].damsEdits[key].value;
+        }
+        delete props.exists;
+        resp.edits = props;
+      }
     }
+
+    // result = await pg.query(`
+    //   select 
+    //     count(*) as count 
+    //   from 
+    //     fin_cache.quads_view qv
+    //   where
+    //     qv.fedora_id = $1 and
+    //     object != ''`, 
+    //   [id.replace('info:fedora', 'info:fedora/application/ucd-lib-client')]
+    // );
+
+    // if( result.rows.length && result.rows[0].count > 0 ) {
+    //   resp.edits = id.replace('info:fedora', 'info:fedora/application/ucd-lib-client');
+    // }
 
     return resp; 
   }

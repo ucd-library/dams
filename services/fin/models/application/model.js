@@ -46,6 +46,32 @@ class ApplicationsModel extends FinEsDataModel {
         id : jsonld['@id']
       });
     } catch(e) {}
+
+    // update edits count
+    let reindex = [];
+    for( let node of jsonld['@graph'] ) {
+      if( !node.isPartOf ) continue;
+
+      let isPartOf = node.isPartOf;
+      if( !Array.isArray(isPartOf) ) {
+        isPartOf = [isPartOf];
+      }
+
+      for( let part of isPartOf ) {
+        if( part['@id'] && part['@id'].match(/^\/collection\//) ||
+            part['@id'].match(/^\/item\//) ) {
+          reindex.push(part['@id']);
+        }
+      }
+    }
+
+    for( let id of reindex ) {
+      await this.messaging.sendMessage(MessageWrapper.createMessage(
+        ['http://digital.ucdavis.edu/schema#Reindex'],
+        {'@id': id}
+      ));
+    }
+
     return super.update(jsonld);
   }
 

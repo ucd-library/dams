@@ -75,6 +75,7 @@ ENV UCD_DAMS_DEPLOYMENT_TAG ${UCD_DAMS_DEPLOYMENT_TAG}
 ARG FIN_SERVER_IMAGE=unknown
 ENV FIN_SERVER_IMAGE ${FIN_SERVER_IMAGE}
 
-ENV GCS_BUCKET_ENV=prod
+ENV GCS_TMP_WORKFLOW_BUCKET=dams-client-media-prod
+ENV GCS_CLIENT_MEDIA_BUCKET=dams-prod-workflow-tmp-space
 
 CMD [ "bash", "-c", "tail -f /dev/null"]

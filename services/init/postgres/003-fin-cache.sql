@@ -43,6 +43,16 @@ CREATE OR REPLACE VIEW dams_links AS
   GROUP BY edits.collection, edits.item, item.object;
 
 
+CREATE OR REPLACE VIEW dams_edits AS
+  with edit_properties as (
+    select * from quads_view where predicate = 'http://digital.ucdavis.edu/schema#itemDefaultDisplay'
+  ),
+  ipo as (
+    select * from quads_view where predicate = 'http://schema.org/isPartOf'
+  )
+  select e.subject as edit_id, ipo.object as target, e.predicate as property, e.object as value from edit_properties e
+  left join ipo on e.subject = ipo.subject;
+
     CREATE OR REPLACE VIEW dams_links_test AS
   with collection_ids as (
     SELECT id FROM search_rdf_type WHERE rdf_type_uri = 'http://schema.org/Collection'

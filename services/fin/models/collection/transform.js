@@ -1,4 +1,4 @@
-const {config} = require('@ucd-lib/fin-service-utils');
+const {config, pg} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 
 const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
@@ -241,6 +241,18 @@ module.exports = async function(path, graph, headers, utils) {
       item._.source[attr.replace(ioUtils.GIT_SOURCE_PROPERTY_BASE, '')] = gitsource[attr][0]['@value'] || gitsource[attr][0]['@id'];
     }
     item._.source.type = 'git';
+  }
+
+  let edits = await pg.query('SELECT * FROM fin_cache.dams_edits WHERE target = $1', ['info:fedora'+item['@id']]);
+  if( edits.rows.length > 0 ) {
+    item.damsEdits = {};
+    for( let edit of edits.rows ) {
+      item.damsEdits[edit.property.replace('http://digital.ucdavis.edu/schema#', '')] = {
+        'value' : edit.value,
+        '@id' : edit.edit_id,
+      }
+    }
+    item.damsEdits.exists = true;
   }
 
   graph = {
