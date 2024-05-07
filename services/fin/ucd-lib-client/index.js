@@ -1,7 +1,7 @@
 global.LOGGER_NAME = 'ucd-lib-client';
 
 const express = require('express');
-const {logger, keycloak} = require('@ucd-lib/fin-service-utils');
+const {logger, keycloak, middleware} = require('@ucd-lib/fin-service-utils');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
@@ -9,6 +9,7 @@ const config = require('./config');
 
 // create express instance
 const app = express();
+app.use(middleware.httpTiming());
 
 // parse cookies and add compression
 app.use(cookieParser()); 
