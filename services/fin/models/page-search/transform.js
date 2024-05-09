@@ -6,6 +6,8 @@ const {gcs} = gc;
 const PDF_IMAGE_PRODUCTS = 'pdf-image-products';
 const IMAGE_PRODUCTS = 'image-products';
 const IMAGE_LIST = 'http://digital.ucdavis.edu/schema#ImageList';
+const ARCHIVAL_GROUP_REGEX = /(^ark:\/[a-z0-9]+\/[a-z0-9]+)/;
+
 
 module.exports = async function(path, graph, headers, utils) {
 
@@ -62,13 +64,22 @@ module.exports = async function(path, graph, headers, utils) {
     value : ['ebucore', 'filename']
   });
 
-  if( headers.link ) {
-    if( headers.link['archival-group'] ) {
-      archivalGroup = headers.link['archival-group'].map(item => item.url)[0];
-    } else if( headers.link.type && 
-      headers.link.type.find(item => item.rel === 'type' && item.url === RDF_URIS.TYPES.ARCHIVAL_GROUP) ) {
-      archivalGroup = item['@id'];
+  let identifiers = item.identifier || [];
+  for( let id of identifiers ) {
+    let ag = id.match(ARCHIVAL_GROUP_REGEX);
+    if( ag ) {
+      archivalGroup = ag[1];
+      break;
     }
+  }
+
+  if( headers.link ) {
+    // if( headers.link['archival-group'] ) {
+    //   archivalGroup = headers.link['archival-group'].map(item => item.url)[0];
+    // } else if( headers.link.type && 
+    //   headers.link.type.find(item => item.rel === 'type' && item.url === RDF_URIS.TYPES.ARCHIVAL_GROUP) ) {
+    //   archivalGroup = item['@id'];
+    // }
 
     // check for completed ia reader workflow
     if( headers.link.workflow ) {

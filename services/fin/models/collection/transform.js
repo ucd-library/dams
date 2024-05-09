@@ -1,7 +1,8 @@
 const {config, pg} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 
-const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
+// const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
+const ARCHIVAL_GROUP_REGEX = /^\/collection\/([A-Z]+-\d+|ark:\/[a-z0-9]+\/[a-z0-9]+)/;
 
 const PDF_IMAGE_PRODUCTS = 'pdf-image-products';
 const STREAMING_VIDEO_WORKFLOW = 'video-to-stream';
@@ -183,17 +184,23 @@ module.exports = async function(path, graph, headers, utils) {
   item._ = {};
   utils.stripFinHost(headers);
 
-  if( headers.link ) {
-    if( headers.link['archival-group'] ) {
-      item._['archival-group'] = headers.link['archival-group'].map(item => item.url);
-      item._.graphId = item._['archival-group'][0];
-    } else if( headers.link.type && 
-      headers.link.type.find(item => item.rel === 'type' && item.url === ARCHIVAL_GROUP) ) {
-      item._['archival-group'] = item['@id'];
-      item._.graphId = item['@id'];
-    }
+  // regex match for ark based fin archival group
+  let ag = item['@id'].match(ARCHIVAL_GROUP_REGEX);
+  if( ag ) {
+    item._.graphId = '/collection/'+ag[1];
+  }
 
-    item.clientMedia ||= {};
+  if( headers.link ) {
+    // if( headers.link['archival-group'] ) {
+    //   item._['archival-group'] = headers.link['archival-group'].map(item => item.url);
+    //   item._.graphId = item._['archival-group'][0];
+    // } else if( headers.link.type && 
+    //   headers.link.type.find(item => item.rel === 'type' && item.url === ARCHIVAL_GROUP) ) {
+    //   item._['archival-group'] = item['@id'];
+    //   item._.graphId = item['@id'];
+    // }
+
+    item.clientMedia = {};
 
     // check for completed ia reader workflow
     if( headers.link.workflow ) {
