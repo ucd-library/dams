@@ -1,7 +1,7 @@
 global.LOGGER_NAME = 'ucd-lib-client';
 
 const express = require('express');
-const {logger, keycloak, middleware} = require('@ucd-lib/fin-service-utils');
+const {logger, keycloak, middleware, controllers} = require('@ucd-lib/fin-service-utils');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
@@ -41,6 +41,8 @@ require('./controllers/identifier')(app);
  * setup sitemap
  */
 // require('./models/sitemap').middleware(app);
+
+controllers.health.register(app);
 
 /**
  * setup static routes
