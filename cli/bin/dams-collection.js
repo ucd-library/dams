@@ -9,6 +9,7 @@ const CRAWL_PROPERTIES = [
   'http://www.w3.org/ns/ldp#contains', 'http://schema.org/hasPart'
 ]
 const ARCHIVAL_GROUP = "http://fedora.info/definitions/v4/repository#ArchivalGroup";
+const FIN_ARCHIVAL_GROUP = "http://digital.ucdavis.edu/schema#FinArchivalGroup";
 
 program
   .command('remove <path>')
@@ -33,7 +34,8 @@ async function remove(finPath) {
   let resp = await api.delete({
     path: finPath,
     permanent : true,
-    jwt : CliConfig.jwt
+    jwt : CliConfig.jwt,
+    timeout : 1000*60*5
   });
 
   if( resp.last.statusCode === 404 ) {
@@ -172,7 +174,7 @@ async function getMetadata(finPath) {
   for( let node of data['@graph'] ) {
     let types = node['@type'] || [];
     if( !Array.isArray(types) ) types = [types];
-    if( types.includes(ARCHIVAL_GROUP) ) {
+    if( types.includes(ARCHIVAL_GROUP) || types.includes(FIN_ARCHIVAL_GROUP) ) {
       isArchivalGroup = true;
       break;
     }
