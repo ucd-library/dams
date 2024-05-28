@@ -234,7 +234,8 @@ export default function render() {
     padding: 0 5%;
   }
   .hero-top-left img {
-    height: 1.58rem;
+    height: 32px;
+    width: 186px;
   }
 
   .hero-top-right {
@@ -601,6 +602,12 @@ export default function render() {
     padding: 4rem 5%;
   }
 
+  .hero-main.site-frame,
+  .recent.site-frame {
+    width: 90%;
+    margin: 0 auto;
+  }
+
   @media (min-width: 1060px) {
     .hero-top {
       margin-top: 40px;
@@ -646,12 +653,6 @@ export default function render() {
       font-size: 1.2rem;
       font-weight: 200;
     }
-  }
-
-  .hero-main.site-frame,
-  .recent.site-frame {
-    width: 90%;
-    margin: 0 auto;
   }
 
   .hero-top-right a {
