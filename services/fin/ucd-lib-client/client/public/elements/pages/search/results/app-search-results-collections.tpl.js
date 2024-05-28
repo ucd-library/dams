@@ -71,7 +71,8 @@ return html`
       max-pages=${this.paginationTotal}
       @page-change=${this._onPageClicked}
       xs-screen
-      darkmode>
+      darkmode
+      ellipses>
     </ucd-theme-pagination>
   </div>
 
