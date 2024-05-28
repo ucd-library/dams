@@ -2,7 +2,7 @@ const {config, pg} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 
 // const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
-const ARCHIVAL_GROUP_REGEX = /^\/collection\/([A-Z]+-\d+|ark:\/[a-z0-9]+\/[a-z0-9]+)/;
+const ARCHIVAL_GROUP_REGEX = /^\/collection\/([A-Z]+-\d+|ark:\/[a-z0-9]+\/[a-z0-9]+(\/[A-Z]+-\d+)?)/;
 
 const PDF_IMAGE_PRODUCTS = 'pdf-image-products';
 const STREAMING_VIDEO_WORKFLOW = 'video-to-stream';
