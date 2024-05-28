@@ -209,7 +209,7 @@ export default function render() {
     <app-browse-by
       id="format"
       label="Format"
-      facet-query-name="@graph.fileFormat"
+      facet-query-name="@graph.fileFormatSimple"
       ?hidden="${this.page !== "/browse/format"}">
       <img
         class="header-icon"
