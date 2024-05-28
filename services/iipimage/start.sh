@@ -1,6 +1,11 @@
 #! /bin/bash
 
-./setup-gcsfuse.sh
+if [[ -z $USE_LOCAL_GCSFUSE == 'true' ]]; then
+  echo "Using local gcsfuse mount"
+  ./setup-gcsfuse.sh
+else
+  echo "Expecting gcsfuse mount already available"
+fi
 
 # https://iipimage.sourceforge.io/documentation/server
 # FILESYSTEM_PREFIX=$FUSE_DIR
