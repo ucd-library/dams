@@ -144,7 +144,6 @@ export default function render() {
         <app-search-results-panel
           id="resultsPanel"
           @toggle-drawer="${this._toggleDrawer}"
-          @page-size-change="${this._onPageSizeChange}"
           @page-change="${this._onPaginationChange}"
         >
         </app-search-results-panel>
