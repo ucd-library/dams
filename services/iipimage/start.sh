@@ -1,6 +1,6 @@
 #! /bin/bash
 
-if [[ -z $USE_LOCAL_GCSFUSE == 'true' ]]; then
+if [[ $USE_LOCAL_GCSFUSE == "true" ]]; then
   echo "Using local gcsfuse mount"
   ./setup-gcsfuse.sh
 else
