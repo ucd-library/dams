@@ -24,6 +24,9 @@ COPY cli /dams-cli
 RUN cd /dams-cli && npm install && npm link && npm link @ucd-lib/fin-api
 # RUN ln -s /dams-cli/bin/dams.js /usr/local/bin/damss
 
+# Collection Import
+COPY collection-import /collection-import
+
 # Models 
 WORKDIR ${FIN_SERVICE_ROOT}/models
 COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package.json .
