@@ -1,6 +1,8 @@
+process.env.LOG_LEVEL = 'ERROR';
 const keycloak = require('/fin/services/node-utils/lib/keycloak.js');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const CONFIG_FILE = path.join(os.homedir(), '.fccli');
 
@@ -11,4 +13,5 @@ const CONFIG_FILE = path.join(os.homedir(), '.fccli');
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(content, null, 2));
 
   console.log('Token saved');  
+  process.exit(0);
 })();

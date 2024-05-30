@@ -50,8 +50,10 @@ cd $METADATA_DIR
 echo "Authenticating with Google Cloud"
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
-echo "Syncing binary backups from gs://$GCS_BINARY_BACKUP_BUCKET"
-gsutil -m rsync -c -J -r -y ".*\.jsonld\.json$"   gs://$GCS_BINARY_BACKUP_BUCKET/$COLLECTION_NAME .
+if [[ $IGNORE_BINARY_SYNC != 'true' ]]; then
+  echo "Syncing binary backups from gs://$GCS_BINARY_BACKUP_BUCKET"
+  gsutil -m rsync -c -J -r -y ".*\.jsonld\.json$"   gs://$GCS_BINARY_BACKUP_BUCKET/$COLLECTION_NAME .
+fi
 
 echo "Importing collection $COLLECTION_NAME"
 fin config set host $FIN_URL
@@ -59,4 +61,4 @@ fin config set host $FIN_URL
 echo "Setting service account token"
 node $SCRIPT_DIR/setToken.js
 
-fin io import .
+fin io import --ag-import-strategy version-all .
