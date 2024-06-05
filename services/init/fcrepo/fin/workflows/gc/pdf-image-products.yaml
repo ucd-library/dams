@@ -9,8 +9,8 @@ main:
       - init:
           assign:
             - location: us-central1
-            - project_id: digital-ucdavis-edu
-            - client_email: dams-local-dev
+            - project_id: ucdlib-dams
+            - client_email: dams-production
       - get_pages:
           call: http.get
           args:

@@ -5,7 +5,7 @@ main:
       - init:
           assign:
             - location: us-central1
-            - project_id: digital-ucdavis-edu
+            - project_id: ucdlib-dams
       - setup_video_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
@@ -42,7 +42,7 @@ main:
                                             command: "node"
                                             args: ${["cli/video-to-stream.js", args.finWorkflowId]}
                                       timeoutSeconds: 3600
-                                      serviceAccountName: ${"fin-server@" + project_id + ".iam.gserviceaccount.com"}
+                                      serviceAccountName: ${"dams-production@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - convert_video:
           call: googleapis.run.v1.namespaces.jobs.run

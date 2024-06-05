@@ -9,8 +9,8 @@ main:
       - init:
           assign:
             - location: us-central1
-            - project_id: digital-ucdavis-edu
-            - client_email: dams-local-dev
+            - project_id: ucdlib-dams
+            - client_email: dams-production
       - setup_process_image_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
