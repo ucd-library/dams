@@ -56,10 +56,6 @@
       }
     },
 
-    "@graph.keywords" : {
-      "type" : "text"
-    },
-
     "@graph.license.@id" : {
       "type" : "keyword"
     },

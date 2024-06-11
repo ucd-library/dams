@@ -325,7 +325,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     
       let imageLabel = '';
       if( formats.length ) imageLabel += formats.map(f => f.format).join(', ') + ' ';
-      imageLabel += '(' + bytes(formats.reduce(((a, r) => a + r.fileSize), 0)).toLowerCase() + ')';
+      imageLabel += '(' + (bytes(formats.reduce(((a, r) => a + r.fileSize), 0))||'').toLowerCase() + ')';
       
       this.shadowRoot.querySelector("#media-format-label").innerHTML = imageLabel;
       this.shadowRoot.querySelector("#media-all-format-label").innerHTML = imageLabel;      
