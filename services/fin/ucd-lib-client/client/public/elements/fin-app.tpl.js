@@ -49,6 +49,11 @@ export default function render() {
         width: 100%;
       }
 
+      app-search-header {
+        position: relative;
+        z-index: 2000;
+      }
+
       .loading-dots {
         text-align: center;
         z-index: 5;

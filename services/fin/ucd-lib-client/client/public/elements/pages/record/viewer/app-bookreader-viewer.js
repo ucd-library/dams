@@ -227,6 +227,11 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     let data = [];
     let minHeight = 9999;
     let offsetHeight = 634;
+    // if( forceRender || this.fullscreen ) {
+    //   offsetHeight = window.innerHeight;    
+    //   this.height = offsetHeight;  
+    //   console.log('setting this.height', this.height);
+    // }
     if( forceRender && this.fullscreen ) {
       offsetHeight = window.innerHeight;      
     }
@@ -255,6 +260,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     });
     
     // adjust br viewport based on image dimensions
+    // if( offsetHeight > minHeight && !this.fullscreen ) {
     if( offsetHeight > minHeight ) {
       document.querySelector('#BookReader').style.height = minHeight + 'px';
     }
@@ -412,6 +418,8 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     let nav = document.querySelector("app-media-viewer-nav");
     if (nav) {
       nav.searchResultsCount = results.matches.length;
+      // this.br.searchResults = results;
+      console.log('nav.searchResultsCount', nav.searchResultsCount);
     }
   }
 
@@ -419,6 +427,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     let nav = document.querySelector("app-media-viewer-nav");
     if (nav) {
       nav.searchResultsCount = 0;
+      console.log('nav.searchResultsCount', nav.searchResultsCount);
     }
   }
 
