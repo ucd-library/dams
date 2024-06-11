@@ -44,6 +44,11 @@ main:
                                                     cpu: "2000m"
                                             command: "node"
                                             args: ${["cli/process-image.js", args.finWorkflowId]}
+                                            env:
+                                              - name: GOOGLE_CLOUD_WORKFLOW_BUCKET
+                                                value: ${args.gcsBucket}
+                                              - name: GOOGLE_CLOUD_WORKFLOW_TMP_BUCKET
+                                                value: ${args.tmpGcsBucket}
                                             # imagePullPolicy: "Always"
                                       timeoutSeconds: 3600
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}

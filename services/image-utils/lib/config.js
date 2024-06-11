@@ -88,7 +88,7 @@ config.workflow = {
   rootPath : env.WORKFLOW_ROOT_PATH || '/workflow',
   gcsBuckets : {
     products : env.GOOGLE_CLOUD_WORKFLOW_BUCKET || 'dams-client-products',
-    tmp : env.GOOGLE_CLOUD_WORKFLOW_TMP_BUCKET || 'dams-workflow-tmp-space'
+    tmp : env.GOOGLE_CLOUD_WORKFLOW_TMP_BUCKET || 'dams-prod-workflow-tmp-space'
   }
 }
 
