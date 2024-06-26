@@ -357,9 +357,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
         // need to recalc pagetops and render for mode1
         brView._renderBookReader(true);
       }
-      brView.height = window.innerHeight;
-
+      
       requestAnimationFrame(() => {
+        brView.height = window.innerHeight;
         let mediaNav = document.querySelector("app-media-viewer-nav"); 
         let brNav = brView.querySelector(".BRfooter");
         if (mediaNav && brNav) {
