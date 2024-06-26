@@ -14,7 +14,7 @@ main:
       - get_pages:
           call: http.get
           args:
-              url: ${args.baseUrl + "/pdf/getNumPages/" + args.finWorkflowId}
+              url: ${args.baseUrl + "/workflow/pdf/getNumPages/" + args.finWorkflowId}
           result: pdf_info
       - set_parallelism:
           assign:
