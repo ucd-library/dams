@@ -275,7 +275,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this.allResults = await this.CollectionModel.search(searchDocument);
     this.allResults = this.allResults.body.results.map(r => {
       return {
-        thumbnailUrl : r.root.image['@id'], 
+        thumbnailUrl : r.root.image?.['@id'], 
         title : r.root.name,
         count : r.root.itemCount,
         id : r.root['@id']
