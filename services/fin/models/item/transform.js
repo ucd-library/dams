@@ -163,22 +163,10 @@ module.exports = async function(path, graph, headers, utils) {
     type : 'id'
   });
 
-  // both schema:keywords and schema:about are used for subjects
   await utils.add({
     attr : 'subjects',
     value : ['schema', 'about'],
     type : 'id'
-  });
-
-  await utils.add({
-    attr : 'subjects',
-    value : ['schema', 'keywords'],
-    parser : (value) => {
-      if( typeof value === 'string' ) {
-        return {name: value};
-      }
-      return value;
-    }
   });
 
   // remove duplicate subjects
