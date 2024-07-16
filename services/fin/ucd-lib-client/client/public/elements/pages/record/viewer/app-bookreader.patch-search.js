@@ -54,16 +54,17 @@ module.exports = function patchSearch(BookReader) {
 
     // Scroll/flash in the ui
     const $boxes = await poll(() => $(`rect.match-index-${match.matchIndex}`), { until: result => result.length > 0 });
-    if ($boxes && $boxes.length) {
+    if ($boxes && $boxes.length && this.isFullscreenActive) {
       $boxes.css('animation', 'none');
       $boxes[0].scrollIntoView({
+        // mod by ucd-lib, actually don't scroll to center in 1up because page is already centered
         // Only vertically center the highlight if we're in 1up or in full screen. In
         // 2up, if we're not fullscreen, the whole body gets scrolled around to try to
         // center the highlight 🙄 See:
         // https://stackoverflow.com/questions/11039885/scrollintoview-causing-the-whole-page-to-move/11041376
         // Note: nearest doesn't quite work great, because the ReadAloud toolbar is now
         // full-width, and covers up the last line of the highlight.
-        block: this.constMode1up == this.mode || this.isFullscreenActive ? 'center' : 'nearest',
+        block: this.isFullscreenActive ? 'center' : 'nearest',
         inline: 'center',
         behavior: onNearbyPage ? 'smooth' : 'auto',
       });
@@ -219,33 +220,6 @@ module.exports = function patchSearch(BookReader) {
 
   function _computePageTops(pages, spacing) {
     console.log({spacing})
-    /*
-    // try 1
-    // calc height of images in inches.. get max height and width of images
-    // 502 x 582 container px
-    let minHeight = Math.min(...pages.map(page => page.height));
-    let maxWidth = Math.max(...pages.map(page => page.width));
-
-    let height = this.offsetWidth / maxWidth * minHeight - 55;
-
-    // hack for mobile resolutions
-    // let widthOver500 = window.innerWidth - 500;
-    // if( widthOver500 < 0 ) widthOver500 = 0;
-    // let pageHeightInches = (pages[0]?.ppi || 500) / (height - widthOver500);
-    let pageHeightInches = height / this.coordSpace.screenDPI; // (pages[0]?.ppi || 500);
-
-    const result = {};
-    let top = spacing;
-    for (const page of pages) {
-      result[page.index] = top;
-      top += pageHeightInches + spacing;
-      // top += page.heightInches + spacing;
-    }
-    console.log(result);
-    return result;
-    */
-
-    
     // calc height of images in inches.. get max height and width of images
     // container width/height in px
     const widthOffset = this.offsetWidth;
@@ -280,42 +254,8 @@ module.exports = function patchSearch(BookReader) {
       result[page.index] = top;
       top += pageHeightInches + spacing;
     }
-    console.log(result);
+    console.log({ result });
     return result;
-    
-
-    /*
-    // try 3, works for portrait images but not landscape or alternating
-    // TODO need height to be smaller if width doesn't fit in container
-    // calc height of images in inches.. get max height and width of images
-    // 502 x 582 container px
-
-    // calc height of images in inches.. get max height and width of images    
-    let maxHeight = Math.max(...pages.map(page => page.height));
-    let maxWidth = Math.max(...pages.map(page => page.width));
-
-    // container width/height in px
-    const widthOffset = this.offsetWidth;
-    const heightOffset = this.offsetHeight;
-
-    // scale to fit container
-    let widthRatio = widthOffset / maxWidth;
-    let heightRatio = heightOffset / maxHeight;
-    let scaleRatio = Math.min(widthRatio, heightRatio);
-
-    let height = maxHeight * scaleRatio;
-    let pageHeightInches = height / this.coordSpace.screenDPI;
-
-    const result = {};
-    let top = spacing;
-    for (const page of pages) {
-      result[page.index] = top;
-      top += pageHeightInches + spacing;
-      // top += page.heightInches + spacing;
-    }
-    console.log(result);
-    return result;
-    */
   }
 
   function _mode1UpRenderPage(page, litElement) {

@@ -50,7 +50,7 @@ export default function render() {
         left: 0px;
         width: 100%;
         height: 100%;
-        z-index: 1000;
+        z-index: 3000;
       }
 
       #br-search-input,
@@ -112,7 +112,7 @@ export default function render() {
         left: 0;
         width: 350px;
         background: var(--color-aggie-gold-40);
-        z-index: 1000;
+        z-index: 3000;
         border-radius: 0 30px 30px 0;
         height: calc(90vh - 100px);
         box-shadow: 0px 3px 6px #00000029;

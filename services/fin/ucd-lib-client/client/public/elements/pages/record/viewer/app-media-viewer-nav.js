@@ -274,12 +274,15 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
   }
 
   _onSearchResultsChange(e) {
-    let results = e.detail?.props?.results;
-    this.searchResultsCount = results.matches.length;
+    this.searchResults = e.detail?.props?.results?.matches || [];
+    this.searchResultsCount = this.searchResults.length;
+    console.log('this.searchResultsCount', this.searchResultsCount)
   }
 
   _onSearchResultsEmpty(e) {
     this.searchResultsCount = 0;
+    this.searchResults = [];
+    console.log('this.searchResultsCount', this.searchResultsCount)
   }
 
   _showingLastThumbFrame() {

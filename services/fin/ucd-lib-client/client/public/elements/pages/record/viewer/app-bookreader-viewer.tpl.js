@@ -33,7 +33,6 @@ export default function render() {
       }
 
       #BookReader {
-        /* min-height: 634px; */
         background-color: transparent;
       }
 
