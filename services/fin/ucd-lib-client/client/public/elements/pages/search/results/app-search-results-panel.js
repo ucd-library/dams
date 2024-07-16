@@ -166,7 +166,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       // make sure we don't have a page the returns results > 10000k
       let t = Math.floor((10000 - numPerPage) / numPerPage) * numPerPage;
       if (total > t) {
-        total = t;
+        this.total = t + "+";
         this.totalOverMaxWindow = true;
       } else {
         this.totalOverMaxWindow = false;
@@ -174,7 +174,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
 
       this.results = results;
       this.numPerPage = numPerPage;
-      this.paginationTotal = Math.ceil(total / numPerPage);
+      this.paginationTotal = Math.ceil(this.total / numPerPage);
       // if( this.paginationTotal < 1 ) this.paginationTotal = 1;
 
       this.shadowRoot.querySelector("#numPerPage").value = numPerPage + "";
