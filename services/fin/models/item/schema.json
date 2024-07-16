@@ -99,11 +99,13 @@
       "type" : "integer"
     },
 
-    "@graph.name" : {
+   "@graph.name" : {
       "type": "text",
       "fields": {
         "raw": { 
-          "type":  "keyword"
+          "type":  "text",
+          "analyzer": "punctuation_insensitive",
+          "fielddata": true
         }
       }
     },
