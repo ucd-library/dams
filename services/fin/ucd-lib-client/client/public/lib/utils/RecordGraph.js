@@ -34,6 +34,10 @@ class RecordGraph {
     if( this.root ) {
       this.clientMedia = new ClientMedia(this.root['@id'], this.data['@graph'], this.opts);
     }
+
+    if( Array.isArray(this.root.name) ) {
+      this.root.name = this.root.name[0];
+    }
   }
 
   /**
