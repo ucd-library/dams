@@ -5,6 +5,7 @@
 import { LitElement } from "lit";
 import render from "./app-audio-viewer.tpl.js";
 
+import "../../../utils/app-share-btn";
 import "@ucd-lib/cork-app-utils";
 import config from "../../../../lib/config";
 import utils from "../../../../lib/utils";
