@@ -551,13 +551,31 @@ export default function render() {
       <div style="margin-bottom: .4rem;">
         <span class="label">Coverage: </span> ${this.yearPublished}
       </div>
-      <div style="margin-bottom: .4rem;" ?hidden="${!this.keywords || !this.keywords.length}">
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.subjects?.length}">
         <span class="label">Subjects: </span> 
-        ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="${item.href}">${item.label}</a>`)}
+          ${this.subjects.map(
+            (about, index) =>
+              html`${index > 0 ? ", " : ""}<a href="${about["@id"]}"
+                  >${about["name"] || about["@id"]}</a>`
+          )}
       </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.material}">
+        <span class="label">Format: </span> ${this.material}
+      </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.languages?.length}">
+        <span class="label">Language: </span> 
+        ${this.languages?.map(
+          (language, index) => html`<span>${language}</span>${index < (this.languages?.length - 1) ? ', ' : ''} `
+        )}
+      </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.location}">
+        <span class="label">Location: </span> ${this.location}
+      </div>
+      
       <div style="margin-bottom: 3rem;">
         <span class="label">Finding Aid: </span> <a href="">Online Archive of California</a>
       </div>
+
     </div>
 
     <div class="collection-highlights">

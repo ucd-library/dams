@@ -23,7 +23,10 @@ class AppCollection extends Mixin(LitElement)
       thumbnailUrl : { type : String },
       thumbnailUrlOverride : { type : String },
       callNumber : { type : String },
-      keywords : { type : Array },
+      subjects : { type : Array },
+      material : { type : String },
+      languages : { type : Array },
+      location : { type : String },
       items : { type : Number },
       yearPublished : { type : Number },
       highlightedItems : { type : Array },
@@ -114,20 +117,16 @@ class AppCollection extends Mixin(LitElement)
       this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';  
     }
 
+    let root = e.payload.root || {};
     this.callNumber = e.vcData.callNumber;
-    this.keywords = (e.vcData.keywords || [])
-      .map(keyword => {
-        let searchObj = this.RecordModel.emptySearchDocument();
-        this.RecordModel.appendKeywordFilter(searchObj, '@graph.keywords', keyword);
-        return {
-          label : keyword,
-          href : '/search/'+this.RecordModel.searchDocumentToUrl(searchObj)
-        }
-      });
+    this.subjects = (e.vcData.subjects || []);
+    this.material = root.material || '';
+    this.languages = root.inLanguage || [];
+    this.location = root.location || '';
     this.items = e.vcData.count;
     this.yearPublished = e.vcData.yearPublished;
 
-    this.citationRoot = e.payload.root;
+    this.citationRoot = root;
 
     if( this.appDataLoaded && !this.savedItems.length ) {
       this.getLatestItems();
@@ -163,7 +162,10 @@ class AppCollection extends Mixin(LitElement)
     this.thumbnailUrl = '';
     this.thumbnailUrlOverride = '';
     this.callNumber = '';
-    this.keywords = [];
+    this.subjects = [];
+    this.material = '';
+    this.languages = [];
+    this.location = '';
     this.items = 0;
     this.yearPublished = 0;
     this.highlightedItems = [];
