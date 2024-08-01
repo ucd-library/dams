@@ -19,13 +19,13 @@ export default function render() {
 
   #popup {
     display: block;
-    z-index: 5;
+    z-index: 2005;
     background: var(--color-aggie-blue-30);
     padding: 10px;
     position: absolute;
     bottom: 70px;
     right: -20px;
-    min-width: 200px;
+    min-width: 325px;
   }
 
   /* #popup::before {

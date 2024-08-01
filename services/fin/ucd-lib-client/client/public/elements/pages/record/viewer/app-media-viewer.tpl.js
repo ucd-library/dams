@@ -291,7 +291,7 @@ export default function render() {
       </div>
 
       <app-media-viewer-nav
-        ?hidden="${!this.mediaType}"
+        ?hidden="${!this.mediaType || this.mediaType === "audio"}"
         .isBookReader="${this.isBookReader}"
         .hideZoom="${this.mediaType === "bookreader" || this.mediaType === "video"}"
         .searchResults="${this.searchResults}"

@@ -18,8 +18,7 @@ export default function render() {
       :host([single-image]) app-share-btn,
       :host app-share-btn,
       :host paper-icon-button {
-        /* background-color: var(--default-primary-color); */
-        color: var(--color-aggie-blue-80);
+        fill: var(--color-aggie-blue-80);
       }
 
       [hidden] {
