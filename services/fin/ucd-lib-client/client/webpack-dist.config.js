@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const BUILD_IE = false;
 
 let configs = require('@ucd-lib/cork-app-build').dist({
   // root directory, all paths below will be relative to root
@@ -8,9 +7,8 @@ let configs = require('@ucd-lib/cork-app-build').dist({
   // folder where bundle.js and ie-bundle.js will be written
   dist : 'dist/js',
   preview : 'public/js',
-  ie : 'ie-bundle.js',
   clientModules : 'public/node_modules'
-}, BUILD_IE);
+});
 
 if( !Array.isArray(configs) ) configs = [configs];
 
@@ -36,15 +34,6 @@ configs.forEach((config, index) => {
       jQuery: 'jquery',
     })
   ];
-
-  if( index === 1 ) {
-    // add dynamic loader plugin for ie
-    config.module.rules.forEach(plugin => {
-      if( !plugin.use ) return;
-      if( plugin.use.loader !== 'babel-loader' ) return;
-      plugin.use.options.plugins = ["syntax-dynamic-import"];
-    });
-  }
 
   config.output.publicPath = '/js/'
   config.output.chunkFilename = '[name]-[chunkhash].'+config.output.filename;

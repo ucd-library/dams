@@ -9,11 +9,9 @@ mkdir dist
 
 cp -r public/images dist/
 cp -r public/fonts dist/
-cp -R -L public/loader dist/
 
 cp public/index.html dist/
 cp public/jwt.html dist/
-cp public/ie.html dist/
 cp public/manifest.json dist/
 
 # Hack fix
