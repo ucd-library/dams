@@ -163,10 +163,11 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
 
     requestAnimationFrame(() => {
       this.total = total;
+
       // make sure we don't have a page the returns results > 10000k
-      let t = Math.floor((10000 - numPerPage) / numPerPage) * numPerPage;
-      if (total > t) {
-        this.total = t + "+";
+      let maxResults = 10000;
+      if (this.total >= maxResults) {
+        this.total = maxResults + "+";
         this.totalOverMaxWindow = true;
       } else {
         this.totalOverMaxWindow = false;
