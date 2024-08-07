@@ -121,6 +121,8 @@ export default function render() {
         font-size: 0.9rem;
         min-width: 6rem;
         text-transform: none;
+        height: 30px;
+        line-height: 30px;
       }
 
       .downloadBtn:hover {
@@ -133,7 +135,7 @@ export default function render() {
       }
 
       #format {
-        height: 50px;
+        height: 56px;
         background-color: var(--color-aggie-blue-50);
         font-size: 0.9rem;
         font-weight: bold;
@@ -150,6 +152,8 @@ export default function render() {
         font-weight: bold;
         padding: 11px 1rem;
         border: solid 2px var(--color-aggie-blue-50);
+        height: 30px;
+        line-height: 30px;
       }
 
       @media (max-width: 600px) {
