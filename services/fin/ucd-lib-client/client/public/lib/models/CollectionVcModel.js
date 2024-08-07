@@ -31,6 +31,8 @@ class CollectionVcModel {
       }
     }
 
+    if( rootNode.subjects && !Array.isArray(rootNode.subjects) ) rootNode.subjects = [rootNode.subjects];
+
     const vcData = {
       id: rootNode["@id"],
       description: rootNode.description,
