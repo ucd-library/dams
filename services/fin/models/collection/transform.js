@@ -66,8 +66,7 @@ module.exports = async function(path, graph, headers, utils) {
 
   await utils.add({
     attr : 'publisher',
-    value : ['schema', 'publisher'],
-    type : 'id'
+    value : ['schema', 'publisher']
   });
 
   await utils.add({
