@@ -571,11 +571,6 @@ export default function render() {
       <div style="margin-bottom: .4rem;" ?hidden="${!this.location}">
         <span class="label">Location: </span> ${this.location}
       </div>
-      
-      <div style="margin-bottom: 3rem;">
-        <span class="label">Finding Aid: </span> <a href="">Online Archive of California</a>
-      </div>
-
     </div>
 
     <div class="collection-highlights">
