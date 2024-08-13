@@ -121,7 +121,7 @@ class AppCollection extends Mixin(LitElement)
     this.callNumber = e.vcData.callNumber;
     this.subjects = (e.vcData.subjects || []);
     this.material = root.material || '';
-    this.languages = root.inLanguage || [];
+    this.languages = !Array.isArray(root.inLanguage || []) ? [root.inLanguage] : root.inLanguage;
     this.location = root.location || '';
     this.items = e.vcData.count;
     this.yearPublished = e.vcData.yearPublished;

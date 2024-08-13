@@ -565,7 +565,7 @@ export default function render() {
       <div style="margin-bottom: .4rem;" ?hidden="${!this.languages?.length}">
         <span class="label">Language: </span> 
         ${this.languages?.map(
-          (language, index) => html`<span>${language}</span>${index < (this.languages?.length - 1) ? ', ' : ''} `
+          (language, index) => html`<span>${language.name}</span>${index < (this.languages?.length - 1) ? ', ' : ''} `
         )}
       </div>
       <div style="margin-bottom: .4rem;" ?hidden="${!this.location}">
