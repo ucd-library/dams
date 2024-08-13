@@ -25,7 +25,7 @@ export default function render() {
     position: absolute;
     bottom: 70px;
     right: -20px;
-    min-width: 325px;
+    min-width: 375px;
   }
 
   /* #popup::before {
