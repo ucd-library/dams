@@ -61,7 +61,7 @@ fin config set host $FIN_URL
 echo "Setting service account token"
 node $SCRIPT_DIR/setToken.js
 
-if [[ $DRY_RUN === 'true' ]]; then
+if [[ $DRY_RUN = 'true' ]]; then
   fin io import --debug-sha-changes --dry-run --ag-import-strategy version-all .
 else
   fin io import --ag-import-strategy version-all .
