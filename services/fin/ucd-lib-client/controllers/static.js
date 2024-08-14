@@ -12,17 +12,6 @@ const {seo, models, logger} = require('@ucd-lib/fin-service-utils');
 // const transform = seo.recordTransform;
 // const collectionTransform = seo.collectionTransform;
 
-const loaderPath = path.join(__dirname, '..', 'client', config.client.assets, 'loader', 'loader.js');
-const loaderSrc = fs.readFileSync(loaderPath, 'utf-8');
-const bundle = `
-  <script>
-    var CORK_LOADER_VERSIONS = {
-      loader : '${config.client.versions.loader}',
-      bundle : '${config.client.versions.bundle}'
-    }
-  </script>
-  <script>${loaderSrc}</script>`;
-
 appConfig.reload(true);
 
 module.exports = async (app) => {
@@ -77,7 +66,7 @@ module.exports = async (app) => {
 
       if( !isRecord && !isCollection ) {
         return next({
-          jsonld, bundle,
+          jsonld,
           title : config.client.title,
           description : '',
           keywords : ''
@@ -97,7 +86,7 @@ module.exports = async (app) => {
           }
     
           return next({
-            jsonld, bundle,
+            jsonld,
             title : collection.name + ' - '+ config.client.title,
             description : collection.description || '',
             keywords : keywords.join(', ')
@@ -117,7 +106,7 @@ module.exports = async (app) => {
           }
 
           return next({
-            jsonld, bundle,
+            jsonld,
             title : (record.name || record.title) + ' - '+ config.client.title,
             description : record.description || '',
             keywords : keywords.join(', ')
@@ -127,7 +116,7 @@ module.exports = async (app) => {
       } catch(e) {
         console.log(e);
         return next({
-          jsonld, bundle,
+          jsonld,
           title : 'Server Error',
           description : 'Invalid URL: '+req.originalUrl,
           keywords : ''

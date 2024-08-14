@@ -141,7 +141,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     // check for any overrides at collection/item level for the image viewer
     let itemId = e.selectedRecord?.graph?.root?.['@id'];
-    let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))[0]['@id'];
+    let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))?.[0]?.['@id'];
     let displayType = await utils.getItemDisplayType(itemId, collectionId, this.FcAppConfigModel, this.CollectionModel);
     this.overrideImageList = false;
 

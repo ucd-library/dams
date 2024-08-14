@@ -255,7 +255,7 @@ class CollectionsModel extends FinEsDataModel {
 
     let map = {};
     for( let hit of result.hits.hits ) {
-      map[hit._source['@id']] = hit._source.name;
+      map[hit._source['@id']] = Array.isArray(hit._source.name) ? hit._source.name[0] : hit._source.name;
     }
 
     return map;

@@ -1,12 +1,5 @@
 <!doctype html>
 <html lang="en">
-  <!--[if lte IE 10]>
-  <script type="text/javascript">
-    if ( document.URL.indexOf( 'ie' ) === -1 ) {
-      window.location = '/ie.html';
-    }
-  </script>
-  <![endif]-->
   <head>
     <meta charset="utf-8" />
     <title>{{title}}</title>
@@ -29,13 +22,6 @@
 
     <link rel="manifest" href="/manifest.json">
 
-    <!-- IE 10 detection -->
-    <script type="text/javascript">
-      window.polymerSkipLoadingFontRoboto = true;
-      if( window.navigator.appVersion.match(/MSIE 10/) ) {
-        window.location = '/ie.html';
-      }
-    </script>
     <style>
       #loading {
         position: absolute; 
@@ -181,11 +167,11 @@
     </style>
     
     <meta name="google-site-verification" content="iK2-C5oxLcdP0n7QBgKtXPd7hvEuMIHqB4d1sSe-okw" />
-
-    {{bundle}}
     
     <!-- from spa-router-middleware -->
     {{config}}
+
+    <script src="/js/bundle.js"></script>
   </head>
 
   <body>

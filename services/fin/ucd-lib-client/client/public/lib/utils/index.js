@@ -265,9 +265,10 @@ class Utils {
     async getItemDisplayType(id, collectionId, fcAppConfigModel, collectionModel) {
       let displayType = '';
 
-      let edits = await collectionModel.getCollectionEdits(collectionId);
-      if( !Object.keys(edits?.payload).length ) return displayType;
-      edits = edits.payload;
+      let edits;
+      if( collectionId ) edits = await collectionModel.getCollectionEdits(collectionId);
+      if( edits && !Object.keys(edits?.payload).length ) return displayType;
+      edits = edits?.payload;
 
       displayType = 'Book Reader - 2 Page';
       if( edits?.edits ) {
@@ -276,7 +277,7 @@ class Utils {
       }
 
       // get item data if it exists
-      let itemEdit = edits.itemOverrides.filter(e => e.item.includes(id))[0];
+      let itemEdit = edits?.itemOverrides.filter(e => e.item.includes(id))[0];
       if( itemEdit && Object.keys(itemEdit).length ) {
         displayType = itemEdit['item_default_display'];
       }
