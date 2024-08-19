@@ -130,7 +130,7 @@ export default function render() {
       margin: 2rem 0;
     }
 
-    .label {
+    .collection-label {
       font-weight: bold;
       padding-right: 0.3rem;
     }
@@ -549,10 +549,10 @@ export default function render() {
       </p>
 
       <div style="margin-bottom: .4rem;">
-        <span class="label">Coverage: </span> ${this.yearPublished}
+        <span class="collection-label">Coverage: </span> ${this.yearPublished}
       </div>
       <div style="margin-bottom: .4rem;" ?hidden="${!this.subjects?.length}">
-        <span class="label">Subjects: </span> 
+        <span class="collection-label">Subjects: </span> 
           ${this.subjects.map(
             (about, index) =>
               html`${index > 0 ? ", " : ""}<a href="${about["@id"]}"
@@ -560,16 +560,16 @@ export default function render() {
           )}
       </div>
       <div style="margin-bottom: .4rem;" ?hidden="${!this.material}">
-        <span class="label">Format: </span> ${this.material}
+        <span class="collection-label">Format: </span> ${this.material}
       </div>
       <div style="margin-bottom: .4rem;" ?hidden="${!this.languages?.length}">
-        <span class="label">Language: </span> 
+        <span class="collection-label">Language: </span> 
         ${this.languages?.map(
           (language, index) => html`<span>${language.name}</span>${index < (this.languages?.length - 1) ? ', ' : ''} `
         )}
       </div>
       <div style="margin-bottom: .4rem;" ?hidden="${!this.location}">
-        <span class="label">Location: </span> ${this.location}
+        <span class="collection-label">Location: </span> ${this.location}
       </div>
     </div>
 
