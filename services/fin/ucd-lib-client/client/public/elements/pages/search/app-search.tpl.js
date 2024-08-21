@@ -97,7 +97,7 @@ export default function render() {
      
         /* mobile */
         app-filters-panel {
-          z-index: 1000;
+          z-index: 2000;
           width: 90vw;
           transition: all 0.3s;
 

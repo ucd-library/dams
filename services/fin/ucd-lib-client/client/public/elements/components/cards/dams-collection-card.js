@@ -24,6 +24,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
       itemCt: { type: Number, attribute: "item-ct" },
       href: { type: String },
       darkBg: { type: Boolean, attribute: "data-dark-bg" },
+      loading: { type: Boolean }
     };
   }
 
@@ -39,6 +40,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     this.itemCt = 0;
     this.href = "";
     this.darkBg = false;
+    this.loading = true;
 
     this._injectModel("CollectionModel", "FcAppConfigModel");
   }
@@ -49,11 +51,11 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     } else if( props.has("href") && !this.id ) {
       this.id = this.href;
     }
-    if( !this.imgSrc ) this.imgSrc = "/images/tree-bike-illustration.png";
   }
 
   async _onCollectionUpdate(e) {
     if( e.state !== "loaded" || e.id !== this.id || this.renderedId === this.id ) return;
+    this.loading = false;
     this.renderedId = this.id;
 
     this.collection = e.vcData;
