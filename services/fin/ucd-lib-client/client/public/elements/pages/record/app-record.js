@@ -165,8 +165,24 @@ class AppRecord extends Mixin(LitElement)
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) return;
 
-    if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
+    let hasError = false;
+    if( this.RecordModel.currentRecordId ) {
+      try {
+        let record = await this.RecordModel.get(this.RecordModel.currentRecordId);
+        this._onRecordUpdate(record);
+      } catch(e) {
+        hasError = true;
+      }
+    }
 
+    if( e.page === '404' || hasError ) {
+      console.error('calling 404 from item page', { page : e.page, hasError });
+      this.dispatchEvent(
+        new CustomEvent("show-404", {})
+      );
+      return;
+    }
+    
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
 
     this._updateLinks(e.location);
