@@ -173,8 +173,9 @@ module.exports = async function(path, graph, headers, utils) {
   });
 
   await utils.add({
-    attr : 'inLanguage',
-    value : ['schema', 'inLanguage']
+    attr : 'language',
+    value : ['schema', 'inLanguage'],
+    type : 'id'
   });
 
   await utils.add({

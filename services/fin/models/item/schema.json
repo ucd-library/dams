@@ -114,6 +114,14 @@
       "type" : "text"
     },
 
+    "@graph.inLanguage.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.inLanguage.name" : {
+      "type" : "keyword"
+    },
+
     "@graph.indexableContent" : {
       "type": "text"
     },

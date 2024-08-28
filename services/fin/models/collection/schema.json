@@ -87,8 +87,12 @@
       "type": "text"
     },
 
-    "@graph.inLanguage" : {
-      "type": "text"
+    "@graph.inLanguage.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.inLanguage.name" : {
+      "type" : "keyword"
     },
 
     "@graph._.updated" : {
