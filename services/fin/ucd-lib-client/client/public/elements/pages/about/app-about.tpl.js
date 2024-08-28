@@ -11,6 +11,7 @@ import navToggleCss from "@ucd-lib/theme-sass/4_component/_nav-toggle.css";
 import headingsCss from "@ucd-lib/theme-sass/2_base_class/_headings.css";
 import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
 import buttonsCss from "@ucd-lib/theme-sass/2_base_class/_buttons.css";
+import listsCss from "@ucd-lib/theme-sass/2_base_class/_lists.css";
 
 export default function render() {
   return html`
@@ -25,6 +26,7 @@ export default function render() {
       ${headingsCss}
       ${linksCss}
       ${buttonsCss}
+      ${listsCss}
       :host {
         display: block;
         position: relative;
@@ -67,9 +69,29 @@ export default function render() {
         border-bottom: dotted 5px var(--default-secondary-color);
       }
 
+      app-about .title-section h1 {
+        margin-top: 0.5rem;
+      }
+
+      app-about .splat-icon-container {
+        display: flex;
+        justify-content: center;
+        padding-top: 2rem;
+      }
+
+      app-about .splat-icon-container img {
+        width: 6rem;
+      }
+
 
     </style>
-
+    <div class="splat-icon-container">
+      <img
+        class="header-icon"
+        slot="header-icon"
+        src="/images/watercolors/watercolor-splat-sunset-about.png"
+      />
+    </div>
     <div class="text-container">  
       <div class="title-section">
         <h1>About<br><span class="fw-light">Digital Collections</span></h1>
@@ -101,14 +123,14 @@ export default function render() {
       
       <h4>Contact</h4>
       <div>
-        <ul>
+        <ul class="list--arrow">
           <li><a href="mailto:eanebeker@ucdavis.edu">Eric A Nebeker</a> (Digital Assets Specialist)</li>
         </ul>
       </div>
       
       <h4>Implementation Team</h4>
       <div>
-        <ul>
+        <ul class="list--arrow">
           <li><a href="https://www.library.ucdavis.edu/person/quinn-hart">Quinn Hart</a> (Team Lead)</li>
           <li><a href="https://www.library.ucdavis.edu/person/justin-merz">Justin Merz</a> (Lead Developer)</li>
           <li><a href="https://www.library.ucdavis.edu/person/dusty-cartwright">Dusty Cartwright</a> (Developer)</li>
@@ -118,7 +140,7 @@ export default function render() {
       
       <h4>DAMS Steering Committee Members</h4>
       <div>
-        <ul>
+        <ul class="list--arrow">
           <li><a href="https://www.library.ucdavis.edu/person/peter-brantley">Peter Brantley</a></li>
           <li><a href="https://www.library.ucdavis.edu/person/vessela-ensberg">Vessela Ensberg</a></li>
           <li><a href="https://www.library.ucdavis.edu/person/xiaoli-li">Xiaoli Li</a></li>
