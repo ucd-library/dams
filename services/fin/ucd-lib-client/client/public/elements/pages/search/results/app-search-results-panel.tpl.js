@@ -304,6 +304,77 @@ export default function render() {
           flex: 3;
         }
       }
+
+      .teaser {
+        padding: 1.5rem; 
+      }
+      .teaser__image {
+        background-color: #dcdcdc;
+        width: 100%;
+        padding-top: 75%;
+      }
+      .teaser__title {
+        background-color: #dcdcdc;
+        height: 1.5rem;
+        width: 80%;
+        margin: .8rem auto 0;
+      }
+
+      .masonry {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .masonry .col-1,
+      .masonry .col-2,
+      .masonry .col-3 {
+        flex: 1 1 calc(33.333% - 16px);
+        box-sizing: border-box;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 16px;
+      }
+
+      .masonry .teaser .teaser__image {
+        width: 100%;
+        height: auto;
+        background-color: #dcdcdc;
+        padding-top: 0;
+      }
+
+      .masonry .teaser .teaser__title {
+        padding: 8px;
+        font-size: 1rem;
+        text-align: center;
+        background-color: #dcdcdc;
+      }
+
+      .list .teaser {
+        display: flex;
+      }
+      .list .teaser__image {
+        height: 250px;
+        width: 33%;
+        padding-top: 0;
+      }
+      .list .teaser__content {
+        width: 75%;
+        margin-left: 3rem;
+      }
+      .list .teaser__title {
+        margin: .8rem auto 0 0;
+      }
+      .list .teaser__content .teaser__details {
+        padding-top: 1rem;
+        width: 80%;
+        margin: .8rem auto 0 0;
+      }
+      .list .teaser__content .teaser__details > * {
+        margin: 0.5rem 0;
+        height: 1rem;
+        background-color: #dcdcdc; 
+      }
     </style>
 
     <div class="header">
@@ -366,6 +437,17 @@ export default function render() {
 
     <div ?hidden="${this.showError}">
       <div ?hidden="${this.showLoading}">
+        <div class="grid" ?hidden="${!this.loading || !this.isGridLayout}">
+          ${[1,2,3,4,5,6,7,8.9,10].map(
+            () => html`
+              <div class="teaser">
+                <div class="teaser__image"></div>
+                <div class="teaser__title"></div>
+              </div>  
+            `
+          )}
+        </div>
+
         <div class="grid" id="gridLayout" ?hidden="${!this.isGridLayout}">
           ${this.results.map(
             (res) => html`
@@ -378,6 +460,51 @@ export default function render() {
           )}
         </div>
 
+        <div class="masonry" ?hidden="${!this.loading || !this.isMosaicLayout}">
+          <div class="col-1">
+            <div class="teaser">
+              <div class="teaser__image" style="height: 350px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 150px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 300px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+          </div>
+          <div class="col-2">
+            <div class="teaser">
+              <div class="teaser__image" style="height: 200px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 275px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 200px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+          </div>
+          <div class="col-3">
+            <div class="teaser">
+              <div class="teaser__image" style="height: 250px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 150px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 250px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+          </div>
+        </div>
+        
         <div class="masonry" id="layout" ?hidden="${!this.isMosaicLayout}">
           ${this.results.map(
             (res) => html`
@@ -393,6 +520,23 @@ export default function render() {
         </div>
 
         <div class="list" ?hidden="${!this.isListLayout}">
+          <div ?hidden="${!this.loading}">
+            ${[1,2,3,4,5,6,7,8.9,10].map(
+              () => html`
+                <div class="teaser">
+                  <div class="teaser__image"></div>
+                  <div class="teaser__content">
+                    <div class="teaser__title"></div>
+                    <div class="teaser__details">
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                </div>  
+              `
+            )}
+          </div>
           ${this.results.map(
             (res) => html`
               <app-search-list-result

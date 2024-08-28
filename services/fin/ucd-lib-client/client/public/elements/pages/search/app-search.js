@@ -45,6 +45,8 @@ export class AppSearch extends Mixin(LitElement)
   }
 
   async firstUpdated() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
     this._onAppStateUpdate(await this.AppStateModel.get());
 
     if( this.appState.location.path[0] === 'search' ) {
@@ -60,6 +62,8 @@ export class AppSearch extends Mixin(LitElement)
    * @param {*} e
    */
   _onAppStateUpdate(e) {
+    if( e.location.page !== 'search' ) return;
+
     this.drawerOpen = e.filtersDrawerOpen ? true : false;
     this.appState = e;
   }

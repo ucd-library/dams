@@ -521,11 +521,11 @@ export default function render() {
 
     <div class="title-section">
       <div class="image-overlay">
-        <img ?hidden="${!this.watercolorBgUrl}" class="watercolor-bg" src="${this.watercolorBgUrl}" width="100%" alt="watercolor background" />
+        <img ?hidden="${!this.watercolorBgUrl}" class="watercolor-bg" src="${this.watercolorBgUrl}" width="100%" />
 
         <!-- <img class="featured-image" src="${this.thumbnailUrl}" width="45%" alt="collection featured image" /> -->
         <div class="featured-image" style="background-image: url(${this.thumbnailUrlOverride}), url(${this.thumbnailUrl})"></div>
-        <img ?hidden="${!this.watercolorFgUrl}" class="watercolor-fg" src="${this.watercolorFgUrl}" width="100%" alt="watercolor foreground" />
+        <img ?hidden="${!this.watercolorFgUrl}" class="watercolor-fg" src="${this.watercolorFgUrl}" width="100%" />
       </div>
       <div class="collection-header">
         
