@@ -182,11 +182,14 @@ export default function render() {
     }
 
     @media (max-width: 600px) {
-      
       app-collection .title-section {
         display: block;
-        min-height: 90vh;
         overflow-y: -webkit-paged-x;
+        padding-top: 3rem;
+      }
+
+      app-collection .title-section .collection-header {
+        height: 11rem;
       }
 
       app-collection .title-section > div {

@@ -77,8 +77,14 @@ class AppCollection extends Mixin(LitElement)
 
     this.collectionId = e.location.fullpath;
 
-    const recordData = await this.CollectionModel.get(e.location.fullpath);
-    this.onCollectionUpdate(recordData);
+    try {
+      let recordData = await this.CollectionModel.get(this.collectionId);
+      this.onCollectionUpdate(recordData);
+    } catch(e) {
+      this.dispatchEvent(
+        new CustomEvent("show-404", {})
+      );
+    }
   }
 
   /**
