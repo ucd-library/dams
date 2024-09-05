@@ -10,15 +10,8 @@ assignees: 'UcDust'
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**Example screenshots/recording**
+Screenshots showing issue and which page its on.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Extra info**
+Anything additional notes.
