@@ -1,6 +1,6 @@
 ---
 name: UI Issue
-about: Create a report to help us improve
+about: Create a new UI issue
 title: ''
 labels: 'UX / UI'
 assignees: 'UcDust'
