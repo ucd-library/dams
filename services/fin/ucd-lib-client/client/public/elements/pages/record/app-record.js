@@ -78,7 +78,7 @@ class AppRecord extends Mixin(LitElement)
     // this.citations = [];
     this.citationRoot = {};
     this.collectionItemCount = 0;
-    this.itemDefaultDisplay = 'Book Reader - 2 Page';
+    this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage;
     this.itemDisplay = '';
 
     this.isUiAdmin = user.canEditUi();
@@ -326,15 +326,6 @@ class AppRecord extends Mixin(LitElement)
     this._updateDisplayData();
     await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
 
-    // TODO save collection data with hasPart pointing to this item
-    // if( Object.keys(this.savedCollectionData).length ) {
-    //   // TEMP hack, also should append to array and not replace
-    //   this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0]['http://digital.ucdavis.edu/schema#itemDisplayExceptions'] 
-    //     = [{'@id': 'info:fedora/application/ucd-lib-client/item/ark:/87287/d70898/ark:/87287/d70898.jsonld.json'}];
-
-    //   await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.savedCollectionData);
-    // }
-
     this.editMode = false;
 
     this._changeMediaViewerDisplay('', true);
@@ -364,25 +355,10 @@ class AppRecord extends Mixin(LitElement)
       this.appDataLoaded = true;
       return;
     }
+
     edits = edits.payload;
-
-    this.itemDefaultDisplay = 'Book Reader - 2 Page';
-    if( edits?.edits ) {
-      // fetch collection override
-      let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
-      if( savedDisplayData ) {
-        this.savedCollectionData = savedDisplayData;
-        let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-        this.itemDefaultDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || this.itemDefaultDisplay;
-      }
-    }
-    this.itemDisplay = this.itemDefaultDisplay;
-
-    // get item data if it exists
-    let itemEdit = edits.itemOverrides.filter(e => e.item.includes(this.record['@id']))[0];
-    if( itemEdit && Object.keys(itemEdit).length ) {
-      this.itemDisplay = itemEdit['item_default_display'] || this.itemDisplay;
-    }
+    this.itemDefaultDisplay = edits?.collection?.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
+    this.itemDisplay = edits?.items?.[this.currentRecordId]?.itemDefaultDisplay || this.itemDefaultDisplay;
 
     this.appDataLoaded = true;
     this._updateDisplayData();
@@ -421,7 +397,7 @@ class AppRecord extends Mixin(LitElement)
 
       if( this.itemDisplay.includes('Image List') ) {
         newDisplayType = 'image';
-      } else if ( this.itemDisplay.includes('Single') ) {
+      } else if ( this.itemDisplay.includes('1 Page') ) {
         newDisplayType = 'bookreader';
         singlePage = true;
       } else if ( this.itemDisplay.includes('2 Page') ) {
@@ -434,7 +410,9 @@ class AppRecord extends Mixin(LitElement)
         if( mediaViewer.singlePage !== singlePage ) {
           mediaViewer.singlePage = singlePage;
           if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
-            mediaViewer._onToggleBookView();
+            requestAnimationFrame(() => {
+              mediaViewer._onToggleBookView();
+            });
           } else {
             // to reload br if not initiated
             mediaViewer._onAppStateUpdate(await this.AppStateModel.get());

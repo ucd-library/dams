@@ -108,7 +108,7 @@ class CollectionService extends BaseService {
    */
   async getCollectionEdits(id) {
     return this.request({
-      url : `${this.baseUrl}/edits${id}`,
+      url : `/api/client-edits${id}`,
       checkCached : () => this.store.data.edits[id],
       onLoading : request => this.store.setCollectionEditLoading(id, request),
       onLoad : result => this.store.setCollectionEditLoaded(id, result.body),

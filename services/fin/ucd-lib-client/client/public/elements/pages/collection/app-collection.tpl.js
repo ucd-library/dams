@@ -2,6 +2,8 @@ import { html, unsafeCSS } from 'lit';
 
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md.js';
 
+import utils from '../../../lib/utils/index.js';
+
 import { sharedStyles } from "../../styles/shared-styles";
 import SharedHtml from '../../utils/shared-html';
 import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
@@ -674,30 +676,30 @@ export default function render() {
                       name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="Book Reader - 2 Page" 
-                      ?checked="${this.itemDefaultDisplay === 'Book Reader - 2 Page'}" 
-                      @change="${(e) => (this.itemDefaultDisplay = 'Book Reader - 2 Page')}">
-                    <label for="two">Book Reader - 2 Page</label>
+                      value="${utils.itemDisplayType.brTwoPage}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.brTwoPage}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage)}">
+                    <label for="two">${utils.itemDisplayType.brTwoPage}</label>
                   </li>
                   <li>
                     <input id="one" 
                       name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="Book Reader - Single Page" 
-                      ?checked="${this.itemDefaultDisplay === 'Book Reader - Single Page'}" 
-                      @change="${(e) => (this.itemDefaultDisplay = 'Book Reader - Single Page')}">
-                    <label for="one">Book Reader - 1 Page</label>
+                      value="${utils.itemDisplayType.brOnePage}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.brOnePage}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.brOnePage)}">
+                    <label for="one">${utils.itemDisplayType.brOnePage}</label>
                   </li>
                   <li>
                     <input id="list" 
                       name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="Image List" 
-                      ?checked="${this.itemDefaultDisplay === 'Image List'}" 
-                      @change="${(e) => (this.itemDefaultDisplay = 'Image List')}">
-                    <label for="list">Image List</label>
+                      value="${utils.itemDisplayType.imageList}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.imageList}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.imageList)}">
+                    <label for="list">${utils.itemDisplayType.imageList}</label>
                   </li>
                 </ul>
               </div>
@@ -726,11 +728,11 @@ export default function render() {
                     <input id="checkbox${index}" 
                       name="checkbox" 
                       type="checkbox"
-                      data-item-id="${item.item.split(':fedora')[1]}">
+                      data-item-id="${item.id}">
                     <label for="checkbox${index}">
-                      <a href="${item.item.split(':fedora')[1]}">${item.item.split('/').pop()}</a>
+                      <a href="${item.id}">${item.linkLabel}</a>
                       <span style="font-style: italic;">
-                        (${item['item_default_display']})
+                        (${item.defaultDisplay})
                       </span>
                     </label>
                   </li>
