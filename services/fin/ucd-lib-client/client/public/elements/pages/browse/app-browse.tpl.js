@@ -99,7 +99,7 @@ export default function render() {
           <div class="priority-links__item">
             <a
               class="vertical-link vertical-link--circle category-brand--secondary"
-              href="/browse/collections"
+              href="/browse/collections/15"
             >
               <div class="vertical-link__figure">
                 <!-- <ucdlib-icon class="vertical-link__image" src="http://localhost:3000/images/ucd-logo.svg"></ucdlib-icon> -->
@@ -129,7 +129,7 @@ export default function render() {
           <div class="priority-links__item">
             <a
               class="vertical-link vertical-link--circle category-brand--secondary"
-              href="/browse/creator"
+              href="/browse/creator/30"
             >
               <div class="vertical-link__figure">
                 <ucdlib-icon
@@ -143,7 +143,7 @@ export default function render() {
           <div class="priority-links__item">
             <a
               class="vertical-link vertical-link--circle category-brand--secondary"
-              href="/browse/format"
+              href="/browse/format/30"
             >
               <div class="vertical-link__figure">
                 <ucdlib-icon
@@ -157,7 +157,7 @@ export default function render() {
           <div class="priority-links__item">
             <a
               class="vertical-link vertical-link--circle category-brand--secondary"
-              href="/browse/subject"
+              href="/browse/subject/30"
             >
               <div class="vertical-link__figure">
                 <ucdlib-icon

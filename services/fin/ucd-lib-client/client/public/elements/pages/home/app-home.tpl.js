@@ -703,7 +703,7 @@ export default function render() {
 <section class="browse-buttons site-frame">
   <div class="priority-links">
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collections">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collections/15">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-box-archive"></ucdlib-icon>
         </div>
@@ -719,7 +719,7 @@ export default function render() {
       </a>
     </div>
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/creator">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/creator/30">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-wand-magic-sparkles"></ucdlib-icon>
         </div>
@@ -727,7 +727,7 @@ export default function render() {
       </a>
     </div>
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/format">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/format/30">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-photo-film"></ucdlib-icon>
         </div>
@@ -735,7 +735,7 @@ export default function render() {
       </a>
     </div>
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/subject">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/subject/30">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-star"></ucdlib-icon>
         </div>
