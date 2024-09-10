@@ -126,13 +126,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this._loadResults(e);
   }
 
-  // _onCollectionVcUpdate(e) {
-  //   if ( e.state !== 'loaded' ) return;
-  //   if( this.collectionResults.filter(r => r.id === e.payload.results.id)[0] ) return;
-  //   this.collectionResults.push(e.payload.results);
-  //   this._renderCollections(e);
-  // }
-
   /**
    * @method _loadResults
    * @description load results based on currentPage
@@ -141,6 +134,12 @@ export default class AppBrowseBy extends Mixin(LitElement)
    */
   async _loadResults(e) {
     this.resultsPerPage = this.isCollectionPage ? 15 : 30;
+    if( e && e.location.path.length > 2 ) {
+      this.resultsPerPage = parseInt(e.location.path[2] || this.resultsPerPage);
+      this.currentIndex = parseInt(e.location.path[3]) || 0;
+    } else {
+      this.currentIndex = 0;
+    }
 
     if( this.totalResults === 0 ) {
       this.loading = true;
@@ -157,19 +156,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this.totalPages = this.totalResults / this.resultsPerPage < 1 ? 1 : Math.ceil(this.totalResults / this.resultsPerPage);
     let pagination = this.shadowRoot.querySelector('ucd-theme-pagination');
     if( pagination ) pagination.requestUpdate('maxPages', this.totalPages);
-
-    if( e && e.location.path.length > 2 ) {
-      this.currentIndex = parseInt(e.location.path[2]);
-    } else {
-      this.currentIndex = 0;
-    }
-
-    let sort = 0;
-    if( e && e.location.path.length > 2 ) {
-      sort = parseInt(e.location.path[2]);
-    }
-
-    this.sortByOptions.forEach((item, index) => item.selected = (sort === index));
 
     this._renderResults();
   }
@@ -337,6 +323,11 @@ export default class AppBrowseBy extends Mixin(LitElement)
   _onPageClicked(e) {
     this.currentPage = e.detail.page;
     this.currentIndex = (this.currentPage - 1) * this.resultsPerPage;
+    let path = '/browse/'+this.id+'/'+this.resultsPerPage;
+    if( this.currentIndex > 0 ) {
+      path += '/'+this.currentIndex;
+    }
+    this.AppStateModel.setLocation(path);
     this._renderResults();
   }
 
