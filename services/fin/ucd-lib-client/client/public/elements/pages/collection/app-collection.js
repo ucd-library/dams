@@ -343,7 +343,7 @@ class AppCollection extends Mixin(LitElement)
     // set item prefs
     this.itemEdits = Object.entries(itemEdits).map(
       ([key, value]) => ({ id: key, linkLabel: key.split('/').pop(), defaultDisplay: value.itemDefaultDisplay })
-    ).filter(item => item.defaultDisplay);
+    ).filter(item => item.defaultDisplay && item.defaultDisplay !== this.itemDefaultDisplay);
 
     // hack for radios occasionally not being selected, styles coming from brand css
     if( this.itemCount === 0 ) this.querySelector('#zero').checked = true;
