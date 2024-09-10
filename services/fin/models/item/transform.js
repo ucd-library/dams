@@ -350,17 +350,17 @@ module.exports = async function(path, graph, headers, utils) {
     item._.source.type = 'git';
   }
 
-  let edits = await pg.query('SELECT * FROM fin_cache.dams_edits WHERE target = $1', ['info:fedora'+item['@id']]);
-  if( edits.rows.length > 0 ) {
-    item.damsEdits = {};
-    for( let edit of edits.rows ) {
-      item.damsEdits[edit.property.replace('http://digital.ucdavis.edu/schema#', '')] = {
-        'value' : edit.value,
-        '@id' : edit.edit_id,
-      }
-    }
-    item.damsEdits.exists = true;
-  }
+  // let edits = await pg.query('SELECT * FROM fin_cache.dams_edits WHERE target = $1', ['info:fedora'+item['@id']]);
+  // if( edits.rows.length > 0 ) {
+  //   item.damsEdits = {};
+  //   for( let edit of edits.rows ) {
+  //     item.damsEdits[edit.property.replace('http://digital.ucdavis.edu/schema#', '')] = {
+  //       'value' : edit.value,
+  //       '@id' : edit.edit_id,
+  //     }
+  //   }
+  //   item.damsEdits.exists = true;
+  // }
 
   graph = {
     '@id' : item._.graphId,
