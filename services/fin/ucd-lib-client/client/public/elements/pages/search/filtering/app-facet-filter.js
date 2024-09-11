@@ -49,8 +49,7 @@ class AppFacetFilter extends Mixin(LitElement)
     requestAnimationFrame(() => {
       let overflowDiv = this.shadowRoot.querySelector('.overflow');
 
-      // TODO more testing here, pretty sure 200px is correct but it's possible it's different
-      if( overflowDiv && overflowDiv.offsetHeight >= 200 ) {
+      if( overflowDiv && overflowDiv.offsetHeight >= 190 ) {
         this.noOverflow = false;
       }
     });

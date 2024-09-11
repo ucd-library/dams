@@ -76,7 +76,8 @@ export default function render() {
   }
 
   .overflow {
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;    
     max-height: 200px;
   }
 
@@ -115,6 +116,9 @@ export default function render() {
   .overflow[no-overflow]::-webkit-scrollbar-track {
     background: transparent;
     border: none;
+  }
+  .overflow[no-overflow] {
+    scrollbar-color: transparent transparent;
   }
   .overflow::-webkit-scrollbar-thumb {
     border-radius: 6px;
