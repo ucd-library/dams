@@ -163,8 +163,18 @@ module.exports = async function(path, graph, headers, utils) {
   });
 
   await utils.add({
-    attr : 'source',
-    value : ['schema', 'material'],
+    attr : 'material',
+    value : ['schema', 'material']
+  });
+
+  await utils.add({
+    attr : 'location',
+    value : ['schema', 'location']
+  });
+
+  await utils.add({
+    attr : 'language',
+    value : ['schema', 'inLanguage'],
     type : 'id'
   });
 

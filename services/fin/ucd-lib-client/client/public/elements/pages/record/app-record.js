@@ -8,6 +8,7 @@ import rightsDefinitions from "../../../lib/rights.json";
 import citations from "../../../lib/models/CitationsModel";
 import utils from "../../../lib/utils/index.js";
 
+import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md.js';
 import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js";
 
 import "./app-media-download";

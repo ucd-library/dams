@@ -132,7 +132,7 @@ export default function render() {
       margin: 2rem 0;
     }
 
-    .label {
+    .collection-label {
       font-weight: bold;
       padding-right: 0.3rem;
     }
@@ -554,14 +554,27 @@ export default function render() {
       </p>
 
       <div style="margin-bottom: .4rem;">
-        <span class="label">Coverage: </span> ${this.yearPublished}
+        <span class="collection-label">Coverage: </span> ${this.yearPublished}
       </div>
-      <div style="margin-bottom: .4rem;" ?hidden="${!this.keywords || !this.keywords.length}">
-        <span class="label">Subjects: </span> 
-        ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="${item.href}">${item.label}</a>`)}
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.subjects?.length}">
+        <span class="collection-label">Subjects: </span> 
+          ${this.subjects.map(
+            (about, index) =>
+              html`${index > 0 ? ", " : ""}<a href="${about["@id"]}"
+                  >${about["name"] || about["@id"]}</a>`
+          )}
       </div>
-      <div style="margin-bottom: 3rem;">
-        <span class="label">Finding Aid: </span> <a href="">Online Archive of California</a>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.material}">
+        <span class="collection-label">Format: </span> ${this.material}
+      </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.languages?.length}">
+        <span class="collection-label">Language: </span> 
+        ${this.languages?.map(
+          (language, index) => html`<span>${language.name}</span>${index < (this.languages?.length - 1) ? ', ' : ''} `
+        )}
+      </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.location}">
+        <span class="collection-label">Location: </span> ${this.location}
       </div>
     </div>
 

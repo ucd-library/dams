@@ -315,7 +315,13 @@ export default function render() {
 
       <div ?hidden="${!this.description || !this.description.length}" class="metadata-row">
         <div class="attr">Description</div>
-        <div class="value" id="descriptionValue">${this.description}</div>
+        <div class="value" id="descriptionValue">
+          <ucdlib-md id="md">
+            <ucdlib-md-content>
+              ${this.description}
+            </ucdlib-md-content>
+          </ucdlib-md>
+        </div>
       </div>
 
       <div ?hidden="${!this.publisher}" class="metadata-row" id="publisher">

@@ -182,9 +182,10 @@ module.exports = async function(path, graph, headers, utils) {
 
   await utils.add({
     attr : 'language',
-    value : ['schema', 'inLanguage']
+    value : ['schema', 'inLanguage'],
+    type : 'id'
   });
-
+  
   await utils.add({
     attr : 'lastModified',
     value : ['fedora', 'lastModified'],
