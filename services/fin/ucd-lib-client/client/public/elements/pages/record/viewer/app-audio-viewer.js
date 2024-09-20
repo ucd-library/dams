@@ -39,6 +39,7 @@ export default class AppAudioViewer extends Mixin(LitElement)
     }
 
     this.fullPath = e.location.fullpath;
+    this._updateStyles();
   }
 
   async firstUpdated(e) {

@@ -5,6 +5,12 @@ const LANG_MAP = {
 };
 
 class Utils {
+  itemDisplayType = {
+    imageList: "Image List",
+    brOnePage: "Book Reader - 1 Page",
+    brTwoPage: "Book Reader - 2 Page",
+  };
+
   getYearFromDate(date) {
     if (!date) return "";
     date = date + "";
@@ -250,41 +256,7 @@ class Utils {
     if( savedData && savedData.body ) return JSON.parse(savedData.body);
     
     return null;     
-  }
-
-  /**
-   * @method getItemDisplayType
-   * @description given an item and collection id, get the app config display type
-   * returns imageList, brOnePage, brTwoPage
-   * 
-   * @param {String} id item id
-   * @param {String} collectionId collection id
-   * @param {Object} fcAppConfigModel reference to model
-   * @param {Object} collectionModel reference to model
-   */
-    async getItemDisplayType(id, collectionId, fcAppConfigModel, collectionModel) {
-      let displayType = '';
-
-      let edits;
-      if( collectionId ) edits = await collectionModel.getCollectionEdits(collectionId);
-      if( edits && !Object.keys(edits?.payload).length ) return displayType;
-      edits = edits?.payload;
-
-      displayType = 'Book Reader - 2 Page';
-      if( edits?.edits ) {
-        let collectionGraph = await this.getAppConfigCollectionGraph(collectionId, fcAppConfigModel);
-        displayType = collectionGraph?.filter(g => g['@id'].includes('/application/ucd-lib-client'))?.[0]?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'];
-      }
-
-      // get item data if it exists
-      let itemEdit = edits?.itemOverrides.filter(e => e.item.includes(id))[0];
-      if( itemEdit && Object.keys(itemEdit).length ) {
-        displayType = itemEdit['item_default_display'];
-      }
-      
-      return displayType;
-    }
-  
+  }  
 }
 
 module.exports = new Utils();

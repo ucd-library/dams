@@ -63,6 +63,7 @@ export default class DamsHero extends Mixin(LitElement)
       img.onload = () => {
         let element = this.shadowRoot.querySelector('.image');
         element.style.backgroundImage += 'var(--gradient-ag-putah), url(' + img.src + ')';
+        element.style.backgroundSize = 'cover';
         element.style.opacity = '1';
       };
     }

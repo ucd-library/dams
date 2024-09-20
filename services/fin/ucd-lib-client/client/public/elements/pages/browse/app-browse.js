@@ -29,7 +29,9 @@ class AppBrowse extends Mixin(LitElement)
   }
 
   _onAppStateUpdate(e) {
-    this.page = e.location.pathname;
+    let page = '/'+e.location.path[0];
+    if( e.location.path.length > 1 ) page += '/'+e.location.path[1];
+    this.page = page;
   }
   
 }

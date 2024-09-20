@@ -142,7 +142,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
     // check for any overrides at collection/item level for the image viewer
     let itemId = e.selectedRecord?.graph?.root?.['@id'];
     let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))?.[0]?.['@id'];
-    let displayType = await utils.getItemDisplayType(itemId, collectionId, this.FcAppConfigModel, this.CollectionModel);
+
+    let displayType = await this._getItemDisplayType(itemId, collectionId);
+
     this.overrideImageList = false;
 
     // default to BR 2 page if no displayType is set
@@ -154,7 +156,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       renderAsBr = false;
       mediaType = 'image';
       this.overrideImageList = true;
-    } else if ( displayType && displayType.includes('Single') && mediaType === 'image' ) {
+    } else if ( displayType && displayType.includes('1 Page') && mediaType === 'image' ) {
       renderAsBr = true;
       mediaType = 'bookreader';
       this.singlePage = true;
@@ -207,6 +209,23 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     this.mediaType = mediaType;
+  }
+
+  async _getItemDisplayType(itemId, collectionId) {
+    let edits;
+    try {
+      edits = await this.CollectionModel.getCollectionEdits(collectionId);
+    } catch (error) {
+      console.warn('Error retrieving collection edits', error);
+    }
+
+    if( edits.state !== 'loaded' ) return null;
+    if( !Object.keys(edits.payload).length ) return null;
+
+    let collectionEdits = edits.payload?.collection || {};
+    let itemEdits = edits.payload?.items || {};
+
+    return itemEdits[itemId]?.itemDefaultDisplay || collectionEdits.itemDefaultDisplay;
   }
 
   _clearMedia() {

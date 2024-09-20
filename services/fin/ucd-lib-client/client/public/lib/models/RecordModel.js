@@ -55,6 +55,7 @@ class RecordModel extends ElasticSearchModel {
       return;
     }
 
+    AppStateModel.set({page: 'item'});
     let id = '/' + e.location.path.join('/');
     let mediaPage = -1;
 
@@ -64,13 +65,20 @@ class RecordModel extends ElasticSearchModel {
       id = id.replace(/:\d+$/, '');
     }
 
-    let result = await this.get(id);
-    await result.payload.clientMedia.loadManifests();
+    let result;
+    try {
+      result = await this.get(id);
+      await result.payload.clientMedia.loadManifests();
+    } catch(e) {
+      console.warn('Error retrieving item', e);
+      AppStateModel.setSelectedRecord(null);
+      AppStateModel.set({page: '404'});
+    }
 
     // item view controller event vs stuff below?
-
+    
     // only trigger a change if the root record changed.
-    if( result.id !== this.currentRecordId || this.selectedMediaPage !== mediaPage ) {
+    if( result && (result.id !== this.currentRecordId || this.selectedMediaPage !== mediaPage) ) {
       this.currentRecordId = result.id;
       this.selectedMediaPage = mediaPage;
 

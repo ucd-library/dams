@@ -23,7 +23,10 @@ class AppCollection extends Mixin(LitElement)
       thumbnailUrl : { type : String },
       thumbnailUrlOverride : { type : String },
       callNumber : { type : String },
-      keywords : { type : Array },
+      subjects : { type : Array },
+      material : { type : String },
+      languages : { type : Array },
+      location : { type : String },
       items : { type : Number },
       yearPublished : { type : Number },
       highlightedItems : { type : Array },
@@ -77,8 +80,14 @@ class AppCollection extends Mixin(LitElement)
 
     this.collectionId = e.location.fullpath;
 
-    const recordData = await this.CollectionModel.get(e.location.fullpath);
-    this.onCollectionUpdate(recordData);
+    try {
+      let recordData = await this.CollectionModel.get(this.collectionId);
+      this.onCollectionUpdate(recordData);
+    } catch(e) {
+      this.dispatchEvent(
+        new CustomEvent("show-404", {})
+      );
+    }
   }
 
   /**
@@ -114,20 +123,16 @@ class AppCollection extends Mixin(LitElement)
       this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';  
     }
 
+    let root = e.payload.root || {};
     this.callNumber = e.vcData.callNumber;
-    this.keywords = (e.vcData.keywords || [])
-      .map(keyword => {
-        let searchObj = this.RecordModel.emptySearchDocument();
-        this.RecordModel.appendKeywordFilter(searchObj, '@graph.keywords', keyword);
-        return {
-          label : keyword,
-          href : '/search/'+this.RecordModel.searchDocumentToUrl(searchObj)
-        }
-      });
+    this.subjects = (e.vcData.subjects || []);
+    this.material = root.material || '';
+    this.languages = !Array.isArray(root.language || []) ? [root.language] : root.language;
+    this.location = root.location || '';
     this.items = e.vcData.count;
     this.yearPublished = e.vcData.yearPublished;
 
-    this.citationRoot = e.payload.root;
+    this.citationRoot = root;
 
     if( this.appDataLoaded && !this.savedItems.length ) {
       this.getLatestItems();
@@ -163,7 +168,10 @@ class AppCollection extends Mixin(LitElement)
     this.thumbnailUrl = '';
     this.thumbnailUrlOverride = '';
     this.callNumber = '';
-    this.keywords = [];
+    this.subjects = [];
+    this.material = '';
+    this.languages = [];
+    this.location = '';
     this.items = 0;
     this.yearPublished = 0;
     this.highlightedItems = [];
@@ -178,7 +186,7 @@ class AppCollection extends Mixin(LitElement)
     this.editMode = false;
     this.itemCount = 6;
     this.citationRoot = {};
-    this.itemDefaultDisplay = 'Book Reader - 2 Page'; // one, list.. for admin pref on BR display type for items in this collection
+    this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage; // one, list.. for admin pref on BR display type for items in this collection
     this.itemEdits = [];
   }
 
@@ -308,84 +316,45 @@ class AppCollection extends Mixin(LitElement)
   async _parseDisplayData() {
     let edits;
     try {
-      console.log('calling getCollectionEdits endpoint');
       edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
     } catch (error) {
-      console.log('Error retrieving collection edits', error);
+      console.warn('Error retrieving collection edits', error);
     }
 
-  
     if( edits.state !== 'loaded' ) return;
     if( !Object.keys(edits.payload).length ) return;
-    edits = edits.payload;
 
-    this.itemEdits = edits.itemOverrides || [];
+    let collectionEdits = edits.payload?.collection || {};
+    let itemEdits = edits.payload?.items || {};
 
-    if( !edits.edits ) return;
-
-    let savedDisplayData = await this.FcAppConfigModel.getAdminData(this.collectionId);
-
-    // let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
-    if( !savedDisplayData ) {
-      this.appDataLoaded = true;
-      return;
-    }
-
-    savedDisplayData = savedDisplayData.body['@graph'];
-
-    let watercolor = savedDisplayData.filter(d => d['@id'].indexOf('#watercolor') > -1)[0];
-    if( watercolor ) {
-      this.watercolor = watercolor['css'];
-    } else {
-      this.watercolor = 'rose';
-    }
+    // set collection prefs
+    this.watercolor = collectionEdits.watercolors?.css || 'rose';
     this.watercolorBgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-back-white.jpg';
     this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';
 
-    let graphRoot = savedDisplayData.filter(d => d['@id'] === '/application/ucd-lib-client' + this.collectionId)[0];
-    if( !graphRoot ) {
-      this.appDataLoaded = true;
-      return;
+    this.thumbnailUrlOverride = collectionEdits.thumbnailUrl?.['@id'] || '';
+    if( this.thumbnailUrlOverride ) {
+      // remove domain
+      let url = new URL(this.thumbnailUrlOverride);
+      this.thumbnailUrlOverride = url?.pathname;
     }
 
-    this.savedItems = [];
-    // featured items
-    let items = graphRoot['exampleOfWork'];
-    if( items ) {
-      if( !Array.isArray(items) ) items = [items];
-      items.forEach((item, index) => {
-        let position = savedDisplayData.find(i => i['@id'] === item)?.['http://schema.org/position'];
-        this.savedItems.push({
-          '@id' : '/item' + item.split('/item')?.[1],
-          position : position || index+1
-        });
-      });
-      this.savedItems.sort((a, b) => a.position - b.position);
-    }
+    this.itemCount = collectionEdits.itemCount || 6;
+    this.itemDefaultDisplay = collectionEdits.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
 
-    this.highlightedItems = [...this.savedItems];
-    if( !this.savedItems.length ) this.getLatestItems();
+    // set item prefs
+    this.itemEdits = Object.entries(itemEdits).map(
+      ([key, value]) => ({ id: key, linkLabel: key.split('/').pop(), defaultDisplay: value.itemDefaultDisplay })
+    ).filter(item => item.defaultDisplay && item.defaultDisplay !== this.itemDefaultDisplay);
 
-    // featured image
-    let featuredImage = graphRoot['contains']?.split('/fcrepo/rest')?.[1];
-    if( featuredImage ) {
-      this.thumbnailUrlOverride = '/fcrepo/rest'+ featuredImage;
-    }
-
-    // itemCount
-    this.itemCount = graphRoot['http://digital.ucdavis.edu/schema#itemCount'];
-    if( !(this.itemCount >= 0) ) this.itemCount = 6;
-    // hack for checkboxes occasionally not being selected
+    // hack for radios occasionally not being selected, styles coming from brand css
     if( this.itemCount === 0 ) this.querySelector('#zero').checked = true;
     if( this.itemCount === 3 ) this.querySelector('#three').checked = true;
     if( this.itemCount === 6 ) this.querySelector('#six').checked = true;
+    if( this.itemDefaultDisplay === utils.itemDisplayType.brTwoPage ) this.querySelector('#two').checked = true;
+    if( this.itemDefaultDisplay === utils.itemDisplayType.brOnePage ) this.querySelector('#one').checked = true;
+    if( this.itemDefaultDisplay === utils.itemDisplayType.imageList ) this.querySelector('#list').checked = true;
 
-    this.itemDefaultDisplay = graphRoot['itemDefaultDisplay'] || this.itemDefaultDisplay;
-    if( this.itemDefaultDisplay === 'Book Reader - 2 Page' ) this.querySelector('#two').checked = true;
-    if( this.itemDefaultDisplay === 'Book Reader - Single Page' ) this.querySelector('#one').checked = true;
-    if( this.itemDefaultDisplay === 'Image List' ) this.querySelector('#list').checked = true;
-
-    this.itemEdits = this.itemEdits.filter(e => e['item_default_display'] !== '' && e['item_default_display'] !== this.itemDefaultDisplay);
     this.appDataLoaded = true;
     this._updateDisplayData();
     this.requestUpdate();
