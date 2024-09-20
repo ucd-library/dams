@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dist": "cd client && ./dist.sh",
+    "watch-admin-ext": "cd client/admin-ui-ext && webpack --watch --config ./webpack.config.js",
     "build": "cd client && ./build.sh",
     "watch": "cd client && ./watch.sh",
     "analyze-bundle": "cd client && webpack --profile --json webpack-dist.config.js > stats.json && webpack-bundle-analyzer -m server stats.json"
@@ -13,6 +14,7 @@
   "author": "jrmerz@ucdavis.edu",
   "license": "MIT",
   "dependencies": {
+    "@ucd-lib/cork-app-utils": "^6.2.0",
     "@ucd-lib/spa-router-middleware": "^0.2.1"
   },
   "devDependencies": {

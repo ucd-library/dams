@@ -8,7 +8,7 @@ class ClientEditsModel extends FinDataModel {
     // base name for model
     super('client-edits');
 
-    this.TYPE = 'http://digital.ucdavis.edu/schema#DamsClientEdit';
+    // this.TYPE = 'http://digital.ucdavis.edu/schema#DamsClientEdit';
 
     this.isRegex = /^(\/application\/ucd-lib-client)?\/(item|collection)\//;
 
