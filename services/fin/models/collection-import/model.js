@@ -1,13 +1,13 @@
-import {logger} from '@ucd-lib/fin-service-utils';
-import kubectl from './lib/kubectl.js'
-import config from './lib/config.js'
-import fs from 'fs';
-import path from 'path';
+const { logger } = require('@ucd-lib/fin-service-utils');
+const kubectl = require('./lib/kubectl.js');
+const config = require('./lib/config.js');
+const fs = require('fs');
+const path = require('path');
 
 class CollectionImportModel {
 
   constructor() {
-    this.kubectl = new kubectl();
+    this.kubectl = kubectl;
   }
 
   async delete(collection) {
@@ -106,8 +106,8 @@ class CollectionImportModel {
 
   async list() {
     let appliedJobs = await kubectl.getJobs();
-    appliedJobs = appliedJobs.map(job => job.metadata.name.match(/^import-/));
-    let availableJobs = fs.readdirSync(kubectl.k8sTemplatePath, config.k8s.collectionImport.templateName);
+    appliedJobs = appliedJobs.filter(job => job.match(/^import-/));
+    let availableJobs = fs.readdirSync(path.join(kubectl.k8sTemplatePath, config.k8s.collectionImport.templateName, 'overlays'));
     
     return {
       applied : appliedJobs,
@@ -118,4 +118,4 @@ class CollectionImportModel {
 }
 
 const inst = new CollectionImportModel();
-export default inst;
+module.exports = inst;

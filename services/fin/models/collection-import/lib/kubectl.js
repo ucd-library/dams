@@ -1,9 +1,9 @@
-import exec from './exec.js'
-import config from './config.js'
-import yaml from 'js-yaml';
-import path from 'path';
-import fs from 'fs';
-import {config, logger} from '@ucd-lib/fin-service-utils';
+const exec = require('./exec.js');
+const config = require('./config.js');
+const yaml = require('js-yaml');
+const path = require('path');
+const fs = require('fs');
+const { logger } = require('@ucd-lib/fin-service-utils');
 
 
 let k8sTemplatePath = config.k8s.templatesRoot;
@@ -18,6 +18,12 @@ class KubectlWrapper {
 
   async init() {
     if( this.initalized ) return;
+
+    if( config.k8s.enabled === false ) {
+      logger.info('kubectl disabled');
+      this.initalized = true;
+      return;
+    }
 
 
     if( config.k8s.platform === 'docker-desktop' ) {
@@ -199,4 +205,4 @@ class KubectlWrapper {
 }
 
 const instance = new KubectlWrapper();
-export default instance;
+module.exports = instance;

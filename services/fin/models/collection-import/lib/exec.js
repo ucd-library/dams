@@ -1,7 +1,7 @@
-import {exec} from 'child_process';
-import {logger} from '@ucd-lib/fin-service-utils';
+const {exec} = require('child_process');
+const {logger} = require('@ucd-lib/fin-service-utils');
 
-export default function (command, args={}, options={}) {
+module.exports = function (command, args={}, options={}) {
   if( !args.shell ) {
     args.shell = '/bin/bash';
   }

@@ -1,4 +1,6 @@
-import { LitElement, html } from 'lit';
+import { LitElement } from 'lit';
+import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+
 import render from "./app-search-breadcrumb.tpl.js";
 
 class AppSearchBreadcrumb extends Mixin(LitElement)

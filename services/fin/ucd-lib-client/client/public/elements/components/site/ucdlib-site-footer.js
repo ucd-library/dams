@@ -1,4 +1,5 @@
 import { LitElement, html, svg } from 'lit';
+import { Mixin } from '@ucd-lib/cork-app-utils';
 import {render, styles} from "./ucdlib-site-footer.tpl.js";
 import ThemeUtils from "../themeUtils";
 

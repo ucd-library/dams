@@ -47,3 +47,5 @@ function errorResponse(res, e, message) {
     }
   });
 }
+
+module.exports = router;

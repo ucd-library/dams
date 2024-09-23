@@ -1,4 +1,6 @@
 import { LitElement, html } from "lit";
+import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+
 import render from "./app-search-header.tpl.js";
 
 import "../../components/search-box";
