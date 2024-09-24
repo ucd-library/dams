@@ -3,6 +3,8 @@
 // https://github.com/google/shaka-player/tree/master/docs/tutorials
 
 import { LitElement } from "lit"
+import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+
 import render from "./app-video-viewer.tpl.js"
 
 import "@ucd-lib/cork-app-utils"

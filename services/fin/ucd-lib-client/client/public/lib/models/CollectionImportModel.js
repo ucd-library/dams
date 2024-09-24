@@ -17,8 +17,16 @@ class CollectionImportModel extends BaseModel {
     return this.service.list();
   }
 
-  start(collection) {
-    return this.service.start(collection);
+  get(collection) {
+    return this.service.get(collection);
+  } 
+
+  start(collection, opts={}) {
+    return this.service.start(collection, opts);
+  }
+
+  delete(collection) {
+    return this.service.delete(collection);
   }
 
 }

@@ -22,6 +22,9 @@ router.get('/:collection', async (req, res) => {
 
 router.post('/:collection', async (req, res) => {
   try {
+    if( req.query.ignoreBinarySync ) {
+      req.query.ignoreBinarySync = req.query.ignoreBinarySync === 'true';
+    }
     res.json(await model.import(req.params.collection, req.query)); 
   } catch(e) {
     errorResponse(res, e, 'Error importing collection: '+req.params.collection);
@@ -38,7 +41,7 @@ router.delete('/:collection', async (req, res) => {
 
 function errorResponse(res, e, message) {
   logger.error(message, e);
-  res.json({
+  res.status(500).json({
     error: true, 
     message, 
     details : {

@@ -6,8 +6,11 @@ class CollectionImportStore extends BaseStore {
     super();
 
     this.data = {
-      list : new LruStore({name: 'collection-import-list', max: 1}),
+      list : new LruStore({name: 'collection.import.list', max: 1}),
+      metadata : new LruStore({name: 'collection.import.metadata'}),
+      actions : new LruStore({name: 'collection.import.actions'})
     };
+
     this.events = {};
   }
 

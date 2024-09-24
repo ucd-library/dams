@@ -159,8 +159,23 @@ class KubectlWrapper {
 
   async get(type, name) {
     await this.init();
-    let config = await this.exec(`kubectl get ${type} ${name} -o json`);
+    let config;
+
+    if( !name ) {
+      config = await this.exec(`kubectl get ${type} -o json`);
+    } else {
+      config = await this.exec(`kubectl get ${type} ${name} -o json`);
+    }
+
     return JSON.parse(config);
+  }
+
+  async logs(type, name) {
+    await this.init();
+    try {
+      return await this.exec(`kubectl logs ${type}/${name}`);
+    } catch(e) {}
+    return '';
   }
 
   /**
@@ -198,8 +213,7 @@ class KubectlWrapper {
       if( flags[key] === '' ) return `--${key}`;
       return `--${key} ${flags[key]}`;
     }).join(' ');
-    let {stdout} = await this.exec(`cork-kube apply ${flagStr} -- ${template}`);
-    return stdout;
+    return this.exec(`cork-kube apply ${flagStr} -- ${template}`);
   }
 
 }

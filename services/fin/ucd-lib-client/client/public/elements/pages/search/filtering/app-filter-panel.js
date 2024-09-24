@@ -1,4 +1,5 @@
 import { LitElement } from "lit";
+import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
 import "./app-range-filter"
 import render from "./app-filter-panel.tpl.js"
