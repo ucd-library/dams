@@ -12,7 +12,7 @@ class CollectionImportService extends BaseService {
 
   async list() {
     let ido = {action: 'list'};
-    let id = payload.getKeys(ido);
+    let id = payload.getKey(ido);
 
     await this.checkRequesting(
       id, this.store.data.list,
@@ -20,7 +20,7 @@ class CollectionImportService extends BaseService {
         url : this.basePath,
         onUpdate : resp => this.store.set(
           payload.generate(ido, resp), 
-          this.data.list
+          this.store.data.list
         )
       })
     );
