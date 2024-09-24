@@ -11,13 +11,17 @@ class CollectionImportService extends BaseService {
   }
 
   async list() {
-    let id = 'list';
+    let ido = {action: 'list'};
+    let id = payload.getKeys(ido);
 
     await this.checkRequesting(
       id, this.store.data.list,
       () => this.request({
         url : this.basePath,
-        onUpdate : this.store.set(id, this.data.list)
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp), 
+          this.data.list
+        )
       })
     );
 
