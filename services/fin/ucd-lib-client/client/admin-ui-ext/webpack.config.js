@@ -1,6 +1,3 @@
-const webpack = require('webpack');
-const { ModuleFederationPlugin } = require('webpack').container;
-
 const path = require('path');
 
 let configs = require('@ucd-lib/cork-app-build').watch({

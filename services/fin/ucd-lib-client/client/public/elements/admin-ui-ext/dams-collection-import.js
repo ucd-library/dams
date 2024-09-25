@@ -1,4 +1,4 @@
-import { LitElement } from 'lit';
+import { LitElement, html } from 'lit';
 import {render, styles} from "./dams-collection-import.tpl.js";
 import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
 import {LitCorkUtils} from '@ucd-lib/cork-app-utils';
@@ -25,13 +25,20 @@ export default class DamsCollectionImport extends Mixin(LitElement)
     this.collectionList = [];
 
     this.render = render.bind(this);
-    this._injectModel('AppStateModel', 'CollectionImportModel');
+    this._injectModel('AppStateModel', 'DataViewModel', 'CollectionImportModel');
 
     this.AppStateModel.get().then(e => this._onAppStateUpdate(e));
+    this.DataViewModel.coreData().then(e => this._onCoreDataUpdate(e));
 
     setInterval(() => {
       this.refresh();
     }, 5000);
+  }
+
+  _onCoreDataUpdate(e) {
+    if( e.state !== 'loaded' ) return;
+    this.config = e.payload.config;
+    this.requestUpdate();
   }
 
   async _onAppStateUpdate(e) {
@@ -63,14 +70,14 @@ export default class DamsCollectionImport extends Mixin(LitElement)
       if( resp.volumes.includes(item) ) {
         list.push({
           id : item,
-          statusDetails : 'available (volume exists)',
+          status : 'available (volume exists)',
           state : 'not-running',
           volume : true
         });
       } else {
         list.push({
           id : item,
-          statusDetails : 'available',
+          status : 'available',
           state : 'not-running'
         });
       } 
@@ -92,15 +99,15 @@ export default class DamsCollectionImport extends Mixin(LitElement)
 
   _wrapCollectionItem(item) {
     item.id = item.metadata.name.replace('import-', '');
-    item.statusDetails = [];
+    // item.statusDetails = [];
 
-    for( let key in item.status ) {
-      if( typeof item.status[key] === 'object' ) {
-        continue;
-      } 
-      item.statusDetails.push(key+'='+item.status[key]);
-    }
-    item.statusDetails = item.statusDetails.join(', ');
+    // for( let key in item.status ) {
+    //   if( typeof item.status[key] === 'object' ) {
+    //     continue;
+    //   } 
+    //   item.statusDetails.push(key+'='+item.status[key]);
+    // }
+    // item.statusDetails = item.statusDetails.join(', ');
 
     if( item.status.active > 0 || item.status.ready > 0 ) {
       item.state = 'running';
@@ -109,15 +116,67 @@ export default class DamsCollectionImport extends Mixin(LitElement)
     }
   }
 
-  async _onCollectionImportClicked(id) {
+  _renderStatus(item) {
+    if( typeof item.status === 'string' ) {
+      return item.status;
+    }
 
-    this.logger.info('Running collection import', id);
-    let resp = await this.CollectionImportModel.start(id);
+    let timestamps = [];
+    if( item.status.startTime ) {
+      timestamps.push({key: 'startTime', ts: new Date(item.status.startTime)});
+    }
+    if( item.status.completionTime ) {
+      timestamps.push({key: 'completionTime', ts: new Date(item.status.completionTime)});
+    }
+
+    let statusFlags = [];
+    for( let key in item.status ) {
+      if( item.status[key] !== 1 ) {
+        continue;
+      }
+      statusFlags.push(key);
+    }
+
+    return html`
+      <div style="display: flex">
+        <div style="flex: 1">
+          <div><b>Job Status</b></div>
+          <div>${statusFlags.join(', ')}</div>
+        </div>
+        <div style="flex: 1">
+          <div><b>Timestamps</b></div>
+          ${timestamps.map(item => html`<div>${item.key}: ${item.ts.toLocaleString()}</div>`)}
+      </div>
+    `;
+  }
+
+  getJob(id) {
+    return this.collectionList.find(item => item.id === id);
+  }
+
+  async _onCollectionImportClicked(id) {
+    let job = this.getJob(id);
+    let ignoreBinarySync = false;
+
+    if( job.state == 'finished' || job.volume ) {
+      ignoreBinarySync = this.querySelector(`input#ibs-input-${id}`).checked;
+    }
+
+    if( !confirm(`Are you sure you want to run the import for ${id} with IGNORE_BINARY_SYNC=${ignoreBinarySync}?`) ) {
+      return;
+    }
+
+    this.logger.info('Running collection import', id, {ignoreBinarySync});
+    let resp = await this.CollectionImportModel.start(id, {ignoreBinarySync});
     this.logger.info('Collection import started', resp);
     this.loadCollectionList();
   }
 
   async _onForceStopClicked(id) {
+    if( !confirm(`Are you sure you want to stop the import for ${id}`) ) {
+      return;
+    }
+
     this.logger.info('Force stopping collection import', id);
     let resp = await this.CollectionImportModel.delete(id);
     this.logger.info('Collection import stopped', resp);
@@ -127,6 +186,11 @@ export default class DamsCollectionImport extends Mixin(LitElement)
   async _onRerunImportClicked(collection) {
     let ignoreBinarySync = this.querySelector(`input#ibs-input-${collection.id}`).checked;
     let id = collection.id;
+    
+    if( !confirm(`Are you sure you want to run the re-import for ${id} with IGNORE_BINARY_SYNC=${ignoreBinarySync}?`) ) {
+      return;
+    }
+
     collection.state = 'removing';
     this.requestUpdate();
 
@@ -152,6 +216,11 @@ export default class DamsCollectionImport extends Mixin(LitElement)
     this.logger.info('Updating collection', id);
     let resp = await this.CollectionImportModel.get(id);
 
+    if( resp.state !== 'loaded' ) {
+      this.logger.warn('Error updating collection', id, resp);
+      return
+    }
+
     let item = resp.payload;
     this._wrapCollectionItem(item);
 
@@ -167,6 +236,17 @@ export default class DamsCollectionImport extends Mixin(LitElement)
     ele.scrollTop = ele.scrollHeight;
   }
 
+  getJobLink(id) {
+    if( !this.config ) return '';
+    let k8s = this.config.k8s || {};
+    
+    if( k8s.platform === 'docker-desktop' ) {
+      return `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/job/${k8s.namespace}/import-${id}?namespace=${k8s.namespace}`
+    } else if( k8s.platform === 'gke' ) {
+      return `https://console.cloud.google.com/kubernetes/job/${k8s.region}/${k8s.cluster}/${k8s.namespace}/import-${id}/details?project=${config.google.project}`;
+    }
+  
+  }
 
 
 }

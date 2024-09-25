@@ -19,3 +19,4 @@ cp public/node_modules/@internetarchive/bookreader/BookReader/icons/fullscreen_e
    public/node_modules/@internetarchive/bookreader/BookReader/icons/fullscreen-exit.svg
 
 webpack --config webpack-dist.config.js
+webpack --config admin-ui-ext/webpack-dist.config.js
