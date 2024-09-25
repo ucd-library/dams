@@ -61,8 +61,8 @@ class KubectlWrapper {
 
     await exec(`
       gcloud container clusters get-credentials ${config.k8s.cluster} \
-        --zone ${config.gc.gke.zone} \
-        --project ${config.gc.projectId}
+        --zone ${config.k8s.region} \
+        --project ${config.google.project}
     `);
   }
 
