@@ -170,10 +170,16 @@ class KubectlWrapper {
     return JSON.parse(config);
   }
 
-  async logs(type, name) {
+  async logs(type, name, opts={}) {
     await this.init();
+
+    let tail = '';
+    if( opts.limit ) {
+      tail = `--tail ${opts.limit}`;
+    }
+
     try {
-      return await this.exec(`kubectl logs ${type}/${name}`);
+      return await this.exec(`kubectl logs ${tail} ${type}/${name}`);
     } catch(e) {}
     return '';
   }

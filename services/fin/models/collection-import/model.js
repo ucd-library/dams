@@ -96,7 +96,7 @@ class CollectionImportModel {
   async get(collection) {
     collection = this.getName(collection);
     let job = await kubectl.get('job', collection);
-    job.logs = await kubectl.logs('job', collection);
+    job.logs = await kubectl.logs('job', collection, {limit:500});
     return job;
   }
 
@@ -125,7 +125,7 @@ class CollectionImportModel {
     appliedJobs = appliedJobs.filter(job => job.metadata.name.match(/^import-/));
     let appliedJobNames = appliedJobs.map(job => job.metadata.name.replace('import-', ''));
     for( let job of appliedJobs ) {
-      job.logs = await kubectl.logs('job', job.metadata.name);
+      job.logs = await kubectl.logs('job', job.metadata.name, {limit:100});
     }
 
     let availableJobs = fs.readdirSync(this.collectionOverlaysPath);
