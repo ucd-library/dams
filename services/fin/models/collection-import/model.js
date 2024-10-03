@@ -12,6 +12,10 @@ class CollectionImportModel {
     this.collectionOverlaysPath = path.join(kubectl.k8sTemplatePath, config.k8s.collectionImport.templateName, 'overlays');
   }
 
+  is() {
+    return false;
+  }
+
   getName(collection) {
     if( !collection.match(/^import-/) ) {
       collection = 'import-'+collection;
@@ -25,7 +29,6 @@ class CollectionImportModel {
   }
 
   async import(collection, opts={}) {
-    console.log('import', collection, opts);
     let {exists, executed} = await this.exists(collection);
     
     if( !exists ) {
