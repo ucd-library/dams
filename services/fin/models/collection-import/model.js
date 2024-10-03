@@ -144,6 +144,10 @@ class CollectionImportModel {
     }
   }
 
+  is() {
+    return false;
+  }
+
 }
 
 const inst = new CollectionImportModel();
