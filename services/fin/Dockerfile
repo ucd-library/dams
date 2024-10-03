@@ -4,21 +4,37 @@ FROM ${FIN_SERVER_IMAGE}
 # TODO: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
 # Ensure crcmod is installed for gsutil
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 ARG UCD_DAMS_REPO_SERVICE_ROOT=services/fin
 
-RUN apt update && apt install -y \
-    apt-transport-https \
-    ca-certificates \
-    gnupg \
-    lsb-release
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/install-depends.sh /install-depends.sh
+RUN chmod +x /install-depends.sh && \
+    /install-depends.sh && \
+    rm /install-depends.sh
+# RUN apt update && \
+#     apt install -y \
+#       apt-transport-https \
+#       ca-certificates \
+#       gnupg \
+#       lsb-release \
+#       gcc \
+#       python3-dev \
+#       python3-setuptools \
+#       python3-pip && \
+#     pip3 uninstall crcmod && \
+#     pip3 install --no-cache-dir -U crcmod && \
+#     apt uninstall -y gcc python3-dev python3-pip && \
+#     rm -rf /var/lib/apt/lists/* && \
+#     apt-get clean
 
-RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-RUN echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
+# RUN mkdir -p /etc/apt/keyrings
+# RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+# RUN echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
 
-RUN apt-get update && apt-get install -y \
-  kubectl \
-  google-cloud-sdk-gke-gcloud-auth-plugin
+# RUN apt-get update && apt-get install -y \
+#   kubectl \
+#   google-cloud-sdk-gke-gcloud-auth-plugin
 
 # Client Code
 RUN mkdir -p ${FIN_SERVICE_ROOT}/ucd-lib-client/admin-ui-ext
