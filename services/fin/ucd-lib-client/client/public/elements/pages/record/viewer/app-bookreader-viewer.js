@@ -293,6 +293,8 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
         },
       },
 
+      imagesBaseURL: '/images/bookreader/',
+
       showToolbar: false,
       server: window.location.host,
       searchInsideUrl: port+"/api/page-search/ia",

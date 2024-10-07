@@ -315,6 +315,8 @@ class AppCollection extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
+    if( !this.collectionId ) return;
+
     let edits;
     try {
       edits = await this.CollectionModel.getCollectionEdits(this.collectionId);

@@ -50,7 +50,12 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
 
   async updated(props) {    
     if (props.has("id") && this.id && this.id !== this.renderedId ) {
-      this._onCollectionUpdate(await this.CollectionModel.get(this.id));
+      try {
+        this._onCollectionUpdate(await this.CollectionModel.get(this.id));
+      } catch(e) {
+        this.logger.warn('Collection not found', e);
+        this.loading = false;
+      }
     } else if( props.has("href") && !this.id ) {
       this.id = this.href;
     }

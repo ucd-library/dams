@@ -531,8 +531,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @description set focus to first clickable element
    */
   setFocus() {
-    if (this.singleImage) {
-      if (!this.breakControls) this.$.zoomOut1.focus();
+    if ( this.singleImage && this.$ ) {
+      if( !this.breakControls ) this.$.zoomOut1.focus();
       else this.$.zoomOut2.focus();
     } else {
       let firstBtn = this.shadowRoot.querySelector("button");

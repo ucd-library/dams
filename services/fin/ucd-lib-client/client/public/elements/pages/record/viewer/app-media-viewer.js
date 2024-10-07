@@ -212,6 +212,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
   }
 
   async _getItemDisplayType(itemId, collectionId) {
+    if( !collectionId ) return;
+
     let edits;
     try {
       edits = await this.CollectionModel.getCollectionEdits(collectionId);

@@ -164,6 +164,8 @@ class CollectionModel extends BaseModel {
       let thumbnailUrl = '';
       let edits;
 
+      if( !id || !fcAppConfigModel ) return;
+
       try {
         edits = await this.getCollectionEdits(id);
       } catch (error) {
