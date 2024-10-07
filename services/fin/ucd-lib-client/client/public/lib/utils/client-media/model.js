@@ -7,11 +7,15 @@ loadingMediaProm.then(module => {
   mediaModel = module.default;
 });
 
+const {getLogger} = require('@ucd-lib/cork-app-utils');
+
 class ClientMedia {
 
   constructor(id, graph, opts={}) {
     this.id = id;
     this.opts = opts;
+
+    this.logger = getLogger('ClientMedia');
 
     this.missingNodes = new Set();
 
@@ -39,7 +43,7 @@ class ClientMedia {
     // just loop all nodes in graph for media
     if( this.mediaGroups.length === 0 ) {
       if( typeof window !== 'undefined' ) {
-        console.warn('No media found for '+id, graph);
+        this.logger.warn('No media found for '+id, graph);
       }
     }
 
@@ -207,7 +211,7 @@ class ClientMedia {
       .filter(node => node);
 
     if( !node.clientMedia.pages ) {
-      console.warn('No images found for list '+node['@id']);
+      this.logger.warn('No images found for list '+node['@id']);
       node.clientMedia.pages = [];
     }
 
@@ -237,7 +241,7 @@ class ClientMedia {
   handlePdf(node) {
     if( !node.clientMedia ) {
       if( typeof window !== 'undefined' ) {
-        console.warn('No clientMedia for pdf '+node['@id']);
+        this.logger.warn('No clientMedia for pdf '+node['@id']);
       }
       node.clientMedia = {};
     }
@@ -268,7 +272,7 @@ class ClientMedia {
   handleImage(node) {
     if( !node.clientMedia ) {
       if( typeof window !== 'undefined' ) {
-        console.warn('No clientMedia for '+node['@id']);
+        this.logger.warn('No clientMedia for '+node['@id']);
       }
       node.clientMedia = {};
     }
@@ -349,7 +353,7 @@ class ClientMedia {
   _crawlMedia(node, crawled={}) {
     node = this.getNode(node);
     if( !node ) {
-      console.warn('Could not find media node for ', node);
+      this.logger.warn('Could not find media node for ', node);
       return;
     } 
 
@@ -389,7 +393,7 @@ class ClientMedia {
     // if( !type && node.fileFormat?.includes('image') ) {
     //   type = 'ImageObject';
     //   node['@type'].push('http://schema.org/ImageObject');
-    //   console.warn('@type is empty for node ', node);
+    //   this.logger.warn('@type is empty for node ', node);
     // }
 
     // or node['@id'] === '/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg' 
@@ -397,7 +401,7 @@ class ClientMedia {
     // if( !type && node['@id'] === '/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg' ) {
     //   node['@type'] = ['http://schema.org/ImageObject'];
     //   type = 'ImageObject';
-    //   console.warn('@type is empty for node ', node);
+    //   this.logger.warn('@type is empty for node ', node);
     // }
 
     return type.split(/(#|\/)/).pop();
