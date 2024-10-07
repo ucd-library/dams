@@ -1,9 +1,10 @@
 import { LitElement } from "lit";
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+import render from "./app-filter-panel.tpl.js";
 
-import "./app-range-filter"
-import render from "./app-filter-panel.tpl.js"
-import "./app-facet-filter"
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
+import "./app-range-filter";
+import "./app-facet-filter";
 
 export class AppFilterPanel extends Mixin(LitElement)
     .with(LitCorkUtils) {

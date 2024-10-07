@@ -5,12 +5,16 @@ const CollectionService = require('../services/CollectionService');
 const RecordStore = require('../stores/RecordStore');
 const AppStateModel = require('./AppStateModel');
 
+const {getLogger} = require('@ucd-lib/cork-app-utils');
+
 class CollectionModel extends BaseModel {
   
     constructor() {
       super();
       this.store = CollectionStore;
       this.service = CollectionService;
+
+      this.logger = getLogger('CollectionModel');
 
       // the selected collection functionality is just a shortcut for listening
       // to es filters and seeing if a collection is being filtered on. This is
@@ -163,7 +167,7 @@ class CollectionModel extends BaseModel {
       try {
         edits = await this.getCollectionEdits(id);
       } catch (error) {
-        console.log('Error retrieving collection edits', error);
+        this.logger.warn('Error retrieving collection edits', error);
       }
       if (!Object.keys(edits.payload).length) return;
       edits = edits.payload;

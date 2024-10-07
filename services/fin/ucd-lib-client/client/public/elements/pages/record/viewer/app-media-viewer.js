@@ -1,7 +1,7 @@
 import { LitElement } from "lit";
 import render from "./app-media-viewer.tpl";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement } from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 
 import "@polymer/iron-pages";
@@ -216,7 +216,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     try {
       edits = await this.CollectionModel.getCollectionEdits(collectionId);
     } catch (error) {
-      console.warn('Error retrieving collection edits', error);
+      this.logger.warn('Error retrieving collection edits', error);
     }
 
     if( edits.state !== 'loaded' ) return null;
@@ -238,7 +238,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
   _onSearchResultsChange(e) {
     this.searchResults = [...e.detail?.props?.results?.matches];
-    console.log('in _onSearchResultsChange', this.searchResults);
     if (this.searchResults.length) {
       this.searchResults = this.searchResults.sort(
         (a, b) =>

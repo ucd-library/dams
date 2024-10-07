@@ -1,7 +1,9 @@
 import { LitElement } from 'lit';
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
 import render from "./app-collection-card.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 import ioLoader from "../../lib/utils/intersection-observer-loader";
 
 export default class AppCollectionCard extends Mixin(LitElement)

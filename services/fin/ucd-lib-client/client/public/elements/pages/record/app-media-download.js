@@ -1,7 +1,8 @@
 import { LitElement } from "lit";
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
 import render from "./app-media-download.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import config from "../../../lib/config";
 import utils from "../../../lib/utils";

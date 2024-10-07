@@ -1,7 +1,8 @@
 import { LitElement } from 'lit';
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
 import render from "./dams-hero.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '@ucd-lib/theme-elements/brand/ucd-theme-header/ucd-theme-header.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-primary-nav/ucd-theme-primary-nav.js';

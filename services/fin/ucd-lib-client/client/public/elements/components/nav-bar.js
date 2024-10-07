@@ -1,7 +1,8 @@
 import { LitElement} from 'lit';
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
 import render from './nav-bar.tpl.js';
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-header/ucdlib-header.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-primary-nav/ucdlib-primary-nav.js';

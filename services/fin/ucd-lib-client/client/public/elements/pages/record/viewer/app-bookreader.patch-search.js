@@ -219,12 +219,10 @@ module.exports = function patchSearch(BookReader) {
   }
 
   function _computePageTops(pages, spacing) {
-    console.log({spacing})
     // calc height of images in inches.. get max height and width of images
     // container width/height in px
     const widthOffset = this.offsetWidth;
     const heightOffset = this.offsetHeight;
-    console.log({ widthOffset, heightOffset });
 
     // hack to scale up spacing for smaller screens
     let diffFrom700 = 700 - widthOffset;
@@ -254,7 +252,6 @@ module.exports = function patchSearch(BookReader) {
       result[page.index] = top;
       top += pageHeightInches + spacing;
     }
-    console.log({ result });
     return result;
   }
 

@@ -1,7 +1,8 @@
 import { LitElement, html } from 'lit';
 import render from "./app-about.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import {MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "../../components/search-box";
 

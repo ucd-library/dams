@@ -1,7 +1,8 @@
 import { LitElement} from 'lit';
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
-import render from "./app-normal-checkbox.tpl.js"
+import render from "./app-normal-checkbox.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 export class AppNormalCheckbox extends Mixin(LitElement)
     .with(LitCorkUtils) {
@@ -93,7 +94,7 @@ export class AppNormalCheckbox extends Mixin(LitElement)
     if( this.labelMapType === null ) this._onLabelMapUpdate();
     if( !this.labelMapType ) return this.value;
     
-    if( this.labelMapType === 'object' && this.labelMap[this.value] ) {
+    if( this.labelMapType === 'object' && typeof this.labelMap === 'object' && this.labelMap[this.value] ) {
       return this.labelMap[this.value];
     } else if( this.labelMapType === 'function' ) {
       return this.labelMap(this.value);

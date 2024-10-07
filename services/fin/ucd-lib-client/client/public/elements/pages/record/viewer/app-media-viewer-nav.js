@@ -1,7 +1,8 @@
 import { LitElement } from "lit";
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
 import render from "./app-media-viewer-nav.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 // import "@polymer/paper-icon-button"
 import "../../../utils/app-share-btn";
@@ -180,7 +181,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     // grrrr
     if (w === 0) {
-      // console.log('Ignoreing resize')
       // setTimeout(() => this._resize(), 200);
       return;
     }
@@ -278,13 +278,11 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
   _onSearchResultsChange(e) {
     this.searchResults = e.detail?.props?.results?.matches || [];
     this.searchResultsCount = this.searchResults.length;
-    console.log('this.searchResultsCount', this.searchResultsCount)
   }
 
   _onSearchResultsEmpty(e) {
     this.searchResultsCount = 0;
     this.searchResults = [];
-    console.log('this.searchResultsCount', this.searchResultsCount)
   }
 
   _showingLastThumbFrame() {

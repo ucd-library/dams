@@ -1,6 +1,6 @@
 import { LitElement} from 'lit';
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "../../utils/app-collection-card";
 
@@ -115,7 +115,7 @@ class AppHome extends Mixin(LitElement)
         panel.collectionIds = collectionIds;
       });
     } catch(e) {
-      console.warn('No featured collections admin data found', e);
+      this.logger.warn('No featured collections admin data found', e);
     }
 
     // get recent collections

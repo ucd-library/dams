@@ -10,7 +10,7 @@ import headingsCss from "@ucd-lib/theme-sass/2_base_class/_headings.css";
 // import index5Css from "@ucd-lib/theme-sass/5_layout/_index.css";
 // import index6Css from "@ucd-lib/theme-sass/6_utility/_index.css";
 // import faCss from "@fortawesome/fontawesome-free/css/all.css";
-// console.log(faCss);
+// this.logger.info(faCss);
 
 export default function render() { 
 return html`
