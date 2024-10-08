@@ -1,13 +1,17 @@
 const definition = require('./definition.js');
 
 // for CommonJS to ES6 module import
+let getLoggerProm = import('@ucd-lib/cork-app-utils');
+let getLogger;
+getLoggerProm.then(module => {
+  getLogger = module.getLogger;
+});
+
 let loadingMediaProm = import('../../models/MediaModel.mjs')
 let mediaModel;
 loadingMediaProm.then(module => {
   mediaModel = module.default;
 });
-
-const {getLogger} = require('@ucd-lib/cork-app-utils');
 
 class ClientMedia {
 
