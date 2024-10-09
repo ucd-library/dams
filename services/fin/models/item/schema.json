@@ -98,8 +98,11 @@
    "@graph.name" : {
       "type": "text",
       "fields": {
-        "raw": { 
-          "type":  "text",
+        "raw": {
+          "type": "keyword"
+        },
+        "punctuation_insensitive": {
+          "type": "text",
           "analyzer": "punctuation_insensitive",
           "fielddata": true
         }

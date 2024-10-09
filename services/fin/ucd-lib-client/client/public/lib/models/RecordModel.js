@@ -189,6 +189,16 @@ class RecordModel extends ElasticSearchModel {
 
     if( collectionId ) {
       this.appendKeywordFilter(searchDocument, 'collectionId', collectionId, 'and');
+    } 
+
+    if( !searchDocument.text ) {
+      searchDocument.sort = [
+        {
+          "@graph.name.raw": {
+            "order": "asc"
+          }
+        }
+      ];
     }
 
     await this.service.defaultSearch(storeId, searchDocument, compact, singleNode);
