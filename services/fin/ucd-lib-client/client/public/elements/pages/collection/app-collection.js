@@ -124,6 +124,18 @@ class AppCollection extends Mixin(LitElement)
       this.watercolorFgUrl = '/images/watercolors/collection-watercolor-' + this.watercolor + '-front.png';  
     }
 
+    // set background image
+    let featuredImageElement = document.querySelector('.featured-image');
+    if( featuredImageElement && this.thumbnailUrlOverride ) {
+      let img = new Image();
+      img.src = this.thumbnailUrlOverride;
+      img.onload = function() {
+        featuredImageElement.style.backgroundImage = `url(${this.src})`;
+      };
+    } else if ( featuredImageElement ) {
+      featuredImageElement.style.backgroundImage = `url(${this.thumbnailUrl})`;
+    }
+
     let root = e.payload.root || {};
     this.callNumber = e.vcData.callNumber;
     this.subjects = (e.vcData.subjects || []);
@@ -189,6 +201,9 @@ class AppCollection extends Mixin(LitElement)
     this.citationRoot = {};
     this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage; // one, list.. for admin pref on BR display type for items in this collection
     this.itemEdits = [];
+
+    let featuredImageElement = document.querySelector('.featured-image');
+    if( featuredImageElement ) featuredImageElement.style.backgroundImage = '';
   }
 
   _onItemDisplayChange(e) {
