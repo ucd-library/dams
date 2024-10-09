@@ -111,7 +111,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this.showError = false;
     this.showLoading = false;
     this.errorMsg = false;
-    this.paginationTotal = false;
+    this.paginationTotal = 0;
     this.totalOverMaxWindow = false;
     this.loading = true;
   }
@@ -182,7 +182,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     requestAnimationFrame(() => {
       this.total = total;
       // make sure we don't have a page the returns results > 10000k
-      let t = Math.floor((10000 - numPerPage) / numPerPage) * numPerPage;
+      let t = Math.floor(10000 / numPerPage) * numPerPage;
       if (total > t) {
         this.total = t + "+";
         this.totalOverMaxWindow = true;
@@ -192,7 +192,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
 
       this.results = results;
       this.numPerPage = numPerPage;
-      this.paginationTotal = Math.ceil(this.total / numPerPage);
+      this.paginationTotal = Math.ceil(total / numPerPage);
       // if( this.paginationTotal < 1 ) this.paginationTotal = 1;
 
       this.shadowRoot.querySelector("#numPerPage").value = numPerPage + "";
