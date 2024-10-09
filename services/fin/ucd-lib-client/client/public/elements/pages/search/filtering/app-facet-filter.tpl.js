@@ -69,7 +69,9 @@ export default function render() {
     flex: 1;
     text-align: right;
     min-width : 1.5rem;
-    padding: 0 10px;
+    padding: 0 0 0 10px;
+    box-sizing: border-box;
+    min-width: fit-content;
   }
   .count.has-count {
     color: black;
@@ -128,7 +130,7 @@ export default function render() {
   /* basic support for FF. Chrome/Safari should support -webkit styles above */
   @supports(scrollbar-color: red blue) {
     * {
-      scrollbar-color: var(--color-aggie-blue-80) var(--color-aggie-blue-50);
+      scrollbar-color: var(--color-aggie-blue-80) var(--color-aggie-blue-40);
       scrollbar-width: thin;
     }
   }
