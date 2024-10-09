@@ -1,7 +1,9 @@
 import { LitElement, html } from 'lit';
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
 import render from "./app-fs-viewer.tpl.js"
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 import "../../../utils/app-virtual-scroller"
 import "@polymer/iron-icons/editor-icons"
 import bytes from "bytes"

@@ -1,9 +1,10 @@
 import { LitElement } from "lit";
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import "@polymer/iron-pages/iron-pages";
 import "./app-filter-panel";
 
 import render from "./app-filters-panel.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 // init facet filters from template
 import config from "../../../../lib/config";

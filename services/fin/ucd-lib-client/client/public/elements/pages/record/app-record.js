@@ -1,7 +1,7 @@
 import { LitElement } from "lit";
 import render from "./app-record.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement } from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import { markdown } from "markdown";
 import rightsDefinitions from "../../../lib/rights.json";
@@ -177,7 +177,6 @@ class AppRecord extends Mixin(LitElement)
     }
 
     if( e.page === '404' || hasError ) {
-      console.error('calling 404 from item page', { page : e.page, hasError });
       this.dispatchEvent(
         new CustomEvent("show-404", {})
       );
@@ -224,7 +223,6 @@ class AppRecord extends Mixin(LitElement)
    * @param {Object} e
    */
   _ssSelectFocus(e) {
-    console.log('focus')
     let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
     let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
 
@@ -243,7 +241,6 @@ class AppRecord extends Mixin(LitElement)
    * @param {Object} e
    */
   _ssSelectBlur(e) {
-    console.log('blur')
     let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
     let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
 

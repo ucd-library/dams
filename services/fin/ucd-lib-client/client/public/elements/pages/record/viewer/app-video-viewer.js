@@ -3,11 +3,9 @@
 // https://github.com/google/shaka-player/tree/master/docs/tutorials
 
 import { LitElement } from "lit"
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+import render from "./app-video-viewer.tpl.js";
 
-import render from "./app-video-viewer.tpl.js"
-
-import "@ucd-lib/cork-app-utils"
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import config from "../../../../lib/config"
 import utils from "../../../../lib/utils"
@@ -155,7 +153,7 @@ export default class AppVideoViewer extends Mixin(LitElement)
       textDisplayFactory : SimpleTextDisplayer
     });
 
-    this.shaka.addEventListener('error', e => console.error('shaka error', e));
+    this.shaka.addEventListener('error', e => this.logger.error('shaka error', e));
     
     this.libsLoaded = true;
     await this._loadVideo();
@@ -180,7 +178,7 @@ export default class AppVideoViewer extends Mixin(LitElement)
     try {
       await this.shaka.load(manifestUri);
     } catch(error) {
-      console.error('Error code: ', error.code, 'object', error);
+      this.logger.error('Error code: ', error.code, 'object', error);
     }
   }
 

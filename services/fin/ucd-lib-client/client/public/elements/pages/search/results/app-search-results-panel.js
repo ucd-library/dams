@@ -1,7 +1,8 @@
 import { LitElement } from "lit";
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
 import render from "./app-search-results-panel.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./app-search-grid-result";
 import "./app-search-list-result";
@@ -476,7 +477,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   // _onSearchVcUpdate(e) {
   //   if (e.state !== "loaded") return;
 
-  //   console.log('e.payload.results', e.payload.results);
+  //   this.logger.info('e.payload.results', e.payload.results);
 
   //   let collections = [];
   //   e.payload.results.forEach((result) => {
@@ -489,7 +490,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   //   });
 
   //   this.totalCollections = collections.length;
-  //   console.log('this.totalCollections', this.totalCollections);
+  //   this.logger.info('this.totalCollections', this.totalCollections);
 
   // }
 

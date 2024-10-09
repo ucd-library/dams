@@ -1,7 +1,7 @@
 import { LitElement } from "lit";
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+import render from "./app-auth-footer.tpl.js";
 
-import render from "./app-auth-footer.tpl.js"
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 class AppAuthFooter extends Mixin(LitElement).with(LitCorkUtils) {
 

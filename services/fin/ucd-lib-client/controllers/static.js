@@ -51,7 +51,8 @@ module.exports = async (app) => {
         featuredImages : config.client.featuredImages,
         env : config.client.env,
         fcAppConfig : appConfig.config,
-        title : config.client.title
+        title : config.client.title,
+        logger : config.client.logger
       });
     },
     template : async (req, res, next) => {

@@ -1,7 +1,8 @@
 import { LitElement} from 'lit';
 import render from "./app-collection.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import {MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 
@@ -314,11 +315,13 @@ class AppCollection extends Mixin(LitElement)
    * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
    */
   async _parseDisplayData() {
+    if( !this.collectionId ) return;
+
     let edits;
     try {
       edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
     } catch (error) {
-      console.warn('Error retrieving collection edits', error);
+      this.logger.warn('Error retrieving collection edits', error);
     }
 
     if( edits.state !== 'loaded' ) return;

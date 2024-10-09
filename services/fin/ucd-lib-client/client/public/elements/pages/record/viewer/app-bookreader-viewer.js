@@ -1,6 +1,6 @@
 import { LitElement } from "lit";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement } from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "@internetarchive/bookreader/src/BookReader.js";
 
@@ -108,6 +108,8 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
       let controls = document.querySelector('.controls');
       let twoPageToggle = document.querySelector('app-media-viewer-nav')?.shadowRoot?.querySelector('.page-toggle');
 
+      if( !scrubber || !controls ) return;
+
       if( this.bookData.pages.length < 2 ) {
         scrubber.style.display = 'none';
         controls.style.flexDirection = 'row-reverse';
@@ -146,9 +148,10 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     );
     this._updateCurrentPageLabel();
 
-    if( !currentPage.parentElement.querySelector('#prev') && 
-        !currentPage.parentElement.querySelector('#next') &&
-        !currentPage.parentElement.querySelector('.BRcurrentpage-override') ) {
+    if( currentPage &&
+        !currentPage.parentElement?.querySelector('#prev') && 
+        !currentPage.parentElement?.querySelector('#next') &&
+        !currentPage.parentElement?.querySelector('.BRcurrentpage-override') ) {
       // clone buttons and reposition them. changing between bookreader items 
       //  destroys previous original arrow/label elements if append/prepend originals
       let prevButtonClone = prevButton.cloneNode(true);
@@ -189,20 +192,22 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     let currentPageOverride = document.querySelector(
       ".BRcurrentpage-override"
     );
-    let currentPageTrimmed = currentPage.innerHTML
-      .replace("(", "")
-      .replace(")", "");
+    let currentPageTrimmed = currentPage?.innerHTML
+      ?.replace("(", "")
+      ?.replace(")", "");
 
     if( currentPageOverride ) currentPageOverride.innerHTML = currentPageTrimmed;
 
-    // emit event to notify app-media-download which pages to download
-    // (single page mode would be 1 file, two page mode would be the 2 files being viewed)
-    this.dispatchEvent(new CustomEvent('br-page-change', {
-      detail: {
-        onePageMode: this.onePage,
-        currentPage: parseInt(currentPageTrimmed.split(' ')[0])
-      },
-    }));
+    if( currentPageTrimmed ) {
+      // emit event to notify app-media-download which pages to download
+      // (single page mode would be 1 file, two page mode would be the 2 files being viewed)
+      this.dispatchEvent(new CustomEvent('br-page-change', {
+        detail: {
+          onePageMode: this.onePage,
+          currentPage: parseInt(currentPageTrimmed.split(' ')[0])
+        },
+      }));
+    }
   }
 
   _toggleBookView() {
@@ -230,14 +235,14 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     // if( forceRender || this.fullscreen ) {
     //   offsetHeight = window.innerHeight;    
     //   this.height = offsetHeight;  
-    //   console.log('setting this.height', this.height);
+    //   this.logger.info('setting this.height', this.height);
     // }
     if( forceRender && this.fullscreen ) {
       offsetHeight = window.innerHeight;      
     }
     this.height = offsetHeight;
     let offsetWidth = document.querySelector('#BookReader').offsetWidth;
-    console.log({ offsetHeight, offsetWidth });
+    this.logger.info({ offsetHeight, offsetWidth });
 
     this.bookData.pages.forEach((bd) => {
       let width = Number(bd[bd.ocr?.imageSize]?.size?.width || 0)
@@ -288,6 +293,8 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
         },
       },
 
+      imagesBaseURL: '/images/bookreader/',
+
       showToolbar: false,
       server: window.location.host,
       searchInsideUrl: port+"/api/page-search/ia",
@@ -300,7 +307,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
       // getPageWidth: (index) => {
       //   let w = this._calcPageWidth(data, index);
       //   // let w = this._calcPageSize(data, index, 'width');
-      //   // console.log('getPageWidth', w);
+      //   // this.logger.info('getPageWidth', w);
       //   return w;
       // },
       // getPageHeight: (index) => {
@@ -309,7 +316,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
       //   // method 2, use max width/height of image to scale, but not scale over height of container
       //   // let h = this._calcPageSize(data, index, 'height');
-      //   // console.log('getPageHeight', h);
+      //   // this.logger.info('getPageHeight', h);
       //   return h;
       // },
 
@@ -348,25 +355,25 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   // }
 
   // _calcPageWidth(data, index) {
-  //   // if( index === 1 ) console.log('IN _calcPageWidth FOR INDEX 1');
+  //   // if( index === 1 ) this.logger.info('IN _calcPageWidth FOR INDEX 1');
 
   //   // first get the width and height of the #BookReader container
   //   let containerWidth = document.querySelector('#BookReader').offsetWidth;
   //   let containerHeight = document.querySelector('#BookReader').offsetHeight;
 
-  //   // if( index === 1 ) console.log({ containerHeight, containerWidth });
+  //   // if( index === 1 ) this.logger.info({ containerHeight, containerWidth });
     
   //   // get the width and height of the image
   //   let imageWidth = data[index]?.[0]?.width || data.width || 0;     
   //   let imageHeight = data[index]?.[0]?.height || data.height || 0;
 
-  //   // if( index === 1 ) console.log({ imageWidth, imageHeight });
+  //   // if( index === 1 ) this.logger.info({ imageWidth, imageHeight });
 
   //   // calc scale ratio by dividing container size by image size
   //   let widthRatio = containerWidth / imageWidth;
   //   let heightRatio = containerHeight / imageHeight;
 
-  //   // if( index === 1 ) console.log({ widthRatio, heightRatio });
+  //   // if( index === 1 ) this.logger.info({ widthRatio, heightRatio });
 
   //   // use the smaller of the two ratios to scale the image
   //   let scaleRatio = Math.min(widthRatio, heightRatio);
@@ -374,14 +381,14 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   //   // scale the image width by the ratio
   //   let newWidth = Math.floor(imageWidth * scaleRatio);
 
-  //   // if( index === 1 ) console.log({ scaleRatio, newWidth });
+  //   // if( index === 1 ) this.logger.info({ scaleRatio, newWidth });
 
   //   // don't scale image for wider screens
   //   if( window.innerWidth > 800 ) {
   //     return imageWidth;
   //   }
 
-  //   // if( index === 1 ) console.log({ returnedWidth: newWidth * this.viewportMultiplier });
+  //   // if( index === 1 ) this.logger.info({ returnedWidth: newWidth * this.viewportMultiplier });
 
   //   // return imageWidth; // this works for normal view, not when scaling for mobile
   //   return newWidth * this.viewportMultiplier; // this scales well with mobile and desktop orientations, but breaks text selection plugin and search plugin
@@ -393,7 +400,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
 
   //   let imageWidth = data[index]?.[0]?.width || data.width || 0;     
   //   let imageHeight = data[index]?.[0]?.height || data.height || 0;
-  //   // console.log('imageHeight before scaling: ', imageHeight);
+  //   // this.logger.info('imageHeight before scaling: ', imageHeight);
 
   //   let widthRatio = containerWidth / imageWidth;
   //   let heightRatio = containerHeight / imageHeight;
@@ -401,7 +408,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
   //   let scaleRatio = Math.min(widthRatio, heightRatio);
     
   //   let newHeight = Math.floor(imageHeight * scaleRatio);
-  //   // console.log('imageHeight after scaling: ', newHeight * this.viewportMultiplier);
+  //   // this.logger.info('imageHeight after scaling: ', newHeight * this.viewportMultiplier);
 
   //   if( window.innerWidth > 800 ) {
   //     // don't scale image for wider screens
@@ -419,7 +426,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     if (nav) {
       nav.searchResultsCount = results.matches.length;
       // this.br.searchResults = results;
-      console.log('nav.searchResultsCount', nav.searchResultsCount);
+      this.logger.info('nav.searchResultsCount', nav.searchResultsCount);
     }
   }
 
@@ -427,7 +434,7 @@ export default class AppBookReaderViewer extends Mixin(LitElement)
     let nav = document.querySelector("app-media-viewer-nav");
     if (nav) {
       nav.searchResultsCount = 0;
-      console.log('nav.searchResultsCount', nav.searchResultsCount);
+      this.logger.info('nav.searchResultsCount', nav.searchResultsCount);
     }
   }
 

@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
-import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+import render from "./app-fs-media-download.tpl.js";
 
-import render from "./app-fs-media-download.tpl.js"
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./viewer/app-fs-viewer"
 

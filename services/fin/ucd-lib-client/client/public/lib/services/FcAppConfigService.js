@@ -112,7 +112,7 @@ class FcAppConfigService extends BaseService {
       checkCached : () => null,
       onLoading : null,
       onLoad : null,
-      onError : null
+      onError : () => console.warn('No featured collections admin data found')
     });
   }
 
