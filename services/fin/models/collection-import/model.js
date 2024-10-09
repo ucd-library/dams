@@ -128,7 +128,8 @@ class CollectionImportModel {
     appliedJobs = appliedJobs.filter(job => job.metadata.name.match(/^import-/));
     let appliedJobNames = appliedJobs.map(job => job.metadata.name.replace('import-', ''));
     for( let job of appliedJobs ) {
-      job.logs = await kubectl.logs('job', job.metadata.name, {limit:100});
+      job.logs = '';
+      // job.logs = await kubectl.logs('job', job.metadata.name, {limit:100});
     }
 
     let availableJobs = fs.readdirSync(this.collectionOverlaysPath);
