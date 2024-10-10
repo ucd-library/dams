@@ -18,6 +18,8 @@ import "./app-image-viewer-lightbox";
 import "@ucd-lib/cork-app-utils";
 import utils from "../../../../lib/utils";
 
+import "../../../components/bookreader/ucdlib-bookreader.js";
+
 export default class AppMediaViewer extends Mixin(LitElement)
   .with(MainDomElement, LitCorkUtils) {
 
@@ -45,7 +47,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.render = render.bind(this);
     this.active = true;
 
-    this._injectModel("AppStateModel", "RecordModel", "FcAppConfigModel", "CollectionModel");
+    this._injectModel("AppStateModel", "RecordModel", "FcAppConfigModel", "CollectionModel", "BookReaderModel");
     this.mediaType = "";
     this.bagOfFilesImage = "";
     this.brFullscreen = false;
@@ -170,6 +172,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if( mediaGroup['@shortType'].includes('ImageObject') || mediaGroup.clientMedia?.pages?.length === 1 ) {
       renderAsBr = false;
       mediaType = 'image';
+    }
+
+    if( renderAsBr ) {
+      this.BookReaderModel.setSelectedBook(e.selectedRecord.clientMedia.id, e.selectedRecord);
     }
 
     if (

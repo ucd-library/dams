@@ -11,7 +11,7 @@ class AppStateModelImpl extends AppStateModel {
   constructor() {
     super();
     this.store = AppStateStore;
-    this.logger = getLogger('AppStateModel');
+    // this.logger = getLogger('AppStateModel');
 
     this.init(APP_CONFIG.appRoutes);
     this._sendGA();

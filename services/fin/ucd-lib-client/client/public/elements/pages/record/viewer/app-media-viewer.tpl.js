@@ -217,6 +217,10 @@ export default function render() {
         <app-audio-viewer id="audio"></app-audio-viewer>
       </ucdlib-pages>
 
+      <div style="margin-top: 5rem;">
+        <ucdlib-bookreader height="500"></ucdlib-bookreader>
+      </div>
+
       <div
         class="search-side-panel ${this.brFullscreen
           ? "fullscreen"
