@@ -71,12 +71,8 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   _updateHeight() {
     this.style.height = this.height+'px';
     this.shadowRoot.querySelector('#single-page').style.height = this.height+'px';
-    this.shadowRoot.querySelector('#double-page').style.height = this.height+'px';
+    // this.shadowRoot.querySelector('#double-page').style.height = this.height+'px';
     this._renderPageSizes();
-
-    if( this.bookViewData?.pages ) {
-      this.shadowRoot.querySelector('#single-page-scroll').style.height = this.height*this.bookViewData.pages.length+'px';
-    }
   }
 
   _renderPageSizes() {
@@ -88,19 +84,31 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     this.bookViewData.pages.forEach(page => {
       if( this.view === 'single' ) {
         this._renderPageSizeSingle(readerHeight, readerWidth, page)
+      } else if( this.view === 'double' ) {
+        this._renderPageSizeDouble(readerHeight, readerWidth, page)
       }
     });
+
+    this._updatePagesPanel();
   }
 
-  _renderPageSizeSingle(readerHeight, readerWidth, page) {
+  _updatePagesPanel() {
+    if( this.view === 'single' && this.bookViewData?.pages) {
+      this.shadowRoot.querySelector('#single-page-scroll').style.overflow = 'auto';
+      this.shadowRoot.querySelector('#single-page-scroll').style.height = this.height*this.bookViewData.pages.length+'px';
+    } else {
+      this.shadowRoot.querySelector('#single-page-scroll').style.overflow = 'hidden';
+      this.shadowRoot.querySelector('#single-page-scroll').style.height = this.height+'px';
+    }
+  }
+
+  _setPageDimensions(readerHeight, readerWidth, page) {
     let width = page.width;
     let height = page.height;
 
-    let realReaderHeight = readerHeight;
     readerHeight = readerHeight - (this.pageBuffer*2);
 
     let isLandscape = (width/height > 1);
-
     let newHeight, newWidth, ratio, ratioDimension;
 
     if( isLandscape ) {
@@ -133,15 +141,29 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     page.renderRatio = ratio;
     page.renderHeight = Math.floor(newHeight);
     page.renderWidth = Math.floor(newWidth);
+  }
 
+  _renderPageSizeSingle(readerHeight, readerWidth, page) {
+    let realReaderHeight = readerHeight;
+    this._setPageDimensions(readerHeight, readerWidth, page);
     page.renderOffsetTop = (realReaderHeight*page.index)+this.pageBuffer;
     page.renderOffsetLeft = 0;
 
     if( this.renderedRatioDimension === 'height' ) {
-      page.renderOffsetTop += Math.floor((realReaderHeight - newHeight) / 2)+this.pageBuffer;
+      page.renderOffsetTop += Math.floor((realReaderHeight - page.renderHeight) / 2)+this.pageBuffer;
     } else {
-      page.renderOffsetLeft += Math.floor((readerWidth - newWidth) / 2);
+      page.renderOffsetLeft += Math.floor((readerWidth - page.renderWidth) / 2);
     }
+  }
+
+  _renderPageSizeDouble(readerHeight, readerWidth, page) {
+    // even pages are on the right
+    // odd pages are on the left 
+    let isRight = page.index % 2 === 0;
+
+    this._setPageDimensions(readerHeight, readerWidth/2, page);
+    page.renderOffsetTop = 0;
+    page.renderOffsetLeft = isRight ? readerWidth/2 : 0;
   }
 
   setPage(page) {
@@ -149,6 +171,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     let oldPage = this.page;
     this.page = page;
 
+    // handle animation if we are only moving one page
     if( this.view === 'single' ) {
       let scrollTop = this.shadowRoot.querySelector('#single-page').scrollTop;
       let buffer = Math.floor(this.height/4);
@@ -167,28 +190,57 @@ export default class UcdlibBookreader extends Mixin(LitElement)
           });
         }
       }
-      this.renderPages();
     }
+
+    this._renderPageSizes();
+    this.renderPages();
   }
 
   renderPages() {
     let currentPages = [];
 
-    for( let i = this.page-1; i <= this.page+1; i++ ) {
-      if( i < 0 || i >= this.bookViewData.pages.length ) {
-        continue;
-      }
-      currentPages.push(i);
-      let pageEle = this.pages.find(p => p.index === i);
-      if( pageEle ) continue;
+    if( this.view === 'single' ) {
+      for( let i = this.page-1; i <= this.page+1; i++ ) {
+        if( i < 0 || i >= this.bookViewData.pages.length ) {
+          continue;
+        }
+        currentPages.push(i);
+        let pageEle = this.pages.find(p => p.index === i);
+        if( pageEle ) continue;
 
-      let ele = document.createElement('ucdlib-bookreader-page');
-      ele.setAttribute('page', i);
-      ele.bookData = this.bookViewData;
-      ele.debug = this.debug;
-      this.pagesEle.appendChild(ele);
-      this.pages.push({index: i, ele});
-      console.log('append page', i);
+        let ele = document.createElement('ucdlib-bookreader-page');
+        ele.setAttribute('page', i);
+        ele.bookData = this.bookViewData;
+        ele.debug = this.debug;
+        ele.buffer = this.pageBuffer;
+        this.pagesEle.appendChild(ele);
+        this.pages.push({index: i, ele});
+        console.log('append page', i);
+      }
+
+      
+    } else if( this.view === 'double' ) {
+      let isEven = this.page % 2 === 0;
+      if( isEven ) {
+        currentPages.push(this.page-1, this.page);
+      } else {
+        currentPages.push(this.page, this.page+1);
+      }
+      currentPages.forEach(i => {
+        if( i < 0 || i >= this.bookViewData.pages.length ) {
+          return;
+        }
+        let pageEle = this.pages.find(p => p.index === i);
+        if( pageEle ) return;
+
+        let ele = document.createElement('ucdlib-bookreader-page');
+        ele.setAttribute('page', i);
+        ele.bookData = this.bookViewData;
+        ele.debug = this.debug;
+        ele.buffer = this.pageBuffer;
+        this.pagesEle.appendChild(ele);
+        this.pages.push({index: i, ele});
+      });
     }
 
     for( let i = this.pages.length-1; i >= 0; i-- ) {
@@ -206,6 +258,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     if( this.view === view ) return;
     this.view = view;
     this._renderPageSizes();
+    this.renderPages();
   }
 
   _onScroll(e) {

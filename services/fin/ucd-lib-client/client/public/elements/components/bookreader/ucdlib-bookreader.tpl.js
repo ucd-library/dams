@@ -33,10 +33,10 @@ export function render() {
 return html`
 
   <div id="page-container">
-    <div id="single-page" ?hidden="${this.view !== 'single'}" @scroll="${this._onScroll}">
+    <div id="single-page"  @scroll="${this._onScroll}">
       <div id="single-page-scroll"></div>
     </div>
-    <div id="double-page" ?hidden="${this.view !== 'double'}"> 
-    </div>
+    <!-- <div id="double-page" ?hidden="${this.view !== 'double'}"> 
+    </div> -->
   </div>
 `;}

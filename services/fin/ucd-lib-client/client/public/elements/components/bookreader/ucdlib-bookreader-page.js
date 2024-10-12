@@ -10,6 +10,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     return {
       debug : { type: Boolean },
       page : { type: Number},
+      buffer : { type: Number },
       bookData : { type: Object },
       pageData : { type: Object },
       ocrData : { type: Array}
@@ -86,6 +87,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   }
 
   _renderOcrData(data, pageData) {
+    // TODO: this might need to be async rendering
     if( !data.parsed ) {
 
       let parser = new DOMParser();
@@ -99,13 +101,12 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
           .getAttribute('coords')
           .split(',')
           .map(v => Math.round(parseInt(v)*this.pageData.renderRatio));
-        console.log({left, bottom, right, top});
 
         let fontSize = bottom-top;
         let letterSpacing = this.getWordLetterSpacing(fontSize, word.textContent, right-left);
         ocrData.push({
           text: word.textContent,
-          top, 
+          top: top + this.pageBuffer, 
           left, 
           right: this.pageData.renderWidth - right, 
           bottom: this.pageData.renderHeight - bottom,
