@@ -7,7 +7,7 @@ class BookReaderStore extends BaseStore {
 
     this.data = {
       state : {
-        selectedPage : 1,
+        selectedPage : 0,
         selectedView : 'single',
       },
       bookManifest : new LruStore({name: 'bookreader.manifest', maxSize: 10}),

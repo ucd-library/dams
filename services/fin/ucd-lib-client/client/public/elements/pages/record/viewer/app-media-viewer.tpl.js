@@ -183,6 +183,12 @@ export default function render() {
         fill: var(--color-aggie-blue-90);
         padding-top: 0.6rem;
       }
+
+      ucdlib-bookreader-navbar {
+        width: 60%;
+        margin: 0 auto;
+      }
+
     </style>
 
     <div class="wrapper" style="position: relative;">
@@ -218,7 +224,8 @@ export default function render() {
       </ucdlib-pages>
 
       <div style="margin-top: 5rem;">
-        <ucdlib-bookreader height="500"></ucdlib-bookreader>
+        <ucdlib-bookreader height="634"></ucdlib-bookreader>
+        <ucdlib-bookreader-navbar></ucdlib-bookreader-navbar>
       </div>
 
       <div

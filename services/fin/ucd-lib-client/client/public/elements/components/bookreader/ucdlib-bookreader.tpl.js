@@ -13,7 +13,7 @@ export function styles() {
     }
 
     #single-page {
-      overflow: auto;
+      overflow: hidden;
       position: relative;
     }
 
@@ -39,7 +39,4 @@ return html`
     <div id="double-page" ?hidden="${this.view !== 'double'}"> 
     </div>
   </div>
-
-  <ucdlib-bookreader-slider></ucdlib-bookreader-slider>
-  <ucdlib-bookreader-navbar></ucdlib-bookreader-navbar>
 `;}

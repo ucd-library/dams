@@ -10,7 +10,7 @@ export function styles() {
       display: block;
       position: relative;
       height: 20px;
-      top: -22px;
+      top: 25px;
 
       -webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */
@@ -49,7 +49,7 @@ export function styles() {
 export function render() { 
 return html`
   <div class="slider">
-    <div id="track">
+    <div id="track" @click="${this._onClickTrack}">
       <div id="handle"  
         @mousedown="${this._onMoveStart}"
         @touchstart="${this._onMoveStart}">

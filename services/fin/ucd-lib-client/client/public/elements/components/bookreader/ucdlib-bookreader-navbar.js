@@ -1,14 +1,18 @@
 import { LitElement } from 'lit';
 import {render, styles} from "./ucdlib-bookreader-navbar.tpl.js";
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-icons/ucdlib-icons';
 
-export default class UcdlibBookreaderNavbar extends LitElement {
+import './ucdlib-bookreader-slider.js';
+
+export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
+.with(LitCorkUtils) {
 
   static get properties() {
     return {
-      brSinglePage : { type: Boolean },
-      brFullscreen : { type: Boolean }
+      selectedPage : { type: Number },
+      numPages : { type: Number }
     }
   }
 
@@ -20,28 +24,33 @@ export default class UcdlibBookreaderNavbar extends LitElement {
     super();
     this.render = render.bind(this);
 
-    this.brSinglePage = false;
-    this.brFullscreen = false;
+    this._injectModel('BookReaderModel');
+
+    this._reset();
   }
 
-  _onToggleBookView(e) {
-    console.log('TODO: _onToggleBookView');
+  _onBookreaderStateUpdate(e) {
+    this.selectedPage = e.selectedPage || 0;
+    this.numPages = e.bookViewData?.pages?.length || 0;
   }
 
-  _onExpandBookView(e) {
-    console.log('TODO: _onExpandBookView');
+  _reset() {
+    this.selectedPage = 0;
+    this.numPages = 0;
   }
 
-  _onCollapseBookView(e) {
-    console.log('TODO: _onCollapseBookView');
-  }
-  
-  _onBRZoomInClicked(e) {
-    console.log('TODO: _onBRZoomInClicked');
+  _prevPage(e) {
+    if( this.selectedPage > 0 ) {
+      this.selectedPage--;
+      this.BookReaderModel.setPage(this.selectedPage);
+    }
   }
 
-  _onBRZoomOutClicked(e) {
-    console.log('TODO: _onBRZoomOutClicked');
+  _nextPage(e) {
+    if( this.selectedPage < this.numPages ) {
+      this.selectedPage++;
+      this.BookReaderModel.setPage(this.selectedPage);
+    }    
   }
   
 }

@@ -7,9 +7,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
 
   static get properties() {
     return {
-      minPage : { type: Number },
       maxPage : { type: Number },
-      currentPage : { type: Number },
+      selectedPage : { type: Number },
       width : { type: Number }
     }
   }
@@ -24,26 +23,40 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
 
     this._injectModel('BookReaderModel');
 
-    this.minPage = 1;
-    this.maxPage = 25;
-    this.currentPage = 1;
-    this.width = this.offsetWidth;
+    this._reset();
 
     this._windowResizeListener = this._onResize.bind(this);
     this._onMove = this._onMove.bind(this);
     this._onMoveStart = this._onMoveStart.bind(this);
     this._onMoveEnd = this._onMoveEnd.bind(this);
-
-    // document.addEventListener('mousemove', this._onMove);
-    // document.addEventListener('mouseup', this._onMoveEnd);
-    // document.addEventListener('touchmove', this._onMove);
-    // document.addEventListener('touchend', this._onMoveEnd);
   }
 
   firstUpdated() {
     this.track = this.shadowRoot.getElementById('track');
     this.handle = this.shadowRoot.getElementById('handle');
+
     this._calculatePages();
+
+    if( this.handle ) {
+      this.handle.addEventListener('mousedown', () => this.isDragging = true);
+      this.handle.addEventListener('touchstart', () => this.isDragging = true);
+      this.handle.addEventListener('mouseup', () => this._onDragEnd.bind(this));
+      this.handle.addEventListener('touchend', this._onDragEnd.bind(this));
+    }
+  }
+
+  _onBookreaderStateUpdate(e) {
+    this.selectedPage = e.selectedPage || 0;
+    this.maxPage = (e.bookViewData?.pages?.length || 1) - 1;
+    this._calculatePages();
+
+    // TODO update slider position with new page
+  }
+
+  _reset() {
+    this.maxPage = 0;
+    this.selectedPage = 0;
+    this.width = this.offsetWidth;
   }
 
   _calculatePages() {
@@ -54,24 +67,28 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
 
   _onResize(e) {
     this.width = this.offsetWidth || 1;
+    this._calculatePages();
   }
 
   _onMoveStart(e) {
     e.preventDefault();
-    document.addEventListener('mousemove', this._onMove);
-    document.addEventListener('mouseup', this._onMoveEnd);
-    document.addEventListener('touchmove', this._onMove);
-    document.addEventListener('touchend', this._onMoveEnd);
+    let slider = this.shadowRoot.querySelector('.slider');
+    if( !slider ) return;
+
+    slider.addEventListener('mousemove', this._onMove);
+    slider.addEventListener('mouseup', this._onMoveEnd);
+    slider.addEventListener('touchmove', this._onMove);
+    slider.addEventListener('touchend', this._onMoveEnd);
+  }
+
+  _onClickTrack(e) {
+    this._onMove(e);
+    this._onDragEnd(e);
   }
 
   _onMove(e) {
     e.preventDefault();
     
-    // TODO fix index, first/second page showing only first page
-    // TODO handle click on scrollbar, not just drag
-    // ONLY UPDATE IMAGE WHEN CLICK OR WHEN DRAG END
-    
-
     let trackRect = this.track.getBoundingClientRect();
     let clientX = e.touches ? e.touches[0].clientX : e.clientX;
     let newLeft = clientX - trackRect.left;
@@ -87,19 +104,26 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     
     // calc new position
     let newPage = Math.floor((newLeft / trackRect.width) * this.maxPage);
-    if( newPage !== this.currentPage ) {
-      this.currentPage = newPage;
-      console.log('on page: ', this.currentPage);
-      this.BookReaderModel.setPage(this.currentPage);
-    }    
+    if( newPage !== this.selectedPage ) {
+      this.selectedPage = newPage;
+    }
   }
 
   _onMoveEnd(e) {
     e.preventDefault();
-    document.removeEventListener('mousemove', this._onMove);
-    document.removeEventListener('mouseup', this._onMoveEnd);
-    document.removeEventListener('touchmove', this._onMove);
-    document.removeEventListener('touchend', this._onMoveEnd);
+    let slider = this.shadowRoot.querySelector('.slider');
+    if( !slider ) return;
+
+    slider.removeEventListener('mousemove', this._onMove);
+    slider.removeEventListener('mouseup', this._onMoveEnd);
+    slider.removeEventListener('touchmove', this._onMove);
+    slider.removeEventListener('touchend', this._onMoveEnd);
+  }
+
+  _onDragEnd(e) {
+    this.isDragging = false
+
+    this.BookReaderModel.setPage(this.selectedPage);
   }
 
 }
