@@ -13,6 +13,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     return {
       book : { type: String },
       bookViewData : { type: Object },
+      pages : { type: Array },
       page : { type: Number },
       view : { type: String },
       height : { type: Number },
@@ -29,12 +30,27 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     this._injectModel('BookReaderModel');
     this.bookViewData = {};
     this.debug = false;
+
+    this.pageBuffer = 5;
+
+    this.pageElements = 3;
+    this.pages = [];
+
+    
     this.render = render.bind(this);
+  }
+
+  firstUpdated() {
+    this.pagesEle = this.shadowRoot.querySelector('#single-page-scroll');
+    this.renderPages();
   }
 
   updated(props) {
     if( props.has('height') ) {
       this._updateHeight();
+    }
+    if( props.has('bookViewData') ) {
+      this.renderPages();
     }
   }
 
@@ -82,6 +98,9 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     let width = page.width;
     let height = page.height;
 
+    let realReaderHeight = readerHeight;
+    readerHeight = readerHeight - (this.pageBuffer*2);
+
     let isLandscape = (width/height > 1);
 
     let newHeight, newWidth, ratio, ratioDimension;
@@ -117,11 +136,11 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     page.renderHeight = Math.floor(newHeight);
     page.renderWidth = Math.floor(newWidth);
 
-    page.renderOffsetTop = readerHeight*page.index;
+    page.renderOffsetTop = (realReaderHeight*page.index)+this.pageBuffer;
     page.renderOffsetLeft = 0;
 
     if( this.renderedRatioDimension === 'height' ) {
-      page.renderOffsetTop += Math.floor((readerHeight - newHeight) / 2);
+      page.renderOffsetTop += Math.floor((realReaderHeight - newHeight) / 2)+this.pageBuffer;
     } else {
       page.renderOffsetLeft += Math.floor((readerWidth - newWidth) / 2);
     }
@@ -141,7 +160,39 @@ export default class UcdlibBookreader extends Mixin(LitElement)
           pageData.renderOffsetTop+pageData.renderHeight > scrollTop+this.height ) {
         this.shadowRoot.querySelector('#single-page').scrollTop = this.page * this.height;
       }
+      this.renderPages();
     }
+  }
+
+  renderPages() {
+    let currentPages = [];
+
+    for( let i = this.page-1; i <= this.page+1; i++ ) {
+      if( i < 0 || i >= this.bookViewData.pages.length ) {
+        continue;
+      }
+      currentPages.push(i);
+      let pageEle = this.pages.find(p => p.index === i);
+      if( pageEle ) continue;
+
+      let ele = document.createElement('ucdlib-bookreader-page');
+      ele.setAttribute('page', i);
+      ele.bookData = this.bookViewData;
+      ele.debug = this.debug;
+      this.pagesEle.appendChild(ele);
+      this.pages.push({index: i, ele});
+      console.log('append page', i);
+    }
+
+    for( let i = this.pages.length-1; i >= 0; i-- ) {
+      let page = this.pages[i];
+      if( currentPages.indexOf(page.index) === -1 ) {
+        page.ele.remove();
+        this.pages.splice(i, 1);
+        console.log('remove page', page.index);
+      }
+    }
+
   }
 
   setView(view) {
@@ -166,6 +217,9 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     let page = Math.round(scrollTop / this.height);
   
     if( this.page === page ) return;
+    // cheat.  this will trick the setPage method into not scrolling
+    this.page = page;
+    this.renderPages();
     this.BookReaderModel.setPage(page);
     this.logger.info('change page from scroll', {current: this.page, to: page});
   };
