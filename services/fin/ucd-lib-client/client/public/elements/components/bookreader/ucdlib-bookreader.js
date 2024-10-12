@@ -3,8 +3,6 @@ import {render, styles} from "./ucdlib-bookreader.tpl.js";
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./ucdlib-bookreader-page.js";
-import "./ucdlib-bookreader-slider.js";
-import "./ucdlib-bookreader-navbar.js";
 
 export default class UcdlibBookreader extends Mixin(LitElement)
   .with(LitCorkUtils) {

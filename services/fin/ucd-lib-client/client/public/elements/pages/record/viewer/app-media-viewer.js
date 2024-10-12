@@ -19,6 +19,7 @@ import "@ucd-lib/cork-app-utils";
 import utils from "../../../../lib/utils";
 
 import "../../../components/bookreader/ucdlib-bookreader.js";
+import "../../../components/bookreader/ucdlib-bookreader-navbar.js";
 
 export default class AppMediaViewer extends Mixin(LitElement)
   .with(MainDomElement, LitCorkUtils) {
