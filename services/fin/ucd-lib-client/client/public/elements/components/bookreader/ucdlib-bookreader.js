@@ -146,6 +146,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
   setPage(page) {
     if( this.page === page ) return;
+    let oldPage = this.page;
     this.page = page;
 
     if( this.view === 'single' ) {
@@ -153,10 +154,18 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       let buffer = Math.floor(this.height/4);
       let pageData = this.bookViewData.pages[page];
 
-      // TODO: add buffer
       if( pageData.renderOffsetTop < scrollTop || 
           pageData.renderOffsetTop+pageData.renderHeight > scrollTop+this.height ) {
-        this.shadowRoot.querySelector('#single-page').scrollTop = this.page * this.height;
+        
+        if( Math.abs(page-oldPage) > 1 ) {
+          this.shadowRoot.querySelector('#single-page').scrollTop = this.page * this.height;
+        } else {
+          this.shadowRoot.querySelector('#single-page').scrollTo({
+            top: this.page * this.height, // Replace 500 with the vertical scroll position
+            left: 0,
+            behavior: 'smooth'
+          });
+        }
       }
       this.renderPages();
     }
