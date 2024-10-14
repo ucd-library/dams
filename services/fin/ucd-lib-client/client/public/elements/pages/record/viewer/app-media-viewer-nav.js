@@ -80,7 +80,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     window.addEventListener("touchmove", (e) => this._onTouchMove(e));
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
-    this._injectModel("AppStateModel", "MediaModel");
+    this._injectModel("AppStateModel", "MediaModel", "BookReaderModel");
 
     window.addEventListener(
       "BookReader:pageChanged",
@@ -113,6 +113,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     if (window.innerWidth < 801) {
       this.brSinglePage = true;
     }
+
+    // TODO temp hack, just set to single page until 2-page mode works in new bookreader
+    this.brSinglePage = true;
+    this.BookReaderModel.setView(this.brSinglePage ? 'single' : 'double');
   }
 
   _onAppStateUpdate(e) {
@@ -480,8 +484,9 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onToggleBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-bookview-toggle"));
+    // this.dispatchEvent(new CustomEvent("br-bookview-toggle"));  
     this.brSinglePage = !this.brSinglePage;
+    this.BookReaderModel.setView(this.brSinglePage ? 'single' : 'double');
   }
 
   /**

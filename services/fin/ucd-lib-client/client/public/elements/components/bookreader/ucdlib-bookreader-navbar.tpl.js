@@ -6,7 +6,8 @@ export function styles() {
       display: block;
     }
 
-    .br-nav-bar {
+    .br-nav-bar,
+    .controls {
       display: flex;
       align-items: center;
     }
@@ -30,6 +31,8 @@ export function styles() {
       color: #022851;
       font-size: 0.9rem;
       font-weight: bold;
+      min-width: 80px;
+      text-align: center;
     }
 
   `;
@@ -41,14 +44,16 @@ export function render() {
 return html`
   <div class="br-nav-bar">
     <ucdlib-bookreader-slider></ucdlib-bookreader-slider>
-    <div id="prev" @click="${this._prevPage}">
-      <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
-    </div>
+    <div class="controls">  
+      <div id="prev" @click="${this._prevPage}">
+        <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
+      </div>
 
-    <span class="br-currentpage-override">${this.selectedPage+1} of ${this.numPages}</span>
+      <span class="br-currentpage-override">${this.selectedPage+1} of ${this.numPages}</span>
 
-    <div id="next" style="width: 25px;" @click="${this._nextPage}">
-      <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
+      <div id="next" style="width: 25px;" @click="${this._nextPage}">
+        <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
+      </div>
     </div>
   </div>
 

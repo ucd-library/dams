@@ -50,7 +50,9 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     this.maxPage = (e.bookViewData?.pages?.length || 1) - 1;
     this._calculatePages();
 
-    // TODO update slider position with new page
+    // update slider position with new page
+    let newLeft = this.pages[this.selectedPage];
+    this.handle.style.left = `${newLeft}px`;
   }
 
   _reset() {
@@ -62,7 +64,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
   _calculatePages() {
     let trackRect = this.track.getBoundingClientRect();
     this.pageWidth = trackRect.width / this.maxPage;
-    this.pages = Array.from({ length: this.maxPage }, (_, i) => i * this.pageWidth);
+    this.pages = Array.from({ length: (this.maxPage+1) }, (_, i) => i * this.pageWidth);
   }
 
   _onResize(e) {
