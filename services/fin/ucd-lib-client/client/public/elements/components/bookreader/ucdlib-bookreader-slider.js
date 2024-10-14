@@ -98,39 +98,31 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     let newLeft = clientX - trackRect.left;
 
     let pageIncrement = this.BookReaderModel.store?.data?.state?.selectedView === 'double' ? 2 : 1;
-    // TODO update page based on increment, so odd number of pages from start
-    // debugger;
-    // newLeft = px from left of page
-    // closestPage = nearest newLeft of page using this.pages.. TODO increment by 1 if pageIncrement is 2 AND page is odd?
 
-    
     // update handle position (between 0 and max track width)
     newLeft = Math.max(0, Math.min(newLeft, trackRect.width));
+
+    // calc new selected page
+    let newPage = Math.floor((newLeft / trackRect.width) * this.maxPage);
+    if( newPage !== this.selectedPage ) {
+      this.selectedPage = newPage;
+    }
 
     let closestPage = this.pages.reduce((prev, curr) => 
       Math.abs(curr - newLeft) < Math.abs(prev - newLeft) ? curr : prev
     );
 
-    // TODO handle after setting this.selectedPage = newPage ?
-    // if( pageIncrement === 2 && this.selectedPage % 2 !== 0 ) {
-    //   let match = this.pages.findIndex(page => page === closestPage);
-    //   if( match !== -1 ) {
-    //     closestPage = this.pages[match+1];
-    //   }
-    // }
-
-    this.handle.style.left = `${closestPage}px`;
-
-    
-    // calc new position
-    let newPage = Math.floor((newLeft / trackRect.width) * this.maxPage);
-    if( newPage !== this.selectedPage ) {
-      // TODO this need to be fixed..?
-      // if( pageIncrement === 2 && this.selectedPage % 2 !== 0 ) {        
-      // } else {
-        this.selectedPage = newPage;
-      // }
+    // if 2page mode, need to flip to odd pages only. if even page, need to flip to next page
+    if( pageIncrement === 2 && this.selectedPage % 2 !== 0 ) {
+      let match = this.pages.findIndex(page => page === closestPage);
+      if( match !== -1 ) {
+        closestPage = this.pages[match+1] || this.pages[match-1]; // if last page, go back one
+        this.selectedPage = this.pages[match+1] ? this.selectedPage+1 : this.selectedPage-1;
+      }
     }
+
+    // update handle position
+    this.handle.style.left = `${closestPage}px`;    
   }
 
   _onMoveEnd(e) {
