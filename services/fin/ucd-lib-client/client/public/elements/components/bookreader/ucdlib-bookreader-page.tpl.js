@@ -11,6 +11,14 @@ export function styles() {
       display: inline-block;
       position: absolute;
       color: red;
+      border: 1px solid red;
+      cursor: text;
+      pointer-events: all;
+    }
+
+    img {
+      user-select: none;
+      pointer-events: auto;
     }
   `;
 
@@ -32,7 +40,7 @@ return html`
 <img ?hidden="${this.debug}" src="${this.pageData?.imageUrl}" alt="">
 
 ${this.ocrData.map((word, i) => html`
-  <span class="word" style="bottom: ${word.bottom}px; right: ${word.right}px; top: ${word.top}px; left: ${word.left}px; font-size: ${word.fontSize}px">${word.text}</span>
+  <span class="word" style="bottom: ${word.bottom}px; right: ${word.right}px; top: ${word.top}px; left: ${word.left}px; line-height: ${word.fontSize}px; letter-spacing: ${word.letterSpacing}; font-size: ${word.fontSize}px">${word.text}</span>
 `)}
 
 `;}

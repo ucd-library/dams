@@ -9,8 +9,8 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   static get properties() {
     return {
       debug : { type: Boolean },
-      viewIndex : { type: Number , attribute : 'view-index' },
-      currentPage : { type: Number, attribute : 'current-page' },
+      page : { type: Number},
+      buffer : { type: Number },
       bookData : { type: Object },
       pageData : { type: Object },
       ocrData : { type: Array}
@@ -23,8 +23,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
 
   constructor() {
     super();
-    this.viewIndex = -9999;
-    this.currentPage = -1;
+    this.page = -1;
     this.debug = false;
     this.pageData = {};
     this.ocrData = [];
@@ -57,13 +56,12 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   }
 
   _updatePageData() {
-    console.log('update page data', this.currentPage, this.viewIndex, this.bookData);
+    console.log('update page data', this.page, this.bookData);
 
     if( !this.bookData || !this.bookData.pages ) return;
-    if( this.currentPage == -1 ) return;
+    if( this.page == -1 ) return;
 
-    let index = this.currentPage+this.viewIndex;
-    if( index < 0 || index >= this.bookData.pages.length ) {
+    if( this.page < 0 || this.page >= this.bookData.pages.length ) {
       this.pageData = {};
       this.style.display = 'none';
       return;
@@ -71,7 +69,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
       this.style.display = 'block';
     }
 
-    this.pageData = this.bookData.pages[this.currentPage+this.viewIndex];
+    this.pageData = this.bookData.pages[this.page];
 
     this.style.top = this.pageData.renderOffsetTop+'px';
     this.style.left = this.pageData.renderOffsetLeft+'px';
@@ -83,12 +81,13 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
 
 
     this.BookReaderModel.getOcrData(this.pageData)
-      .then(data => this._renderOcrData(data));
+      .then(data => this._renderOcrData(data, this.pageData));
 
     this.requestUpdate();
   }
 
-  _renderOcrData(data) {
+  _renderOcrData(data, pageData) {
+    // TODO: this might need to be async rendering
     if( !data.parsed ) {
 
       let parser = new DOMParser();
@@ -103,10 +102,16 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
           .split(',')
           .map(v => Math.round(parseInt(v)*this.pageData.renderRatio));
 
+        let fontSize = bottom-top;
+        let letterSpacing = this.getWordLetterSpacing(fontSize, word.textContent, right-left);
         ocrData.push({
           text: word.textContent,
-          top, left, right, bottom,
-          fontSize: bottom-top,
+          top: top + this.pageBuffer, 
+          left, 
+          right: this.pageData.renderWidth - right, 
+          bottom: this.pageData.renderHeight - bottom,
+          fontSize,
+          letterSpacing: letterSpacing.toFixed(2)+'px'
         });
       });
 
@@ -114,6 +119,19 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     }
 
     this.ocrData = data.parsed;
+  }
+
+  getWordLetterSpacing(fontSize, word, width) {
+    let span = document.createElement('span');
+    span.style.fontSize = fontSize+'px';
+    span.style.visibility = 'hidden';
+    span.innerHTML = word;
+    document.body.appendChild(span);
+
+    let spanWidth = span.offsetWidth;
+    let spacing = (width - spanWidth) / (word.length-1);
+    document.body.removeChild(span);
+    return spacing
   }
 
 }
