@@ -1,4 +1,4 @@
-import { LitElement } from 'lit';
+import { css, LitElement } from 'lit';
 import {render, styles} from "./ucdlib-bookreader.tpl.js";
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
@@ -31,11 +31,26 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
     this.pageBuffer = 5;
 
+    // make sure if you change this you update the css property --transition-duration
+    // to HALF the value of this.animationTime
+    this.animationTime = 0.5; // seconds
+
     this.pageElements = 3;
     this.pages = [];
 
+    this._onResize = this._onResize.bind(this);
     
     this.render = render.bind(this);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('resize', this._onResize);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('resize', this._onResize);
   }
 
   firstUpdated() {
@@ -163,12 +178,15 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
     this._setPageDimensions(readerHeight, readerWidth/2, page);
     page.renderOffsetTop = 0;
+
+   
+    page.renderOffsetLeft = Math.round(readerWidth/2);
     page.renderOffsetLeft = isRight ? readerWidth/2 : 0;
   }
 
   setPage(page) {
     if( this.page === page ) return;
-    let oldPage = this.page;
+    this.lastPage = this.page;
     this.page = page;
 
     // handle animation if we are only moving one page
@@ -180,7 +198,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       if( pageData.renderOffsetTop < scrollTop || 
           pageData.renderOffsetTop+pageData.renderHeight > scrollTop+this.height ) {
         
-        if( Math.abs(page-oldPage) > 1 ) {
+        if( Math.abs(page-this.lastPage) > 1 ) {
           this.shadowRoot.querySelector('#single-page').scrollTop = this.page * this.height;
         } else {
           this.shadowRoot.querySelector('#single-page').scrollTo({
@@ -196,7 +214,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     this.renderPages();
   }
 
-  renderPages() {
+  renderPages(animate=true) {
     let currentPages = [];
 
     if( this.view === 'single' ) {
@@ -215,31 +233,84 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         ele.buffer = this.pageBuffer;
         this.pagesEle.appendChild(ele);
         this.pages.push({index: i, ele});
-        console.log('append page', i);
       }
 
       
     } else if( this.view === 'double' ) {
       let isEven = this.page % 2 === 0;
-      if( isEven ) {
-        currentPages.push(this.page-1, this.page);
+
+      // check if this should be animated
+      let visiblePages = [];
+      let nextPages = [];
+      let prevPages = [];
+      if( this.lastPage % 2 === 0 ) {
+        visiblePages = [this.lastPage-1, this.lastPage];
+        nextPages = [this.lastPage+1, this.lastPage+2];
+        prevPages = [this.lastPage-2, this.lastPage-3];
       } else {
-        currentPages.push(this.page, this.page+1);
+        visiblePages = [this.lastPage, this.lastPage+1];
+        nextPages = [this.lastPage+2, this.lastPage+3];
+        prevPages = [this.lastPage-1, this.lastPage-2];
       }
+      
+
+      let isAnimateNext = nextPages.includes(this.page);
+      let isAnimatePrev = prevPages.includes(this.page);
+
+      let cssOrder = [
+        ['page-left-prev'],
+        ['page-right-prev'],
+        ['page-left'],
+        ['page-right'],
+        ['page-left-next'],
+        ['page-right-next']
+      ]
+
+      if( (isAnimateNext || isAnimatePrev) && animate) {
+        this._animateDoublePage({isAnimateNext, isAnimatePrev, cssOrder});
+        return;
+      }
+
+      // right page
+      if( isEven ) {
+        for( let i = this.page-3; i <= this.page+2; i++ ) {
+          currentPages.push(i);
+        }
+      // left page
+      } else {
+        for( let i = this.page-2; i <= this.page+3; i++ ) {
+          currentPages.push(i);
+        }
+      }
+
+      let cssIndex = 0;
       currentPages.forEach(i => {
         if( i < 0 || i >= this.bookViewData.pages.length ) {
+          cssIndex++;
           return;
         }
         let pageEle = this.pages.find(p => p.index === i);
-        if( pageEle ) return;
+        if( pageEle ) {
+          this._updateCss(pageEle.ele, cssOrder[cssIndex]);
+          pageEle.cssIndex = cssIndex;
+          return cssIndex++;
+        }
 
         let ele = document.createElement('ucdlib-bookreader-page');
         ele.setAttribute('page', i);
+        this._updateCss(ele, cssOrder[cssIndex]);
         ele.bookData = this.bookViewData;
         ele.debug = this.debug;
         ele.buffer = this.pageBuffer;
         this.pagesEle.appendChild(ele);
-        this.pages.push({index: i, ele});
+        this.pages.push({
+          index: i, 
+          ele, 
+          cssIndex,
+          isNext : cssOrder[cssIndex].includes('next'),
+          isPrev : cssOrder[cssIndex].includes('prev')
+        });
+        cssIndex++;
       });
     }
 
@@ -248,10 +319,51 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       if( currentPages.indexOf(page.index) === -1 ) {
         page.ele.remove();
         this.pages.splice(i, 1);
-        console.log('remove page', page.index);
       }
     }
+  }
 
+  _animateDoublePage(props) {
+    this.BookReaderModel.setAnimating(true);
+
+    this.logger.info('animate double page start', props);
+    if( props.isAnimateNext ) {
+      props.cssOrder.forEach(css => css.push('animate-next-start'));
+    } else if( props.isAnimatePrev ) {
+      props.cssOrder.forEach(css => css.push('animate-prev-start'));
+    }
+
+    if( window.debugAnimate ) debugger;
+
+    this.pages.forEach(page => {
+      this._updateCss(page.ele, props.cssOrder[page.cssIndex]);
+    });
+
+    if( window.noAnimate ) return;
+
+    setTimeout(() => {
+      this.logger.info('animate double page middle', props);
+      this.pages.forEach(page => {
+        if( props.isAnimateNext ) {
+          page.ele.classList.remove('animate-next-start');
+          page.ele.classList.add('animate-next-end');
+        } else if( props.isAnimatePrev ) {
+          page.ele.classList.remove('animate-prev-start');
+          page.ele.classList.add('animate-prev-end');
+        }
+      });
+
+      setTimeout(() => {
+        this.logger.info('animate double page end', props);
+        this.renderPages(false);
+        this.BookReaderModel.setAnimating(false);
+      }, (this.animationTime/2)*1000);
+    }, (this.animationTime/2)*1000);
+  }
+
+  _updateCss(ele, classList) {
+    ele.classList = '';
+    classList.forEach(name => ele.classList.add(name));
   }
 
   setView(view) {
@@ -270,6 +382,16 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       this.scrollTimeout = null;
       this._updatePageFromScroll();
     }, 200);
+  }
+
+  _onResize() {
+    if( this.resizeTimeout ) {
+      return;
+    }
+    
+    this.resizeTimeout = setTimeout(() => {
+      this._renderPageSizes();
+    }, 100);
   }
 
   _updatePageFromScroll() {

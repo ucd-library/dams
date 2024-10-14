@@ -13,6 +13,10 @@ class BookReaderModel extends BaseModel {
     this.register('BookReaderModel');
   }
 
+  getState() {
+    return this.store.data.state;
+  }
+
   /**
    * @method setPage
    * @description set the current page to render.  if 'double' view
@@ -21,6 +25,7 @@ class BookReaderModel extends BaseModel {
    * @param {Number} page 
    */
   setPage(page) {
+    if( this.isAnimating() ) return;
     this.store.setState('selectedPage', page);
   }
 
@@ -31,7 +36,22 @@ class BookReaderModel extends BaseModel {
    * @param {String} view 
    */
   setView(view) {
+    if( this.isAnimating() ) return;
     this.store.setState('selectedView', view);
+  }
+
+  /**
+   * @method setAnimating
+   * @description are we currently animating between pages?
+   * 
+   * @param {Boolean} animating 
+   */
+  setAnimating(animating) {
+    this.store.setState('animating', animating);
+  }
+
+  isAnimating() {
+    return this.store.data.state.animating;
   }
 
   /**

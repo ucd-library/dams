@@ -29,6 +29,10 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.ocrData = [];
     this._injectModel('BookReaderModel');
     this.render = render.bind(this);
+
+    this._onClick = this._onClick.bind(this);
+
+    this._onBookreaderStateUpdate(this.BookReaderModel.getState());
   }
 
   firstUpdated() {
@@ -42,6 +46,32 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
 
     if( props.has('debug') ) {
       this._debugUpdated();
+    }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('click', this._onClick);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener('click', this._onClick);
+  }
+
+  _onClick() {
+    if( this.view === 'double' ) {
+      if( this.page % 2 === 0 ) {
+        this.BookReaderModel.setPage(this.page+1);
+      } else {
+        this.BookReaderModel.setPage(this.page-1);
+      }
+    }
+  }
+
+  _onBookreaderStateUpdate(e) {
+    if( this.view !== e.selectedView ) {
+      this.view = e.selectedView;
     }
   }
 
