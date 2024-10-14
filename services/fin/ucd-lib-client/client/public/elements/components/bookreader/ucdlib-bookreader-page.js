@@ -37,6 +37,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
 
   firstUpdated() {
     this.imgEle = this.shadowRoot.querySelector('img');
+    this._updatePageData();
   }
 
   updated(props) {
@@ -86,6 +87,9 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   }
 
   _updatePageData() {
+    if( !this.bookData || !this.bookData.pages ) return;
+    if( !this.imgEle ) return;
+
     console.log('update page data', this.page, this.bookData);
 
     if( !this.bookData || !this.bookData.pages ) return;

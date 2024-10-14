@@ -90,10 +90,20 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     this._renderPageSizes();
   }
 
-  _renderPageSizes() {
+  _renderPageSizes(opts={}) {
     if( !this.bookViewData?.pages ) return;
     if( !this.height ) return;
 
+    // render page panel
+    if( this.view === 'single' && this.bookViewData?.pages) {
+      this.shadowRoot.querySelector('#single-page-scroll').style.overflow = 'auto';
+      this.shadowRoot.querySelector('#single-page-scroll').style.height = this.height*this.bookViewData.pages.length+'px';
+    } else {
+      this.shadowRoot.querySelector('#single-page-scroll').style.overflow = 'hidden';
+      this.shadowRoot.querySelector('#single-page-scroll').style.height = this.height+'px';
+    }
+
+    // render pages based on view and size
     let readerWidth = this.offsetWidth;
     let readerHeight = this.height;
     this.bookViewData.pages.forEach(page => {
@@ -104,18 +114,9 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       }
     });
 
-    this._updatePagesPanel();
+    this.renderPages(opts);
   }
 
-  _updatePagesPanel() {
-    if( this.view === 'single' && this.bookViewData?.pages) {
-      this.shadowRoot.querySelector('#single-page-scroll').style.overflow = 'auto';
-      this.shadowRoot.querySelector('#single-page-scroll').style.height = this.height*this.bookViewData.pages.length+'px';
-    } else {
-      this.shadowRoot.querySelector('#single-page-scroll').style.overflow = 'hidden';
-      this.shadowRoot.querySelector('#single-page-scroll').style.height = this.height+'px';
-    }
-  }
 
   _setPageDimensions(readerHeight, readerWidth, page) {
     let width = page.width;
@@ -211,11 +212,15 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     }
 
     this._renderPageSizes();
-    this.renderPages();
   }
 
-  renderPages(animate=true) {
+  renderPages(opts={}) {
+    if( !this.bookViewData.pages ) return;
     let currentPages = [];
+
+    if( opts.animate === undefined ) {
+      opts.animate = true;
+    }
 
     if( this.view === 'single' ) {
       for( let i = this.page-1; i <= this.page+1; i++ ) {
@@ -224,7 +229,10 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         }
         currentPages.push(i);
         let pageEle = this.pages.find(p => p.index === i);
-        if( pageEle ) continue;
+        if( pageEle ) {
+          pageEle.ele.className = '';
+          continue;
+        }
 
         let ele = document.createElement('ucdlib-bookreader-page');
         ele.setAttribute('page', i);
@@ -266,7 +274,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         ['page-right-next']
       ]
 
-      if( (isAnimateNext || isAnimatePrev) && animate) {
+      if( (isAnimateNext || isAnimatePrev) && opts.animate) {
         this._animateDoublePage({isAnimateNext, isAnimatePrev, cssOrder});
         return;
       }
@@ -333,13 +341,13 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       props.cssOrder.forEach(css => css.push('animate-prev-start'));
     }
 
-    if( window.debugAnimate ) debugger;
+    // if( window.debugAnimate ) debugger;
 
     this.pages.forEach(page => {
       this._updateCss(page.ele, props.cssOrder[page.cssIndex]);
     });
 
-    if( window.noAnimate ) return;
+    // if( window.noAnimate ) return;
 
     setTimeout(() => {
       this.logger.info('animate double page middle', props);
@@ -355,7 +363,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
       setTimeout(() => {
         this.logger.info('animate double page end', props);
-        this.renderPages(false);
+        this.renderPages({animate: false});
         this.BookReaderModel.setAnimating(false);
       }, (this.animationTime/2)*1000);
     }, (this.animationTime/2)*1000);
@@ -369,11 +377,22 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   setView(view) {
     if( this.view === view ) return;
     this.view = view;
-    this._renderPageSizes();
-    this.renderPages();
+
+    this.shadowRoot.querySelector('#single-page-scroll').style.display = 'none';
+    this._renderPageSizes({animate: false});
+    this.pages.forEach(page => page.ele._updatePageData());
+    this.shadowRoot.querySelector('#single-page-scroll').style.display = 'block';
+
+    if( this.view === 'single' && this.bookViewData.pages ) {
+      let currentPage = this.bookViewData.pages[this.page];
+      console.log('scroll to', currentPage.renderOffsetTop);
+      this.shadowRoot.querySelector('#single-page').scrollTop = currentPage.renderOffsetTop;
+    }
   }
 
   _onScroll(e) {
+    if( this.view !== 'single' ) return;
+
     if( this.scrollTimeout ) {
       return;
     }
@@ -401,7 +420,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     if( this.page === page ) return;
     // cheat.  this will trick the setPage method into not scrolling
     this.page = page;
-    this.renderPages();
+    this.renderPages({animate: false});
     this.BookReaderModel.setPage(page);
     this.logger.info('change page from scroll', {current: this.page, to: page});
   };
