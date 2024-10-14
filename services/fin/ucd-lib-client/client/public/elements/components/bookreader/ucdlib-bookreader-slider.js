@@ -40,9 +40,9 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     if( this.handle ) {
       this.handle.addEventListener('mousedown', () => this.isDragging = true);
       this.handle.addEventListener('touchstart', () => this.isDragging = true);
-      this.handle.addEventListener('mouseup', () => this._onDragEnd.bind(this));
-      this.handle.addEventListener('touchend', this._onDragEnd.bind(this));
     }
+    window.addEventListener('mouseup', () => this._onDragEnd.bind(this));
+    window.addEventListener('touchend', this._onDragEnd.bind(this));
   }
 
   _onBookreaderStateUpdate(e) {
@@ -74,13 +74,15 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
 
   _onMoveStart(e) {
     e.preventDefault();
+    
+    window.addEventListener('mouseup', this._onMoveEnd);
+    window.addEventListener('touchend', this._onMoveEnd);
+
     let slider = this.shadowRoot.querySelector('.slider');
     if( !slider ) return;
 
     slider.addEventListener('mousemove', this._onMove);
-    slider.addEventListener('mouseup', this._onMoveEnd);
-    slider.addEventListener('touchmove', this._onMove);
-    slider.addEventListener('touchend', this._onMoveEnd);
+    slider.addEventListener('touchmove', this._onMove);    
   }
 
   _onClickTrack(e) {
@@ -95,36 +97,64 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     let clientX = e.touches ? e.touches[0].clientX : e.clientX;
     let newLeft = clientX - trackRect.left;
 
-    // update handle position
+    let pageIncrement = this.BookReaderModel.store?.data?.state?.selectedView === 'double' ? 2 : 1;
+    // TODO update page based on increment, so odd number of pages from start
+    // debugger;
+    // newLeft = px from left of page
+    // closestPage = nearest newLeft of page using this.pages.. TODO increment by 1 if pageIncrement is 2 AND page is odd?
+
+    
+    // update handle position (between 0 and max track width)
     newLeft = Math.max(0, Math.min(newLeft, trackRect.width));
 
     let closestPage = this.pages.reduce((prev, curr) => 
       Math.abs(curr - newLeft) < Math.abs(prev - newLeft) ? curr : prev
     );
 
+    // TODO handle after setting this.selectedPage = newPage ?
+    // if( pageIncrement === 2 && this.selectedPage % 2 !== 0 ) {
+    //   let match = this.pages.findIndex(page => page === closestPage);
+    //   if( match !== -1 ) {
+    //     closestPage = this.pages[match+1];
+    //   }
+    // }
+
     this.handle.style.left = `${closestPage}px`;
+
     
     // calc new position
     let newPage = Math.floor((newLeft / trackRect.width) * this.maxPage);
     if( newPage !== this.selectedPage ) {
-      this.selectedPage = newPage;
+      // TODO this need to be fixed..?
+      // if( pageIncrement === 2 && this.selectedPage % 2 !== 0 ) {        
+      // } else {
+        this.selectedPage = newPage;
+      // }
     }
   }
 
   _onMoveEnd(e) {
     e.preventDefault();
+
+    this._onMove(e);
+    this.isDragging = false;
+    this.BookReaderModel.setPage(this.selectedPage);
+
+    window.removeEventListener('mouseup', this._onMoveEnd);
+    window.removeEventListener('touchend', this._onMoveEnd);
+
     let slider = this.shadowRoot.querySelector('.slider');
     if( !slider ) return;
 
-    slider.removeEventListener('mousemove', this._onMove);
-    slider.removeEventListener('mouseup', this._onMoveEnd);
     slider.removeEventListener('touchmove', this._onMove);
-    slider.removeEventListener('touchend', this._onMoveEnd);
+    slider.removeEventListener('mousemove', this._onMove);
   }
 
   _onDragEnd(e) {
-    this.isDragging = false
+    e.preventDefault();
 
+    this._onMove(e);
+    this.isDragging = false
     this.BookReaderModel.setPage(this.selectedPage);
   }
 
