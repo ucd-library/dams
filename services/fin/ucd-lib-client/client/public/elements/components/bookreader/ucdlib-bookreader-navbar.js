@@ -32,6 +32,11 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   _onBookreaderStateUpdate(e) {
     this.selectedPage = e.selectedPage || 0;
     this.numPages = e.bookViewData?.pages?.length || 0;
+
+    requestAnimationFrame(() => {
+      let slider = this.shadowRoot.querySelector('ucdlib-bookreader-slider');
+      if( slider ) slider._onResize();
+    });
   }
 
   _reset() {
@@ -47,7 +52,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   }
 
   _nextPage(e) {
-    if( this.selectedPage < this.numPages ) {
+    if( (this.selectedPage+1) < this.numPages ) {
       this.selectedPage++;
       this.BookReaderModel.setPage(this.selectedPage);
     }    
