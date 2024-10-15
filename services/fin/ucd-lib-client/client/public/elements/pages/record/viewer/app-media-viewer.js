@@ -66,20 +66,20 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     this.$ = {};
 
-    window.addEventListener(
-      "BookReader:SearchCallback",
-      this._onSearchResultsChange.bind(this)
-    );
+    // window.addEventListener(
+    //   "BookReader:SearchCallback",
+    //   this._onSearchResultsChange.bind(this)
+    // );
 
-    window.addEventListener(
-      "BookReader:SearchCallbackEmpty",
-      this._onSearchResultsEmpty.bind(this)
-    );
+    // window.addEventListener(
+    //   "BookReader:SearchCallbackEmpty",
+    //   this._onSearchResultsEmpty.bind(this)
+    // );
 
-    window.addEventListener(
-      "BookReader:SearchGoToResult",
-      this._onBRSearchGoToResult.bind(this)
-    );
+    // window.addEventListener(
+    //   "BookReader:SearchGoToResult",
+    //   this._onBRSearchGoToResult.bind(this)
+    // );
   }
 
   async firstUpdated() {
@@ -245,15 +245,17 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if( bookreaderViewer ) bookreaderViewer.destroy();
   }
 
-  _onSearchResultsChange(e) {
-    this.searchResults = [...e.detail?.props?.results?.matches];
+  _onSearchResultsChange(searchResults={}) {
+    this.searchResults = [...searchResults?.body?.matches];
+
     if (this.searchResults.length) {
       this.searchResults = this.searchResults.sort(
         (a, b) =>
-          parseInt(a.displayPageNumber.replace("n", "")) -
-          parseInt(b.displayPageNumber.replace("n", ""))
+          parseInt(a.par?.[0]?.page || 0) -
+          parseInt(b.par?.[0]?.page || 0)
       );
     }
+
     this.searchResultsCount = this.searchResults?.length;
     this._updateSearchNav();
   }
@@ -496,7 +498,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
    *
    * @param {Object} e custom HTML event
    */
-  _onBRSearch(e) {
+  async _onBRSearch(e) {
     let brNav = document.querySelector("app-media-viewer-nav");
     if (brNav) {
       // nav elements are moved into the bookreader viewer in full screen mode
@@ -511,10 +513,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
       this.searchResultsCount = 0;
     }
 
-    let bookreader = document.querySelector("app-bookreader-viewer");
-    if (bookreader) {
-      bookreader.search(this.queryTerm);
-    }
+    let searchRes = await this.BookReaderModel.search(this.bookItemId, this.queryTerm);
+  
+    this._onSearchResultsChange(searchRes);
   }
 
   _onClearSearch(e) {

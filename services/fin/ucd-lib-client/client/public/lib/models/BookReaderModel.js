@@ -118,6 +118,10 @@ class BookReaderModel extends BaseModel {
   async getOcrData(page) {
     return this.service.getOcrData(page.ocrUrl);
   }
+
+  async search(itemId, query) {
+    return this.service.search(itemId, query);
+  }
 }
 
 const model = new BookReaderModel();
