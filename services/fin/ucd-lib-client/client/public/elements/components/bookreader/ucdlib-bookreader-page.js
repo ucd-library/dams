@@ -26,6 +26,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.page = -1;
     this.debug = false;
     this.pageData = {};
+    this.buffer = 0;
     this.ocrData = [];
     this._injectModel('BookReaderModel');
     this.render = render.bind(this);
@@ -116,14 +117,24 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.requestUpdate();
   }
 
-  _renderOcrData(data, pageData) {
+  _renderOcrData(data) {
     // TODO: this might need to be async rendering
-    if( !data.parsed ) {
+
+    let pageChanged = false;
+    if( this.renderedOcrTo ) {
+      for( let key in this.renderedOcrTo ) {
+        if( this.renderedOcrTo[key] !== this.pageData[key] ) {
+          pageChanged = true;
+          break;
+        }
+      }
+    }
+
+    if( !data.parsed || pageChanged ) {
 
       let parser = new DOMParser();
       let xmlDoc = parser.parseFromString(data.payload, "text/xml");
       let ocrData = [];
-      let ocrRatio = this.pageData.renderWidth / this.pageData.originalWidth;
 
       xmlDoc.querySelectorAll('WORD').forEach(word => {
         
@@ -136,16 +147,23 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
         let letterSpacing = this.getWordLetterSpacing(fontSize, word.textContent, right-left);
         ocrData.push({
           text: word.textContent,
-          top: top + this.pageBuffer, 
+          top: top + this.buffer, 
           left, 
           right: this.pageData.renderWidth - right, 
-          bottom: this.pageData.renderHeight - bottom,
+          bottom: (this.pageData.renderHeight - bottom)+this.buffer,
           fontSize,
           letterSpacing: letterSpacing.toFixed(2)+'px'
         });
       });
 
       data.parsed = ocrData;
+    }
+
+    this.renderedOcrTo = {
+      top: this.pageData.renderOffsetTop,
+      left: this.pageData.renderOffsetLeft,
+      width: this.pageData.renderWidth,
+      height: this.pageData.renderHeight
     }
 
     this.ocrData = data.parsed;

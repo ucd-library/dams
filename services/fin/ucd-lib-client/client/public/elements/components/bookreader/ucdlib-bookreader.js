@@ -29,7 +29,8 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     this.bookViewData = {};
     this.debug = false;
 
-    this.pageBuffer = 5;
+    // TODO: don't change from 0
+    this.pageBuffer = 0;
 
     // make sure if you change this you update the css property --transition-duration
     // to HALF the value of this.animationTime
@@ -288,7 +289,9 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
     this._setPageDimensions(readerHeight, readerWidth/2, page);
     page.renderOffsetTop = 0;
-    page.renderOffsetLeft = isRight ? readerWidth/2 : 0;
+
+    let midPoint = Math.floor(readerWidth/2);
+    page.renderOffsetLeft = isRight ? midPoint : midPoint - page.renderWidth;
   }
 
   /**
