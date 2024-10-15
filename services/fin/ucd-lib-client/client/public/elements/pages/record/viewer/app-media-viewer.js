@@ -254,8 +254,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if (this.searchResults.length) {
       this.searchResults = this.searchResults.sort(
         (a, b) =>
-          parseInt(a.par?.[0]?.page || 0) -
-          parseInt(b.par?.[0]?.page || 0)
+          parseInt(a.par?.page || 0) -
+          parseInt(b.par?.page || 0)
       );
     }
 
@@ -528,6 +528,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if (!this.queryTerm) {
       this.searchResults = [];
       this.searchResultsCount = 0;
+      this.BookReaderModel.clearSearch();
     }
 
     this.BookReaderModel.search(this.itemId, this.bookItemId, this.queryTerm);

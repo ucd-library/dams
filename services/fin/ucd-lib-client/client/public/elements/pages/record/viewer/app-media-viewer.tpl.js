@@ -283,11 +283,11 @@ export default function render() {
                   style="margin: 0 0 2rem; cursor: pointer;"
                   data-match-index="${result.matchIndex}"
                   data-array-index="${index}"
-                  data-page="${result.par?.[0]?.page || 0}"
+                  data-page="${result.par?.page || 0}"
                   @click="${this._onSearchResultClick}"
                 >
                   <h4 style="margin-bottom: 0">
-                    Page ${parseInt(result.par?.[0]?.page || 0)}
+                    Page ${parseInt(result.par?.page || 0)}
                   </h4>
                   <p style="font-size: .9rem; margin-top: .3rem">
                     ${unsafeHTML(

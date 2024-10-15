@@ -54,9 +54,25 @@ class BookReaderService extends BaseService {
         item_id : bookItemId,
         q : query
       },
-      checkCached : () => this.store.data.state.searchResults,
-      onUpdate : resp => {
+      checkCached : () => {
+        let searchResults = this.store.data.state.searchResults;
+
+        if( searchResults?.path !== bookItemId || searchResults?.text !== query ){
+          this.store.setState('searchResults', null);
+        }
+        return this.store.data.state.searchResults;
+      },
+      onLoad: (result) => {
+        // update matches to be matches[0] for entire array
+        (result.body.matches || []).forEach(match => {
+          match.par = match.par?.[0];
+          if( match.par?.[0] ) delete match.par[0];
+        });
+        return result;
+      },
+      onUpdate : resp => {        
         this.store.setState('searchResults', payloadUtils.generate(ido, resp));
+
       }
     });
 
