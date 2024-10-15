@@ -258,6 +258,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     this.searchResultsCount = this.searchResults?.length;
     this._updateSearchNav();
+
+    let brNav = this.querySelector('ucdlib-bookreader-navbar');
+    if( brNav ) brNav.updateSearchResults(this.searchResults);
   }
 
   _onSearchResultsEmpty(e) {
@@ -284,10 +287,21 @@ export default class AppMediaViewer extends Mixin(LitElement)
   }
 
   _onSearchResultClick(e) {
-    let br = document.querySelector("app-bookreader-viewer");
-    if (!br) return;
-    // navigate to search result in viewer
-    br.onSearchResultClick(e);
+    let page = e.currentTarget.dataset?.page || 1;
+    try {
+      page = parseInt(page);
+    } catch (e) {
+      page = 1;
+    }
+
+    // TODO update slider with indicators of matches
+    this.BookReaderModel.setPage(page-1);
+
+    
+    // let br = document.querySelector("app-bookreader-viewer");
+    // if (!br) return;
+    // // navigate to search result in viewer
+    // br.onSearchResultClick(e);
 
     // also update selected search result in nav
     let nav = this.querySelector("app-media-viewer-nav");

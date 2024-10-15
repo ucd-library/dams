@@ -9,7 +9,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     return {
       maxPage : { type: Number },
       selectedPage : { type: Number },
-      width : { type: Number }
+      width : { type: Number },
+      searchResults : { type: Array },
     }
   }
 
@@ -25,7 +26,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
 
     this._reset();
 
-    this._windowResizeListener = this._onResize.bind(this);
+    window.addEventListener('resize', this._onResize.bind(this));
     this._onMove = this._onMove.bind(this);
     this._onMoveStart = this._onMoveStart.bind(this);
     this._onMoveEnd = this._onMoveEnd.bind(this);
@@ -59,6 +60,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     this.maxPage = 0;
     this.selectedPage = 0;
     this.width = this.offsetWidth;
+    this.searchResults = [];
   }
 
   _calculatePages() {
@@ -70,6 +72,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
   _onResize(e) {
     this.width = this.offsetWidth || 1;
     this._calculatePages();
+    this.updateSearchResults(this.searchResults);
   }
 
   _onMoveStart(e) {
@@ -148,6 +151,56 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     this._onMove(e);
     this.isDragging = false
     this.BookReaderModel.setPage(this.selectedPage);
+  }
+
+  updateSearchResults(searchResults=[]) {
+    // update slider with indicators of matches
+    let searchIndicatorsDiv = this.shadowRoot.querySelector('.search-indicators');
+    if( !searchIndicatorsDiv ) return;
+
+    searchIndicatorsDiv.innerHTML = '';
+    this.searchResults = searchResults;
+
+    // clear all event listeners
+    let indicators = searchIndicatorsDiv.querySelectorAll('.indicator');
+    (indicators || []).forEach(indicator => {
+      indicator.removeEventListener('click');
+    });
+
+    searchResults.forEach(result => {
+      let pageNumber = result.par?.[0]?.page || 0;
+      let indicator = document.createElement('div');
+      indicator.classList.add('indicator');
+      indicator.style.left = `${(this.pages[pageNumber-1] || 0) - 4}px`;
+
+      let searchQuery = document.createElement('div');
+      searchQuery.classList.add('search-query');
+
+      let main = document.createElement('main');
+      let mainText = result.text || '';
+      if( mainText.indexOf('{{{') !== -1 && mainText.indexOf('}}}') !== -1 ) {
+        mainText = mainText.replace('{{{', '<mark>').replace('}}}', '</mark>');
+      }
+      main.innerHTML = mainText;
+
+      let footer = document.createElement('footer');
+      footer.innerText = `Page ${pageNumber}`;
+
+      searchQuery.appendChild(main);
+      searchQuery.appendChild(footer);
+      indicator.appendChild(searchQuery);
+
+      // add event listener to click/touch of indicator
+      indicator.addEventListener('click', e => {
+        let pageIncrement = this.BookReaderModel.store?.data?.state?.selectedView === 'double' ? 2 : 1;
+        if( pageIncrement === 2 && pageNumber % 2 === 0 ) {
+          pageNumber -= 1;
+        }
+        this.BookReaderModel.setPage(pageNumber-1);
+      });
+
+      searchIndicatorsDiv.appendChild(indicator);
+    });
   }
 
 }

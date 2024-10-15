@@ -59,6 +59,13 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       this.BookReaderModel.setPage(this.selectedPage);
     }    
   }
+
+  updateSearchResults(searchResults=[]) {
+    let slider = this.shadowRoot.querySelector('ucdlib-bookreader-slider');
+    if( slider ) {
+      slider.updateSearchResults(searchResults);
+    }
+  }
   
 }
 

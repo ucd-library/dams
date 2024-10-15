@@ -41,6 +41,54 @@ export function styles() {
       border: none;
     }
 
+    .search-indicators {
+      position: absolute;
+    }
+
+    .search-indicators .indicator {
+      background-color: var(--color-aggie-gold);
+      width: 8px;
+      position: absolute;
+      height: 17px;
+      bottom: 6px;
+      border-radius: 2px;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .search-indicators .search-query {
+      display: none;
+    }
+
+    .search-indicators .indicator:hover .search-query {
+      display: block;
+      position: absolute;
+      left: -14px;
+      bottom: 25px;
+      width: 350px;
+      max-width: 100vw;
+      padding: 12px 14px;
+      padding-bottom: 10px;
+      color: #fff;
+      background: #333;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      animation: fadeUp 0.2s;
+      font-size: 0.9rem;
+      cursor: pointer;
+      z-index: 100;
+    }
+
+    .search-indicators .search-query footer {
+      font-size: .8rem;
+    }
+
+    .search-indicators .search-query mark {
+      color: #adaedc;
+      font-weight: bold;
+      background-color: #272958;
+    }
+
   `;
 
   return [elementStyles];
@@ -49,6 +97,12 @@ export function styles() {
 export function render() { 
 return html`
   <div class="slider">
+    <div class="search-indicators">
+      <!-- <div class="search-query">
+        <main>"Lean M. <mark>Davis</mark>, B.S.; E.H. Hagermann; Henry L. Hurst"</main>
+        <footer>Page 45</footer>
+      </div> -->
+    </div>
     <div id="track" @click="${this._onClickTrack}">
       <div id="handle"  
         @mousedown="${this._onMoveStart}"

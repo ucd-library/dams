@@ -282,6 +282,7 @@ export default function render() {
                   style="margin: 0 0 2rem; cursor: pointer;"
                   data-match-index="${result.matchIndex}"
                   data-array-index="${index}"
+                  data-page="${result.par?.[0]?.page || 0}"
                   @click="${this._onSearchResultClick}"
                 >
                   <h4 style="margin-bottom: 0">
