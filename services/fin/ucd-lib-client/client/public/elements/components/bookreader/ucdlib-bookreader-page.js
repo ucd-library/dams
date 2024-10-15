@@ -89,10 +89,6 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   _updatePageData() {
     if( !this.bookData || !this.bookData.pages ) return;
     if( !this.imgEle ) return;
-
-    console.log('update page data', this.page, this.bookData);
-
-    if( !this.bookData || !this.bookData.pages ) return;
     if( this.page == -1 ) return;
 
     if( this.page < 0 || this.page >= this.bookData.pages.length ) {
