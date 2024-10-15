@@ -65,6 +65,7 @@ class BookReaderModel extends BaseModel {
   }
 
   setSelectedBook(id, record) {
+    this.clearSearch();
     this.store.setState('selectedBook', id);
     if( record ) {
       this.loadBookFromItemRecord(record);
@@ -119,8 +120,12 @@ class BookReaderModel extends BaseModel {
     return this.service.getOcrData(page.ocrUrl);
   }
 
-  async search(itemId, query) {
-    return this.service.search(itemId, query);
+  async search(itemId, bookItemId, query) {
+    return this.service.search(itemId, bookItemId, query);
+  }
+
+  async clearSearch() {
+    this.store.setState('searchResults', null);
   }
 }
 

@@ -35,6 +35,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       overrideImageList: { type: Boolean },
       bookData: { type: Object },
       bookItemId: { type: String },
+      itemId: { type: String },
       isBookReader: { type: Boolean },
       searchResults: { type: Array },
       searchResultsCount: { type: Number },
@@ -56,6 +57,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.singlePage = false;
     this.bookData = {};
     this.bookItemId = "";
+    this.itemId = "";
     this.isBookReader = false;
     this.overrideImageList = false;
     this.searchResults = [];
@@ -103,6 +105,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if (!mediaGroups || !mediaGroups.length) return;
     // mediaGroup = mediaGroup[0];
 
+    this.itemId = e.selectedRecord?.graph?.root?.['@id'];
     let renderAsBr = false;
     let mediaType;
 
@@ -527,14 +530,13 @@ export default class AppMediaViewer extends Mixin(LitElement)
       this.searchResultsCount = 0;
     }
 
-    let searchRes = await this.BookReaderModel.search(this.bookItemId, this.queryTerm);
-    // this._onSearchResultsChange(searchRes);
+    this.BookReaderModel.search(this.itemId, this.bookItemId, this.queryTerm);
   }
 
-  _onBookreaderSearchUpdate(e) {
-    if( e.state !== 'loaded' ) return;
+  _onBookreaderStateUpdate(e) {
+    if( e.searchResults?.state !== 'loaded' ) return;
 
-    let searchResults = e.payload;
+    let searchResults = e.searchResults.payload;
     this._onSearchResultsChange(searchResults);
   }
 

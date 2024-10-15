@@ -255,6 +255,7 @@ export default function render() {
               <input
                 type="text"
                 id="br-search-input"
+                autocomplete="off"
                 @change="${this._onBRSearch}"
               />
 
