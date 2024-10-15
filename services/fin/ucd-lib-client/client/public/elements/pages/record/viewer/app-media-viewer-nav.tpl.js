@@ -270,20 +270,6 @@ export default function render() {
           height: 150px;
         }
 
-        /* .break {
-          width: 100%;
-        } */
-
-        #buttonWrapper.wrap {
-          /* padding-top: 1rem; */
-          /* position: relative;
-          left: 62vw; */
-        }
-
-
-
-
-
         #thumbnails {
           width: 80% !important;
         }

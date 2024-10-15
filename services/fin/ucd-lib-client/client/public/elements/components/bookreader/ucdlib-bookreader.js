@@ -3,6 +3,7 @@ import {render, styles} from "./ucdlib-bookreader.tpl.js";
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./ucdlib-bookreader-page.js";
+import "./ucdlib-bookreader-navbar.js";
 
 export default class UcdlibBookreader extends Mixin(LitElement)
   .with(LitCorkUtils) {
@@ -577,6 +578,10 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   //   this.logger.info('change page from scroll', {current: this.page, to: page});
   // };
 
+  updateSearchResults(searchResults=[]) {
+    let nav = this.shadowRoot.querySelector('ucdlib-bookreader-navbar');
+    if( nav ) nav.updateSearchResults(searchResults);
+  }
 }
 
 customElements.define('ucdlib-bookreader', UcdlibBookreader);

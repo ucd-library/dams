@@ -24,6 +24,11 @@ export function styles() {
     #single-page ucdlib-bookreader-page {
       position: absolute;
     }
+
+    ucdlib-bookreader-navbar {
+        width: 60%;
+        margin: 0 auto;
+      }
   `;
 
   return [elementStyles];
@@ -39,4 +44,5 @@ return html`
     <!-- <div id="double-page" ?hidden="${this.view !== 'double'}"> 
     </div> -->
   </div>
+  <ucdlib-bookreader-navbar></ucdlib-bookreader-navbar>
 `;}

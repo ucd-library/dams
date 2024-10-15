@@ -19,7 +19,6 @@ import "@ucd-lib/cork-app-utils";
 import utils from "../../../../lib/utils";
 
 import "../../../components/bookreader/ucdlib-bookreader.js";
-import "../../../components/bookreader/ucdlib-bookreader-navbar.js";
 
 export default class AppMediaViewer extends Mixin(LitElement)
   .with(MainDomElement, LitCorkUtils) {
@@ -262,8 +261,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.searchResultsCount = this.searchResults?.length;
     this._updateSearchNav();
 
-    let brNav = this.querySelector('ucdlib-bookreader-navbar');
-    if( brNav ) brNav.updateSearchResults(this.searchResults);
+
+    let br = this.querySelector('ucdlib-bookreader');
+    if( br ) br.updateSearchResults(this.searchResults);
   }
 
   _onSearchResultsEmpty(e) {

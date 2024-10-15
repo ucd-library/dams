@@ -184,11 +184,6 @@ export default function render() {
         padding-top: 0.6rem;
       }
 
-      ucdlib-bookreader-navbar {
-        width: 60%;
-        margin: 0 auto;
-      }
-
     </style>
 
     <div class="wrapper" style="position: relative;">
@@ -210,23 +205,21 @@ export default function render() {
           />
         </div>
         <app-image-viewer id="image"></app-image-viewer>
-        <app-bookreader-viewer
-          id="bookreader"
-          .fullscreen="${this.brFullscreen}"
-          .bookData="${this.bookData}"
-          bookItemId="${this.bookItemId}"
-          ?brsinglepage="${this.singlePage}"
-          @br-page-change="${this._onBookViewPageChange}"
-          @br-cancel-search="${this._onClearSearch}">
-        </app-bookreader-viewer>
+        <ucdlib-bookreader id="bookreader" max-height="634" style="padding-bottom: 3.5rem"></ucdlib-bookreader>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>
       </ucdlib-pages>
 
-      <div style="margin-top: 5rem;">
-        <ucdlib-bookreader max-height="634"></ucdlib-bookreader>
-        <ucdlib-bookreader-navbar></ucdlib-bookreader-navbar>
-      </div>
+      <app-bookreader-viewer
+        id="bookreader"
+        style="display: none;"
+        .fullscreen="${this.brFullscreen}"
+        .bookData="${this.bookData}"
+        bookItemId="${this.bookItemId}"
+        ?brsinglepage="${this.singlePage}"
+        @br-page-change="${this._onBookViewPageChange}"
+        @br-cancel-search="${this._onClearSearch}">
+      </app-bookreader-viewer>
 
       <div
         class="search-side-panel ${this.brFullscreen
