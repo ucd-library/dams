@@ -44,6 +44,20 @@ class BookReaderService extends BaseService {
     return this.store.data.ocrData.get(id);
   }
 
+  async search(itemId, query) {
+    return this.request({
+      url : '/api/page-search/ia',
+      qs : {
+        item_id : itemId,
+        q : query
+      },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : () => console.warn('No search data found')
+    });
+  }
+
 }
 
 const service = new BookReaderService();

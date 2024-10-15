@@ -285,7 +285,7 @@ export default function render() {
                   @click="${this._onSearchResultClick}"
                 >
                   <h4 style="margin-bottom: 0">
-                    Page ${parseInt(result.displayPageNumber.replace("n", "")) + 1}
+                    Page ${parseInt(result.par?.[0]?.page || 0)}
                   </h4>
                   <p style="font-size: .9rem; margin-top: .3rem">
                     ${unsafeHTML(
