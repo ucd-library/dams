@@ -246,7 +246,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
   }
 
   _onSearchResultsChange(searchResults={}) {
-    this.searchResults = [...searchResults?.body?.matches];
+    this.searchResults = [...searchResults?.matches];
 
     if (this.searchResults.length) {
       this.searchResults = this.searchResults.sort(
@@ -528,8 +528,14 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     let searchRes = await this.BookReaderModel.search(this.bookItemId, this.queryTerm);
-  
-    this._onSearchResultsChange(searchRes);
+    // this._onSearchResultsChange(searchRes);
+  }
+
+  _onBookreaderSearchUpdate(e) {
+    if( e.state !== 'loaded' ) return;
+
+    let searchResults = e.payload;
+    this._onSearchResultsChange(searchResults);
   }
 
   _onClearSearch(e) {

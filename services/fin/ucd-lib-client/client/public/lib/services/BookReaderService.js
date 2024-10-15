@@ -2,7 +2,7 @@ import {BaseService, PayloadUtils} from '@ucd-lib/cork-app-utils';
 import BookReaderStore from '../stores/BookReaderStore.js';
 
 let payloadUtils = new PayloadUtils({
-  idParts : ['path']
+  idParts : ['path', 'text']
 });
 
 class BookReaderService extends BaseService {
@@ -45,17 +45,22 @@ class BookReaderService extends BaseService {
   }
 
   async search(itemId, query) {
-    return this.request({
+    let ido = {path: itemId, text: query};
+    let id = payloadUtils.getKey(ido);
+
+    await this.request({
       url : '/api/page-search/ia',
       qs : {
         item_id : itemId,
         q : query
       },
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : () => console.warn('No search data found')
+      checkCached : () => this.store.data.search.get(id),
+      onUpdate : resp => {
+        this.store.set(payloadUtils.generate(ido, resp), this.store.data.search)
+      }
     });
+
+    return this.store.data.search.get(id);
   }
 
 }

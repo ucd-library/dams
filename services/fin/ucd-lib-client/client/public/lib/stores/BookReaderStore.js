@@ -11,10 +11,12 @@ class BookReaderStore extends BaseStore {
         selectedView : 'double',
       },
       bookManifest : new LruStore({name: 'bookreader.manifest', maxSize: 10}),
-      ocrData : new LruStore({name: 'bookreader.ocr', maxSize: 50})
+      ocrData : new LruStore({name: 'bookreader.ocr', maxSize: 50}),
+      search : new LruStore({name: 'bookreader.search', maxSize: 10}),
     };
     this.events = {
-      BOOKREADER_STATE_UPDATE: 'bookreader-state-update'
+      BOOKREADER_STATE_UPDATE: 'bookreader-state-update',
+      BOOKREADER_SEARCH_UPDATE: 'bookreader-search-update'
     };
   }
 
