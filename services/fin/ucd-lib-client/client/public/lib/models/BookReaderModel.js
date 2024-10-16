@@ -9,6 +9,8 @@ class BookReaderModel extends BaseModel {
 
     this.store = BookReaderStore;
     this.service = BookReaderService;
+    this.service.model = this;
+    this.xmlParser = new DOMParser();
       
     this.register('BookReaderModel');
   }
@@ -93,7 +95,7 @@ class BookReaderModel extends BaseModel {
     }
 
     let manifest = this.store.data.bookManifest.get(id);
-    let index, image, ocrUrl, imageUrl, height, width, originalHeight, originalWidth;
+    let index, image, ocrUrl, imageUrl, height, width, originalHeight, originalWidth, scale;
     let bookViewData = {
       id,
       totalHeight : 0,
@@ -110,22 +112,95 @@ class BookReaderModel extends BaseModel {
       width = parseInt(image.size.width);
       originalHeight = parseInt(page.original.size.height);
       originalWidth = parseInt(page.original.size.width);
-      return {height, width, imageUrl, ocrUrl, index, originalHeight, originalWidth};
+      scale = width / originalWidth;
+      return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth};
     });
 
     this.store.setState('bookViewData', bookViewData);
   }
 
-  async getOcrData(page) {
-    return this.service.getOcrData(page.ocrUrl);
+  async getOcrData(page, itemId) {
+    return this.service.getOcrData(page.ocrUrl, itemId, page.index);
   }
 
   async search(itemId, bookItemId, query) {
+    this.clearSearch();
     return this.service.search(itemId, bookItemId, query);
   }
 
   async clearSearch() {
     this.store.setState('searchResults', null);
+  }
+
+  getSearchResults(itemId, page) {
+    let searchResults = this.store.data.state.searchResults;
+    if( !searchResults || searchResults.itemId !== itemId ) {
+      return {results: [], itemId, page, text: ''};
+    }
+
+    let results = searchResults.payload[page];
+    return {results: results || [], itemId, page, text: searchResults.text};
+  }
+
+  getBookViewPage(itemId, page) {
+    let bookData = this.store.data.state.bookViewData
+    if( !bookData || bookData?.id !== itemId ) {
+      this.logger.error('could not find book data for page', itemId, page);
+      return null;
+    }
+
+    let pageData = bookData.pages.find(i => i.index === page);
+    if( !pageData ) {
+      this.logger.error('could not find page data for page', itemId, page);
+      return null;
+    }
+
+    return pageData;
+  }
+
+  parsePageWords(xml, itemId, page) {
+    let xmlDoc = this.xmlParser.parseFromString(xml, "text/xml");
+    let ocrData = [];
+
+    // let o = xmlDoc.querySelector('OBJECT');
+    // let height = parseInt(o.getAttribute('height'));
+    // let width = parseInt(o.getAttribute('width'));
+
+    let bookData = this.store.data.state.bookViewData
+    if( !bookData || bookData?.id !== itemId ) {
+      this.logger.error('could not find book data for page', itemId, page);
+      return ocrData;
+    }
+
+    let pageData = bookData.pages.find(i => i.index === page);
+    if( !pageData ) {
+      this.logger.error('could not find page data for page', page, bookData);
+      return ocrData;
+    }
+
+    let {scale} = pageData;
+
+    xmlDoc.querySelectorAll('WORD').forEach(word => {
+      var [left, bottom, right, top] = word
+        .getAttribute('coords')
+        .split(',')
+        .map(v => parseInt(v));
+
+      word = {
+        // fullResBbox : {
+        //   left : left * (1+scale),
+        //   bottom : bottom * (1+scale),
+        //   right : right * (1+scale),
+        //   top : top * (1+scale)
+        // },
+        bbox: {left, bottom, right, top, scale},
+        text : word.textContent
+      }
+
+      ocrData.push(word);
+    });
+
+    return ocrData
   }
 }
 

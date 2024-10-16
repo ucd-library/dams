@@ -28,17 +28,17 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.pageData = {};
     this.buffer = 0;
     this.ocrData = [];
+    this.bboxMatchBuffer = 2;
     this._injectModel('BookReaderModel');
     this.render = render.bind(this);
 
     this._onClick = this._onClick.bind(this);
-
-    this._onBookreaderStateUpdate(this.BookReaderModel.getState());
   }
 
   firstUpdated() {
     this.imgEle = this.shadowRoot.querySelector('img');
     this._updatePageData();
+    this._onBookreaderStateUpdate(this.BookReaderModel.getState());
   }
 
   updated(props) {
@@ -62,6 +62,8 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   }
 
   _onClick() {
+    return; // disabled for now
+    // this makes selecting text difficult
     if( this.view === 'double' ) {
       if( this.page % 2 === 0 ) {
         this.BookReaderModel.setPage(this.page+1);
@@ -75,7 +77,33 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     if( this.view !== e.selectedView ) {
       this.view = e.selectedView;
     }
+
+    if( e.searchResults?.state === 'loaded' && 
+        e.searchResults?.itemId === this.bookData?.id ) {
+      this._renderOcrData();
+    }
   }
+
+  // updateSearchResults(e) {
+  //   if( e.id === this.renderedSearchResults ) return;
+  //   let selected = {};
+
+  //   e.payload.matches.forEach(result => {
+  //     if( result.par.page-1 !== this.page ) return;
+  //     result.originalRatio = result.par.page_width / this.pageData.originalWidth;
+  //     result.original = {
+  //       top: result.par.t * (1+result.originalRatio),
+  //       left: result.par.l * (1+result.originalRatio),
+  //       right: result.par.r * (1+result.originalRatio),
+  //       bottom: result.par.b * (1+result.originalRatio)
+  //     }
+  //     selected[this._getWordId(result)] = result;
+  //   });
+
+  //   this.selected = selected;
+  //   this.renderedSearchResults = e.id;
+  //   this._renderOcrData();
+  // }
 
   _debugUpdated() {
     if( this.debug ) {
@@ -111,14 +139,20 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.imgEle.style.height = this.pageData.renderHeight+'px';
 
 
-    this.BookReaderModel.getOcrData(this.pageData)
-      .then(data => this._renderOcrData(data, this.pageData));
+    this.BookReaderModel.getOcrData(this.pageData, this.bookData.id)
+      .then(data => this._renderOcrData(data));
 
     this.requestUpdate();
   }
 
   _renderOcrData(data) {
     // TODO: this might need to be async rendering
+    if( !data && this.renderedOcrData ) {
+      data = this.renderedOcrData;
+    }
+    if( !data ) return;
+
+    let search = this.BookReaderModel.getSearchResults(this.bookData.id, this.page);
 
     let pageChanged = false;
     if( this.renderedOcrTo ) {
@@ -129,44 +163,58 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
         }
       }
     }
+    if( search.text !== this.renderedSearchText ) {
+      pageChanged = true;
+    }
 
-    if( !data.parsed || pageChanged ) {
+    let ocrData = [];
+    if( !this.ocrData || pageChanged ) {
+      data.payload.forEach(word => {
+        let scaledWord = {
+          text : word.text,
+          top : Math.round(word.bbox.top*this.pageData.renderRatio),
+          left : Math.round(word.bbox.left*this.pageData.renderRatio),
+          right : Math.round(word.bbox.right*this.pageData.renderRatio),
+          bottom : Math.round(word.bbox.bottom*this.pageData.renderRatio)
+        }
 
-      let parser = new DOMParser();
-      let xmlDoc = parser.parseFromString(data.payload, "text/xml");
-      let ocrData = [];
-
-      xmlDoc.querySelectorAll('WORD').forEach(word => {
+        let fontSize = scaledWord.bottom-scaledWord.top;
+        let letterSpacing = this.getWordLetterSpacing(fontSize, word.text, scaledWord.right-scaledWord.left);
         
-        let [left, bottom, right, top] = word
-          .getAttribute('coords')
-          .split(',')
-          .map(v => Math.round(parseInt(v)*this.pageData.renderRatio));
+        scaledWord.letterSpacing = letterSpacing.toFixed(2)+'px';
+        scaledWord.fontSize = fontSize;
+        scaledWord.top += this.buffer;
+        scaledWord.bottom = this.pageData.renderHeight - scaledWord.bottom + this.buffer;
+        scaledWord.right = this.pageData.renderWidth - scaledWord.right;
+        scaledWord.selected = this._isSelectedWord(word, search.results);
 
-        let fontSize = bottom-top;
-        let letterSpacing = this.getWordLetterSpacing(fontSize, word.textContent, right-left);
-        ocrData.push({
-          text: word.textContent,
-          top: top + this.buffer, 
-          left, 
-          right: this.pageData.renderWidth - right, 
-          bottom: (this.pageData.renderHeight - bottom)+this.buffer,
-          fontSize,
-          letterSpacing: letterSpacing.toFixed(2)+'px'
-        });
+        ocrData.push(scaledWord);
       });
-
-      data.parsed = ocrData;
     }
 
     this.renderedOcrTo = {
       top: this.pageData.renderOffsetTop,
       left: this.pageData.renderOffsetLeft,
       width: this.pageData.renderWidth,
-      height: this.pageData.renderHeight
+      height: this.pageData.renderHeight,
     }
+    this.renderedSearchText = search.text;
 
-    this.ocrData = data.parsed;
+    this.ocrData = ocrData;
+    this.renderedOcrData = data;
+    this.requestUpdate();
+  }
+
+  _isSelectedWord(word, results) {
+    let hit, re;
+    for( hit of results ) {
+      for( re of hit.regex ) {
+        if( re.test(word.text) ) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   getWordLetterSpacing(fontSize, word, width) {

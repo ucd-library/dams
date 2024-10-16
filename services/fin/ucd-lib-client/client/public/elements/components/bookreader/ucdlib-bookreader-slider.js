@@ -168,7 +168,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     });
 
     searchResults.forEach(result => {
-      let pageNumber = result.par?.page || 0;
+      let pageNumber = result.page || 0;
       let indicator = document.createElement('div');
       indicator.classList.add('indicator');
       indicator.style.left = `${(this.pages[pageNumber-1] || 0) - 4}px`;

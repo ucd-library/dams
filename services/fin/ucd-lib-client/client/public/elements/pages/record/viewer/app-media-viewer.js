@@ -248,14 +248,18 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if( bookreaderViewer ) bookreaderViewer.destroy();
   }
 
-  _onSearchResultsChange(searchResults={}) {
-    this.searchResults = [...searchResults?.matches];
+  _onSearchResultsChange(resultsByPage={}) {
+    let results = [];
+    for( let page in resultsByPage ) {
+      results = results.concat(...resultsByPage[page]);
+    }
+    this.searchResults = results;
 
     if (this.searchResults.length) {
-      this.searchResults = this.searchResults.sort(
+      this.searchResults.sort(
         (a, b) =>
-          parseInt(a.par?.page || 0) -
-          parseInt(b.par?.page || 0)
+          parseInt(a?.page || 0) -
+          parseInt(b?.page || 0)
       );
     }
 

@@ -130,10 +130,18 @@ export function styles() {
     span.word {
       display: inline-block;
       position: absolute;
-      color: red;
-      border: 1px solid red;
+      color: transparent;
+      /*color: red;*/
+      /*border: 1px solid red;*/
       cursor: text;
       pointer-events: all;
+    }
+
+    span.word[selected] {
+      border: 3px solid var(--color-redbud);
+      background-color: #f555b140;
+      margin: -1px;
+      border-radius: 4px;
     }
 
     img {
@@ -157,10 +165,15 @@ return html`
   <div>Render ratio dimension: ${this.pageData.renderRatioDimension}</div>
 </div> 
 
-<img ?hidden="${this.debug}" src="${this.pageData?.imageUrl}" alt="">
+<img ?hidden="${this.debug}" draggable="false" src="${this.pageData?.imageUrl}" alt="">
 
 ${this.ocrData.map((word, i) => html`
-  <span class="word" style="bottom: ${word.bottom}px; right: ${word.right}px; top: ${word.top}px; left: ${word.left}px; line-height: ${word.fontSize}px; letter-spacing: ${word.letterSpacing}; font-size: ${word.fontSize}px">${word.text}</span>
+  <span 
+    class="word"
+    ?selected="${word.selected}" 
+    style="bottom: ${word.bottom}px; right: ${word.right}px; top: ${word.top}px; left: ${word.left}px; line-height: ${word.fontSize}px; letter-spacing: ${word.letterSpacing}; font-size: ${word.fontSize}px">
+    ${word.text}
+  </span>
 `)}
 
 `;}
