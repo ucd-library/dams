@@ -128,6 +128,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     // if( this.AppStateModel.location.page !== 'item' ) this._onSearchResultsEmpty();
   }
 
+  _onBookreaderStateUpdate(e) {
+    this.brFullscreen = e.fullscreen;
+  }
+
   /**
    * @method _onTouchEnd
    * @description bound to window touch end/cancel events. if we are
@@ -496,7 +500,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onExpandBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-expand-view"));
+    this.BookReaderModel.setFullscreen(true);
+    // this.dispatchEvent(new CustomEvent("br-expand-view"));
     this.brFullscreen = true;
   }
 
@@ -507,7 +512,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onCollapseBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-collapse-view"));
+    this.BookReaderModel.setFullscreen(false);
+    // this.dispatchEvent(new CustomEvent("br-collapse-view"));
     this.brFullscreen = false;
   }
 
@@ -552,6 +558,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    */
   _onSearchToggled(e) {
     this.searching = !this.searching;
+    this.BookReaderModel.setSearchActive(this.searching);
     this.dispatchEvent(new CustomEvent("br-search-toggle"));
   }
 

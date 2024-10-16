@@ -12,7 +12,9 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   static get properties() {
     return {
       selectedPage : { type: Number },
-      numPages : { type: Number }
+      numPages : { type: Number },
+      fullscreen : { type: Boolean },
+      singlePageView : { type: Boolean }
     }
   }
 
@@ -32,6 +34,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   _onBookreaderStateUpdate(e) {
     this.selectedPage = e.selectedPage || 0;
     this.numPages = e.bookViewData?.pages?.length || 0;
+    this.singlePageView = e.selectedView === 'double' ? false : true;
 
     requestAnimationFrame(() => {
       let slider = this.shadowRoot.querySelector('ucdlib-bookreader-slider');
@@ -42,10 +45,12 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   _reset() {
     this.selectedPage = 0;
     this.numPages = 0;
+    this.fullscreen = false;
+    this.singlePageView = false;
   }
 
   _prevPage(e) {
-    let pageIncrement = this.BookReaderModel.store?.data?.state?.selectedView === 'double' ? 2 : 1;
+    let pageIncrement = this.singlePageView ? 1 : 2;
     if( this.selectedPage > 0 ) {
       this.selectedPage -= pageIncrement;
       this.BookReaderModel.setPage(this.selectedPage);
@@ -53,7 +58,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   }
 
   _nextPage(e) {
-    let pageIncrement = this.BookReaderModel.store?.data?.state?.selectedView === 'double' ? 2 : 1;
+    let pageIncrement = this.singlePageView ? 1 : 2;
     if( (this.selectedPage+pageIncrement) < this.numPages ) {
       this.selectedPage += pageIncrement;
       this.BookReaderModel.setPage(this.selectedPage);
@@ -65,6 +70,31 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     if( slider ) {
       slider.updateSearchResults(searchResults);
     }
+  }
+
+  _onSearchClicked(e) {
+    let searching = this.BookReaderModel.store?.data?.state?.searchActive || false;
+    this.BookReaderModel.setSearchActive(!searching);
+  }
+  
+
+  _onToggleBookView(e) {    
+    this.BookReaderModel.setView(this.singlePageView ? 'double' : 'single');
+    this.singlePageView = !this.singlePageView;
+  }
+
+  _onZoomInClicked(e) {
+    console.log('TODO zoom in');
+  }
+
+  _onZoomOutClicked(e) {
+    console.log('TODO zoom out');
+  }
+
+  _onCloseClicked(e) {
+    console.log('close fullscreen, setting fullscreen to false');
+    this.BookReaderModel.setFullscreen(false);
+    this.fullscreen = false;
   }
   
 }

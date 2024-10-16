@@ -391,52 +391,65 @@ export default class AppMediaViewer extends Mixin(LitElement)
   _onExpandBookView(e) {
     this.brFullscreen = true;
 
-    let brView = document.querySelector("#bookreader");
-    if (brView) {
-      brView.classList.add("fullscreen");
-      brView
-        .querySelector("#BookReader")
-        .classList.add("fullscreen");
-      document.body.style.overflow = "hidden";
+    // resize bookreader to fit full screen
+    let br = document.querySelector("ucdlib-bookreader");
+    if( !br ) return;
 
-      if( brView.onePage ) {
-        // need to recalc pagetops and render for mode1
-        brView._renderBookReader(true);
-      }
+    br.maxHeight = window.innerHeight + 5; // TODO spacing from navbar
+    br.classList.add("fullscreen");
+
+
+    // TODO make sure buttons show up as expected (z-index changes?)
+    // debugger;
+
+
+
+    // let brView = document.querySelector("#bookreader");
+    // if (brView) {
+    //   brView.classList.add("fullscreen");
+    //   brView
+    //     .querySelector("#BookReader")
+    //     .classList.add("fullscreen");
+    //   document.body.style.overflow = "hidden";
+
+    //   if( brView.onePage ) {
+    //     // need to recalc pagetops and render for mode1
+    //     brView._renderBookReader(true);
+    //   }
       
-      requestAnimationFrame(() => {
-        brView.height = window.innerHeight;
-        let mediaNav = document.querySelector("app-media-viewer-nav"); 
-        let brNav = brView.querySelector(".BRfooter");
-        if (mediaNav && brNav) {
-          // append media nav in brNav to display inline
-          let li = document.createElement("li");
-          li.appendChild(mediaNav);
-          brNav.querySelector("nav > ul").appendChild(li);
+    //   requestAnimationFrame(() => {
+    //     brView.height = window.innerHeight;
+    //     let mediaNav = document.querySelector("app-media-viewer-nav"); 
+    //     let brNav = brView.querySelector(".BRfooter");
+    //     if (mediaNav && brNav) {
+    //       // append media nav in brNav to display inline
+    //       let li = document.createElement("li");
+    //       li.appendChild(mediaNav);
+    //       brNav.querySelector("nav > ul").appendChild(li);
   
-          // also move search button as first child
-          let brSearch = mediaNav.shadowRoot.querySelector(".br-search");
-          if (brSearch) {
-            let brSearchCopy = brSearch.cloneNode(true);
-            brSearchCopy.style.display = ''; // remove display none
+    //       // also move search button as first child
+    //       let brSearch = mediaNav.shadowRoot.querySelector(".br-search");
+    //       if (brSearch) {
+    //         let brSearchCopy = brSearch.cloneNode(true);
+    //         brSearchCopy.style.display = ''; // remove display none
 
-            let searchButton = brSearchCopy.querySelector('.zoom .fullscreen-search');
-            let prevButton = brSearchCopy.querySelector('.search-pagination #search-prev');
-            let nextButton = brSearchCopy.querySelector('.search-pagination #search-next');
+    //         let searchButton = brSearchCopy.querySelector('.zoom .fullscreen-search');
+    //         let prevButton = brSearchCopy.querySelector('.search-pagination #search-prev');
+    //         let nextButton = brSearchCopy.querySelector('.search-pagination #search-next');
 
-            if( searchButton ) searchButton.addEventListener('click', this._onToggleBRSearch.bind(this));
-            if( prevButton ) prevButton.addEventListener('click', this._prevSearchResult.bind(this));
-            if( nextButton ) nextButton.addEventListener('click', this._nextSearchResult.bind(this));
+    //         if( searchButton ) searchButton.addEventListener('click', this._onToggleBRSearch.bind(this));
+    //         if( prevButton ) prevButton.addEventListener('click', this._prevSearchResult.bind(this));
+    //         if( nextButton ) nextButton.addEventListener('click', this._nextSearchResult.bind(this));
 
-            brNav.prepend(brSearchCopy);
-          }
-        }
+    //         brNav.prepend(brSearchCopy);
+    //       }
+    //     }
   
-        brView.br.resize();
-        if( this.queryTerm ) this._onBRSearch({ currentTarget: { value: this.queryTerm } });
-      });
+    //     brView.br.resize();
+    //     if( this.queryTerm ) this._onBRSearch({ currentTarget: { value: this.queryTerm } });
+    //   });
       
-    }
+    // }
   }
 
   _prevSearchResult(e) {
@@ -459,39 +472,47 @@ export default class AppMediaViewer extends Mixin(LitElement)
    */
   _onCollapseBookView(e) {
     this.brFullscreen = false;
+
+    // resize bookreader to fit full screen
+    let br = document.querySelector("ucdlib-bookreader");
+    if( !br ) return;
+
+    br.maxHeight = 634;
+    br.classList.remove("fullscreen");
     
-    let brView = document.querySelector("#bookreader");
-    if (brView) {
-      brView.classList.remove("fullscreen");
-      brView
-        .querySelector("#BookReader")
-        .classList.remove("fullscreen");
-      document.body.style.overflow = "";
-      let mediaNav = brView.querySelector("app-media-viewer-nav");
-      if (mediaNav) {
-        document.querySelector(".wrapper").append(mediaNav);
-      }
 
-      // remove search button (that we cloned in expand) 
-      let brNav = brView.querySelector(".BRfooter");
-      let brSearch = brNav?.querySelector('.br-search');
-      if( brSearch ) brSearch.remove();
+    // let brView = document.querySelector("#bookreader");
+    // if (brView) {
+    //   brView.classList.remove("fullscreen");
+    //   brView
+    //     .querySelector("#BookReader")
+    //     .classList.remove("fullscreen");
+    //   document.body.style.overflow = "";
+    //   let mediaNav = brView.querySelector("app-media-viewer-nav");
+    //   if (mediaNav) {
+    //     document.querySelector(".wrapper").append(mediaNav);
+    //   }
 
-      // if br onePage, need to autofit scale. twoPage already resets
-      if( brView.onePage ) {     
-        brView.fullscreen = false;   
-        brView.br._modes.mode1Up.mode1UpLit.scale = 1;
-        // need to recalc pagetops and render for mode1
-        brView._renderBookReader(true);
-      } else {
-        brView.height = 634;
-      }
-    }
+    //   // remove search button (that we cloned in expand) 
+    //   let brNav = brView.querySelector(".BRfooter");
+    //   let brSearch = brNav?.querySelector('.br-search');
+    //   if( brSearch ) brSearch.remove();
 
-    requestAnimationFrame(() => {
-      brView.br.resize();
-      if( this.queryTerm ) this._onBRSearch({ currentTarget: { value: this.queryTerm } });
-    });
+    //   // if br onePage, need to autofit scale. twoPage already resets
+    //   if( brView.onePage ) {     
+    //     brView.fullscreen = false;   
+    //     brView.br._modes.mode1Up.mode1UpLit.scale = 1;
+    //     // need to recalc pagetops and render for mode1
+    //     brView._renderBookReader(true);
+    //   } else {
+    //     brView.height = 634;
+    //   }
+    // }
+
+    // requestAnimationFrame(() => {
+    //   brView.br.resize();
+    //   if( this.queryTerm ) this._onBRSearch({ currentTarget: { value: this.queryTerm } });
+    // });
   }
 
   /**
@@ -507,6 +528,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       // nav elements are moved into the bookreader viewer in full screen mode
       brNav.searching = this.brSearchOpen;
     }
+    this.BookReaderModel.setSearchActive(this.brSearchOpen);
   }
 
   /**
@@ -535,10 +557,13 @@ export default class AppMediaViewer extends Mixin(LitElement)
   }
 
   _onBookreaderStateUpdate(e) {
-    if( e.searchResults?.state !== 'loaded' ) return;
+    e.fullscreen ? this._onExpandBookView() : this._onCollapseBookView();
+    e.searchActive ? this.brSearchOpen = true : this.brSearchOpen = false;
 
-    let searchResults = e.searchResults.payload;
-    this._onSearchResultsChange(searchResults);
+    if( e.searchResults?.state === 'loaded' ) {
+      let searchResults = e.searchResults.payload;
+      this._onSearchResultsChange(searchResults);
+    }
   }
 
   _onClearSearch(e) {
@@ -551,7 +576,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.searchResultsCount = 0;
     this._onBRSearch({ currentTarget: { value: "" } });
 
-    if( e.detail.closeSearch ) this.brSearchOpen = false;
+    if( e.detail.closeSearch ) {
+      this.brSearchOpen = false;
+      this.BookReaderModel.setSearchActive(false);
+    }
   }
 
   _onBRSearchGoToResult(e) {

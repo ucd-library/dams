@@ -184,6 +184,30 @@ export default function render() {
         padding-top: 0.6rem;
       }
 
+      ucdlib-bookreader {
+         padding-bottom: 3.5rem;
+      }
+
+      /* .br-fullscreen-active {
+          html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+      } */
+
+      ucdlib-bookreader.fullscreen {
+        background-color: white;
+        position: fixed;
+        padding: 0px;
+        margin: 0px;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 3000;
+      }
     </style>
 
     <div class="wrapper" style="position: relative;">
@@ -205,7 +229,7 @@ export default function render() {
           />
         </div>
         <app-image-viewer id="image"></app-image-viewer>
-        <ucdlib-bookreader id="bookreader" max-height="634" style="padding-bottom: 3.5rem"></ucdlib-bookreader>
+        <ucdlib-bookreader ?fullscreen="${this.brFullscreen}" id="bookreader" max-height="634"></ucdlib-bookreader>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>
       </ucdlib-pages>

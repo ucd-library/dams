@@ -425,7 +425,7 @@ export default function render() {
         </div>
 
         <!-- this is moved next to the bookreader slider in app-media-viewer in full screen -->
-        <div class="br-search" style="display: none;">
+        <!-- <div class="br-search" style="display: none;">
           <div
             class="zoom ${this.searching ? "searching" : ""}"
             @click="${this._onSearchToggled}"
@@ -461,7 +461,7 @@ export default function render() {
               <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div
