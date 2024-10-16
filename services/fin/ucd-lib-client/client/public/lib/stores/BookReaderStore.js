@@ -10,7 +10,9 @@ class BookReaderStore extends BaseStore {
         selectedPage : 0,
         selectedView : 'double',
         bookViewData : null,
-        searchResults : null
+        searchResults : null,
+        fullscreen : false,
+        searchActive : false
       },
       bookManifest : new LruStore({name: 'bookreader.manifest', maxSize: 10}),
       ocrData : new LruStore({name: 'bookreader.ocr', maxSize: 50})

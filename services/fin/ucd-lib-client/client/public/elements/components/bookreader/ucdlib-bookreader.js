@@ -3,6 +3,7 @@ import {render, styles} from "./ucdlib-bookreader.tpl.js";
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./ucdlib-bookreader-page.js";
+import "./ucdlib-bookreader-navbar.js";
 
 export default class UcdlibBookreader extends Mixin(LitElement)
   .with(LitCorkUtils) {
@@ -14,6 +15,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       pages : { type: Array },
       page : { type: Number },
       view : { type: String },
+      fullScreen : { type: Boolean },
       maxHeight : { type: Number, attribute: 'max-height' },
       fullscreen : { type: Boolean }
     }
@@ -35,6 +37,8 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     // make sure if you change this you update the css property --transition-duration
     // to HALF the value of this.animationTime
     this.animationTime = 0.5; // seconds
+
+    this.fullscreen = false;
 
     this.pages = [];
 
@@ -62,7 +66,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     if( props.has('maxHeight') ) {
       this._updateHeight();
     }
-    if( props.has('bookViewData') ) {
+    if( props.has('bookViewData') || props.has('fullscreen') ) {
       this.rerender({full: true, animate: false});
     }
   }
@@ -111,7 +115,8 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         this.lastRendered.maxHeight === this.maxHeight &&
         this.lastRendered.bookViewDataId === this.bookViewData.id &&
         this.lastRendered.width === this.offsetWidth &&
-        this.lastRendered.full === opts.full ) {
+        this.lastRendered.full === opts.full &&
+        this.lastRendered.fullscreen === this.fullscreen ) {
       return;
     }
 
@@ -125,13 +130,24 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     // updated, we need to make sure the elements are poked to update 
     this.pages.forEach(page => page.ele._updatePageData());
 
+    if( opts.full ) {
+      // if single view, make sure we are scrolled to the current page
+      if( this.view === 'single' && this.bookViewData.pages ) {
+        setTimeout(() => {
+          let currentPage = this.bookViewData.pages[this.page];
+          this.shadowRoot.querySelector('#single-page').scrollTop = currentPage.renderOffsetTopForScroll;
+        }, 10);
+      }
+    }
+
     this.lastRendered = {
       full: opts.full,
       view: this.view,
       page: this.page,
       maxHeight: this.maxHeight,
       width: this.offsetWidth,
-      bookViewDataId: this.bookViewData.id
+      bookViewDataId: this.bookViewData.id,
+      fullscreen: this.fullscreen
     }
   }
 
@@ -141,11 +157,15 @@ export default class UcdlibBookreader extends Mixin(LitElement)
    * element as well.
    */
   _renderAllPageSizes() {
+    if( this.fullscreen ) {
+      this.style.height = '';
+    }
+
     // render pages based on view and size
     let readerWidth = this.offsetWidth;
-    let readerHeight = this.maxHeight;
+    let readerHeight = this.fullscreen ? (this.offsetHeight-80) : this.maxHeight;
     this.renderedHeight = readerHeight;
-    
+
     let renderedMaxHeight = 0;
     let renderedWidthRatioMaxHeight = 0;
     let heightRatioCount = 0;
@@ -179,7 +199,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
     // update the height of the page container based on the max page height since it's smaller
     // than the widget height
-    if( renderedMaxHeight && renderedMaxHeight < this.maxHeight ) {
+    if( !this.fullscreen && renderedMaxHeight && renderedMaxHeight < this.maxHeight ) {
       this.renderedHeight = renderedMaxHeight;
 
       this.bookViewData.pages.forEach(page => {
@@ -191,7 +211,9 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       });
     }
 
-    this.style.height = this.renderedHeight+'px';
+    if( !this.fullscreen ) {
+      this.style.height = this.renderedHeight+'px';
+    }
     this.shadowRoot.querySelector('#single-page').style.height = this.renderedHeight+'px';
 
     if( this.view === 'single' && this.bookViewData?.pages) {
@@ -265,6 +287,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     let realReaderHeight = readerHeight;
     this._setPageDimensions(readerHeight, readerWidth, page);
     page.renderOffsetTop = (realReaderHeight*page.index)+this.pageBuffer;
+    page.renderOffsetTopForScroll = realReaderHeight*page.index;
     page.renderOffsetLeft = 0;
 
     if( page.renderRatioDimension === 'width' ) {
@@ -288,7 +311,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     let isRight = page.index % 2 === 0;
 
     this._setPageDimensions(readerHeight, readerWidth/2, page);
-    page.renderOffsetTop = 0;
+    page.renderOffsetTop = Math.floor((readerHeight - page.renderHeight) / 2);
 
     let midPoint = Math.floor(readerWidth/2);
     page.renderOffsetLeft = isRight ? midPoint : midPoint - page.renderWidth;
@@ -352,7 +375,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     // if single view, make sure we are scrolled to the current page
     if( this.view === 'single' && this.bookViewData.pages ) {
       let currentPage = this.bookViewData.pages[this.page];
-      this.shadowRoot.querySelector('#single-page').scrollTop = currentPage.renderOffsetTop;
+      this.shadowRoot.querySelector('#single-page').scrollTop = currentPage.renderOffsetTopForScroll;
     }
   }
 
@@ -577,6 +600,10 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   //   this.logger.info('change page from scroll', {current: this.page, to: page});
   // };
 
+  updateSearchResults(searchResults=[]) {
+    let nav = this.shadowRoot.querySelector('ucdlib-bookreader-navbar');
+    if( nav ) nav.updateSearchResults(searchResults);
+  }
 }
 
 customElements.define('ucdlib-bookreader', UcdlibBookreader);

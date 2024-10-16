@@ -66,6 +66,16 @@ class BookReaderModel extends BaseModel {
     this.store.setState('fullscreen', fullscreen);
   }
 
+  /**
+   * @method setSearchActive
+   * @description set the search to active (search overlay)
+   * 
+   * @param {Boolean} active 
+   */
+  setSearchActive(active) {
+    this.store.setState('searchActive', active);
+  }
+
   setSelectedBook(id, record) {
     this.clearSearch();
     this.store.setState('selectedBook', id);
