@@ -11,6 +11,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
       selectedPage : { type: Number },
       width : { type: Number },
       searchResults : { type: Array },
+      isMoving : { type: Boolean }
     }
   }
 
@@ -61,6 +62,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     this.selectedPage = 0;
     this.width = this.offsetWidth;
     this.searchResults = [];
+    this.isMoving = false;
   }
 
   _calculatePages() {
@@ -83,6 +85,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     window.addEventListener('touchend', this._onMoveEnd);
     window.addEventListener('mousemove', this._onMove);
     window.addEventListener('touchmove', this._onMove);    
+
+    this.isMoving = true;
   }
 
   _onClickTrack(e) {
@@ -137,6 +141,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     window.removeEventListener('touchend', this._onMoveEnd);
     window.removeEventListener('touchmove', this._onMove);
     window.removeEventListener('mousemove', this._onMove);
+
+    this.isMoving = false;
   }
 
   _onDragEnd(e) {

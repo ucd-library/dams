@@ -89,6 +89,22 @@ export function styles() {
       background-color: #272958;
     }
 
+    .label {
+      width : 25px;
+      font-size: 12px; 
+      position: absolute;
+      top: -22px;
+      left: -2px;
+      text-align: center;
+      transform: scale(0);
+      transition: transform 200ms linear;
+      color: var(--default-primary-color);
+    }
+
+    .label[moving] {
+      transform: scale(1);
+    }
+
   `;
 
   return [elementStyles];
@@ -107,6 +123,7 @@ return html`
       <div id="handle"  
         @mousedown="${this._onMoveStart}"
         @touchstart="${this._onMoveStart}">
+        <div id="numberLabel" class="label" ?moving="${this.isMoving}">${this.selectedPage+1}</div>
      </div>
     </div>
   </div>

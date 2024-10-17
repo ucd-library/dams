@@ -402,10 +402,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
     // br.maxHeight = window.innerHeight + 5; // TODO spacing from navbar
     // br.classList.add("fullscreen");
 
-
-    // TODO make sure buttons show up as expected (z-index changes?)
-    // debugger;
-
+    // hide scrollbars
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
 
     // let brView = document.querySelector("#bookreader");
@@ -483,6 +482,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     br.maxHeight = 634;
     // br.classList.remove("fullscreen");
+
+    // allow scroll
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
     
 
     // let brView = document.querySelector("#bookreader");
