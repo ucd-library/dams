@@ -82,7 +82,7 @@ class BookReaderService extends BaseService {
             match.par.text = text;
             match.par.regex = (text.match(/{{{(.*?)}}}/g) || [])
               .map(str => str.replace('{{{', '').replace('}}}', ''))
-              .map(str => new RegExp(str, 'gi'));
+              .map(str => new RegExp(str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'));
 
             if( match.par.boxes ) delete match.par.boxes;
 
