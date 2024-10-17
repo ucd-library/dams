@@ -51,6 +51,9 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
 
   _prevPage(e) {
     let pageIncrement = this.singlePageView ? 1 : 2;
+    if( this.selectedPage === 1 ) pageIncrement = 1;
+    if( pageIncrement === 2 && this.selectedPage % 2 === 0 ) pageIncrement = 1; // if viewing odd page (0-index) in 2page mode, should only move a single page back
+
     if( this.selectedPage > 0 ) {
       this.BookReaderModel.setPage(this.selectedPage - pageIncrement);
     }
@@ -58,6 +61,9 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
 
   _nextPage(e) {
     let pageIncrement = this.singlePageView ? 1 : 2;
+    if( this.selectedPage === 0 ) pageIncrement = 1;
+    if( pageIncrement === 2 && this.selectedPage % 2 === 0 ) pageIncrement = 1; // if viewing odd page (0-index) in 2page mode, should only move a single page forward
+
     if( (this.selectedPage+pageIncrement) < this.numPages ) {
       this.BookReaderModel.setPage(this.selectedPage + pageIncrement);
     }    

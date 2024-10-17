@@ -113,7 +113,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     );
 
     // if 2page mode, need to flip to odd pages only. if even page, need to flip to next page
-    if( pageIncrement === 2 && this.selectedPage % 2 !== 0 ) {
+    if( pageIncrement === 2 && this.selectedPage % 2 === 0 ) {
+      // debugger;
       let match = this.pages.findIndex(page => page === closestPage);
       if( match !== -1 ) {
         closestPage = this.pages[match+1] || this.pages[match-1]; // if last page, go back one
