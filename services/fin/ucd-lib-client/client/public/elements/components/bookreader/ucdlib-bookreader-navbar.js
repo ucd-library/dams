@@ -82,11 +82,11 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   }
 
   _onZoomInClicked(e) {
-    console.log('TODO zoom in');
+    this.BookReaderModel.zoomIn();
   }
 
   _onZoomOutClicked(e) {
-    console.log('TODO zoom out');
+    this.BookReaderModel.zoomOut();
   }
 
   _onCloseClicked(e) {

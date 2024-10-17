@@ -11,12 +11,63 @@ class BookReaderModel extends BaseModel {
     this.service = BookReaderService;
     this.service.model = this;
     this.xmlParser = new DOMParser();
+    this.zoomLevels = [1, 1.25, 1.5, 2, 3, 4];
       
     this.register('BookReaderModel');
   }
 
   getState() {
     return this.store.data.state;
+  }
+
+  zoomIn() {
+    let zoomIndex = this.store.data.state.zoomIndex;
+    this.setZoom(zoomIndex+1);
+  }
+
+  zoomOut() {
+    let zoomIndex = this.store.data.state.zoomIndex;
+    this.setZoom(zoomIndex-1);
+  }
+
+  setZoom(zoomIndex) {
+    if( !this.store.data.state.fullscreen ) return;
+
+    zoomIndex = parseInt(zoomIndex);
+    if( zoomIndex < 0 ) zoomIndex = 0;
+    if( zoomIndex >= this.zoomLevels.length ) {
+      zoomIndex = this.zoomLevels.length-1;
+    }
+    let zoom = this.zoomLevels[zoomIndex];
+    
+    if( zoom === this.store.data.state.zoom ) return;
+    if( zoomIndex === this.store.data.state.zoomIndex ) return;
+    
+    let state = {zoom, zoomIndex};
+    if( zoomIndex === 0 ) {
+      state.offsetX = 0;
+      state.offsetY = 0;
+    }
+
+    this.store.setState(state);
+  }
+
+  setPan(offsetX, offsetY) {
+    if( !this.store.data.state.fullscreen ) return;
+    if( this.store.data.state.offsetX === offsetX && 
+        this.store.data.state.offsetY === offsetY ) return;
+    if( this.store.data.state.zoomIndex === 0 ) return;
+
+    this.store.setState({offsetX, offsetY});
+  }
+
+  resetPanZoom() {
+    this.store.setState({
+      zoom: this.zoomLevels[0],
+      zoomIndex: 0,
+      offsetX: 0, 
+      offsetY: 0
+    });
   }
 
   /**
@@ -28,6 +79,7 @@ class BookReaderModel extends BaseModel {
    */
   setPage(page) {
     if( this.isAnimating() ) return;
+    this.resetPanZoom();
     this.store.setState('selectedPage', page);
   }
 
@@ -39,6 +91,7 @@ class BookReaderModel extends BaseModel {
    */
   setView(view) {
     if( this.isAnimating() ) return;
+    this.resetPanZoom();
     this.store.setState('selectedView', view);
   }
 
@@ -63,6 +116,7 @@ class BookReaderModel extends BaseModel {
    * @param {Boolean} fullscreen 
    */
   setFullscreen(fullscreen) {
+    this.resetPanZoom();
     this.store.setState('fullscreen', fullscreen);
   }
 
@@ -83,7 +137,11 @@ class BookReaderModel extends BaseModel {
       selectedPage : 0,
       searchResults : null,
       fullscreen : false,
-      searchActive: false
+      searchActive: false,
+      offsetX : 0,
+      offsetY : 0,
+      zoomIndex : 0,
+      zoom : this.zoomLevels[0]
     });
     if( record ) {
       this.loadBookFromItemRecord(record);

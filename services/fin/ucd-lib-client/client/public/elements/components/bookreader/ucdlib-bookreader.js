@@ -17,7 +17,10 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       view : { type: String },
       fullScreen : { type: Boolean },
       maxHeight : { type: Number, attribute: 'max-height' },
-      fullscreen : { type: Boolean }
+      fullscreen : { type: Boolean },
+      zoom : { type: Number },
+      offsetX : { type: Number },
+      offsetY : { type: Number }
     }
   }
 
@@ -40,9 +43,16 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
     this.fullscreen = false;
 
+    this.zoom = 0;
+    this.offsetX = 0;
+    this.offsetY = 0;
+
     this.pages = [];
 
     this._onResize = this._onResize.bind(this);
+    this._onMousedown = this._onMousedown.bind(this);
+    this._onMouseup = this._onMouseup.bind(this);
+    this._onMousemove = this._onMousemove.bind(this);
     
     this.render = render.bind(this);
   }
@@ -50,11 +60,19 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('resize', this._onResize);
+    this.addEventListener('mousedown', this._onMousedown);
+    window.addEventListener('mouseup', this._onMouseup);
+    window.addEventListener('mousemove', this._onMousemove);
+    window.addEventListener('mouseout', this._onMouseup);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('resize', this._onResize);
+    this.removeEventListener('mousedown', this._onMousedown);
+    window.removeEventListener('mouseup', this._onMouseup);
+    window.removeEventListener('mousemove', this._onMousemove);
+    window.removeEventListener('mouseout', this._onMouseup);
   }
 
   firstUpdated() {
@@ -84,6 +102,18 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         this.bookViewData = e.bookViewData;
         this._updateHeight();
       }
+    }
+
+    if( this.panEle &&
+      (this.lastPan?.offsetX !== e.offsetX || 
+      this.lastPan?.offsetY !== e.offsetY || 
+      this.lastPan?.zoom !== e.zoom) ) {
+
+      this.zoom = e.zoom || 0;
+      this.offsetX = e.offsetX || 0;
+      this.offsetY = e.offsetY || 0;
+      this.panEle.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) scale(${this.zoom})`;
+      this.lastPan = {offsetX: e.offsetX, offsetY: e.offsetY, zoom: e.zoom};
     }
 
     this.setPage(e.selectedPage);
@@ -144,6 +174,13 @@ export default class UcdlibBookreader extends Mixin(LitElement)
           }
         }, 10);
       }
+    }
+
+    // set pan/zoom ele
+    if( this.view === 'single' ) {
+      this.panEle = this.pages.find(page => page.index === this.page).ele;
+    } else {
+      this.panEle = this.shadowRoot.querySelector('#single-page');
     }
 
     this.lastRendered = {
@@ -413,6 +450,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         let pageEle = this.pages.find(p => p.index === i);
         if( pageEle ) {
           pageEle.ele.className = '';
+          pageEle.ele.style.transform = '';
           continue;
         }
 
@@ -483,6 +521,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         if( pageEle ) {
           this._updateCss(pageEle.ele, cssOrder[cssIndex]);
           pageEle.cssIndex = cssIndex;
+          pageEle.ele.style.transform = '';
           return cssIndex++;
         }
 
@@ -611,6 +650,33 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   updateSearchResults(searchResults=[]) {
     let nav = this.shadowRoot.querySelector('ucdlib-bookreader-navbar');
     if( nav ) nav.updateSearchResults(searchResults);
+  }
+
+  _onMousedown(e) {
+    if( !this.fullscreen ) return;
+    
+    this.pan = {
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetXStart: this.offsetX,
+      offsetYStart: this.offsetY
+    }
+  }
+
+  _onMouseup(e) {
+    if( !this.pan ) return;
+    this.pan = null;
+  }
+
+  _onMousemove(e) {
+    if( !this.pan ) return;
+    let deltaX = e.clientX - this.pan.startX;
+    let deltaY = e.clientY - this.pan.startY;
+    // let offsetX = this.pan.offsetXStart + (deltaX/this.zoom);
+    // let offsetY = this.pan.offsetYStart + (deltaY/this.zoom);
+    let offsetX = this.pan.offsetXStart + deltaX;
+    let offsetY = this.pan.offsetYStart + deltaY;
+    this.BookReaderModel.setPan(offsetX, offsetY);
   }
 }
 

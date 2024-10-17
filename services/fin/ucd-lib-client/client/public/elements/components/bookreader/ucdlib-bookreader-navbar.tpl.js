@@ -139,10 +139,10 @@ return html`
         ></ucdlib-icon>
       </div>
 
-      <div @click="${this._onZoomOutClicked}" style="display: none;">
+      <div @click="${this._onZoomOutClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-minus"></ucdlib-icon>
       </div>
-      <div @click="${this._onZoomInClicked}" style="display: none;">
+      <div @click="${this._onZoomInClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
       </div>
       <div @click="${this._onCloseClicked}">
