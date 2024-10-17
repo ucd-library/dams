@@ -52,16 +52,14 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   _prevPage(e) {
     let pageIncrement = this.singlePageView ? 1 : 2;
     if( this.selectedPage > 0 ) {
-      this.selectedPage -= pageIncrement;
-      this.BookReaderModel.setPage(this.selectedPage);
+      this.BookReaderModel.setPage(this.selectedPage - pageIncrement);
     }
   }
 
   _nextPage(e) {
     let pageIncrement = this.singlePageView ? 1 : 2;
     if( (this.selectedPage+pageIncrement) < this.numPages ) {
-      this.selectedPage += pageIncrement;
-      this.BookReaderModel.setPage(this.selectedPage);
+      this.BookReaderModel.setPage(this.selectedPage + pageIncrement);
     }    
   }
 

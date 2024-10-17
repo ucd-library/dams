@@ -78,7 +78,13 @@ class BookReaderModel extends BaseModel {
 
   setSelectedBook(id, record) {
     this.clearSearch();
-    this.store.setState('selectedBook', id);
+    this.store.setState({
+      selectedBook : id,
+      selectedPage : 0,
+      searchResults : null,
+      fullscreen : false,
+      searchActive: false
+    });
     if( record ) {
       this.loadBookFromItemRecord(record);
     } else {
@@ -89,6 +95,8 @@ class BookReaderModel extends BaseModel {
 
   async loadBookFromItemRecord(record) {
     let id = record.clientMedia.id;
+
+    // let imageList = null;
     let imageList = record.clientMedia?.mediaGroups?.find(item => item?.['@shortType'].includes('ImageList'));
     let pdf = record.clientMedia?.mediaGroups?.find(item => item?.fileFormatSimple === 'pdf');
 
@@ -112,16 +120,21 @@ class BookReaderModel extends BaseModel {
       pages : null
     }
 
+    let isIndex0 = false;
+    if( manifest.payload.length ) {
+      isIndex0 = manifest.payload[0].page === 0;
+    }
+
     bookViewData.pages = manifest.payload.map(page => {
-      index = page.page-1;
+      index = isIndex0 ? page.page : page.page - 1;
       image = page[page.ocr.imageSize];
       ocrUrl = page.ocr.url;
       imageUrl = image.url;
 
       height = parseInt(image.size.height);
       width = parseInt(image.size.width);
-      originalHeight = parseInt(page.original.size.height);
-      originalWidth = parseInt(page.original.size.width);
+      originalHeight = parseInt(page?.original?.size?.height || page?.large?.size?.height);
+      originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
       scale = width / originalWidth;
       return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth};
     });

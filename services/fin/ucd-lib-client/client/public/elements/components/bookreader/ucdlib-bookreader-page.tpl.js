@@ -23,11 +23,11 @@ export function styles() {
     }
 
     :host(.page-left) {
-      z-index: 50;
+      z-index: 40;
     }
 
     :host(.page-right) {
-      z-index: 50;
+      z-index: 40;
     }
 
     :host(.page-left-next) {
@@ -44,7 +44,7 @@ export function styles() {
     /* animate next */
 
     :host(.page-left.animate-next-start) {
-      z-index: 10;
+      z-index: 15;
     }
 
     :host(.page-right.animate-next-start) {
@@ -60,7 +60,7 @@ export function styles() {
 
     :host(.page-right-next.animate-next-start) {
       visibility: visible;
-       z-index: 15;
+       z-index: 20;
     }
 
     :host(.page-right.animate-next-end) {
@@ -76,7 +76,7 @@ export function styles() {
 
     :host(.page-right-next.animate-next-end) {
       visibility: visible;
-       z-index: 15;
+       z-index: 20;
     }
 
 
@@ -91,7 +91,7 @@ export function styles() {
     }
 
     :host(.page-right.animate-prev-start) {
-      z-index: 10;
+      z-index: 15;
     }
 
     :host(.page-right-prev.animate-prev-start) {
@@ -148,6 +148,20 @@ export function styles() {
       user-select: none;
       pointer-events: auto;
     }
+
+    .loading {
+      height: 100%;
+      position: relative;
+    }
+    .loading div {  
+      position: absolute;
+      left: 5px;
+      top: 5px;
+      right: 5px;
+      bottom: 5px;
+      background: #eee;
+      border-radius: 10px;
+    }
   `;
 
   return [elementStyles];
@@ -165,7 +179,10 @@ return html`
   <div>Render ratio dimension: ${this.pageData.renderRatioDimension}</div>
 </div> 
 
-<img ?hidden="${this.debug}" draggable="false" src="${this.pageData?.imageUrl}" alt="">
+<img ?hidden="${this.debug || this.loading}" draggable="false" src="${this.pageData?.imageUrl}" alt="">
+<div ?hidden="${!this.loading}" class="loading">
+  <div></div>
+</div>
 
 ${this.ocrData.map((word, i) => html`
   <span 

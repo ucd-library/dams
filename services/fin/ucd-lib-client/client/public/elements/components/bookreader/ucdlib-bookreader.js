@@ -69,6 +69,9 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     if( props.has('bookViewData') || props.has('fullscreen') ) {
       this.rerender({full: true, animate: false});
     }
+    if( props.has('bookViewData') ) {
+      this.pages.forEach(page => page.ele.bookData = this.bookViewData);
+    }
   }
 
   _onBookreaderStateUpdate(e) {
@@ -108,6 +111,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   rerender(opts={}) {
     if( !this.bookViewData?.pages ) return;
     if( !this.maxHeight ) return;
+    if( this.page < 0 ) return;
 
     if( this.lastRendered &&
         this.lastRendered.view === this.view &&
@@ -135,7 +139,9 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       if( this.view === 'single' && this.bookViewData.pages ) {
         setTimeout(() => {
           let currentPage = this.bookViewData.pages[this.page];
-          this.shadowRoot.querySelector('#single-page').scrollTop = currentPage.renderOffsetTopForScroll;
+          if( currentPage ) {
+            this.shadowRoot.querySelector('#single-page').scrollTop = currentPage.renderOffsetTopForScroll;
+          }
         }, 10);
       }
     }
@@ -399,7 +405,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     }
 
     if( this.view === 'single' ) {
-      for( let i = this.page-1; i <= this.page+1; i++ ) {
+      for( let i = this.page-2; i <= this.page+2; i++ ) {
         if( i < 0 || i >= this.bookViewData.pages.length ) {
           continue;
         }
@@ -546,7 +552,9 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       setTimeout(() => {
         this.logger.info('animate double page end', props);
         this._renderCurrentPages({animate: false});
-        this.BookReaderModel.setAnimating(false);
+        setTimeout(() => {
+          this.BookReaderModel.setAnimating(false);
+        }, 50);
       }, (this.animationTime/2)*1000);
     }, (this.animationTime/2)*1000);
   }

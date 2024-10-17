@@ -23,7 +23,13 @@ class BookReaderStore extends BaseStore {
   }
 
   setState(prop, value) {
-    this.data.state[prop] = value;
+    if( typeof prop === 'object' ) {
+      Object.keys(prop).forEach(key => {
+        this.data.state[key] = prop[key];
+      });
+    } else {
+      this.data.state[prop] = value;
+    }
     this.emit(this.events.BOOKREADER_STATE_UPDATE, this.data.state);
   }
 

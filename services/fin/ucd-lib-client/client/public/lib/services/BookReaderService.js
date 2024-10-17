@@ -16,29 +16,34 @@ class BookReaderService extends BaseService {
 
   async loadPdfManifest(id, pdf) {
     let ido = {path: id};
-    id = payloadUtils.getKey(ido);
 
     await this.request({
       url : pdf.clientMedia.pdf.manifest,
-      checkCached : () => this.store.data.pdfManifest.get(id),
+      checkCached : () => this.store.data.bookManifest.get(id),
       onUpdate : resp => {
         let payload = payloadUtils.generate(ido, resp);
         payload.src = pdf;
+        payload.id = id;
+        if( payload.payload ) {
+          payload.payload = payload.payload.pages;
+        }
         this.store.set(payload, this.store.data.bookManifest);
       }
     })
   }
 
   async getOcrData(url, itemId, page) {
-    let ido = {path: url};
-    let id = payloadUtils.getKey(ido);
-
+    let id = url;
     await this.request({
       url,
       checkCached : () => this.store.data.ocrData.get(id),
       onUpdate : resp => {
-        resp.payload = this.model.parsePageWords(resp.payload, itemId, page);
-        this.store.set(payloadUtils.generate(ido, resp), this.store.data.ocrData)
+        if( resp.payload ) {
+          resp.payload = this.model.parsePageWords(resp.payload, itemId, page);
+        }
+        let payload = payloadUtils.generate({path:id}, resp)
+        payload.id = id;
+        this.store.set(payload, this.store.data.ocrData)
       }
     })
 

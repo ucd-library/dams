@@ -13,7 +13,9 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
       buffer : { type: Number },
       bookData : { type: Object },
       pageData : { type: Object },
-      ocrData : { type: Array}
+      ocrData : { type: Array},
+      loading : { type: Boolean },
+      clickNavEnabled : { type: Boolean }
     }
   }
 
@@ -29,6 +31,8 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.buffer = 0;
     this.ocrData = [];
     this.bboxMatchBuffer = 2;
+    this.loading = false;
+    this.clickNavEnabled = false;
     this._injectModel('BookReaderModel');
     this.render = render.bind(this);
 
@@ -62,7 +66,8 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   }
 
   _onClick() {
-    return; // disabled for now
+    if( !this.clickNavEnabled ) return; 
+
     // this makes selecting text difficult
     if( this.view === 'double' ) {
       if( this.page % 2 === 0 ) {
@@ -105,6 +110,15 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   //   this._renderOcrData();
   // }
 
+  _setLoading(src) {
+    this.loading = true;
+    let img = new Image();
+    img.onload = () => {
+      this.loading = false;
+    }
+    img.src = src;
+  }
+
   _debugUpdated() {
     if( this.debug ) {
       this.style.border = '1px solid red';
@@ -138,6 +152,10 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.imgEle.style.width = this.pageData.renderWidth+'px';
     this.imgEle.style.height = this.pageData.renderHeight+'px';
 
+    if( this.lastImgUrl !== this.pageData.imageUrl ) {
+      this._setLoading(this.pageData.imageUrl);
+      this.lastImgUrl = this.pageData.imageUrl;
+    }
 
     this.BookReaderModel.getOcrData(this.pageData, this.bookData.id)
       .then(data => this._renderOcrData(data));
