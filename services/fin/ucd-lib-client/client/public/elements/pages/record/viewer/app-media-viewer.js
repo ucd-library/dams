@@ -557,7 +557,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
       this.BookReaderModel.clearSearch();
     }
 
-    this.BookReaderModel.search(this.itemId, this.bookItemId, this.queryTerm);
+    if( this.itemId && this.bookItemId && this.queryTerm ) {
+      this.BookReaderModel.search(this.itemId, this.bookItemId, this.queryTerm);
+    }
   }
 
   _onBookreaderStateUpdate(e) {

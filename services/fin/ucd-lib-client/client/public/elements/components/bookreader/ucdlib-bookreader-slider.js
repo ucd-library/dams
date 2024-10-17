@@ -73,6 +73,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     this.width = this.offsetWidth || 1;
     this._calculatePages();
     this.updateSearchResults(this.searchResults);
+    this.handle.style.left = `${this.pages[this.selectedPage]}px`;  
   }
 
   _onMoveStart(e) {
@@ -80,12 +81,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     
     window.addEventListener('mouseup', this._onMoveEnd);
     window.addEventListener('touchend', this._onMoveEnd);
-
-    let slider = this.shadowRoot.querySelector('.slider');
-    if( !slider ) return;
-
-    slider.addEventListener('mousemove', this._onMove);
-    slider.addEventListener('touchmove', this._onMove);    
+    window.addEventListener('mousemove', this._onMove);
+    window.addEventListener('touchmove', this._onMove);    
   }
 
   _onClickTrack(e) {
@@ -116,7 +113,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     );
 
     // if 2page mode, need to flip to odd pages only. if even page, need to flip to next page
-    if( pageIncrement === 2 && this.selectedPage % 2 !== 0 ) {
+    if( pageIncrement === 2 && this.selectedPage % 2 === 0 ) {
+      // debugger;
       let match = this.pages.findIndex(page => page === closestPage);
       if( match !== -1 ) {
         closestPage = this.pages[match+1] || this.pages[match-1]; // if last page, go back one
@@ -137,12 +135,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
 
     window.removeEventListener('mouseup', this._onMoveEnd);
     window.removeEventListener('touchend', this._onMoveEnd);
-
-    let slider = this.shadowRoot.querySelector('.slider');
-    if( !slider ) return;
-
-    slider.removeEventListener('touchmove', this._onMove);
-    slider.removeEventListener('mousemove', this._onMove);
+    window.removeEventListener('touchmove', this._onMove);
+    window.removeEventListener('mousemove', this._onMove);
   }
 
   _onDragEnd(e) {
