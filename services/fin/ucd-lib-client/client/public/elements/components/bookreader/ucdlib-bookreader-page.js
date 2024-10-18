@@ -83,6 +83,18 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
       this.view = e.selectedView;
     }
 
+    // don't render words if we are animating
+    this.animating = e.animating;
+    if( this.animating ) {
+      this._pauseOnAnimation();
+    } else {
+      if( this.pauseAnimationResolve ) {
+        this.pauseAnimationResolve();
+        this.pauseAnimation = null;
+        this.pauseAnimationResolve = null;
+      }
+    }
+
     if( e.searchResults?.state === 'loaded' && 
         e.searchResults?.itemId === this.bookData?.id ) {
       this._renderOcrData();
@@ -175,6 +187,10 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
       let wordGroupCount = Math.ceil(data.payload.length / this.wordProcessGroupSize);
 
       for( let i = 0; i < wordGroupCount; i += 1 ) {
+        if( this.pauseAnimation ) {
+          await this.pauseAnimation;
+        }
+
         let words = data.payload.slice(i*this.wordProcessGroupSize, (i+1)*this.wordProcessGroupSize);
         let scaledWords = await this._renderWordGroup(words, search);
         ocrData.push(...scaledWords);
@@ -214,6 +230,15 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
       let scaledWords = words.map(word => this._renderWordSize(word, search));
       setTimeout(() => resolve(scaledWords), 0);
     });
+  }
+
+  _pauseOnAnimation() {
+    if( !this.animating ) return Promise.resolve();
+
+    this.pauseAnimation = new Promise((resolve, reject) => {
+      this.pauseAnimationResolve = resolve;
+    });
+    return this.pauseAnimation;
   }
 
   /**
