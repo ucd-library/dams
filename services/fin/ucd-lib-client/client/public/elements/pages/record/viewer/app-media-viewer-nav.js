@@ -80,7 +80,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     window.addEventListener("touchmove", (e) => this._onTouchMove(e));
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
-    this._injectModel("AppStateModel", "MediaModel");
+    this._injectModel("AppStateModel", "MediaModel", "BookReaderModel");
 
     window.addEventListener(
       "BookReader:pageChanged",
@@ -113,6 +113,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     if (window.innerWidth < 801) {
       this.brSinglePage = true;
     }
+
+    // TODO temp hack, just set to single page until 2-page mode works in new bookreader
+    this.brSinglePage = true;
+    this.BookReaderModel.setView(this.brSinglePage ? 'single' : 'double');
   }
 
   _onAppStateUpdate(e) {
@@ -122,6 +126,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.leftMostThumbnail = e.mediaViewerNavLeftMostThumbnail;
     this._resize();
     // if( this.AppStateModel.location.page !== 'item' ) this._onSearchResultsEmpty();
+  }
+
+  _onBookreaderStateUpdate(e) {
+    this.brFullscreen = e.fullscreen;
   }
 
   /**
@@ -480,8 +488,9 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onToggleBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-bookview-toggle"));
+    // this.dispatchEvent(new CustomEvent("br-bookview-toggle"));  
     this.brSinglePage = !this.brSinglePage;
+    this.BookReaderModel.setView(this.brSinglePage ? 'single' : 'double');
   }
 
   /**
@@ -491,7 +500,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onExpandBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-expand-view"));
+    this.BookReaderModel.setFullscreen(true);
+    // this.dispatchEvent(new CustomEvent("br-expand-view"));
     this.brFullscreen = true;
   }
 
@@ -502,7 +512,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onCollapseBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-collapse-view"));
+    this.BookReaderModel.setFullscreen(false);
+    // this.dispatchEvent(new CustomEvent("br-collapse-view"));
     this.brFullscreen = false;
   }
 
@@ -547,6 +558,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    */
   _onSearchToggled(e) {
     this.searching = !this.searching;
+    this.BookReaderModel.setSearchActive(this.searching);
     this.dispatchEvent(new CustomEvent("br-search-toggle"));
   }
 

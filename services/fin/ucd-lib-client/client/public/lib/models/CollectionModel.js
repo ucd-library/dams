@@ -14,7 +14,7 @@ class CollectionModel extends BaseModel {
       this.store = CollectionStore;
       this.service = CollectionService;
 
-      this.logger = getLogger('CollectionModel');
+      // this.logger = getLogger('CollectionModel');
 
       // the selected collection functionality is just a shortcut for listening
       // to es filters and seeing if a collection is being filtered on. This is

@@ -22,9 +22,6 @@ CREATE OR REPLACE FUNCTION dams_edits.insert_edit(
   edit_in JSONB
 ) RETURNS VOID AS $$
 BEGIN
-
-
-
   INSERT INTO dams_edits.edit (collection_id, item_id, edit_id, edit)
   VALUES (collection_id_in, item_id_in, edit_id_in, edit_in);
 END;

@@ -41,7 +41,7 @@ export default function render() {
         max-width: 100%;
       }
 
-      app-bookreader-viewer.fullscreen {
+      /* app-bookreader-viewer.fullscreen {
         background-color: white;
         position: fixed;
         padding: 0px;
@@ -51,7 +51,7 @@ export default function render() {
         width: 100%;
         height: 100%;
         z-index: 3000;
-      }
+      } */
 
       #br-search-input,
       #br-search-input:focus {
@@ -183,6 +183,19 @@ export default function render() {
         fill: var(--color-aggie-blue-90);
         padding-top: 0.6rem;
       }
+
+      ucdlib-bookreader {
+         padding-bottom: 3.5rem;
+      }
+
+      /* .br-fullscreen-active {
+          html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+      } */
     </style>
 
     <div class="wrapper" style="position: relative;">
@@ -204,18 +217,21 @@ export default function render() {
           />
         </div>
         <app-image-viewer id="image"></app-image-viewer>
-        <app-bookreader-viewer
-          id="bookreader"
-          .fullscreen="${this.brFullscreen}"
-          .bookData="${this.bookData}"
-          bookItemId="${this.bookItemId}"
-          ?brsinglepage="${this.singlePage}"
-          @br-page-change="${this._onBookViewPageChange}"
-          @br-cancel-search="${this._onClearSearch}">
-        </app-bookreader-viewer>
+        <ucdlib-bookreader ?fullscreen="${this.brFullscreen}" id="bookreader" max-height="634"></ucdlib-bookreader>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>
       </ucdlib-pages>
+
+      <app-bookreader-viewer
+        id="bookreader"
+        style="display: none;"
+        .fullscreen="${this.brFullscreen}"
+        .bookData="${this.bookData}"
+        bookItemId="${this.bookItemId}"
+        ?brsinglepage="${this.singlePage}"
+        @br-page-change="${this._onBookViewPageChange}"
+        @br-cancel-search="${this._onClearSearch}">
+      </app-bookreader-viewer>
 
       <div
         class="search-side-panel ${this.brFullscreen
@@ -244,6 +260,7 @@ export default function render() {
               <input
                 type="text"
                 id="br-search-input"
+                autocomplete="off"
                 @change="${this._onBRSearch}"
               />
 
@@ -271,10 +288,11 @@ export default function render() {
                   style="margin: 0 0 2rem; cursor: pointer;"
                   data-match-index="${result.matchIndex}"
                   data-array-index="${index}"
+                  data-page="${result?.page || 0}"
                   @click="${this._onSearchResultClick}"
                 >
                   <h4 style="margin-bottom: 0">
-                    Page ${parseInt(result.displayPageNumber.replace("n", "")) + 1}
+                    Page ${parseInt(result?.page || 0)}
                   </h4>
                   <p style="font-size: .9rem; margin-top: .3rem">
                     ${unsafeHTML(
