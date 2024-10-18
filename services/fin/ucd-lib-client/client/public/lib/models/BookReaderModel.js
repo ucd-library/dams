@@ -276,12 +276,6 @@ class BookReaderModel extends BaseModel {
         .map(v => parseInt(v));
 
       word = {
-        // fullResBbox : {
-        //   left : left * (1+scale),
-        //   bottom : bottom * (1+scale),
-        //   right : right * (1+scale),
-        //   top : top * (1+scale)
-        // },
         bbox: {left, bottom, right, top, scale},
         text : word.textContent
       }

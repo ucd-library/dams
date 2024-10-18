@@ -31,6 +31,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.buffer = 0;
     this.ocrData = [];
     this.loading = false;
+    this.wordProcessGroupSize = 25;
     this.clickNavEnabled = false;
     this._injectModel('BookReaderModel');
     this.render = render.bind(this);
@@ -141,7 +142,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.requestUpdate();
   }
 
-  _renderOcrData(data) {
+  async _renderOcrData(data) {
     // TODO: this might need to be async rendering
     if( !data && this.renderedOcrData ) {
       data = this.renderedOcrData;
@@ -163,32 +164,31 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
       pageChanged = true;
     }
 
+    // make sure these haven't changed after render 
+    let currentPage = this.page;
+    let currentBookId = this.bookData.id;
+    let currentSearch = search.text;
+
     let ocrData = [];
+    let time = new Date().getTime();
     if( !this.ocrData || pageChanged ) {
-      data.payload.forEach(word => {
-        let scaledWord = {
-          text : word.text,
-          top : Math.round(word.bbox.top*this.pageData.renderRatio),
-          left : Math.round(word.bbox.left*this.pageData.renderRatio),
-          right : Math.round(word.bbox.right*this.pageData.renderRatio),
-          bottom : Math.round(word.bbox.bottom*this.pageData.renderRatio)
-        }
+      let wordGroupCount = Math.ceil(data.payload.length / this.wordProcessGroupSize);
 
-        let fontSize = scaledWord.bottom-scaledWord.top;
-        let letterSpacing = this.getWordLetterSpacing(fontSize, word.text, scaledWord.right-scaledWord.left);
-        
-        scaledWord.letterSpacing = letterSpacing.toFixed(2)+'px';
-        scaledWord.fontSize = fontSize;
-        scaledWord.top += this.buffer;
-        scaledWord.bottom = this.pageData.renderHeight - scaledWord.bottom + this.buffer;
-        scaledWord.right = this.pageData.renderWidth - scaledWord.right;
-        scaledWord.selected = this._isSelectedWord(word, search.results);
+      for( let i = 0; i < wordGroupCount; i += 1 ) {
+        let words = data.payload.slice(i*this.wordProcessGroupSize, (i+1)*this.wordProcessGroupSize);
+        let scaledWords = await this._renderWordGroup(words, search);
+        ocrData.push(...scaledWords);
+      }
+    }
+    this.logger.debug('page='+this.page+' rendering '+payload.length+' words took', new Date().getTime()-time, 'ms');
 
-        ocrData.push(scaledWord);
-      });
+    // make sure these haven't changed after render
+    if( currentPage !== this.page || currentBookId !== this.bookData.id || currentSearch !== search.text ) {
+      return;
     }
 
     this.renderedOcrTo = {
+      renderRation : this.pageData.renderRatio,
       top: this.pageData.renderOffsetTop,
       left: this.pageData.renderOffsetLeft,
       width: this.pageData.renderWidth,
@@ -199,6 +199,51 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.ocrData = ocrData;
     this.renderedOcrData = data;
     this.requestUpdate();
+  }
+
+  /**
+   * @method _renderWordGroup
+   * @description render a group of words at a time to prevent blocking the UI
+   * 
+   * @param {*} words 
+   * @param {*} search 
+   * @returns 
+   */
+  _renderWordGroup(words, search) {
+    return new Promise((resolve, reject) => {
+      let scaledWords = words.map(word => this._renderWordSize(word, search));
+      setTimeout(() => resolve(scaledWords), 0);
+    });
+  }
+
+  /**
+   * @method _renderWordSize
+   * @description render a single word, scaling it to the page and search results
+   * 
+   * @param {*} word 
+   * @param {*} search 
+   * @returns 
+   */
+  _renderWordSize(word, search) {
+    let scaledWord = {
+      text : word.text,
+      top : Math.round(word.bbox.top*this.pageData.renderRatio),
+      left : Math.round(word.bbox.left*this.pageData.renderRatio),
+      right : Math.round(word.bbox.right*this.pageData.renderRatio),
+      bottom : Math.round(word.bbox.bottom*this.pageData.renderRatio)
+    }
+
+    let fontSize = scaledWord.bottom-scaledWord.top;
+    let letterSpacing = this.getWordLetterSpacing(fontSize, word.text, scaledWord.right-scaledWord.left);
+    
+    scaledWord.letterSpacing = letterSpacing.toFixed(2)+'px';
+    scaledWord.fontSize = fontSize;
+    scaledWord.top += this.buffer;
+    scaledWord.bottom = this.pageData.renderHeight - scaledWord.bottom + this.buffer;
+    scaledWord.right = this.pageData.renderWidth - scaledWord.right;
+    scaledWord.selected = this._isSelectedWord(word, search.results);
+
+    return scaledWord;
   }
 
   _isSelectedWord(word, results) {
