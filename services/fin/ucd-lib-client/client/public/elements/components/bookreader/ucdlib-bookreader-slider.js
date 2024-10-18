@@ -163,10 +163,11 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
       indicator.removeEventListener('click');
     });
 
-    searchResults.forEach(result => {
+    searchResults.forEach((result, index) => {
       let pageNumber = result.page || 0;
       let indicator = document.createElement('div');
       indicator.classList.add('indicator');
+      indicator.setAttribute('data-search-result', index);
       indicator.style.left = `${(this.pages[pageNumber-1] || 0) - 4}px`;
 
       let searchQuery = document.createElement('div');
@@ -193,6 +194,9 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
           pageNumber -= 1;
         }
         this.BookReaderModel.setPage(pageNumber-1);
+        
+        let selectedSearchResult = parseInt(indicator.getAttribute('data-search-result')) || 0;
+        this.BookReaderModel.setSelectedSearchResult(selectedSearchResult);
       });
 
       searchIndicatorsDiv.appendChild(indicator);

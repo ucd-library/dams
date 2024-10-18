@@ -66,6 +66,7 @@ class AppRecord extends Mixin(LitElement)
     this.subjects = [];
     this.callNumber = "";
     this.collectionImg = "";
+    this.defaultCollectionImg = "/images/tree-bike-illustration.png";
     this.collectionId = "";
     this.renderedCollectionId = "";
     this.description = "";
@@ -158,6 +159,8 @@ class AppRecord extends Mixin(LitElement)
       || e.vcData?.images?.large?.url
       || e.vcData?.images?.original?.url;
     }
+
+    if( !this.collectionImg ) this.collectionImg = this.defaultCollectionImg;    
   }
 
   /**
