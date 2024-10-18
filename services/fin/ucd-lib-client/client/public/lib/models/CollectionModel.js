@@ -161,34 +161,17 @@ class CollectionModel extends BaseModel {
      * @returns {String} image url
      */
     async getFeaturedImage(id, fcAppConfigModel) {
-      let thumbnailUrl = '';
-      let edits;
-
       if( !id || !fcAppConfigModel ) return;
+      let edits;
 
       try {
         edits = await this.getCollectionEdits(id);
       } catch (error) {
         this.logger.warn('Error retrieving collection edits', error);
       }
-      if (!Object.keys(edits.payload).length) return;
-      edits = edits.payload;
 
-
-      let collectionEdit = edits.edits;
-      if( !collectionEdit ) return;
-
-      let savedDisplayData = await fcAppConfigModel.getAdminData(id);
-      if( !savedDisplayData ) return;
-
-      savedDisplayData = savedDisplayData.body['@graph'];
-      let graphRoot = savedDisplayData.filter(d => d['@id'] === '/application/ucd-lib-client' + id)[0];
-      if( !graphRoot ) return;
-
-      if( graphRoot['thumbnailUrl']?.split('/fcrepo/rest')?.[1] ) {
-        thumbnailUrl = '/fcrepo/rest'+ graphRoot['thumbnailUrl'].split('/fcrepo/rest')[1];
-      }
-
+      let thumbnailUrl = edits?.payload?.collection?.thumbnailUrl?.['@id'];
+      if( thumbnailUrl ) thumbnailUrl = '/fcrepo/rest'+ thumbnailUrl.split('/fcrepo/rest')[1];
       return thumbnailUrl;
     }
 
