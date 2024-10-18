@@ -81,21 +81,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
     this._injectModel("AppStateModel", "MediaModel", "BookReaderModel");
-
-    window.addEventListener(
-      "BookReader:pageChanged",
-      this._onBRPageChange.bind(this)
-    );
-
-    window.addEventListener(
-      "BookReader:SearchCallback",
-      this._onSearchResultsChange.bind(this)
-    );
-
-    window.addEventListener(
-      "BookReader:SearchCallbackEmpty",
-      this._onSearchResultsEmpty.bind(this)
-    );
   }
 
   connectedCallback() {
@@ -130,6 +115,17 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
   _onBookreaderStateUpdate(e) {
     this.brFullscreen = e.fullscreen;
+    this.selectedResult = e.selectedSearchResult + 1;
+
+    this.searchResults = [];
+    if( e.searchResults?.state === 'loaded' ) {
+      let searchResults = e.searchResults.payload || {};
+      searchResults = Object.keys(searchResults).map(key => searchResults[key]);
+      searchResults.forEach(result => {
+        this.searchResults.push(...result);
+      });
+    }
+    this.searchResultsCount = this.searchResults.length;
   }
 
   /**
@@ -283,10 +279,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     );
   }
 
-  _onSearchResultsChange(e) {
-    this.searchResults = e.detail?.props?.results?.matches || [];
-    this.searchResultsCount = this.searchResults.length;
-  }
+  // _onSearchResultsChange(searchResults) {
+  //   this.searchResults = e.detail?.props?.results?.matches || [];
+  //   this.searchResultsCount = this.searchResults.length;
+  // }
 
   _onSearchResultsEmpty(e) {
     this.searchResultsCount = 0;

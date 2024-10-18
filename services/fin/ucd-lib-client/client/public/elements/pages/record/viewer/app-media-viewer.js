@@ -300,15 +300,11 @@ export default class AppMediaViewer extends Mixin(LitElement)
       page = 1;
     }
 
-    // TODO update slider with indicators of matches
+    let searchResult = parseInt(e.currentTarget.dataset?.arrayIndex) || 0;
+
     this.BookReaderModel.setPage(page-1);
-
+    this.BookReaderModel.setSelectedSearchResult(searchResult);
     
-    // let br = document.querySelector("app-bookreader-viewer");
-    // if (!br) return;
-    // // navigate to search result in viewer
-    // br.onSearchResultClick(e);
-
     // also update selected search result in nav
     let nav = this.querySelector("app-media-viewer-nav");
     if (!nav) return;
@@ -367,12 +363,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
    */
   _onChangeSearchResult(e) {
     this.selectedResult = e.detail?.selectedResult;
-    let brView = document.querySelector("#bookreader");
-    if (brView) {
-      brView.onSearchPrevNext(
-        this.searchResults[this.selectedResult - 1].matchIndex
-      );
-    }
+
+    this.BookReaderModel.setPage((this.searchResults[this.selectedResult-1]?.page || 1) - 1);
+    this.BookReaderModel.setSelectedSearchResult(this.selectedResult-1)
   }
 
   /**
@@ -544,6 +537,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
    * @param {Object} e custom HTML event
    */
   async _onBRSearch(e) {
+    this.BookReaderModel.setSelectedSearchResult(0);
     let brNav = document.querySelector("app-media-viewer-nav");
     if (brNav) {
       // nav elements are moved into the bookreader viewer in full screen mode
@@ -567,11 +561,14 @@ export default class AppMediaViewer extends Mixin(LitElement)
   _onBookreaderStateUpdate(e) {
     e.fullscreen ? this._onExpandBookView() : this._onCollapseBookView();
     e.searchActive ? this.brSearchOpen = true : this.brSearchOpen = false;
+    console.log('setting this.selectedResult to ', e.selectedSearchResult + 1);
+    this.selectedResult = e.selectedSearchResult + 1;
 
+    let searchResults = {};
     if( e.searchResults?.state === 'loaded' ) {
-      let searchResults = e.searchResults.payload;
-      this._onSearchResultsChange(searchResults);
+      searchResults = e.searchResults.payload;
     }
+    this._onSearchResultsChange(searchResults);
   }
 
   _onClearSearch(e) {
@@ -584,10 +581,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.searchResultsCount = 0;
     this._onBRSearch({ currentTarget: { value: "" } });
 
-    if( e.detail.closeSearch ) {
-      this.brSearchOpen = false;
-      this.BookReaderModel.setSearchActive(false);
-    }
+    this.brSearchOpen = false;
+    this.BookReaderModel.setSearchActive(false);
   }
 
   _onBRSearchGoToResult(e) {

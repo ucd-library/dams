@@ -67,6 +67,11 @@ export function styles() {
       padding-right: 0.9rem;
     }
 
+    .br-search div {
+      display: inline-block;
+      vertical-align: sub;
+    }
+
     .br-search div.zoom {
       background-color: var(--color-aggie-blue);
       border-radius: 50%;
@@ -82,6 +87,13 @@ export function styles() {
       height: 25px;
       margin: 11px auto;
       fill: white;
+    }
+
+    .br-search #search-prev ucdlib-icon,
+    .br-search #search-next ucdlib-icon { 
+      width: 50px;
+      height: 50px;
+      fill: var(--color-aggie-blue);
     }
 
     .br-search::after {
@@ -160,7 +172,7 @@ return html`
     </div>
     <div
       class="search-pagination"
-      ?hidden="${true || this.searchResultsCount === 0}">
+      ?hidden="${this.searchResultsCount === 0}">
       <div
         id="search-prev"
         style="padding-left: .5rem; width: 40px;"

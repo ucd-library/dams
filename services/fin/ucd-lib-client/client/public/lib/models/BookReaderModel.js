@@ -135,7 +135,18 @@ class BookReaderModel extends BaseModel {
    * @param {Boolean} active 
    */
   setSearchActive(active) {
+    if( !active ) this.store.setState('selectedSearchResult', 0);
     this.store.setState('searchActive', active);
+  }
+
+  /**
+   * @method setSelectedSearchResult
+   * @description set the selected search result
+   * 
+   * @param {Number} page
+   */
+  setSelectedSearchResult(page) {
+    this.store.setState('selectedSearchResult', page);
   }
 
   setSelectedBook(id, record) {

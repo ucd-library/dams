@@ -14,7 +14,10 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       selectedPage : { type: Number },
       numPages : { type: Number },
       fullscreen : { type: Boolean },
-      singlePageView : { type: Boolean }
+      singlePageView : { type: Boolean },
+      selectedResult : { type: Number },
+      searchResults : { type: Array },
+      searchResultsCount : { type: Number }
     }
   }
 
@@ -35,6 +38,18 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     this.selectedPage = e.selectedPage || 0;
     this.numPages = e.bookViewData?.pages?.length || 0;
     this.singlePageView = e.selectedView === 'double' ? false : true;
+    this.selectedResult = (e.selectedSearchResult || 0) + 1;
+
+    this.searchResults = [];
+    if( e.searchResults?.state === 'loaded' ) {
+      let searchResults = e.searchResults.payload || {};
+      let results = [];
+      for( let page in searchResults ) {
+        results.push(...searchResults[page]);
+      }
+      this.searchResults = results.sort((a,b) => parseInt(a.page || 0) - parseInt(b.page || 0));
+    }
+    this.searchResultsCount = this.searchResults.length;
 
     requestAnimationFrame(() => {
       let slider = this.shadowRoot.querySelector('ucdlib-bookreader-slider');
@@ -47,6 +62,9 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     this.numPages = 0;
     this.fullscreen = false;
     this.singlePageView = false;
+    this.selectedResult = 0;
+    this.searchResults = [];
+    this.searchResultsCount = 0;
   }
 
   _prevPage(e) {
@@ -66,7 +84,21 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
 
     if( (this.selectedPage+pageIncrement) < this.numPages ) {
       this.BookReaderModel.setPage(this.selectedPage + pageIncrement);
-    }    
+    }
+  }
+
+  _prevSearchResult(e) {
+    if( this.selectedResult > 1 ) {
+      this.BookReaderModel.setPage((this.searchResults[this.selectedResult - 2]?.page || 1) - 1)
+      this.BookReaderModel.setSelectedSearchResult(this.selectedResult - 2);
+    }
+  }
+
+  _nextSearchResult(e) {
+    if( this.selectedResult < this.searchResultsCount ) {
+      this.BookReaderModel.setPage((this.searchResults[this.selectedResult]?.page || 1) - 1)
+      this.BookReaderModel.setSelectedSearchResult(this.selectedResult);
+    }
   }
 
   updateSearchResults(searchResults=[]) {
