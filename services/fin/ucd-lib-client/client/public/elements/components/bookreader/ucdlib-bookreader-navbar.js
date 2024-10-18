@@ -128,7 +128,6 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   }
 
   _onCloseClicked(e) {
-    console.log('close fullscreen, setting fullscreen to false');
     this.BookReaderModel.setFullscreen(false);
     this.fullscreen = false;
   }

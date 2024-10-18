@@ -410,14 +410,14 @@ class AppRecord extends Mixin(LitElement)
 
         if( mediaViewer.singlePage !== singlePage ) {
           mediaViewer.singlePage = singlePage;
-          if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
-            requestAnimationFrame(() => {
-              mediaViewer._onToggleBookView();
-            });
-          } else {
-            // to reload br if not initiated
-            mediaViewer._onAppStateUpdate(await this.AppStateModel.get());
-          }         
+          // if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
+          //   requestAnimationFrame(() => {
+          //     mediaViewer._onToggleBookView();
+          //   });
+          // } else {
+          //   // to reload br if not initiated
+          //   mediaViewer._onAppStateUpdate(await this.AppStateModel.get());
+          // }         
         }
         mediaViewer.isBookReader = newDisplayType === 'bookreader';
         mediaViewer.mediaType = newDisplayType;
@@ -497,12 +497,12 @@ class AppRecord extends Mixin(LitElement)
     }, 3000);
   }
 
-  _onBookViewPageChange(e) {
-    let appMediaDownload = document.querySelector('app-media-download');
-    if( appMediaDownload ) {
-      appMediaDownload.brPageChange(e.detail);
-    }
-  }
+  // _onBookViewPageChange(e) {
+  //   let appMediaDownload = document.querySelector('app-media-download');
+  //   if( appMediaDownload ) {
+  //     appMediaDownload.brPageChange(e.detail);
+  //   }
+  // }
 }
 
 customElements.define("app-record", AppRecord);

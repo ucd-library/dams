@@ -277,7 +277,7 @@ export default function render() {
     </div>
 
 
-    <app-media-viewer @br-page-change="${this._onBookViewPageChange}"></app-media-viewer>
+    <app-media-viewer></app-media-viewer>
 
     <div class="container" style="padding-bottom: 50px">
       <h3>${this.name}</h3>

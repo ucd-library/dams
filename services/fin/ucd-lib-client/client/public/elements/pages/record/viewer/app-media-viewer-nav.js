@@ -279,16 +279,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     );
   }
 
-  // _onSearchResultsChange(searchResults) {
-  //   this.searchResults = e.detail?.props?.results?.matches || [];
-  //   this.searchResultsCount = this.searchResults.length;
-  // }
-
-  _onSearchResultsEmpty(e) {
-    this.searchResultsCount = 0;
-    this.searchResults = [];
-  }
-
   _showingLastThumbFrame() {
     if (
       this.leftMostThumbnail + this.thumbnailsPerFrame >
@@ -556,32 +546,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.searching = !this.searching;
     this.BookReaderModel.setSearchActive(this.searching);
     this.dispatchEvent(new CustomEvent("br-search-toggle"));
-  }
-
-  _onBRPageChange(e) {
-    // TODO similar logic for calulating current page needs to be called when single vs double page is toggled
-    // also when search term changes, the current search result selected needs to be recalculated based on currently viewed page
-    if (!this.searchResults.length) return;
-    let singlePageDiff = this.singleImage ? 1 : 0;
-    let pageIndex = e.detail.props.currentIndex();
-
-    // check if page has a matched search term
-    let matchedSearchResult = this.searchResults.findIndex(
-      (r) => r.par[0].page === pageIndex + singlePageDiff
-    );
-    if (matchedSearchResult === -1) {
-      // loop over this.searchResults to determine the closest page that is less that pageIndex
-      this.searchResults.forEach((result, index) => {
-        if (result.par[0].page < pageIndex + singlePageDiff) {
-          matchedSearchResult = index;
-        }
-      });
-    }
-
-    if (!matchedSearchResult || matchedSearchResult < 0)
-      matchedSearchResult = 0;
-
-    this.selectedResult = matchedSearchResult + 1;
   }
 }
 
