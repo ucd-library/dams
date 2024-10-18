@@ -107,7 +107,7 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
     newLeft = Math.max(0, Math.min(newLeft, trackRect.width));
 
     // calc new selected page
-    let newPage = Math.floor((newLeft / trackRect.width) * this.maxPage);
+    let newPage = Math.round((newLeft / trackRect.width) * this.maxPage);
     if( newPage !== this.selectedPage ) {
       this.selectedPage = newPage;
     }
@@ -118,12 +118,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
 
     // if 2page mode, need to flip to odd pages only. if even page, need to flip to next page
     if( pageIncrement === 2 && this.selectedPage % 2 === 0 ) {
-      // debugger;
       let match = this.pages.findIndex(page => page === closestPage);
-      if( match !== -1 ) {
-        closestPage = this.pages[match+1] || this.pages[match-1]; // if last page, go back one
-        this.selectedPage = this.pages[match+1] ? this.selectedPage+1 : this.selectedPage-1;
-      }
+      this.selectedPage = match;
     }
 
     // update handle position
