@@ -7,7 +7,6 @@ import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 import "@polymer/iron-pages";
 
 import "./app-image-viewer";
-import "./app-bookreader-viewer";
 // import "./app-360-image-viewer"
 import "./app-video-viewer";
 import "./app-audio-viewer";
@@ -241,10 +240,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
   _clearMedia() {
     let imageViewer = this.querySelector("app-image-viewer");
-    let bookreaderViewer = this.querySelector("app-bookreader-viewer");    
+    // let bookreaderViewer = this.querySelector("app-bookreader-viewer");    
 
     if( imageViewer ) imageViewer.destroy();
-    if( bookreaderViewer ) bookreaderViewer.destroy();
+    // if( bookreaderViewer ) bookreaderViewer.destroy();
   }
 
   _onSearchResultsChange(resultsByPage={}) {

@@ -88,27 +88,6 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     }
   }
 
-  // updateSearchResults(e) {
-  //   if( e.id === this.renderedSearchResults ) return;
-  //   let selected = {};
-
-  //   e.payload.matches.forEach(result => {
-  //     if( result.par.page-1 !== this.page ) return;
-  //     result.originalRatio = result.par.page_width / this.pageData.originalWidth;
-  //     result.original = {
-  //       top: result.par.t * (1+result.originalRatio),
-  //       left: result.par.l * (1+result.originalRatio),
-  //       right: result.par.r * (1+result.originalRatio),
-  //       bottom: result.par.b * (1+result.originalRatio)
-  //     }
-  //     selected[this._getWordId(result)] = result;
-  //   });
-
-  //   this.selected = selected;
-  //   this.renderedSearchResults = e.id;
-  //   this._renderOcrData();
-  // }
-
   _setLoading(src) {
     this.loading = true;
     let img = new Image();
