@@ -30,7 +30,6 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     this.pageData = {};
     this.buffer = 0;
     this.ocrData = [];
-    this.bboxMatchBuffer = 2;
     this.loading = false;
     this.clickNavEnabled = false;
     this._injectModel('BookReaderModel');
