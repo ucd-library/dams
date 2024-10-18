@@ -180,7 +180,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
         ocrData.push(...scaledWords);
       }
     }
-    this.logger.debug('page='+this.page+' rendering '+payload.length+' words took', new Date().getTime()-time, 'ms');
+    this.logger.debug('page='+this.page+' rendering '+data.payload.length+' words took', new Date().getTime()-time, 'ms');
 
     // make sure these haven't changed after render
     if( currentPage !== this.page || currentBookId !== this.bookData.id || currentSearch !== search.text ) {
