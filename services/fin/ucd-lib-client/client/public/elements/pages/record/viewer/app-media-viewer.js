@@ -38,7 +38,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
       searchResults: { type: Array },
       searchResultsCount: { type: Number },
       selectedResult: { type: Number },
-      queryTerm: { type: String }
+      queryTerm: { type: String },
+      noMedia: { type: Boolean }
     };
   }
 
@@ -63,6 +64,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.selectedResult = 1;
     this.queryTerm = "";
     this.regexPattern = /\{\{\{.*?\}\}\}/g;
+    this.noMedia = false;
 
     this.$ = {};
 
@@ -100,8 +102,12 @@ export default class AppMediaViewer extends Mixin(LitElement)
   async _onRenderMedia(e) {
     // TODO eventually support mutiple mediaGroups, combine different media types into same viewer/nav?
     let mediaGroups = e.selectedRecord?.clientMedia?.mediaGroups;
-    if (!mediaGroups || !mediaGroups.length) return;
-    // mediaGroup = mediaGroup[0];
+    
+    if (!mediaGroups || !mediaGroups.length || !mediaGroups.filter(m => m['@type'].length > 0).length ) {
+      this.logger.error('No recognized types found in media groups for record', e.selectedRecord?.clientMedia?.id || e.selectedRecord);      
+      this.noMedia = true;
+      return;
+    }
 
     this.itemId = e.selectedRecord?.graph?.root?.['@id'];
     let renderAsBr = false;
@@ -217,6 +223,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     this.mediaType = mediaType;
+    this.noMedia = false;
   }
 
   async _getItemDisplayType(itemId, collectionId) {

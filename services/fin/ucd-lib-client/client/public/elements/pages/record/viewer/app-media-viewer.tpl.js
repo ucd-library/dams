@@ -222,16 +222,9 @@ export default function render() {
         <app-audio-viewer id="audio"></app-audio-viewer>
       </ucdlib-pages>
 
-      <app-bookreader-viewer
-        id="bookreader"
-        style="display: none;"
-        .fullscreen="${this.brFullscreen}"
-        .bookData="${this.bookData}"
-        bookItemId="${this.bookItemId}"
-        ?brsinglepage="${this.singlePage}"
-        @br-page-change="${this._onBookViewPageChange}"
-        @br-cancel-search="${this._onClearSearch}">
-      </app-bookreader-viewer>
+      <div ?hidden="${!this.noMedia}" style="height: 600px;">
+        <img src="/images/tree-bike-illustration.png" style="margin: 0 auto; display: block; height: 600px;" />
+      </div>
 
       <div
         class="search-side-panel ${this.brFullscreen
