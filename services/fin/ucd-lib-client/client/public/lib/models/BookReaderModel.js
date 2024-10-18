@@ -44,9 +44,17 @@ class BookReaderModel extends BaseModel {
     if( zoomIndex === this.store.data.state.zoomIndex ) return;
     
     let state = {zoom, zoomIndex};
+
+    // if we are zooming, we need to adjust the offset
     if( zoomIndex === 0 ) {
       state.offsetX = 0;
       state.offsetY = 0;
+    } else {
+      let offsetX = this.store.data.state.offsetX;
+      let offsetY = this.store.data.state.offsetY;
+      let currentZoom = this.store.data.state.zoom;
+      state.offsetX = offsetX * (zoom / currentZoom);
+      state.offsetY = offsetY * (zoom / currentZoom);
     }
 
     this.store.setState(state);
