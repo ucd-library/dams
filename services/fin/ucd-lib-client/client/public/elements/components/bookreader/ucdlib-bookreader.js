@@ -105,6 +105,8 @@ export default class UcdlibBookreader extends Mixin(LitElement)
       }
     }
 
+    this.animating = e.animating;
+
     if( this.panEle &&
       (this.lastPan?.offsetX !== e.offsetX || 
       this.lastPan?.offsetY !== e.offsetY || 
@@ -460,6 +462,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         ele.bookData = this.bookViewData;
         ele.debug = this.debug;
         ele.buffer = this.pageBuffer;
+        ele.animating = this.animating;
         this.pagesEle.appendChild(ele);
         this.pages.push({index: i, ele});
       }
@@ -532,6 +535,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
         ele.bookData = this.bookViewData;
         ele.debug = this.debug;
         ele.buffer = this.pageBuffer;
+        ele.animating = this.animating;
         this.pagesEle.appendChild(ele);
         this.pages.push({
           index: i, 
