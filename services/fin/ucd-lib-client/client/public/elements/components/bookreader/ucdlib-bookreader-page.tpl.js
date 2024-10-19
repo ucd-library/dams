@@ -126,13 +126,14 @@ export function styles() {
       z-index: 15;
     }
     
+    span[animating].word {
+      display: none
+    }
 
     span.word {
       display: inline-block;
       position: absolute;
       color: transparent;
-      /*color: red;*/
-      /*border: 1px solid red;*/
       cursor: text;
       pointer-events: all;
     }
@@ -187,6 +188,7 @@ return html`
 ${this.ocrData.map((word, i) => html`
   <span 
     class="word"
+    ?animating="${this.animating}"
     ?selected="${word.selected}" 
     style="bottom: ${word.bottom}px; right: ${word.right}px; top: ${word.top}px; left: ${word.left}px; line-height: ${word.fontSize}px; letter-spacing: ${word.letterSpacing}; font-size: ${word.fontSize}px">
     ${word.text}

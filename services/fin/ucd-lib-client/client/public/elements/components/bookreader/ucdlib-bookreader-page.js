@@ -15,7 +15,8 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
       pageData : { type: Object },
       ocrData : { type: Array},
       loading : { type: Boolean },
-      clickNavEnabled : { type: Boolean }
+      clickNavEnabled : { type: Boolean },
+      animating : { type: Boolean }
     }
   }
 
