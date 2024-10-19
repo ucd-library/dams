@@ -4,6 +4,7 @@ import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./ucdlib-bookreader-page.js";
 import "./ucdlib-bookreader-navbar.js";
+import { set } from '../../../lib/stores/CollectionStore.js';
 
 export default class UcdlibBookreader extends Mixin(LitElement)
   .with(LitCorkUtils) {
@@ -565,37 +566,38 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   _animateDoublePage(props) {
     this.BookReaderModel.setAnimating(true);
 
-    this.logger.info('animate double page start', props);
-    if( props.isAnimateNext ) {
-      props.cssOrder.forEach(css => css.push('animate-next-start'));
-    } else if( props.isAnimatePrev ) {
-      props.cssOrder.forEach(css => css.push('animate-prev-start'));
-    }
-
-    this.pages.forEach(page => {
-      this._updateCss(page.ele, props.cssOrder[page.cssIndex]);
-    });
-
     setTimeout(() => {
-      this.logger.info('animate double page middle', props);
+      this.logger.info('animate double page start', props);
+      if( props.isAnimateNext ) {
+        props.cssOrder.forEach(css => css.push('animate-next-start'));
+      } else if( props.isAnimatePrev ) {
+        props.cssOrder.forEach(css => css.push('animate-prev-start'));
+      }
+
       this.pages.forEach(page => {
-        if( props.isAnimateNext ) {
-          page.ele.classList.remove('animate-next-start');
-          page.ele.classList.add('animate-next-end');
-        } else if( props.isAnimatePrev ) {
-          page.ele.classList.remove('animate-prev-start');
-          page.ele.classList.add('animate-prev-end');
-        }
+        this._updateCss(page.ele, props.cssOrder[page.cssIndex]);
       });
 
+      
       setTimeout(() => {
-        this.logger.info('animate double page end', props);
-        this._renderCurrentPages({animate: false});
+        this.logger.info('animate double page middle', props);
+        this.pages.forEach(page => {
+          if( props.isAnimateNext ) {
+            page.ele.classList.remove('animate-next-start');
+            page.ele.classList.add('animate-next-end');
+          } else if( props.isAnimatePrev ) {
+            page.ele.classList.remove('animate-prev-start');
+            page.ele.classList.add('animate-prev-end');
+          }
+        });
+
         setTimeout(() => {
+          this.logger.info('animate double page end', props);
+          this._renderCurrentPages({animate: false});
           this.BookReaderModel.setAnimating(false);
-        }, 50);
+        }, (this.animationTime/2)*1000);
       }, (this.animationTime/2)*1000);
-    }, (this.animationTime/2)*1000);
+    }, 25);
   }
 
   /**

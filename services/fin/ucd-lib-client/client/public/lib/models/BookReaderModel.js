@@ -110,7 +110,13 @@ class BookReaderModel extends BaseModel {
    * @param {Boolean} animating 
    */
   setAnimating(animating) {
-    this.store.setState('animating', animating);
+    if( animating ) {
+      this.store.setState('animating', animating);
+    } else {
+      setTimeout(() => 
+        this.store.setState('animating', false), 100
+      );
+    }
   }
 
   isAnimating() {
