@@ -126,7 +126,7 @@ export function styles() {
       z-index: 15;
     }
     
-    span[animating].word {
+    .words[animating] {
       display: none
     }
 
@@ -185,14 +185,16 @@ return html`
   <div></div>
 </div>
 
+
+<div class="words" ?animating="${this.animating}">
 ${this.ocrData.map((word, i) => html`
   <span 
     class="word"
-    ?animating="${this.animating}"
     ?selected="${word.selected}" 
     style="bottom: ${word.bottom}px; right: ${word.right}px; top: ${word.top}px; left: ${word.left}px; line-height: ${word.fontSize}px; letter-spacing: ${word.letterSpacing}; font-size: ${word.fontSize}px">
     ${word.text}
   </span>
 `)}
+</div>
 
 `;}
