@@ -62,8 +62,11 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     super.connectedCallback();
     window.addEventListener('resize', this._onResize);
     this.addEventListener('mousedown', this._onMousedown);
-    window.addEventListener('mouseup', this._onMouseup);
+    this.addEventListener('touchstart', this._onMousedown);
     window.addEventListener('mousemove', this._onMousemove);
+    window.addEventListener('touchmove', this._onMousemove);
+    window.addEventListener('mouseup', this._onMouseup);
+    window.addEventListener('touchend', this._onMouseup);
     window.addEventListener('mouseout', this._onMouseup);
   }
 
@@ -71,8 +74,11 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     super.disconnectedCallback();
     window.removeEventListener('resize', this._onResize);
     this.removeEventListener('mousedown', this._onMousedown);
-    window.removeEventListener('mouseup', this._onMouseup);
+    this.removeEventListener('touchstart', this._onMousedown);
     window.removeEventListener('mousemove', this._onMousemove);
+    window.removeEventListener('touchmove', this._onMousemove);
+    window.removeEventListener('mouseup', this._onMouseup);
+    window.removeEventListener('touchend', this._onMouseup);
     window.removeEventListener('mouseout', this._onMouseup);
   }
 
@@ -660,10 +666,17 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
   _onMousedown(e) {
     if( !this.fullscreen ) return;
-    
+    if( this.pan ) return;
+
+    let {clientX, clientY} = e;
+    if( !clientX && e.touches && e.touches.length  ) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
+
     this.pan = {
-      startX: e.clientX,
-      startY: e.clientY,
+      startX: clientX,
+      startY: clientY,
       offsetXStart: this.offsetX,
       offsetYStart: this.offsetY
     }
@@ -676,10 +689,15 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
   _onMousemove(e) {
     if( !this.pan ) return;
-    let deltaX = e.clientX - this.pan.startX;
-    let deltaY = e.clientY - this.pan.startY;
-    // let offsetX = this.pan.offsetXStart + (deltaX/this.zoom);
-    // let offsetY = this.pan.offsetYStart + (deltaY/this.zoom);
+
+    let {clientX, clientY} = e;
+    if( !clientX && e.touches && e.touches.length  ) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
+
+    let deltaX = clientX - this.pan.startX;
+    let deltaY = clientY - this.pan.startY;
     let offsetX = this.pan.offsetXStart + deltaX;
     let offsetY = this.pan.offsetYStart + deltaY;
     this.BookReaderModel.setPan(offsetX, offsetY);

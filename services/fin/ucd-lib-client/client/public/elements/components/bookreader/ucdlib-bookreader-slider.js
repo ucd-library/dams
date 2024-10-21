@@ -27,24 +27,49 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
 
     this._reset();
 
-    window.addEventListener('resize', this._onResize.bind(this));
     this._onMove = this._onMove.bind(this);
     this._onMoveStart = this._onMoveStart.bind(this);
     this._onMoveEnd = this._onMoveEnd.bind(this);
+    // this._onDragEnd = this._onDragEnd.bind(this);
+    this._onResize = this._onResize.bind(this);
   }
 
   firstUpdated() {
     this.track = this.shadowRoot.getElementById('track');
     this.handle = this.shadowRoot.getElementById('handle');
+    if( this.handle ) {
+      this.handle.addEventListener('mousedown', this._onMoveStart);
+      // this.handle.addEventListener('touchstart', () => this.isDragging = true);
+    } else {
+      this.logger.error('Failed to find handle element');
+    }
 
     this._calculatePages();
+  }
 
-    if( this.handle ) {
-      this.handle.addEventListener('mousedown', () => this.isDragging = true);
-      this.handle.addEventListener('touchstart', () => this.isDragging = true);
-    }
-    window.addEventListener('mouseup', () => this._onDragEnd.bind(this));
-    window.addEventListener('touchend', this._onDragEnd.bind(this));
+  connectedCallback() {
+    super.connectedCallback();
+
+
+
+    // window.addEventListener('mouseup', this._onDragEnd);
+    // window.addEventListener('touchend', this._onDragEnd);
+    window.addEventListener('resize', this._onResize);
+
+    window.addEventListener('mouseup', this._onMoveEnd);
+    // window.addEventListener('touchend', this._onMoveEnd);
+    window.addEventListener('mousemove', this._onMove);
+    // window.addEventListener('touchmove', this._onMove);    
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
+    window.removeEventListener('mouseup', this._onMoveEnd);
+    window.removeEventListener('resize', this._onResize);
+    // window.removeEventListener('touchend', this._onMoveEnd);
+    // window.removeEventListener('touchmove', this._onMove);
+    window.removeEventListener('mousemove', this._onMove); 
   }
 
   _onBookreaderStateUpdate(e) {
@@ -79,14 +104,12 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
   }
 
   _onMoveStart(e) {
-    e.preventDefault();
-    
-    window.addEventListener('mouseup', this._onMoveEnd);
-    window.addEventListener('touchend', this._onMoveEnd);
-    window.addEventListener('mousemove', this._onMove);
-    window.addEventListener('touchmove', this._onMove);    
-
+    // e.preventDefault();
     this.isMoving = true;
+    this.moveStart = {
+      x : e.clientX,
+       left : this.handle.offsetLeft
+    }
   }
 
   _onClickTrack(e) {
@@ -95,7 +118,8 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
   }
 
   _onMove(e) {
-    e.preventDefault();
+    if( !this.isMoving ) return;
+    // e.preventDefault();
     
     let trackRect = this.track.getBoundingClientRect();
     let clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -127,22 +151,19 @@ export default class UcdlibBookreaderSlider extends Mixin(LitElement)
   }
 
   _onMoveEnd(e) {
-    e.preventDefault();
+    if( !this.isMoving ) return;
+    // e.preventDefault();
 
     this._onMove(e);
     this.isDragging = false;
     this.BookReaderModel.setPage(this.selectedPage);
 
-    window.removeEventListener('mouseup', this._onMoveEnd);
-    window.removeEventListener('touchend', this._onMoveEnd);
-    window.removeEventListener('touchmove', this._onMove);
-    window.removeEventListener('mousemove', this._onMove);
-
     this.isMoving = false;
   }
 
   _onDragEnd(e) {
-    e.preventDefault();
+    if( !this.isMoving ) return;
+    // e.preventDefault();
 
     this._onMove(e);
     this.isDragging = false
