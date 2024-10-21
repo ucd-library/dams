@@ -114,7 +114,7 @@ class BookReaderModel extends BaseModel {
       this.store.setState('animating', animating);
     } else {
       setTimeout(() => 
-        this.store.setState('animating', false), 100
+        this.store.setState('animating', false), 25
       );
     }
   }
