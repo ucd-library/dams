@@ -107,10 +107,27 @@ export function styles() {
       transform: skewX(196deg);
     }
 
+    #buttonWrapper {
+      white-space: nowrap; 
+      padding-left: 2rem;
+    }
+
     #buttonWrapper .single-page-book {
       width: 25px;
       height: 25px;
       margin-top: 11px;
+    }
+
+    @media (max-width: 767px) {
+      #buttonWrapper .zoom-icons {
+        display: none;
+      }
+      ucdlib-bookreader-slider {
+        padding-right: .5rem;
+      }
+      #buttonWrapper {
+        padding-left: .5rem;
+      }
     }
 
   `;
@@ -137,7 +154,6 @@ return html`
     </div>
 
     <div id="buttonWrapper"
-      style="white-space: nowrap; padding-left: 2rem;"
       ?hidden="${!this.fullscreen}">
       <div @click="${this._onToggleBookView}" class="page-toggle">
         <ucdlib-icon
@@ -151,10 +167,10 @@ return html`
         ></ucdlib-icon>
       </div>
 
-      <div @click="${this._onZoomOutClicked}">
+      <div class="zoom-icons" @click="${this._onZoomOutClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-minus"></ucdlib-icon>
       </div>
-      <div @click="${this._onZoomInClicked}">
+      <div class="zoom-icons" @click="${this._onZoomInClicked}">
         <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
       </div>
       <div @click="${this._onCloseClicked}">
