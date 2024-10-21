@@ -206,6 +206,15 @@ class ClientEditsModel extends FinDataModel {
 
     for( let edit of nodes ) {
       for( let prop in edit ) {
+        if( prop === '@id' ) {
+          obj['@id'] = edit[prop];
+          try {
+            obj['@id'] = new URL(obj['@id']).pathname.replace(/^\/fcrepo\/rest/, '');
+          } catch(e) {
+            console.log(e);
+          }
+        }
+
         if( !(prop.match(/^http:\/\/digital.ucdavis.edu\/schema/) ||
             prop.match(/http:\/\/schema.org/))) continue;
 
