@@ -152,47 +152,6 @@ class CollectionModel extends BaseModel {
     }
 
     /**
-     * @method getFeaturedImage
-     * @description get overridden featured image for collection if exists
-     * 
-     * @param {String} id collection id
-     * @param {Object} fcAppConfigModel instance of FcAppConfigModel
-     * 
-     * @returns {String} image url
-     */
-    async getFeaturedImage(id, fcAppConfigModel) {
-      let thumbnailUrl = '';
-      let edits;
-
-      if( !id || !fcAppConfigModel ) return;
-
-      try {
-        edits = await this.getCollectionEdits(id);
-      } catch (error) {
-        this.logger.warn('Error retrieving collection edits', error);
-      }
-      if (!Object.keys(edits.payload).length) return;
-      edits = edits.payload;
-
-
-      let collectionEdit = edits.edits;
-      if( !collectionEdit ) return;
-
-      let savedDisplayData = await fcAppConfigModel.getAdminData(id);
-      if( !savedDisplayData ) return;
-
-      savedDisplayData = savedDisplayData.body['@graph'];
-      let graphRoot = savedDisplayData.filter(d => d['@id'] === '/application/ucd-lib-client' + id)[0];
-      if( !graphRoot ) return;
-
-      if( graphRoot['thumbnailUrl']?.split('/fcrepo/rest')?.[1] ) {
-        thumbnailUrl = '/fcrepo/rest'+ graphRoot['thumbnailUrl'].split('/fcrepo/rest')[1];
-      }
-
-      return thumbnailUrl;
-    }
-
-    /**
      * @method getCollectionEdits
      * @description get all item edits for a collection
      * 

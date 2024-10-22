@@ -20,6 +20,7 @@ class CollectionStore extends BaseStore {
     this.events = {
       COLLECTION_OVERVIEW_UPDATE : 'collection-overview-update',
       COLLECTION_UPDATE : 'collection-update',
+      COLLECTION_EDITS_UPDATE : 'collection-edits-update',
       COLLECTION_SEARCH_UPDATE : 'collection-search-update'
     }
   }
@@ -164,7 +165,7 @@ class CollectionStore extends BaseStore {
 
   _setCollectionEditState(state) {
     this.data.edits[state.id] = state;
-    this.emit(this.events.COLLECTION_UPDATE, state);
+    this.emit(this.events.COLLECTION_EDIT_UPDATE, state);
   }
 
 
