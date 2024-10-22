@@ -235,7 +235,7 @@ export default function render() {
       /* align-items: center;
       justify-content: center; */
       text-align: center;
-      font-size: .8rem;
+      font-size: 16px;
       font-weight: bold;
       white-space: nowrap;
       min-width: 150px;
@@ -247,6 +247,7 @@ export default function render() {
 
     .left-panel .file-upload-label ucdlib-icon {
       height: 50%;
+      width: 25px;
       position: relative;
       top: 5%;
       left: -5%;
@@ -257,10 +258,11 @@ export default function render() {
       background-color: var(--color-aggie-blue);
     }
 
-    .left-panel  .file-upload-label span {
+    .left-panel .file-upload-label span {
       position: relative;
       top: 20%;
       right: 20%;
+      padding-left: .2rem;
     }
 
     .selected-file {
