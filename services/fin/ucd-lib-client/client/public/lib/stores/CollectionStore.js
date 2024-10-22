@@ -1,4 +1,4 @@
-var {BaseStore} = require('@ucd-lib/cork-app-utils');
+var {BaseStore, LruStore} = require('@ucd-lib/cork-app-utils');
 const vcModel = require('../models/CollectionVcModel');
 
 class CollectionStore extends BaseStore {
@@ -12,16 +12,23 @@ class CollectionStore extends BaseStore {
       overview : {
         state : this.STATE.INIT
       },
-      search : {
-        state : this.STATE.INIT
-      }
+      search : new LruStore({name: 'collection-search', max: 20})
     }
 
     this.events = {
       COLLECTION_OVERVIEW_UPDATE : 'collection-overview-update',
       COLLECTION_UPDATE : 'collection-update',
-      COLLECTION_SEARCH_UPDATE : 'collection-search-update'
     }
+  }
+
+  set(payload, store, event) {
+    if( !payload.state ) {
+      if( payload.request ) payload.state = this.STATE.LOADING;
+      else if( payload.payload ) payload.state = this.STATE.LOADED;
+      else if( payload.error ) payload.state = this.STATE.ERROR;
+    }
+
+    super.set(payload, store, event);
   }
 
   getCollection(id='') {
@@ -31,17 +38,17 @@ class CollectionStore extends BaseStore {
   /**
    * Search
    */
-  setSearchLoading(searchDocument, request) {
+  setSearchLoading(searchDocument, request, cacheId) {
     this._setSearchState({
       state : this.STATE.LOADING,
-      request, searchDocument
+      request, searchDocument, cacheId
     })
   }
 
-  setSearchLoaded(searchDocument, payload) {
+  setSearchLoaded(searchDocument, payload, cacheId) {
     this._setSearchState({
       state : this.STATE.LOADED,
-      searchDocument, payload
+      searchDocument, payload, cacheId
     })
   }
 
