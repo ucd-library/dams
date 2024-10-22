@@ -94,14 +94,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       this._onSelectedRecordUpdate(selectedRecord);
     }
 
-    // also set brSinglePage if width is less than 801px
-    if (window.innerWidth < 801) {
+    let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    if (screenWidth < 800) {
       this.brSinglePage = true;
     }
-
-    // TODO temp hack, just set to single page until 2-page mode works in new bookreader
-    this.brSinglePage = true;
-    this.BookReaderModel.setView(this.brSinglePage ? 'single' : 'double');
   }
 
   _onAppStateUpdate(e) {
