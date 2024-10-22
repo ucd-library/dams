@@ -100,8 +100,11 @@ class CollectionModel extends BaseModel {
       return this.store.data.selected;
     }
 
-    search(searchDocument) {
-      return this.service.search(searchDocument);
+    async search(searchDocument) {
+      let resp = await this.service.search(searchDocument);
+      if( resp.request ) await resp.request;
+      console.log('search id', resp.id);
+      return this.store.data.search.get(resp.id);
     }
 
     getRecentCollections(limit=3) {
