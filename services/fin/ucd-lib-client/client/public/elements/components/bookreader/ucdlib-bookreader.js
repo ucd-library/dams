@@ -64,7 +64,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     this.addEventListener('mousedown', this._onMousedown);
     this.addEventListener('touchstart', this._onMousedown);
     window.addEventListener('mousemove', this._onMousemove);
-    window.addEventListener('touchmove', this._onMousemove);
+    window.addEventListener('touchmove', this._onMousemove, {passive: false});
     window.addEventListener('mouseup', this._onMouseup);
     window.addEventListener('touchend', this._onMouseup);
     window.addEventListener('mouseout', this._onMouseup);
@@ -689,6 +689,34 @@ export default class UcdlibBookreader extends Mixin(LitElement)
 
   _onMousemove(e) {
     if( !this.pan ) return;
+
+    try {
+      e.preventDefault();
+    } catch(e) {}
+
+    if( e.touches && e.touches.length > 1 && !this.pan.touchZoom ) {
+      this.pan.touchZoom = {
+        startZoom: this.BookReaderModel.store.data.state.zoomIndex,
+        startXDiff: Math.abs(e.touches[0].clientX - e.touches[1].clientX),
+        startYDiff: Math.abs(e.touches[0].clientY - e.touches[1].clientY)
+      }
+    }
+
+    if( this.pan.touchZoom ) {
+      // ignore zoom if only 1 touch
+      if( e.touches && e.touches.length <= 1  ) {
+        this.pan.touchZoom = null;
+        return;
+      }
+      let newYDiff = Math.abs(e.touches[0].clientY - e.touches[1].clientY);
+      let newXDiff = Math.abs(e.touches[0].clientX - e.touches[1].clientX);
+
+      let deltaX = newXDiff - this.pan.touchZoom.startXDiff;
+      let deltaY = newYDiff - this.pan.touchZoom.startYDiff;
+      let zoom = this.pan.touchZoom.startZoom + (Math.floor((deltaX + deltaY) / 100) );
+      this.BookReaderModel.setZoom(zoom);
+      return;
+    }
 
     let {clientX, clientY} = e;
     if( !clientX && e.touches && e.touches.length  ) {
