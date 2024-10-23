@@ -33,6 +33,11 @@ class CollectionVcModel {
 
     if( rootNode.subjects && !Array.isArray(rootNode.subjects) ) rootNode.subjects = [rootNode.subjects];
 
+    let clientEdits = {};
+    try {
+      clientEdits = e.payload.data['@graph'].find(g => g['@shortType'] === 'ClientEdit' || g['@shortType'].includes('ClientEdit'));
+    } catch(e) {}
+
     const vcData = {
       id: rootNode["@id"],
       description: rootNode.description,
@@ -42,6 +47,7 @@ class CollectionVcModel {
       callNumber,
       count: rootNode.itemCount,
       yearPublished: rootNode.yearPublished,
+      clientEdits
     };
 
     e.vcData = vcData;

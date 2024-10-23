@@ -126,24 +126,25 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( e.location.path[1] !== this.id ) return; // the page
     
     this.isCollectionPage = this.label.toLowerCase() === 'collection';
-    this._loadResults(e);
+    this._loadResults();
   }
 
   /**
    * @method _loadResults
    * @description load results based on currentPage
-   *
-   * @param {Object} e event object if called from _onAppStateUpdate
    */
-  async _loadResults(e) {
+  async _loadResults() {    
     this.resultsPerPage = this.isCollectionPage ? 15 : 30;
-    if( e && e.location.path.length > 2 ) {
-      this.resultsPerPage = parseInt(e.location.path[2] || this.resultsPerPage);
-      this.currentIndex = parseInt(e.location.path[3]) || 0;
+
+    if( this.AppStateModel.location && this.AppStateModel.location.path.length > 2 ) {
+      this.resultsPerPage = parseInt(this.AppStateModel.location.path[2] || this.resultsPerPage);
+      this.currentIndex = parseInt(this.AppStateModel.location.path[3]) || 0;
     } else {
       this.currentIndex = 0;
-    }
+    }    
 
+    this.currentPage = this.currentIndex ? (this.currentIndex / this.resultsPerPage) + 1 : 1;
+    
     if( this.totalResults === 0 ) {
       this.loading = true;
       if( this.isCollectionPage ) { 
@@ -256,8 +257,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
       sort : [
         sort
       ],
-      limit : this.resultsPerPage,
-      offset : this.currentIndex,
+      limit : 0,
+      offset : 0,
       facets : {}
     }
 

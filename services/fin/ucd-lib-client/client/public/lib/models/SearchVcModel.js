@@ -88,7 +88,7 @@ class SearchVcModel extends BaseModel {
         collection: result.root.publisher ? result.root.publisher.name : "", // for detail display
         creator: result.root.creator ? result.root.creator.name : "", // for detail display
         date: result.root.yearPublished || 'Undated', // for detail display
-        format: [mediaType], // for detail display
+        format: mediaType ? [mediaType] : null // for detail display
       });
     });
 
