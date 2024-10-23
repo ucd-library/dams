@@ -29,9 +29,9 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     super();
     this.render = render.bind(this);
 
-    this._injectModel('BookReaderModel');
-
     this._reset();
+
+    this._injectModel('BookReaderModel');
   }
 
   _onBookreaderStateUpdate(e) {

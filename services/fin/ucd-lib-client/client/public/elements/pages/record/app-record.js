@@ -169,6 +169,8 @@ class AppRecord extends Mixin(LitElement)
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) return;
 
+    this._updateSlimStyles();
+
     let hasError = false;
     if( this.RecordModel.currentRecordId ) {
       try {
