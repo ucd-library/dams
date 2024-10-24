@@ -222,7 +222,7 @@ export default function render() {
         <app-audio-viewer id="audio"></app-audio-viewer>
       </ucdlib-pages>
 
-      <div ?hidden="${!this.noMedia}" style="height: 600px;">
+      <div ?hidden="${!this.noMedia}">
         <img src="/images/tree-bike-illustration.png" style="margin: 0 auto; display: block; height: 600px;" />
       </div>
 
