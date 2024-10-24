@@ -208,21 +208,31 @@ class BookReaderModel extends BaseModel {
       isIndex0 = manifest.payload[0].page === 0;
     }
 
-    bookViewData.pages = manifest.payload.map(page => {
-      index = isIndex0 ? page.page : page.page - 1;
-      image = page[page.ocr.imageSize];
-      ocrUrl = page.ocr.url;
-      imageUrl = image.url;
+    bookViewData.pages = manifest.payload
+      .filter(page => this._isValidPage(page))  
+      .map(page => {
+        index = isIndex0 ? page.page : page.page - 1;
+        image = page[page.ocr.imageSize];
+        ocrUrl = page.ocr.url;
+        imageUrl = image.url;
 
-      height = parseInt(image.size.height);
-      width = parseInt(image.size.width);
-      originalHeight = parseInt(page?.original?.size?.height || page?.large?.size?.height);
-      originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
-      scale = width / originalWidth;
-      return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth};
-    });
+        height = parseInt(image.size.height);
+        width = parseInt(image.size.width);
+        originalHeight = parseInt(page?.original?.size?.height || page?.large?.size?.height);
+        originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
+        scale = width / originalWidth;
+        return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth};  
+      }
+    );
 
     this.store.setState('bookViewData', bookViewData);
+  }
+
+  _isValidPage(page) {
+    if( isNaN(page.page) ) return false;
+    if( page.page === null || page.page === undefined ) return false;
+    if( !page.ocr?.url || !page.ocr?.size ) return false;
+    return true;
   }
 
   async getOcrData(page, itemId) {

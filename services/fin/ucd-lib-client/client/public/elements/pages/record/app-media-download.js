@@ -318,7 +318,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       
       formats.forEach((format) => {
         let option = document.createElement("option");
-        option.innerHTML = format.format + ' (' + bytes(format.fileSize).toLowerCase() + ')';
+        let label = format.format;
+        if( format.fileSize ) label += ' (' + bytes(format.fileSize).toLowerCase() + ')';
+        option.innerHTML = label;
         option.value = format.format;
         this.shadowRoot.querySelector("#format").appendChild(option);
       });
