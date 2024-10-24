@@ -21,15 +21,15 @@ class CollectionStore extends BaseStore {
     }
   }
 
-  set(payload, store, event) {
-    if( !payload.state ) {
-      if( payload.request ) payload.state = this.STATE.LOADING;
-      else if( payload.payload ) payload.state = this.STATE.LOADED;
-      else if( payload.error ) payload.state = this.STATE.ERROR;
-    }
+  // set(payload, store, event) {
+  //   if( !payload.state ) {
+  //     if( payload.request ) payload.state = this.STATE.LOADING;
+  //     else if( payload.payload ) payload.state = this.STATE.LOADED;
+  //     else if( payload.error ) payload.state = this.STATE.ERROR;
+  //   }
 
-    super.set(payload, store, event);
-  }
+  //   super.set(payload, store, event);
+  // }
 
   getCollection(id='') {
     return this.data.byId[id];
