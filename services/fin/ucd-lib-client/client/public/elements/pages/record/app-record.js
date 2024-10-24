@@ -150,9 +150,9 @@ class AppRecord extends Mixin(LitElement)
     this.renderedCollectionId = e.id;
     this.collectionId = e.id;
 
-    let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.collectionId, this.FcAppConfigModel);
+    let overriddenFeatureImage = e.vcData?.clientEdits?.['@id'] || '';
     if (overriddenFeatureImage) {
-      this.collectionImg = overriddenFeatureImage;
+      this.collectionImg = '/fcrepo/rest' + overriddenFeatureImage + '/featuredImage.jpg';;
     } else {
       this.collectionImg = e.vcData?.images?.small?.url                   
       || e.vcData?.images?.medium?.url 
@@ -168,6 +168,8 @@ class AppRecord extends Mixin(LitElement)
    */
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) return;
+
+    this._updateSlimStyles();
 
     let hasError = false;
     if( this.RecordModel.currentRecordId ) {

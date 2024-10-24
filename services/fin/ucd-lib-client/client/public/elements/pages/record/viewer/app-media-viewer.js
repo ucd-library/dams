@@ -159,7 +159,17 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     if( renderAsBr ) {
+      // if admin pref display saved for this item, then default to specific view
+      // else set to single page mode if screen width < 800px, double if >= 800px
+      let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      if( !displayType && screenWidth < 800 ) {
+        this.singlePage = true;
+      } else if( !displayType && screenWidth >= 800 ) {
+        this.singlePage = false;
+      }
+
       this.BookReaderModel.setSelectedBook(e.selectedRecord.clientMedia.id, e.selectedRecord);
+      this.BookReaderModel.setView(this.singlePage ? 'single' : 'double');
     }
 
     if (

@@ -67,9 +67,10 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
     this.renderedId = this.id;
 
     this.collection = e.vcData;
-    let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.id, this.FcAppConfigModel);
+
+    let overriddenFeatureImage = this.collection.clientEdits?.['@id'] || '';
     if (overriddenFeatureImage) {
-      this.imgSrc = overriddenFeatureImage;
+      this.imgSrc = '/fcrepo/rest' + overriddenFeatureImage + '/featuredImage.jpg';
     } else if( this.collection.images ) {
       let images = this.collection.images;
       this.imgSrc = images.medium ? images.medium.url : images.original.url;

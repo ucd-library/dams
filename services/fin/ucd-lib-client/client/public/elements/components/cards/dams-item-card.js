@@ -63,7 +63,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
         this.mediaType = "audio";
       } else {
         this.mediaType = "imageList";
-        let imageCount = this.data.format[0]?.split(' ')[0];
+        let imageCount = this.data.format?.[0]?.split(' ')[0];
         if( imageCount && parseInt(imageCount) < 2 ) {
           this.mediaType = 'image';
         }
