@@ -1,6 +1,9 @@
 import { LitElement } from "lit";
-import "../../../utils/app-range-slider";
 import render from "./app-range-filter.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
+import "../../../utils/app-range-slider";
 
 export default class AppRangeFilter extends Mixin(LitElement).with(
   LitCorkUtils

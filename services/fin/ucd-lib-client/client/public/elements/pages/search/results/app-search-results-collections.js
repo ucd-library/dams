@@ -1,5 +1,8 @@
 import { LitElement } from 'lit';
+
 import render from "./app-search-results-collections.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "../../../components/cards/dams-collection-card";
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
@@ -88,7 +91,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     let end = start + this.resultsPerPage;
     this.resultsDisplayed = this.results.slice(start, end);
 
-    console.warn('Not calling collection base scrolling: TODO');
+    this.logger.warn('Not calling collection base scrolling: TODO');
     // let collections = this.shadowRoot.querySelector(".collections-in-search");
     // if (collections && scrollTo) {
     //   window.scrollTo({

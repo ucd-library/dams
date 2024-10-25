@@ -88,7 +88,6 @@ export default class AppVirtualScroller extends LitElement {
     // check for iOS overscroll and ignore
     if( this.itemHeight * (lastItem-1) > this.height &&
        this.scrollTop + this.height + 5 > this.totalScrollHeight ) {
-      // console.log('overflow protection!');
       return;
     }
     
@@ -108,7 +107,6 @@ export default class AppVirtualScroller extends LitElement {
   renderItems() {
     // update triggered from nested object
     if( this.renderedItems.length > this.items.length ) {
-      // console.log('ignoring out of date render');
       return html``;
     }
 

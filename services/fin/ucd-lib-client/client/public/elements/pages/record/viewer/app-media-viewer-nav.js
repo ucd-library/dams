@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
+
 import render from "./app-media-viewer-nav.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 // import "@polymer/paper-icon-button"
 import "../../../utils/app-share-btn";
@@ -77,22 +80,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     window.addEventListener("touchmove", (e) => this._onTouchMove(e));
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
-    this._injectModel("AppStateModel", "MediaModel");
-
-    window.addEventListener(
-      "BookReader:pageChanged",
-      this._onBRPageChange.bind(this)
-    );
-
-    window.addEventListener(
-      "BookReader:SearchCallback",
-      this._onSearchResultsChange.bind(this)
-    );
-
-    window.addEventListener(
-      "BookReader:SearchCallbackEmpty",
-      this._onSearchResultsEmpty.bind(this)
-    );
+    this._injectModel("AppStateModel", "MediaModel", "BookReaderModel");
   }
 
   connectedCallback() {
@@ -106,8 +94,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       this._onSelectedRecordUpdate(selectedRecord);
     }
 
-    // also set brSinglePage if width is less than 801px
-    if (window.innerWidth < 801) {
+    let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    if (screenWidth < 800) {
       this.brSinglePage = true;
     }
   }
@@ -119,6 +107,21 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.leftMostThumbnail = e.mediaViewerNavLeftMostThumbnail;
     this._resize();
     // if( this.AppStateModel.location.page !== 'item' ) this._onSearchResultsEmpty();
+  }
+
+  _onBookreaderStateUpdate(e) {
+    this.brFullscreen = e.fullscreen;
+    this.selectedResult = e.selectedSearchResult + 1;
+
+    this.searchResults = [];
+    if( e.searchResults?.state === 'loaded' ) {
+      let searchResults = e.searchResults.payload || {};
+      searchResults = Object.keys(searchResults).map(key => searchResults[key]);
+      searchResults.forEach(result => {
+        this.searchResults.push(...result);
+      });
+    }
+    this.searchResultsCount = this.searchResults.length;
   }
 
   /**
@@ -178,7 +181,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     // grrrr
     if (w === 0) {
-      // console.log('Ignoreing resize')
       // setTimeout(() => this._resize(), 200);
       return;
     }
@@ -271,18 +273,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
         },
       })
     );
-  }
-
-  _onSearchResultsChange(e) {
-    this.searchResults = e.detail?.props?.results?.matches || [];
-    this.searchResultsCount = this.searchResults.length;
-    console.log('this.searchResultsCount', this.searchResultsCount)
-  }
-
-  _onSearchResultsEmpty(e) {
-    this.searchResultsCount = 0;
-    this.searchResults = [];
-    console.log('this.searchResultsCount', this.searchResultsCount)
   }
 
   _showingLastThumbFrame() {
@@ -480,8 +470,9 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onToggleBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-bookview-toggle"));
+    // this.dispatchEvent(new CustomEvent("br-bookview-toggle"));  
     this.brSinglePage = !this.brSinglePage;
+    this.BookReaderModel.setView(this.brSinglePage ? 'single' : 'double');
   }
 
   /**
@@ -491,7 +482,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onExpandBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-expand-view"));
+    this.BookReaderModel.setFullscreen(true);
+    // this.dispatchEvent(new CustomEvent("br-expand-view"));
     this.brFullscreen = true;
   }
 
@@ -502,7 +494,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onCollapseBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-collapse-view"));
+    this.BookReaderModel.setFullscreen(false);
+    // this.dispatchEvent(new CustomEvent("br-collapse-view"));
     this.brFullscreen = false;
   }
 
@@ -531,8 +524,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @description set focus to first clickable element
    */
   setFocus() {
-    if (this.singleImage) {
-      if (!this.breakControls) this.$.zoomOut1.focus();
+    if ( this.singleImage && this.$ ) {
+      if( !this.breakControls ) this.$.zoomOut1.focus();
       else this.$.zoomOut2.focus();
     } else {
       let firstBtn = this.shadowRoot.querySelector("button");
@@ -547,33 +540,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    */
   _onSearchToggled(e) {
     this.searching = !this.searching;
+    this.BookReaderModel.setSearchActive(this.searching);
     this.dispatchEvent(new CustomEvent("br-search-toggle"));
-  }
-
-  _onBRPageChange(e) {
-    // TODO similar logic for calulating current page needs to be called when single vs double page is toggled
-    // also when search term changes, the current search result selected needs to be recalculated based on currently viewed page
-    if (!this.searchResults.length) return;
-    let singlePageDiff = this.singleImage ? 1 : 0;
-    let pageIndex = e.detail.props.currentIndex();
-
-    // check if page has a matched search term
-    let matchedSearchResult = this.searchResults.findIndex(
-      (r) => r.par[0].page === pageIndex + singlePageDiff
-    );
-    if (matchedSearchResult === -1) {
-      // loop over this.searchResults to determine the closest page that is less that pageIndex
-      this.searchResults.forEach((result, index) => {
-        if (result.par[0].page < pageIndex + singlePageDiff) {
-          matchedSearchResult = index;
-        }
-      });
-    }
-
-    if (!matchedSearchResult || matchedSearchResult < 0)
-      matchedSearchResult = 0;
-
-    this.selectedResult = matchedSearchResult + 1;
   }
 }
 

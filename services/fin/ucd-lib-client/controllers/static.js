@@ -19,7 +19,10 @@ module.exports = async (app) => {
   logger.info('CLIENT_ENV='+config.client.env.CLIENT_ENV+', Serving static assets from '+assetsDir);
 
   let collectionModel = await models.get('collection');
-  collectionModel = collectionModel.model;
+  collectionModel = collectionModel?.model;
+
+  let recordModel = await models.get('item');
+  recordModel = recordModel?.model;
 
   /**
    * Setup SPA app routes
@@ -47,19 +50,22 @@ module.exports = async (app) => {
         // recordCount: (await records.rootCount()).count,
         featuredImages : config.client.featuredImages,
         env : config.client.env,
-        fcAppConfig : appConfig.config
+        fcAppConfig : appConfig.config,
+        title : config.client.title,
+        logger : config.client.logger
       });
     },
     template : async (req, res, next) => {
       let jsonld = '';
-
       let isRecord = false;
       let isCollection = false;
 
       let parts = req.originalUrl.split('/').filter(p => p ? true : false);
+
       if( parts[0] === 'collection' ) {
-        if( parts.length === 2 ) isCollection = '/'+parts.join('/');
-        else isRecord = true;
+        isCollection = '/'+parts.join('/');
+      } else if( parts[0] === 'item' ) {
+        isRecord = true;
       } else if( parts[0] === 'search' ) {
         isCollection = isSearchCollectionReq(req);
       }
@@ -68,48 +74,31 @@ module.exports = async (app) => {
         return next({
           jsonld,
           title : config.client.title,
-          description : '',
-          keywords : ''
+          description : ''
         });
       }
 
       try {
         if( isCollection ) {
-          let collection = await collections.get(isCollection);
-          // collection = collectionTransform(collection._source);
+          let collection = await collectionModel.get(isCollection);
           jsonld = JSON.stringify(collection, '  ', '  ');
-    
-          let keywords = [];
-          if( collection.keywords ) {
-            if( !Array.isArray(collection.keywords) ) keywords = [collection.keywords];
-            else keywords = collection.keywords;
-          }
     
           return next({
             jsonld,
             title : collection.name + ' - '+ config.client.title,
-            description : collection.description || '',
-            keywords : keywords.join(', ')
+            description : collection.description || ''
           })
 
         } else {
-
           let id = req.originalUrl;
-          let record = await records.esGet(id);
-          // record = transform(record._source);
+          let record = await recordModel.get(id);
+          record = record['@graph'].filter(r => r['@id'] === id)[0];
           jsonld = JSON.stringify(record, '  ', '  ');
-    
-          let keywords = [];
-          if( record.keywords ) {
-            if( !Array.isArray(record.keywords) ) keywords = [record.keywords];
-            else keywords = record.keywords;
-          }
 
           return next({
             jsonld,
             title : (record.name || record.title) + ' - '+ config.client.title,
-            description : record.description || '',
-            keywords : keywords.join(', ')
+            description : record.description || ''
           })
 
         }
@@ -118,8 +107,7 @@ module.exports = async (app) => {
         return next({
           jsonld,
           title : 'Server Error',
-          description : 'Invalid URL: '+req.originalUrl,
-          keywords : ''
+          description : 'Invalid URL: '+req.originalUrl
         })
       }
     }

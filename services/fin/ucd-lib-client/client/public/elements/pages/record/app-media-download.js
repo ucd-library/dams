@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
+
 import render from "./app-media-download.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import config from "../../../lib/config";
 import utils from "../../../lib/utils";
@@ -138,52 +141,52 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    *  otherwise set to single page at currentPage
    * @param {Object}} detail page change detail, page number and if single page or 2 page view 
    */
-  async brPageChange(detail) { 
-    let { currentPage, onePageMode } = detail;
+  // async brPageChange(detail) { 
+  //   let { currentPage, onePageMode } = detail;
 
-    let record = await this.AppStateModel.getSelectedRecord();
-    if (!record) return;
+  //   let record = await this.AppStateModel.getSelectedRecord();
+  //   if (!record) return;
 
-    let { clientMedia, selectedMedia } = record;
+  //   let { clientMedia, selectedMedia } = record;
 
-    this.brCurrentPage = currentPage;
-    let pages;
-    let imageList = clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
-    if( imageList ) {
-      pages = imageList.clientMedia.pages;
-    } else {
-      pages = selectedMedia.clientMedia.pages;
-    }
+  //   this.brCurrentPage = currentPage;
+  //   let pages;
+  //   let imageList = clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
+  //   if( imageList ) {
+  //     pages = imageList.clientMedia.pages;
+  //   } else {
+  //     pages = selectedMedia.clientMedia.pages;
+  //   }
 
-    if( onePageMode ) {
-      // set download href to single page
-      let href = pages[currentPage - 1]?.download?.url;  
-      this.isTwoPageView = false;
-      if( !href ) {
-        // no download besides pdf for selected page, show all files download with options
-        // this._noSinglePageDownload();
-        this._renderDownloadSingleFormat();
-      } else {
-        this.href = href;
-      }
-    } else {
-      this.isTwoPageView = true;      
+  //   if( onePageMode ) {
+  //     // set download href to single page
+  //     let href = pages[currentPage - 1]?.download?.url;  
+  //     this.isTwoPageView = false;
+  //     if( !href ) {
+  //       // no download besides pdf for selected page, show all files download with options
+  //       // this._noSinglePageDownload();
+  //       this._renderDownloadSingleFormat();
+  //     } else {
+  //       this.href = href;
+  //     }
+  //   } else {
+  //     this.isTwoPageView = true;      
 
-      // set download href to 2 pages for archive download option
-      let image1 = pages[currentPage - 1]?.download?.url?.replace('/fcrepo/rest', '');
-      let image2 = pages[currentPage]?.download?.url?.replace('/fcrepo/rest', '');
-      let urls = [];
-      if( image1 ) urls.push(image1);
-      if( image2 ) urls.push(image2);
-      if( urls.length ) {
-        this._setZipPaths(urls);
-      } else {
-        // no download besides pdf for selected page, show all files download with options
-        // this._noSinglePageDownload();
-        this._renderDownloadSingleFormat();
-      }
-    }
-  }
+  //     // set download href to 2 pages for archive download option
+  //     let image1 = pages[currentPage - 1]?.download?.url?.replace('/fcrepo/rest', '');
+  //     let image2 = pages[currentPage]?.download?.url?.replace('/fcrepo/rest', '');
+  //     let urls = [];
+  //     if( image1 ) urls.push(image1);
+  //     if( image2 ) urls.push(image2);
+  //     if( urls.length ) {
+  //       this._setZipPaths(urls);
+  //     } else {
+  //       // no download besides pdf for selected page, show all files download with options
+  //       // this._noSinglePageDownload();
+  //       this._renderDownloadSingleFormat();
+  //     }
+  //   }
+  // }
 
   _noSinglePageDownload() {
     this.zipName = this.rootRecord.name

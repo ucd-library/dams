@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
+
 import render from "./app-image-viewer.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import utils from "../../../../lib/utils";
 

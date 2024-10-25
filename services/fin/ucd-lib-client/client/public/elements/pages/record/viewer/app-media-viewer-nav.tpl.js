@@ -270,20 +270,6 @@ export default function render() {
           height: 150px;
         }
 
-        /* .break {
-          width: 100%;
-        } */
-
-        #buttonWrapper.wrap {
-          /* padding-top: 1rem; */
-          /* position: relative;
-          left: 62vw; */
-        }
-
-
-
-
-
         #thumbnails {
           width: 80% !important;
         }
@@ -431,7 +417,7 @@ export default function render() {
           ?hidden="${this.isBookReader || this.hideZoom}"
         >
           <ucdlib-icon
-            icon="ucdlib-dams:fa-magnifying-glass-plus"
+            icon="ucdlib-dams:fa-up-right-and-down-left-from-center"
           ></ucdlib-icon>
         </div>
         <div ?hidden="${this.brFullscreen}">
@@ -439,7 +425,7 @@ export default function render() {
         </div>
 
         <!-- this is moved next to the bookreader slider in app-media-viewer in full screen -->
-        <div class="br-search" style="display: none;">
+        <!-- <div class="br-search" style="display: none;">
           <div
             class="zoom ${this.searching ? "searching" : ""}"
             @click="${this._onSearchToggled}"
@@ -475,7 +461,7 @@ export default function render() {
               <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div
@@ -497,6 +483,11 @@ export default function render() {
         <div @click="${this._onZoomInClicked}">
           <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
         </div>
+
+        <div @click="${this._onCloseClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-down-left-and-up-right-to-center"></ucdlib-icon>
+        </div>
+
       </div>
     </div>
   `;

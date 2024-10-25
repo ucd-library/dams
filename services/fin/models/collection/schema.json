@@ -79,6 +79,22 @@
       }
     },
 
+    "@graph.material" : {
+      "type": "text"
+    },
+
+    "@graph.location" : {
+      "type": "text"
+    },
+
+    "@graph.inLanguage.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.inLanguage.name" : {
+      "type" : "keyword"
+    },
+
     "@graph._.updated" : {
       "type" : "date"
     },

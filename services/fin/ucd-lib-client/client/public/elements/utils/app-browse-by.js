@@ -1,5 +1,8 @@
 import { LitElement } from 'lit';
+
 import render from "./app-browse-by.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "../components/cards/dams-collection-card";
 
@@ -123,25 +126,25 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( e.location.path[1] !== this.id ) return; // the page
     
     this.isCollectionPage = this.label.toLowerCase() === 'collection';
-    this._loadResults(e);
+    this._loadResults();
   }
-
-  // _onCollectionVcUpdate(e) {
-  //   if ( e.state !== 'loaded' ) return;
-  //   if( this.collectionResults.filter(r => r.id === e.payload.results.id)[0] ) return;
-  //   this.collectionResults.push(e.payload.results);
-  //   this._renderCollections(e);
-  // }
 
   /**
    * @method _loadResults
    * @description load results based on currentPage
-   *
-   * @param {Object} e event object if called from _onAppStateUpdate
    */
-  async _loadResults(e) {
+  async _loadResults() {    
     this.resultsPerPage = this.isCollectionPage ? 15 : 30;
 
+    if( this.AppStateModel.location && this.AppStateModel.location.path.length > 2 ) {
+      this.resultsPerPage = parseInt(this.AppStateModel.location.path[2] || this.resultsPerPage);
+      this.currentIndex = parseInt(this.AppStateModel.location.path[3]) || 0;
+    } else {
+      this.currentIndex = 0;
+    }    
+
+    this.currentPage = this.currentIndex ? (this.currentIndex / this.resultsPerPage) + 1 : 1;
+    
     if( this.totalResults === 0 ) {
       this.loading = true;
       if( this.isCollectionPage ) { 
@@ -157,19 +160,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this.totalPages = this.totalResults / this.resultsPerPage < 1 ? 1 : Math.ceil(this.totalResults / this.resultsPerPage);
     let pagination = this.shadowRoot.querySelector('ucd-theme-pagination');
     if( pagination ) pagination.requestUpdate('maxPages', this.totalPages);
-
-    if( e && e.location.path.length > 2 ) {
-      this.currentIndex = parseInt(e.location.path[2]);
-    } else {
-      this.currentIndex = 0;
-    }
-
-    let sort = 0;
-    if( e && e.location.path.length > 2 ) {
-      sort = parseInt(e.location.path[2]);
-    }
-
-    this.sortByOptions.forEach((item, index) => item.selected = (sort === index));
 
     this._renderResults();
   }
@@ -267,13 +257,13 @@ export default class AppBrowseBy extends Mixin(LitElement)
       sort : [
         sort
       ],
-      limit : this.resultsPerPage,
-      offset : this.currentIndex,
+      limit : 0,
+      offset : 0,
       facets : {}
     }
 
     this.allResults = await this.CollectionModel.search(searchDocument);
-    this.allResults = this.allResults.body.results.map(r => {
+    this.allResults = this.allResults.payload.results.map(r => {
       return {
         thumbnailUrl : r.root.image?.['@id'], 
         title : r.root.name,
@@ -337,6 +327,11 @@ export default class AppBrowseBy extends Mixin(LitElement)
   _onPageClicked(e) {
     this.currentPage = e.detail.page;
     this.currentIndex = (this.currentPage - 1) * this.resultsPerPage;
+    let path = '/browse/'+this.id+'/'+this.resultsPerPage;
+    if( this.currentIndex > 0 ) {
+      path += '/'+this.currentIndex;
+    }
+    this.AppStateModel.setLocation(path);
     this._renderResults();
   }
 

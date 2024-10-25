@@ -1,7 +1,7 @@
 import { LitElement, html } from "lit";
 import render from "./app-search.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement } from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./results/app-search-results-panel";
 import "./filtering/app-filters-panel";
@@ -45,6 +45,8 @@ export class AppSearch extends Mixin(LitElement)
   }
 
   async firstUpdated() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
     this._onAppStateUpdate(await this.AppStateModel.get());
 
     if( this.appState.location.path[0] === 'search' ) {
@@ -60,6 +62,8 @@ export class AppSearch extends Mixin(LitElement)
    * @param {*} e
    */
   _onAppStateUpdate(e) {
+    if( e.location.page !== 'search' ) return;
+
     this.drawerOpen = e.filtersDrawerOpen ? true : false;
     this.appState = e;
   }

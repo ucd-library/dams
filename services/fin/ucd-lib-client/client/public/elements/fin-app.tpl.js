@@ -120,11 +120,14 @@ export default function render() {
         </div>
         <app-home id="home"></app-home>
         <app-search id="search"></app-search>
-        <app-record id="item"></app-record>
+        <app-record id="item" @show-404="${(e) => this.page = '404'}"></app-record>
         <app-browse id="browse"></app-browse>
         <app-about id="about"></app-about>
-        <app-collection id="collection"></app-collection>
+        <app-collection id="collection" @show-404="${(e) => this.page = '404'}"></app-collection>        
       </ucdlib-pages>
+
+      <app-404 id="404" ?hidden="${this.page !== '404'}"></app-404>
+
       <div class="footer site-frame">
         <ucdlib-site-footer>
           <ucdlib-site-footer-column header="Digital Collections">

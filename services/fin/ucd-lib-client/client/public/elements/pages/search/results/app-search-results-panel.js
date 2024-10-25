@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
+
 import render from "./app-search-results-panel.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./app-search-grid-result";
 import "./app-search-list-result";
@@ -34,6 +37,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       paginationTotal: { type: Number }, // total number for pagination widget, we max out at 10000
       totalOverMaxWindow: { type: Boolean },
       currentPage: { type: Number },
+      loading: { type: Boolean },
+      lastSearch: { type: String }
     };
   }
 
@@ -42,8 +47,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this.active = true;
     this.render = render.bind(this);
 
-    this.results = [];
-    this.collectionResults = [];
     this.gridMargin = 15;
 
     if (initIsListLayout === "grid") {
@@ -60,17 +63,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       this.isMosaicLayout = true;
     }
 
-    this.totalCollections = 0;
-    this.total = "0";
-    this.numPerPage = 20;
-    this.currentIndex = 0;
-    this.currentPage = 1;
-    this.showCollectionResults = false;
-    this.showError = false;
-    this.showLoading = false;
-    this.errorMsg = false;
-    this.paginationTotal = false;
-    this.totalOverMaxWindow = false;
+    this._reset();
 
     this.resizeTimer = -1;
     window.addEventListener("resize", () => this._resizeAsync());
@@ -96,9 +89,32 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    */
   _onAppStateUpdate(e) {
     if (e.location.page !== "search") return;
+
+    if( this.AppStateModel.location.fullpath !== this.lastSearch ) {
+      this._reset();
+      this.lastSearch = this.AppStateModel.location.fullpath;
+    }
+
     this._setSelectedDisplay();
     this._resizeAsync();
     this.filterDisplayResults();
+  }
+
+  _reset() {
+    this.results = [];
+    this.collectionResults = [];
+    this.totalCollections = 0;
+    this.total = "0";
+    this.numPerPage = 20;
+    this.currentIndex = 0;
+    this.currentPage = 1;
+    this.showCollectionResults = false;
+    this.showError = false;
+    this.showLoading = false;
+    this.errorMsg = false;
+    this.paginationTotal = 0;
+    this.totalOverMaxWindow = false;
+    this.loading = true;
   }
 
   /**
@@ -155,6 +171,9 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Array} currentIndex index
    */
   renderResults(results, total, numPerPage, currentIndex) {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
+    this.lastSearch = this.AppStateModel.location.fullpath;
     this.results = [];
     this.showHeaderFooter = true;
     this.showError = false;
@@ -164,7 +183,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     requestAnimationFrame(() => {
       this.total = total;
       // make sure we don't have a page the returns results > 10000k
-      let t = Math.floor((10000 - numPerPage) / numPerPage) * numPerPage;
+      let t = Math.floor(10000 / numPerPage) * numPerPage;
       if (total > t) {
         this.total = t + "+";
         this.totalOverMaxWindow = true;
@@ -174,7 +193,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
 
       this.results = results;
       this.numPerPage = numPerPage;
-      this.paginationTotal = Math.ceil(this.total / numPerPage);
+      this.paginationTotal = Math.ceil(total / numPerPage);
       // if( this.paginationTotal < 1 ) this.paginationTotal = 1;
 
       this.shadowRoot.querySelector("#numPerPage").value = numPerPage + "";
@@ -183,7 +202,10 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       this.currentPage =
         this.currentIndex === 0 ? 1 : this.currentIndex / this.numPerPage + 1;
 
-      requestAnimationFrame(() => this._resize());
+      requestAnimationFrame(() => {
+        this._resize();
+        this.loading = false;
+      });
     });
   }
 
@@ -313,6 +335,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @description buffer resize masonary layout call
    */
   _resizeAsync() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
     if (this.resizeTimer !== -1) clearTimeout(this.resizeTimer);
     this.resizeTimer = setTimeout(() => {
       this.resizeTimer = -1;
@@ -329,6 +353,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @description resize masonary layout
    */
   async _resize() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
     if( !this.isListLayout ) {
       let firstDiv = this.shadowRoot
         .querySelector("#layout")
@@ -451,7 +477,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   // _onSearchVcUpdate(e) {
   //   if (e.state !== "loaded") return;
 
-  //   console.log('e.payload.results', e.payload.results);
+  //   this.logger.info('e.payload.results', e.payload.results);
 
   //   let collections = [];
   //   e.payload.results.forEach((result) => {
@@ -464,7 +490,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   //   });
 
   //   this.totalCollections = collections.length;
-  //   console.log('this.totalCollections', this.totalCollections);
+  //   this.logger.info('this.totalCollections', this.totalCollections);
 
   // }
 

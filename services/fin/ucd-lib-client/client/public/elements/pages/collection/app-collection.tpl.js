@@ -2,6 +2,8 @@ import { html, unsafeCSS } from 'lit';
 
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md.js';
 
+import utils from '../../../lib/utils/index.js';
+
 import { sharedStyles } from "../../styles/shared-styles";
 import SharedHtml from '../../utils/shared-html';
 import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
@@ -130,7 +132,7 @@ export default function render() {
       margin: 2rem 0;
     }
 
-    .label {
+    .collection-label {
       font-weight: bold;
       padding-right: 0.3rem;
     }
@@ -182,11 +184,14 @@ export default function render() {
     }
 
     @media (max-width: 600px) {
-      
       app-collection .title-section {
         display: block;
-        min-height: 90vh;
         overflow-y: -webkit-paged-x;
+        padding-top: 3rem;
+      }
+
+      app-collection .title-section .collection-header {
+        height: 11rem;
       }
 
       app-collection .title-section > div {
@@ -230,7 +235,7 @@ export default function render() {
       /* align-items: center;
       justify-content: center; */
       text-align: center;
-      font-size: .8rem;
+      font-size: 16px;
       font-weight: bold;
       white-space: nowrap;
       min-width: 150px;
@@ -242,6 +247,7 @@ export default function render() {
 
     .left-panel .file-upload-label ucdlib-icon {
       height: 50%;
+      width: 25px;
       position: relative;
       top: 5%;
       left: -5%;
@@ -252,10 +258,11 @@ export default function render() {
       background-color: var(--color-aggie-blue);
     }
 
-    .left-panel  .file-upload-label span {
+    .left-panel .file-upload-label span {
       position: relative;
       top: 20%;
       right: 20%;
+      padding-left: .2rem;
     }
 
     .selected-file {
@@ -521,11 +528,11 @@ export default function render() {
 
     <div class="title-section">
       <div class="image-overlay">
-        <img ?hidden="${!this.watercolorBgUrl}" class="watercolor-bg" src="${this.watercolorBgUrl}" width="100%" alt="watercolor background" />
+        <img ?hidden="${!this.watercolorBgUrl}" class="watercolor-bg" src="${this.watercolorBgUrl}" width="100%" />
 
         <!-- <img class="featured-image" src="${this.thumbnailUrl}" width="45%" alt="collection featured image" /> -->
         <div class="featured-image" style="background-image: url(${this.thumbnailUrlOverride}), url(${this.thumbnailUrl})"></div>
-        <img ?hidden="${!this.watercolorFgUrl}" class="watercolor-fg" src="${this.watercolorFgUrl}" width="100%" alt="watercolor foreground" />
+        <img ?hidden="${!this.watercolorFgUrl}" class="watercolor-fg" src="${this.watercolorFgUrl}" width="100%" />
       </div>
       <div class="collection-header">
         
@@ -549,14 +556,27 @@ export default function render() {
       </p>
 
       <div style="margin-bottom: .4rem;">
-        <span class="label">Coverage: </span> ${this.yearPublished}
+        <span class="collection-label">Coverage: </span> ${this.yearPublished}
       </div>
-      <div style="margin-bottom: .4rem;" ?hidden="${!this.keywords || !this.keywords.length}">
-        <span class="label">Subjects: </span> 
-        ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="${item.href}">${item.label}</a>`)}
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.subjects?.length}">
+        <span class="collection-label">Subjects: </span> 
+          ${this.subjects.map(
+            (about, index) =>
+              html`${index > 0 ? ", " : ""}<a href="${about["@id"]}"
+                  >${about["name"] || about["@id"]}</a>`
+          )}
       </div>
-      <div style="margin-bottom: 3rem;">
-        <span class="label">Finding Aid: </span> <a href="">Online Archive of California</a>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.material}">
+        <span class="collection-label">Format: </span> ${this.material}
+      </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.languages?.length}">
+        <span class="collection-label">Language: </span> 
+        ${this.languages?.map(
+          (language, index) => html`<span>${language.name}</span>${index < (this.languages?.length - 1) ? ', ' : ''} `
+        )}
+      </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.location}">
+        <span class="collection-label">Location: </span> ${this.location}
       </div>
     </div>
 
@@ -671,30 +691,30 @@ export default function render() {
                       name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="Book Reader - 2 Page" 
-                      ?checked="${this.itemDefaultDisplay === 'Book Reader - 2 Page'}" 
-                      @change="${(e) => (this.itemDefaultDisplay = 'Book Reader - 2 Page')}">
-                    <label for="two">Book Reader - 2 Page</label>
+                      value="${utils.itemDisplayType.brTwoPage}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.brTwoPage}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage)}">
+                    <label for="two">${utils.itemDisplayType.brTwoPage}</label>
                   </li>
                   <li>
                     <input id="one" 
                       name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="Book Reader - Single Page" 
-                      ?checked="${this.itemDefaultDisplay === 'Book Reader - Single Page'}" 
-                      @change="${(e) => (this.itemDefaultDisplay = 'Book Reader - Single Page')}">
-                    <label for="one">Book Reader - 1 Page</label>
+                      value="${utils.itemDisplayType.brOnePage}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.brOnePage}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.brOnePage)}">
+                    <label for="one">${utils.itemDisplayType.brOnePage}</label>
                   </li>
                   <li>
                     <input id="list" 
                       name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="Image List" 
-                      ?checked="${this.itemDefaultDisplay === 'Image List'}" 
-                      @change="${(e) => (this.itemDefaultDisplay = 'Image List')}">
-                    <label for="list">Image List</label>
+                      value="${utils.itemDisplayType.imageList}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.imageList}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.imageList)}">
+                    <label for="list">${utils.itemDisplayType.imageList}</label>
                   </li>
                 </ul>
               </div>
@@ -723,11 +743,11 @@ export default function render() {
                     <input id="checkbox${index}" 
                       name="checkbox" 
                       type="checkbox"
-                      data-item-id="${item.item.split(':fedora')[1]}">
+                      data-item-id="${item.id}">
                     <label for="checkbox${index}">
-                      <a href="${item.item.split(':fedora')[1]}">${item.item.split('/').pop()}</a>
+                      <a href="${item.id}">${item.linkLabel}</a>
                       <span style="font-style: italic;">
-                        (${item['item_default_display']})
+                        (${item.defaultDisplay})
                       </span>
                     </label>
                   </li>

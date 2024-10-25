@@ -1,7 +1,8 @@
 import { LitElement} from 'lit';
 import render from "./app-browse.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import {MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '../../utils/app-browse-by';
 
@@ -29,7 +30,9 @@ class AppBrowse extends Mixin(LitElement)
   }
 
   _onAppStateUpdate(e) {
-    this.page = e.location.pathname;
+    let page = '/'+e.location.path[0];
+    if( e.location.path.length > 1 ) page += '/'+e.location.path[1];
+    this.page = page;
   }
   
 }

@@ -133,15 +133,13 @@ export default function render() {
 
 <div class="spinner"></div>
 
-<div id="close">
-  <ucdlib-icon icon="ucdlib-dams:fa-xmark" @click="${this._onCloseClicked}"></ucdlib-icon>
-</div>   
 
 <app-media-viewer-nav 
   id="nav"
   is-lightbox
   @zoom-in="${this._onZoomInClicked}"
-  @zoom-out="${this._onZoomOutClicked}">
+  @zoom-out="${this._onZoomOutClicked}"
+  @close="${this._onCloseClicked}">
 </app-media-viewer-nav>
 
 `;}

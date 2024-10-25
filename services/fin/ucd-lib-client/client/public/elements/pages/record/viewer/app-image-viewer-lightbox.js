@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
+
 import render from "./app-image-viewer-lightbox.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "leaflet";
 import "leaflet-iiif";

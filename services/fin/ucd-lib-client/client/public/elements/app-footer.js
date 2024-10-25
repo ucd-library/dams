@@ -1,5 +1,7 @@
 import { LitElement, html } from 'lit';
+
 import render from "./app-footer.tpl.js";
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./auth/app-auth-footer";
 

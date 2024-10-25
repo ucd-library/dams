@@ -4,6 +4,8 @@ import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
 import buttonsCss from "@ucd-lib/theme-sass/2_base_class/_buttons.css";
 import headingsCss from "@ucd-lib/theme-sass/2_base_class/_headings.css";
 
+import utils from '../../../lib/utils/index.js';
+
 export default function render() {
   return html`
     <style include="shared-styles">
@@ -245,17 +247,17 @@ export default function render() {
           @click="${this._ssSelectFocus}"
           @blur="${this._ssSelectBlur}">
           <select>
-              <option .value=${''} ?selected=${this.itemDisplay === ''}>
+              <option .value=${this.itemDefaultDisplay} ?selected=${this.itemDisplay === this.itemDefaultDisplay}>
                 Collection Default (${this.itemDefaultDisplay})
               </option>
-              <option .value=${'Book Reader - 2 Page'} ?selected=${this.itemDisplay === 'Book Reader - 2 Page'}>
-                Book Reader - 2 Page
+              <option .value=${utils.itemDisplayType.brTwoPage} ?selected=${this.itemDisplay !== this.itemDefaultDisplay && this.itemDisplay === utils.itemDisplayType.brTwoPage}>
+                ${utils.itemDisplayType.brTwoPage}
               </option>
-              <option .value=${'Book Reader - Single Page'} ?selected=${this.itemDisplay === 'Book Reader - Single Page'}>
-                Book Reader - Single Page
+              <option .value=${utils.itemDisplayType.brOnePage} ?selected=${this.itemDisplay !== this.itemDefaultDisplay && this.itemDisplay === utils.itemDisplayType.brOnePage}>
+                ${utils.itemDisplayType.brOnePage}
               </option>
-              <option .value=${'Image List'} ?selected=${this.itemDisplay === 'Image List'}>
-                Image List
+              <option .value=${utils.itemDisplayType.imageList} ?selected=${this.itemDisplay !== this.itemDefaultDisplay && this.itemDisplay === utils.itemDisplayType.imageList}>
+                ${utils.itemDisplayType.imageList}
               </option>
           </select>
         </ucd-theme-slim-select>
@@ -275,7 +277,7 @@ export default function render() {
     </div>
 
 
-    <app-media-viewer @br-page-change="${this._onBookViewPageChange}"></app-media-viewer>
+    <app-media-viewer></app-media-viewer>
 
     <div class="container" style="padding-bottom: 50px">
       <h3>${this.name}</h3>
@@ -313,7 +315,13 @@ export default function render() {
 
       <div ?hidden="${!this.description || !this.description.length}" class="metadata-row">
         <div class="attr">Description</div>
-        <div class="value" id="descriptionValue">${this.description}</div>
+        <div class="value" id="descriptionValue">
+          <ucdlib-md id="md">
+            <ucdlib-md-content>
+              ${this.description}
+            </ucdlib-md-content>
+          </ucdlib-md>
+        </div>
       </div>
 
       <div ?hidden="${!this.publisher}" class="metadata-row" id="publisher">

@@ -38,6 +38,19 @@ config.client = {
     UCD_DAMS_DEPLOYMENT_TAG : process.env.UCD_DAMS_DEPLOYMENT_TAG || '',
     FIN_SERVER_IMAGE : process.env.FIN_SERVER_IMAGE || ''
   },
+  logger : {
+    logLevel : process.env.CLIENT_LOG_LEVEL || 'warn',
+    logLevels : process.env.CLIENT_LOG_LEVELS ? JSON.parse(process.env.CLIENT_LOG_LEVELS) : {},
+    reportErrors : {
+      enabled : process.env.CLIENT_ERROR_REPORTING_ENABLED === 'true',
+      url : process.env.CLIENT_ERROR_REPORTING_URL || '',
+      key : process.env.CLIENT_ERROR_REPORTING_KEY || '',
+      customAttributes : {
+        appName : 'dams',
+        appOwner : 'digital'
+      }
+    }
+  },
 
   featuredImages : [
     {

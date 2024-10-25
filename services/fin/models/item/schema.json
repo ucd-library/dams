@@ -98,8 +98,11 @@
    "@graph.name" : {
       "type": "text",
       "fields": {
-        "raw": { 
-          "type":  "text",
+        "raw": {
+          "type": "keyword"
+        },
+        "punctuation_insensitive": {
+          "type": "text",
           "analyzer": "punctuation_insensitive",
           "fielddata": true
         }
@@ -112,6 +115,14 @@
 
     "@graph.alternativeHeadline" : {
       "type" : "text"
+    },
+
+    "@graph.inLanguage.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.inLanguage.name" : {
+      "type" : "keyword"
     },
 
     "@graph.indexableContent" : {

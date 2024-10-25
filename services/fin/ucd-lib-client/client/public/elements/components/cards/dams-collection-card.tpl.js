@@ -100,6 +100,10 @@ return html`
     background-position: center;
     background-repeat: no-repeat;
   }
+  .u-background-image.loading {
+    background-color: #dcdcdc;
+  }
+
   .aspect--4x3 {
     position: relative;
     width: 100%;
@@ -145,12 +149,12 @@ return html`
 
 <a href="${this.href}" class="marketing-highlight category-brand--secondary u-space-mb o-box">
   <div class="marketing-highlight__image">
-    <div class="aspect--4x3 u-background-image" role="img" aria-label="" style="background-image:url(${this.imgSrc});">
+    <div class="aspect--4x3 u-background-image ${this.loading ? 'loading' : ''}" role="img" aria-label="" style="background-image:url(${this.imgSrc})">
   </div>
   </div>
   <div class="marketing-highlight__body ${this.darkBg ? 'dark' : ''}">
     <h4 class="marketing-highlight__title">${this.cardTitle}</h4>
-    <p class="marketing-highlight__items">${this.itemCt || 0} items</p>
+    <p class="marketing-highlight__items"><span ?hidden="${!this.itemCt}">${this.itemCt || 0} items</span></p>
   </div>
 </a>
 

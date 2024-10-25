@@ -1,5 +1,8 @@
 import { LitElement } from 'lit';
+
 import render from "./app-share-btn.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import './app-toast-popup.js';
 
@@ -70,7 +73,7 @@ export default class AppShareBtn extends Mixin(LitElement)
       let toastPopup = this.shadowRoot.querySelector('app-toast-popup');
       if( toastPopup ) toastPopup.showPopup();
     } catch (err) {
-      console.error('Failed to copy url: ', err);
+      this.logger.error('Failed to copy url: ', err);
     }
   }
 

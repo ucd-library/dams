@@ -58,8 +58,8 @@ class ApplicationsModel extends FinEsDataModel {
       }
 
       for( let part of isPartOf ) {
-        if( part['@id'] && part['@id'].match(/^\/collection\//) ||
-            part['@id'].match(/^\/item\//) ) {
+        if( part['@id'] && (part['@id'].match(/^\/collection\//) ||
+            part['@id'].match(/^\/item\//)) ) {
           reindex.push(part['@id']);
         }
       }

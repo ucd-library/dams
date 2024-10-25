@@ -1,5 +1,8 @@
 import { LitElement } from 'lit';
+
 import render from "./dams-hero.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '@ucd-lib/theme-elements/brand/ucd-theme-header/ucd-theme-header.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-primary-nav/ucd-theme-primary-nav.js';
@@ -63,6 +66,7 @@ export default class DamsHero extends Mixin(LitElement)
       img.onload = () => {
         let element = this.shadowRoot.querySelector('.image');
         element.style.backgroundImage += 'var(--gradient-ag-putah), url(' + img.src + ')';
+        element.style.backgroundSize = 'cover';
         element.style.opacity = '1';
       };
     }

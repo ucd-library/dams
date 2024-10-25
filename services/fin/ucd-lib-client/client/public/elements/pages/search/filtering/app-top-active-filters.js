@@ -1,5 +1,8 @@
 import { LitElement } from 'lit';
-import render from "./app-top-active-filters.tpl.js"
+import render from "./app-top-active-filters.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 import config from "../../../../lib/config"
 
 export default class AppTopActiveFilters extends Mixin(LitElement)

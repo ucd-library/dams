@@ -1,13 +1,14 @@
 import { LitElement } from "lit";
 import render from "./app-record.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement } from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import { markdown } from "markdown";
 import rightsDefinitions from "../../../lib/rights.json";
 import citations from "../../../lib/models/CitationsModel";
 import utils from "../../../lib/utils/index.js";
 
+import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md.js';
 import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js";
 
 import "./app-media-download";
@@ -65,6 +66,7 @@ class AppRecord extends Mixin(LitElement)
     this.subjects = [];
     this.callNumber = "";
     this.collectionImg = "";
+    this.defaultCollectionImg = "/images/tree-bike-illustration.png";
     this.collectionId = "";
     this.renderedCollectionId = "";
     this.description = "";
@@ -78,7 +80,7 @@ class AppRecord extends Mixin(LitElement)
     // this.citations = [];
     this.citationRoot = {};
     this.collectionItemCount = 0;
-    this.itemDefaultDisplay = 'Book Reader - 2 Page';
+    this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage;
     this.itemDisplay = '';
 
     this.isUiAdmin = user.canEditUi();
@@ -148,15 +150,17 @@ class AppRecord extends Mixin(LitElement)
     this.renderedCollectionId = e.id;
     this.collectionId = e.id;
 
-    let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.collectionId, this.FcAppConfigModel);
+    let overriddenFeatureImage = e.vcData?.clientEdits?.['@id'] || '';
     if (overriddenFeatureImage) {
-      this.collectionImg = overriddenFeatureImage;
+      this.collectionImg = '/fcrepo/rest' + overriddenFeatureImage + '/featuredImage.jpg';;
     } else {
       this.collectionImg = e.vcData?.images?.small?.url                   
       || e.vcData?.images?.medium?.url 
       || e.vcData?.images?.large?.url
       || e.vcData?.images?.original?.url;
     }
+
+    if( !this.collectionImg ) this.collectionImg = this.defaultCollectionImg;    
   }
 
   /**
@@ -165,8 +169,25 @@ class AppRecord extends Mixin(LitElement)
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) return;
 
-    if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
+    this._updateSlimStyles();
 
+    let hasError = false;
+    if( this.RecordModel.currentRecordId ) {
+      try {
+        let record = await this.RecordModel.get(this.RecordModel.currentRecordId);
+        this._onRecordUpdate(record);
+      } catch(e) {
+        hasError = true;
+      }
+    }
+
+    if( e.page === '404' || hasError ) {
+      this.dispatchEvent(
+        new CustomEvent("show-404", {})
+      );
+      return;
+    }
+    
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
 
     this._updateLinks(e.location);
@@ -207,7 +228,6 @@ class AppRecord extends Mixin(LitElement)
    * @param {Object} e
    */
   _ssSelectFocus(e) {
-    console.log('focus')
     let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
     let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
 
@@ -226,7 +246,6 @@ class AppRecord extends Mixin(LitElement)
    * @param {Object} e
    */
   _ssSelectBlur(e) {
-    console.log('blur')
     let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
     let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
 
@@ -310,15 +329,6 @@ class AppRecord extends Mixin(LitElement)
     this._updateDisplayData();
     await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
 
-    // TODO save collection data with hasPart pointing to this item
-    // if( Object.keys(this.savedCollectionData).length ) {
-    //   // TEMP hack, also should append to array and not replace
-    //   this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0]['http://digital.ucdavis.edu/schema#itemDisplayExceptions'] 
-    //     = [{'@id': 'info:fedora/application/ucd-lib-client/item/ark:/87287/d70898/ark:/87287/d70898.jsonld.json'}];
-
-    //   await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.savedCollectionData);
-    // }
-
     this.editMode = false;
 
     this._changeMediaViewerDisplay('', true);
@@ -348,25 +358,10 @@ class AppRecord extends Mixin(LitElement)
       this.appDataLoaded = true;
       return;
     }
+
     edits = edits.payload;
-
-    this.itemDefaultDisplay = 'Book Reader - 2 Page';
-    if( edits?.edits ) {
-      // fetch collection override
-      let savedDisplayData = await utils.getAppConfigCollectionGraph(this.collectionId, this.FcAppConfigModel);
-      if( savedDisplayData ) {
-        this.savedCollectionData = savedDisplayData;
-        let graphRoot = this.savedCollectionData.filter(d => d['@id'].indexOf('/application/ucd-lib-client') > -1)[0];
-        this.itemDefaultDisplay = graphRoot?.['http://digital.ucdavis.edu/schema#itemDefaultDisplay']?.[0]?.['@value'] || this.itemDefaultDisplay;
-      }
-    }
-    this.itemDisplay = this.itemDefaultDisplay;
-
-    // get item data if it exists
-    let itemEdit = edits.itemOverrides.filter(e => e.item.includes(this.record['@id']))[0];
-    if( itemEdit && Object.keys(itemEdit).length ) {
-      this.itemDisplay = itemEdit['item_default_display'] || this.itemDisplay;
-    }
+    this.itemDefaultDisplay = edits?.collection?.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
+    this.itemDisplay = edits?.items?.[this.currentRecordId]?.itemDefaultDisplay || this.itemDefaultDisplay;
 
     this.appDataLoaded = true;
     this._updateDisplayData();
@@ -405,7 +400,7 @@ class AppRecord extends Mixin(LitElement)
 
       if( this.itemDisplay.includes('Image List') ) {
         newDisplayType = 'image';
-      } else if ( this.itemDisplay.includes('Single') ) {
+      } else if ( this.itemDisplay.includes('1 Page') ) {
         newDisplayType = 'bookreader';
         singlePage = true;
       } else if ( this.itemDisplay.includes('2 Page') ) {
@@ -417,12 +412,14 @@ class AppRecord extends Mixin(LitElement)
 
         if( mediaViewer.singlePage !== singlePage ) {
           mediaViewer.singlePage = singlePage;
-          if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
-            mediaViewer._onToggleBookView();
-          } else {
-            // to reload br if not initiated
-            mediaViewer._onAppStateUpdate(await this.AppStateModel.get());
-          }         
+          // if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
+          //   requestAnimationFrame(() => {
+          //     mediaViewer._onToggleBookView();
+          //   });
+          // } else {
+          //   // to reload br if not initiated
+          //   mediaViewer._onAppStateUpdate(await this.AppStateModel.get());
+          // }         
         }
         mediaViewer.isBookReader = newDisplayType === 'bookreader';
         mediaViewer.mediaType = newDisplayType;
@@ -502,12 +499,12 @@ class AppRecord extends Mixin(LitElement)
     }, 3000);
   }
 
-  _onBookViewPageChange(e) {
-    let appMediaDownload = document.querySelector('app-media-download');
-    if( appMediaDownload ) {
-      appMediaDownload.brPageChange(e.detail);
-    }
-  }
+  // _onBookViewPageChange(e) {
+  //   let appMediaDownload = document.querySelector('app-media-download');
+  //   if( appMediaDownload ) {
+  //     appMediaDownload.brPageChange(e.detail);
+  //   }
+  // }
 }
 
 customElements.define("app-record", AppRecord);

@@ -1,10 +1,7 @@
 import { LitElement, html } from "lit";
 import render from "./fin-app.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
-
-// sets globals Mixin and EventInterface
-import "@ucd-lib/cork-app-utils";
+import {MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js'
 
@@ -17,6 +14,7 @@ import "../lib";
 // app elements
 import "./pages/search/app-search-header";
 import "./pages/search/app-search-breadcrumb";
+import './pages/404/app-404';
 import "./app-footer";
 import "./auth/app-auth-footer";
 import "./components/site/ucdlib-site-footer";
@@ -136,6 +134,16 @@ export class FinApp extends Mixin(LitElement)
 
     this.page = page;
     this.pathInfo = e.location.pathname.split('/media')[0];
+
+    if( this.page === 'collection' ) {
+      let collectionId = e.location.fullpath;
+      this._onCollectionUpdate(await this.CollectionModel.get(collectionId));
+    } else if( this.page === 'item' ) {
+      let itemId = e.location.fullpath;
+      this._onRecordUpdate(await this.RecordModel.get(itemId));     
+    }
+
+    if( !['item', 'collection'].includes(this.page) ) this._updatePageMetadata();
   }
 
   /**
@@ -172,6 +180,62 @@ export class FinApp extends Mixin(LitElement)
       );
     }
     return page;
+  }
+
+  /**
+   * @method _updatePageMetadata
+   * @description update the title/description of the page based on the current page
+   * @param {String} title override the title
+   * @param {String} description override the description
+   */
+  _updatePageMetadata(title='', description='', brand=APP_CONFIG.title) {
+    // 'UC Davis Library Digital Collections' (36 chars, + 3 for ' - '), ideally 60 chars total
+    if( title.length > 21 ) {
+      title = title.slice(0, 18) + '...';
+    }
+
+    if( title.length > 0 ) title = title + ' - ' + brand;
+
+    document.title = title || brand;
+    document.head.querySelector('[name="description"]').content = description;
+  }
+  
+  /**
+   * @method onCollectionUpdate
+   * @description fired when collection updates
+   *
+   * @param {Object} e
+   */
+  async _onCollectionUpdate(e) {
+    if( e.state !== 'loaded' ) return;
+    if( this.AppStateModel.location.page !== 'collection' ) return;
+
+    // parse title/description for meta updates
+    let title = APP_CONFIG.title;
+    let collectionName = e.vcData?.title || APP_CONFIG.collectionLabels[e.id] || '';
+    if( collectionName ) title = collectionName + ' - ' + title;
+    let description = e.vcData?.description || '';
+
+    this._updatePageMetadata(title, description);
+  }
+
+  /**
+   * @method _onRecordUpdate
+   * @description fired when record updates
+   *
+   * @param {Object} e state event
+   */
+  async _onRecordUpdate(e) {
+    if (e.state !== "loaded") return;
+    if (this.AppStateModel.location.page !== "item") return;
+  
+    // parse title/description for meta updates
+    let title = APP_CONFIG.title;
+    let itemName = e.vcData?.name || '';
+    if (itemName) title = itemName + ' - ' + title;
+    let description = e.vcData?.description || '';
+
+    this._updatePageMetadata(title, description);
   }
 
   /**

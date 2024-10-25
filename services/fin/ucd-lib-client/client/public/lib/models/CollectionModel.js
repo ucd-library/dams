@@ -5,12 +5,16 @@ const CollectionService = require('../services/CollectionService');
 const RecordStore = require('../stores/RecordStore');
 const AppStateModel = require('./AppStateModel');
 
+const {getLogger} = require('@ucd-lib/cork-app-utils');
+
 class CollectionModel extends BaseModel {
   
     constructor() {
       super();
       this.store = CollectionStore;
       this.service = CollectionService;
+
+      // this.logger = getLogger('CollectionModel');
 
       // the selected collection functionality is just a shortcut for listening
       // to es filters and seeing if a collection is being filtered on. This is
@@ -96,8 +100,10 @@ class CollectionModel extends BaseModel {
       return this.store.data.selected;
     }
 
-    search(searchDocument) {
-      return this.service.search(searchDocument);
+    async search(searchDocument) {
+      let resp = await this.service.search(searchDocument);
+      if( resp.request ) await resp.request;
+      return this.store.data.search.get(resp.id);
     }
 
     getRecentCollections(limit=3) {
@@ -109,12 +115,12 @@ class CollectionModel extends BaseModel {
         }]
       };
       // searchDocument = {limit: 3};
-      return this.service.search(searchDocument);
+      return this.search(searchDocument);
     }
 
     getHomepageDefaultCollections() {
       let searchDocument = {limit: 3};
-      return this.service.search(searchDocument);
+      return this.search(searchDocument);
     }
 
     /**
@@ -145,45 +151,6 @@ class CollectionModel extends BaseModel {
 
       AppStateModel.setSelectedCollection(selected);
       AppStateModel.set({searchCollection: selected});
-    }
-
-    /**
-     * @method getFeaturedImage
-     * @description get overridden featured image for collection if exists
-     * 
-     * @param {String} id collection id
-     * @param {Object} fcAppConfigModel instance of FcAppConfigModel
-     * 
-     * @returns {String} image url
-     */
-    async getFeaturedImage(id, fcAppConfigModel) {
-      let thumbnailUrl = '';
-      let edits;
-
-      try {
-        edits = await this.getCollectionEdits(id);
-      } catch (error) {
-        console.log('Error retrieving collection edits', error);
-      }
-      if (!Object.keys(edits.payload).length) return;
-      edits = edits.payload;
-
-
-      let collectionEdit = edits.edits;
-      if( !collectionEdit ) return;
-
-      let savedDisplayData = await fcAppConfigModel.getAdminData(id);
-      if( !savedDisplayData ) return;
-
-      savedDisplayData = savedDisplayData.body['@graph'];
-      let graphRoot = savedDisplayData.filter(d => d['@id'] === '/application/ucd-lib-client' + id)[0];
-      if( !graphRoot ) return;
-
-      if( graphRoot['thumbnailUrl']?.split('/fcrepo/rest')?.[1] ) {
-        thumbnailUrl = '/fcrepo/rest'+ graphRoot['thumbnailUrl'].split('/fcrepo/rest')[1];
-      }
-
-      return thumbnailUrl;
     }
 
     /**

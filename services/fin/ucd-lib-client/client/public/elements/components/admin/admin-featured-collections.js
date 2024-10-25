@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
 import render from "./admin-featured-collections.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 import "./admin-content-panel";
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";

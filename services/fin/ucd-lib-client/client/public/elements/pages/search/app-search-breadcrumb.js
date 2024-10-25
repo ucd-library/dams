@@ -1,5 +1,8 @@
-import { LitElement, html } from 'lit';
+import { LitElement } from 'lit';
+
 import render from "./app-search-breadcrumb.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 class AppSearchBreadcrumb extends Mixin(LitElement)
   .with(LitCorkUtils) {
@@ -103,7 +106,7 @@ class AppSearchBreadcrumb extends Mixin(LitElement)
    * @description CollectionInterface, fired when selected collection updates
    */
   // _onSelectedCollectionUpdate(e) {
-  //   console.log(e);
+  //   this.logger.info(e);
   //   if( !e ) {
   //     if( !this.record ) {
   //       this.collection = null;

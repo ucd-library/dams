@@ -1,5 +1,8 @@
 import { LitElement } from 'lit';
-import utils from "../../../../lib/utils"
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
+import utils from "../../../../lib/utils";
 
 export default class AppSearchResult extends Mixin(LitElement)
   .with(LitCorkUtils) {

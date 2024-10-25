@@ -66,7 +66,7 @@ export class Citation extends LitElement {
       let toastPopup = this.shadowRoot.querySelector('app-toast-popup');
       if( toastPopup ) toastPopup.showPopup();
     } catch (err) {
-      console.error('Failed to copy citation: ', err);
+      this.logger.error('Failed to copy citation: ', err);
     }
   }
 

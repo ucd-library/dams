@@ -1,14 +1,15 @@
-const {BaseService} = require('@ucd-lib/cork-app-utils');
+const {BaseService, digest} = require('@ucd-lib/cork-app-utils');
 const CollectionStore = require('../stores/CollectionStore');
 const config = require('../config');
 const RecordGraph = require('../utils/RecordGraph.js');
+const vcModel = require('../models/CollectionVcModel');
+
 
 class CollectionService extends BaseService {
 
   constructor() {
     super();
     this.store = CollectionStore;
-
     this.baseUrl = '/api/collection';
   }
 
@@ -80,8 +81,10 @@ class CollectionService extends BaseService {
 
     searchDocument.textFields = config.elasticSearch.textFields.collection;
     searchDocument.limit = 1000;
+    
+    let id = await digest(searchDocument);
 
-    return this.request({
+    let request = this.request({
       url : this.baseUrl,
       qs : opts,
       json : true,
@@ -89,15 +92,20 @@ class CollectionService extends BaseService {
         method : 'POST',
         body : searchDocument
       },
-      onLoading : promise => this.store.setSearchLoading(searchDocument, promise),
+      checkCached : () => this.store.data.search.get(id),
+      onLoading : request => this.store.set({searchDocument, request, id}, this.store.data.search),
       onLoad : result => {
         if( result.body.results ) {
           result.body.results = result.body.results.map(record => new RecordGraph(record));
         }
-        this.store.setSearchLoaded(searchDocument, result.body)
+        let payload = {searchDocument, payload: result.body, id};
+        vcModel.renderCollections(payload);
+        this.store.set(payload, this.store.data.search)
       },
-      onError : e => this.store.setSearchError(searchDocument, e)
+      onError : error => this.store.setSearchError({searchDocument, error, id}, this.store.data.search)
     });
+
+    return {id, request}
   }
 
   /**
@@ -108,7 +116,7 @@ class CollectionService extends BaseService {
    */
   async getCollectionEdits(id) {
     return this.request({
-      url : `${this.baseUrl}/edits${id}`,
+      url : `/api/client-edits${id}`,
       checkCached : () => this.store.data.edits[id],
       onLoading : request => this.store.setCollectionEditLoading(id, request),
       onLoad : result => this.store.setCollectionEditLoaded(id, result.body),
