@@ -82,6 +82,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
   }
 
   async _onRenderMedia(e) {
+    if( !e.selectedRecord ) return;
+
     let renderAsBr = false;
     let mediaType;
     this.noMedia = false;
