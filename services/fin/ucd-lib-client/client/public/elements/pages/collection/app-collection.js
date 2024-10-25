@@ -248,7 +248,7 @@ class AppCollection extends Mixin(LitElement)
 
     let featuredImage = '';
     let fileElement = document.querySelector('#file-upload');
-    if( fileElement?.length ) {
+    if( fileElement?.files?.length ) {
       featuredImage = fileElement.files[0];
     }
     this._updateDisplayData(featuredImage);
