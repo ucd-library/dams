@@ -35,6 +35,8 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       if (this.visible && e.which === 27) this.hide();
     });
 
+    window.addEventListener('popstate', this._onPopState.bind(this));
+
     this._injectModel("AppStateModel", "MediaModel");
   }
 
@@ -51,6 +53,12 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
     if (selectedRecord ) {
       this._onSelectedRecordUpdate(selectedRecord);
+    }
+  }
+
+  _onPopState(e) {
+    if ( this.AppStateModel.store.data.showLightbox ) {
+      this.AppStateModel.set({ showLightbox: false });
     }
   }
 
