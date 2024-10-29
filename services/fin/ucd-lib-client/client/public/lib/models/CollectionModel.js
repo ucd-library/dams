@@ -103,7 +103,6 @@ class CollectionModel extends BaseModel {
     async search(searchDocument) {
       let resp = await this.service.search(searchDocument);
       if( resp.request ) await resp.request;
-      console.log('search id', resp.id);
       return this.store.data.search.get(resp.id);
     }
 
@@ -116,12 +115,12 @@ class CollectionModel extends BaseModel {
         }]
       };
       // searchDocument = {limit: 3};
-      return this.service.search(searchDocument);
+      return this.search(searchDocument);
     }
 
     getHomepageDefaultCollections() {
       let searchDocument = {limit: 3};
-      return this.service.search(searchDocument);
+      return this.search(searchDocument);
     }
 
     /**

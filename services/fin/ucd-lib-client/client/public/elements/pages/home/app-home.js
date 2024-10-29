@@ -120,9 +120,8 @@ class AppHome extends Mixin(LitElement)
 
     // get recent collections
     let data = await this.CollectionModel.getRecentCollections();
-    
-    if( data.response?.ok && data.body?.results?.length ) {
-      this.recentCollections = data.body.results?.slice(0, 3);
+    if( data?.payload?.results?.length ) {
+      this.recentCollections = data?.payload?.results?.slice(0, 3);
     }
 
     this.requestUpdate();
@@ -130,6 +129,11 @@ class AppHome extends Mixin(LitElement)
 
   _setFeaturedImage() {
     this.heroImgOptions = (APP_CONFIG.featuredImages || []);
+
+    // if collection doesn't exist for a featured image, remove it from the list
+    this.heroImgOptions = this.heroImgOptions.filter(i => {
+      return APP_CONFIG.collectionLabels[i.collectionLink];
+    });
 
     let i = Math.floor(Math.random() *  this.heroImgOptions.length);
     let src = this.heroImgOptions[i];
