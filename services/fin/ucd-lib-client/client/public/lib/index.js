@@ -11,7 +11,8 @@ const models =  {
   SeoModel : require('./models/SeoModel'),
   FiltersModel : require('./models/FiltersModel'),
   FcAppConfigModel : require('./models/FcAppConfigModel'),
-  BrowseByModel : require('./models/BrowseByModel')
+  BrowseByModel : require('./models/BrowseByModel'),
+  BookReaderModel : require('./models/BookReaderModel'),
 };
 
 if( typeof window !== 'undefined' ) {

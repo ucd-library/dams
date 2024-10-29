@@ -234,17 +234,17 @@ class RecordModel extends ElasticSearchModel {
     return this.store.getDefaultSearch(storeId);
   }
 
-  /**
-     * @method getIaBookManifest
-     * @description load a records IA bookreader page data by id
-     * 
-     * @param {String} url the manifest url
-     * 
-     * @returns {Promise} resolves to record
-     */
-  async getIaBookManifest(url) {
-    return await this.service.getIaBookManifest(url);
-  }
+  // /**
+  //    * @method getIaBookManifest
+  //    * @description load a records IA bookreader page data by id
+  //    * 
+  //    * @param {String} url the manifest url
+  //    * 
+  //    * @returns {Promise} resolves to record
+  //    */
+  // async getIaBookManifest(url) {
+  //   return await this.service.getIaBookManifest(url);
+  // }
     
 
   /**

@@ -14,7 +14,7 @@ class CollectionModel extends BaseModel {
       this.store = CollectionStore;
       this.service = CollectionService;
 
-      this.logger = getLogger('CollectionModel');
+      // this.logger = getLogger('CollectionModel');
 
       // the selected collection functionality is just a shortcut for listening
       // to es filters and seeing if a collection is being filtered on. This is
@@ -100,8 +100,10 @@ class CollectionModel extends BaseModel {
       return this.store.data.selected;
     }
 
-    search(searchDocument) {
-      return this.service.search(searchDocument);
+    async search(searchDocument) {
+      let resp = await this.service.search(searchDocument);
+      if( resp.request ) await resp.request;
+      return this.store.data.search.get(resp.id);
     }
 
     getRecentCollections(limit=3) {
@@ -113,12 +115,12 @@ class CollectionModel extends BaseModel {
         }]
       };
       // searchDocument = {limit: 3};
-      return this.service.search(searchDocument);
+      return this.search(searchDocument);
     }
 
     getHomepageDefaultCollections() {
       let searchDocument = {limit: 3};
-      return this.service.search(searchDocument);
+      return this.search(searchDocument);
     }
 
     /**
@@ -149,30 +151,6 @@ class CollectionModel extends BaseModel {
 
       AppStateModel.setSelectedCollection(selected);
       AppStateModel.set({searchCollection: selected});
-    }
-
-    /**
-     * @method getFeaturedImage
-     * @description get overridden featured image for collection if exists
-     * 
-     * @param {String} id collection id
-     * @param {Object} fcAppConfigModel instance of FcAppConfigModel
-     * 
-     * @returns {String} image url
-     */
-    async getFeaturedImage(id, fcAppConfigModel) {
-      if( !id || !fcAppConfigModel ) return;
-      let edits;
-
-      try {
-        edits = await this.getCollectionEdits(id);
-      } catch (error) {
-        this.logger.warn('Error retrieving collection edits', error);
-      }
-
-      let thumbnailUrl = edits?.payload?.collection?.thumbnailUrl?.['@id'];
-      if( thumbnailUrl ) thumbnailUrl = '/fcrepo/rest'+ thumbnailUrl.split('/fcrepo/rest')[1];
-      return thumbnailUrl;
     }
 
     /**

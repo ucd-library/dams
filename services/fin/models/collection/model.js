@@ -3,6 +3,8 @@ const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 const workflowUtils = require('../workflows.js');
 const validate = require('../validate.js');
+const clientEdits = require('../client-edits');
+const clientEditsModel = clientEdits.model;
 
 class CollectionsModel extends FinEsDataModel {
 
@@ -67,6 +69,7 @@ class CollectionsModel extends FinEsDataModel {
    */
   async get(id, opts={}, index) {
     let collection = await super.get(id, opts, index);
+    await this._appendClientEdits(collection);
     return this._appendImageNode(collection);    
   }
 
@@ -74,10 +77,23 @@ class CollectionsModel extends FinEsDataModel {
     let result = await super.search(searchDocument, opts, index);
     if( result.results ) {
       for( let collection of result.results ) {
+        await this._appendClientEdits(collection);
         await this._appendImageNode(collection);
       }
     }
     return result;
+  }
+
+  async _appendClientEdits(collection) {
+    if( !collection ) return collection;
+    let resp = await clientEditsModel.get(collection['@id']);
+
+    if( resp?.collection ) {
+      if( !resp.collection['@type'] ) resp.collection['@type'] = [];
+      if( !Array.isArray(resp.collection['@type']) ) resp.collection['@type'] = [resp.collection['@type']];
+      resp.collection['@type'].push('http://digital.ucdavis.edu/schema#ClientEdit');
+      collection['@graph'].push(resp.collection);
+    }
   }
 
   async _appendImageNode(collection) {

@@ -15,7 +15,6 @@
   "author": "jrmerz@ucdavis.edu",
   "license": "MIT",
   "dependencies": {
-    "@ucd-lib/cork-app-utils": "^6.2.0",
     "@ucd-lib/spa-router-middleware": "^0.2.1"
   },
   "devDependencies": {

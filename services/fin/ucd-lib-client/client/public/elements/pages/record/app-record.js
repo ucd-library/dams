@@ -66,6 +66,7 @@ class AppRecord extends Mixin(LitElement)
     this.subjects = [];
     this.callNumber = "";
     this.collectionImg = "";
+    this.defaultCollectionImg = "/images/tree-bike-illustration.png";
     this.collectionId = "";
     this.renderedCollectionId = "";
     this.description = "";
@@ -149,15 +150,17 @@ class AppRecord extends Mixin(LitElement)
     this.renderedCollectionId = e.id;
     this.collectionId = e.id;
 
-    let overriddenFeatureImage = await this.CollectionModel.getFeaturedImage(this.collectionId, this.FcAppConfigModel);
+    let overriddenFeatureImage = e.vcData?.clientEdits?.['@id'] || '';
     if (overriddenFeatureImage) {
-      this.collectionImg = overriddenFeatureImage;
+      this.collectionImg = '/fcrepo/rest' + overriddenFeatureImage + '/featuredImage.jpg';;
     } else {
       this.collectionImg = e.vcData?.images?.small?.url                   
       || e.vcData?.images?.medium?.url 
       || e.vcData?.images?.large?.url
       || e.vcData?.images?.original?.url;
     }
+
+    if( !this.collectionImg ) this.collectionImg = this.defaultCollectionImg;    
   }
 
   /**
@@ -165,6 +168,8 @@ class AppRecord extends Mixin(LitElement)
    */
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) return;
+
+    this._updateSlimStyles();
 
     let hasError = false;
     if( this.RecordModel.currentRecordId ) {
@@ -407,14 +412,14 @@ class AppRecord extends Mixin(LitElement)
 
         if( mediaViewer.singlePage !== singlePage ) {
           mediaViewer.singlePage = singlePage;
-          if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
-            requestAnimationFrame(() => {
-              mediaViewer._onToggleBookView();
-            });
-          } else {
-            // to reload br if not initiated
-            mediaViewer._onAppStateUpdate(await this.AppStateModel.get());
-          }         
+          // if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
+          //   requestAnimationFrame(() => {
+          //     mediaViewer._onToggleBookView();
+          //   });
+          // } else {
+          //   // to reload br if not initiated
+          //   mediaViewer._onAppStateUpdate(await this.AppStateModel.get());
+          // }         
         }
         mediaViewer.isBookReader = newDisplayType === 'bookreader';
         mediaViewer.mediaType = newDisplayType;
@@ -494,12 +499,12 @@ class AppRecord extends Mixin(LitElement)
     }, 3000);
   }
 
-  _onBookViewPageChange(e) {
-    let appMediaDownload = document.querySelector('app-media-download');
-    if( appMediaDownload ) {
-      appMediaDownload.brPageChange(e.detail);
-    }
-  }
+  // _onBookViewPageChange(e) {
+  //   let appMediaDownload = document.querySelector('app-media-download');
+  //   if( appMediaDownload ) {
+  //     appMediaDownload.brPageChange(e.detail);
+  //   }
+  // }
 }
 
 customElements.define("app-record", AppRecord);

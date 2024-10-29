@@ -149,6 +149,8 @@ class AppCollection extends Mixin(LitElement)
 
     if( this.appDataLoaded && !this.savedItems.length ) {
       this.getLatestItems();
+    } else if( this.savedItems.length ) {
+      this.highlightedItems = this.savedItems;
     }
 
     this._updateDisplayData();
@@ -241,16 +243,17 @@ class AppCollection extends Mixin(LitElement)
 
     this.editMode = false;
 
-    // TODO how to handle validation that all 6 featured items are populated? or more like how to alert user
-
     // parse highlighted items
     this.savedItems = [];
     let newSavedItems = [];
+    let itemArkRegex = /^\/?(item\/)?(ark:\/)?/;
+
     let itemInputs = document.querySelectorAll('.item-ark-input');
     itemInputs.forEach((input, index) => {
       if( input.value ) {
+        let val = input.value.trim();
         newSavedItems.push({
-          '@id' : '/item'+input.value.trim(),
+          '@id' : `/item/ark:/${val.replace(itemArkRegex, '')}`,
           position : index+1
         });
       }
@@ -359,6 +362,10 @@ class AppCollection extends Mixin(LitElement)
 
     this.itemCount = collectionEdits.itemCount || 6;
     this.itemDefaultDisplay = collectionEdits.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
+
+    this.savedItems = collectionEdits.exampleOfWork;
+    if( !Array.isArray(this.savedItems) ) this.savedItems = [];
+    this.savedItems.sort((a,b) => a.position - b.position);
 
     // set item prefs
     this.itemEdits = Object.entries(itemEdits).map(
