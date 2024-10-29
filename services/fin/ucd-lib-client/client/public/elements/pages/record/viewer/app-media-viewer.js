@@ -82,18 +82,27 @@ export default class AppMediaViewer extends Mixin(LitElement)
   }
 
   async _onRenderMedia(e) {
-    // TODO eventually support mutiple mediaGroups, combine different media types into same viewer/nav?
+    if( !e.selectedRecord ) return;
+
+    let renderAsBr = false;
+    let mediaType;
+    this.noMedia = false;
+
     let mediaGroups = e.selectedRecord?.clientMedia?.mediaGroups;
     
     if (!mediaGroups || !mediaGroups.length || !mediaGroups.filter(m => m['@type'].length > 0).length ) {
-      this.logger.error('No recognized types found in media groups for record', e.selectedRecord?.clientMedia?.id || e.selectedRecord);      
-      this.noMedia = true;
-      return;
+      // try to at least load a single image as fallback
+      let thumbnailUrl = utils.getThumbnailFromClientMedia(e?.selectedRecord?.clientMedia);
+      if( thumbnailUrl ) {
+        this.mediaType = 'image';
+      } else {
+        this.noMedia = true;        
+        this.logger.error('No recognized types found in media groups for record', e.selectedRecord?.clientMedia?.id || e.selectedRecord);      
+      }
+      return; 
     }
 
-    this.itemId = e.selectedRecord?.graph?.root?.['@id'];
-    let renderAsBr = false;
-    let mediaType;
+    this.itemId = e.selectedRecord?.graph?.root?.['@id'];    
 
     // to check for imageList first, otherwise default to pdf for bookreader
     let mediaGroup = mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
@@ -153,7 +162,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     // single page images should use normal image viewer
-    if( mediaGroup['@shortType'].includes('ImageObject') || mediaGroup.clientMedia?.pages?.length === 1 ) {
+    if( (mediaGroup?.['@shortType'] || []).includes('ImageObject') || mediaGroup?.clientMedia?.pages?.length === 1 ) {
       renderAsBr = false;
       mediaType = 'image';
     }
@@ -237,6 +246,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     if( imageViewer ) imageViewer.destroy();
     // if( bookreaderViewer ) bookreaderViewer.destroy();
+    this.noMedia = false;
   }
 
   _onSearchResultsChange(resultsByPage={}) {

@@ -191,6 +191,7 @@ class AppCollection extends Mixin(LitElement)
     this.citationRoot = {};
     this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage; // one, list.. for admin pref on BR display type for items in this collection
     this.itemEdits = [];
+    if( document.querySelector('#file-upload')?.value ) document.querySelector('#file-upload').value = '';
   }
 
   _onItemDisplayChange(e) {
@@ -245,12 +246,18 @@ class AppCollection extends Mixin(LitElement)
     });
     this.savedItems = [...newSavedItems];
 
-    let featuredImage = document.querySelector('#file-upload').files[0];
+    let featuredImage = '';
+    let fileElement = document.querySelector('#file-upload');
+    if( fileElement?.files?.length ) {
+      featuredImage = fileElement.files[0];
+    }
     this._updateDisplayData(featuredImage);
 
+
     await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData);
-    if( featuredImage ) {
+    if( fileElement && featuredImage ) {
       await this.FcAppConfigModel.saveCollectionFeaturedImage(this.collectionId, featuredImage);
+      fileElement.value = '';
     }
 
     // parse checked item exceptions to reset them to collection default display type
@@ -281,6 +288,7 @@ class AppCollection extends Mixin(LitElement)
   _onCancelEditClicked(e) {
     if( !this.isUiAdmin ) return;
     this.editMode = false;
+    document.querySelector('#file-upload').value = '';
   }
 
   /**

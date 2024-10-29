@@ -297,6 +297,8 @@ class RecordModel extends ElasticSearchModel {
       return this.store.getSearch();
     }
 
+    if( !searchDocument.sort ) searchDocument.sort = [{ "@graph.name.raw": { "order": "asc" } }];
+
     try {
       await this.service.search(searchDocument, opts);
     } catch(e) {}
