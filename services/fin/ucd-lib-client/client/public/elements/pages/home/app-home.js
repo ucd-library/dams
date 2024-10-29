@@ -121,7 +121,7 @@ class AppHome extends Mixin(LitElement)
     // get recent collections
     let data = await this.CollectionModel.getRecentCollections();
     
-    if( data.response.ok && data.body.results.length ) {
+    if( data.response?.ok && data.body?.results?.length ) {
       this.recentCollections = data.body.results?.slice(0, 3);
     }
 
