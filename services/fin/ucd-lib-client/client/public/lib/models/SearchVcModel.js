@@ -65,6 +65,8 @@ class SearchVcModel extends BaseModel {
       let imageList = mediaGroups.filter(m => utils.getMediaType(m) === 'ImageList')[0];
       if( imageList && imageList.hasPart && imageList.hasPart.length ) {
         mediaType = imageList.hasPart.length + ' page' + (imageList.hasPart.length > 1 ? 's' : '')  + ', Image';
+      } else if( imageList && typeof imageList.hasPart === 'object' && Object.keys(imageList.hasPart).length < 2 ) {
+        mediaType = 'Image';
       } else if( imageList && imageList.hasPart ) { // some items just point to the dl/pdf
         mediaType = 'Multi-page, Image';
       }
