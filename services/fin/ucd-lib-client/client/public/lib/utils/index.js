@@ -116,7 +116,6 @@ class Utils {
       }
     }
 
-    if( clientMedia.id === "/item/ark:/85140/d4495h" ) console.log({clientMedia, thumbnailUrl});
     return thumbnailUrl;
   }
 
