@@ -34,6 +34,7 @@ class AppRecord extends Mixin(LitElement)
       publisher: { type: String },
       subjects: { type: Array },
       callNumber: { type: String },
+      material: { type: String },
       size: { type: String },
       rights: { type: Object },
       metadata: { type: Array },
@@ -65,6 +66,7 @@ class AppRecord extends Mixin(LitElement)
     this.publisher = "";
     this.subjects = [];
     this.callNumber = "";
+    this.material = "";
     this.collectionImg = "";
     this.defaultCollectionImg = "/images/tree-bike-illustration.png";
     this.collectionId = "";
@@ -136,6 +138,7 @@ class AppRecord extends Mixin(LitElement)
     this.publisher = this.record.publisher;
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
+    this.material = this.record.material;
 
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;

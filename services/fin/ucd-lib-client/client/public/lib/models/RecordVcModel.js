@@ -67,6 +67,7 @@ class RecordVcModel {
         arkDoi: ["?"],
         fedoraLinks: ["?"],
         citationText: "?",
+        material: root.material || '',
         // building these in the ui for now since the links change as different media is selected
         // arkDoi,
         // fedoraLinks,

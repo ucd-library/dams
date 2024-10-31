@@ -348,6 +348,11 @@ export default function render() {
         <div class="value" id="callNumberValue">${this.callNumber}</div>
       </div>
 
+      <div ?hidden="${!this.material}" class="metadata-row" id="material">
+        <div class="attr">Format</div>
+        <div class="value" id="materialValue">${this.material}</div>
+      </div>
+
       <div class="metadata-row" id="identifier">
         <div class="attr">ARK / DOI</div>
         <div class="value" id="identifierValue">
