@@ -1,6 +1,8 @@
 import { html } from 'lit';
 import { sharedStyles } from '../../../styles/shared-styles';
 
+import utils from '../../../../lib/utils';
+
 export default function render() { 
   return html`
 
@@ -159,7 +161,7 @@ export default function render() {
         ?disabled="${item.disabled}">
       </app-normal-checkbox>
 
-      <div class="count ${item.doc_count > 0 ? 'has-count' : ''}">${item.doc_count}</div>
+      <div class="count ${item.doc_count > 0 ? 'has-count' : ''}">${utils.formatNumberWithCommas(item.doc_count)}</div>
     </div>
     `)}
   </div>

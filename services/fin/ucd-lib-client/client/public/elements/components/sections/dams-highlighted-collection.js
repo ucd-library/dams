@@ -4,6 +4,8 @@ import render from "./dams-highlighted-collection.tpl.js";
 
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
+import utils from "../../../lib/utils/index.js";
+
 /**
  * @class DamsHighlightedCollection
  * @description Homepage UI component class for displaying a page section higlighting a collection.
@@ -84,7 +86,7 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
       this.imgSrc = "/images/tree-bike-illustration.png";
     }
     this.collectionTitle = res.vcData.title;
-    this.itemCt = res.vcData.count;
+    this.itemCt = utils.formatNumberWithCommas(res.vcData.count);
     this.href = res.id;
   }
 }
