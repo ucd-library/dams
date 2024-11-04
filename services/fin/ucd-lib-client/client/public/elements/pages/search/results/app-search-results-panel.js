@@ -157,8 +157,12 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       return;
     } 
 
+    this.totalCollections = 0;
+
     let collectionIds = decodedUrl.split('@graph.isPartOf.@id","or","')[1].split('"]')[0].split(',');
-    this.totalCollections = collectionIds.length;
+    if( collectionIds.length > 1 ) {
+      this.totalCollections = collectionIds.length;
+    }
   }
 
   /**
