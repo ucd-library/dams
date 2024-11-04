@@ -539,6 +539,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
         composed: true
       })
     );
+
+    window.scrollTo(0, 0);
   }
 }
 

@@ -198,7 +198,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     );
 
     this._updateSideImages();
-    window.scrollTo(0, 0);
   }
 
   /**
@@ -237,7 +236,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     );
 
     this._updateSideImages();
-    window.scrollTo(0, 0);
   }
 
   async _searchBrowseByCollections() {
