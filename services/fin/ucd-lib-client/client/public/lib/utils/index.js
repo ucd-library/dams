@@ -82,12 +82,16 @@ class Utils {
       return "BagOfFiles";
     }
 
+    if( record.fileFormat?.includes('image') && record.clientMedia?.images ) return "ImageObject";
+    
     return null;
   }
 
-  getThumbnailFromClientMedia(clientMedia) {
+  getThumbnailFromClientMedia(clientMedia={}) {
     let thumbnailUrl = "";
     let graph = clientMedia.graph;
+
+    if( !clientMedia.mediaGroups ) return thumbnailUrl;
 
     for (const mediaGroup of clientMedia.mediaGroups) {
       if (mediaGroup.clientMedia?.images?.medium?.url) {
@@ -111,6 +115,8 @@ class Utils {
         }
       }
     }
+
+    if( clientMedia.id === "/item/ark:/85140/d4495h" ) console.log({clientMedia, thumbnailUrl});
     return thumbnailUrl;
   }
 
