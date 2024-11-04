@@ -75,6 +75,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       if( this.media.original?.url ) {
         // we might not have size
         let size = await this.getImageSize(this.media.original);
+        if( Array.isArray(size) && size.length > 1 ) size = size[0];
         srcset += `${this.media.original.url} ${size.width}w`;
 
         // calculate height based on width of screen for single image items
