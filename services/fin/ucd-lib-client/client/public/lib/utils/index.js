@@ -37,6 +37,14 @@ class Utils {
     return Array.isArray(value) ? value : [value];
   }
 
+  formatNumberWithCommas(num) {
+    try {
+      num = typeof num === 'string' ? parseFloat(num) : num;
+    } catch(e) {}
+    if( isNaN(num) ) return num;
+    return new Intl.NumberFormat('en-US').format(num);
+  }
+
   /**
    * @method findMediaFromId
    * @description given a record object, use the id (@id) to return
@@ -116,7 +124,6 @@ class Utils {
       }
     }
 
-    if( clientMedia.id === "/item/ark:/85140/d4495h" ) console.log({clientMedia, thumbnailUrl});
     return thumbnailUrl;
   }
 

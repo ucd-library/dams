@@ -118,13 +118,15 @@ export class FinApp extends Mixin(LitElement)
    */
   async _onAppStateUpdate(e) {
     if (e.location.page === this.currentPage) return;
+
+    this._updateScrollPosition(e);
     this.currentPage = e.location.page;
 
     this.showBreadcrumb = this.BREADCRUMB_PAGES.includes(e.location.page);
     this.showSearchHeader = this.SEARCH_HEADER_PAGES.includes(e.location.page);
 
     this.appState = e;
-    window.scrollTo(0, 0);
+
     let page = e.location.page;
     if (!this.loadedPages[page]) {
       this.page = "loading";
@@ -144,6 +146,34 @@ export class FinApp extends Mixin(LitElement)
     }
 
     if( !['item', 'collection'].includes(this.page) ) this._updatePageMetadata();
+  }
+
+  /**
+   * @method _updateScrollPosition
+   * @description update the scroll position based on the current page
+   * @param {Object} e
+   */
+  _updateScrollPosition(e) {
+    let scrollPositionY = 0;
+    // every page change should scroll to top, except on search page we want to store the scroll position if nav to an item and then back, 
+    // so when nav back, we can scroll to the same position we started at
+    if( e.location.page === 'item' && e.lastLocation.page === 'search' && !this.searchScrollPositionY ) {
+      this.searchScrollPositionY = window.scrollY;
+    } else if( e.location.page === 'search' && e.lastLocation.page === 'item' ) {
+      scrollPositionY = this.searchScrollPositionY;
+      this.searchScrollPositionY = 0;
+    } else if( e.location.page === 'search' && e.lastLocation.page === 'search' ) {
+      scrollPositionY = 0;
+      this.searchScrollPositionY = 0;
+    }
+
+    if( !['item', 'search'].includes(e.location.page) && !['item', 'search'].includes(e.lastLocation.page) ) {
+      this.searchScrollPositionY = 0;
+    }
+
+    requestAnimationFrame(() => {      
+      window.scrollTo(0, scrollPositionY);
+    });
   }
 
   /**

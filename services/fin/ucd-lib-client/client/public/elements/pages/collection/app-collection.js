@@ -142,7 +142,7 @@ class AppCollection extends Mixin(LitElement)
     this.material = root.material || '';
     this.languages = !Array.isArray(root.language || []) ? [root.language] : root.language;
     this.location = root.location || '';
-    this.items = e.vcData.count;
+    this.items = utils.formatNumberWithCommas(e.vcData.count);
     this.yearPublished = e.vcData.yearPublished;
 
     this.citationRoot = root;

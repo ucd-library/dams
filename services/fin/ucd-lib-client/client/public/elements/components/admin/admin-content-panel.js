@@ -104,6 +104,18 @@ export class AdminContentPanel extends LitElement {
   }
 
   /**
+   * @method _removeCollection
+   * @description Remove Collection button press event, remove collection dropdown from ui
+   */
+  _removeCollection(e) {
+    let position = e.currentTarget.dataset.index;
+    this.collectionIds = this.collectionIds.filter(c => c.position != position); // remove collection from collectionIds
+    this.collectionIds = this.collectionIds.map((c,index) => { return { position: index, selected: c.selected }}); // reindex positions
+    this.isDirty = true;
+    this.requestUpdate();
+  }
+
+  /**
    * @method _addCollection
    * @description Add Collection button press event, add collection dropdown to ui
    */
