@@ -30,6 +30,7 @@ config.client = {
     FIN_SERVER_REPO_HASH : process.env.FIN_SERVER_REPO_HASH || '',
     APP_VERSION : process.env.APP_VERSION || '',
     BUILD_NUM : process.env.BUILD_NUM || '',
+    BUILD_DATETIME : process.env.BUILD_DATETIME || '',
     UCD_DAMS_REPO_BRANCH : process.env.UCD_DAMS_REPO_BRANCH || '',
     UCD_DAMS_REPO_TAG : process.env.UCD_DAMS_REPO_TAG || '',
     UCD_DAMS_REPO_SHA : process.env.UCD_DAMS_REPO_SHA || '',
