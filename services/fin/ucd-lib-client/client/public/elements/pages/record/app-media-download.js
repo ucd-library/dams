@@ -189,6 +189,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
   // }
 
   _noSinglePageDownload() {
+    debugger;
     this.zipName = this.rootRecord.name
       .replace(/[^a-zA-Z0-9]/g, "-")
       .toLowerCase();
@@ -240,6 +241,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let firstMediaDownload = this.clientMedia.mediaGroups[0]?.clientMedia?.download?.[0]?.url;
 
     if( allFiles || this.isTwoPageView ) {
+      debugger;
       // build zip download url
       this.zipName = this.rootRecord.name
         .replace(/[^a-zA-Z0-9]/g, "-")
@@ -420,11 +422,16 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     if( !urls.length ) return;
 
+    if( urls.length === 1 ) {
+      this.archiveHref = '/fcrepo/rest'+urls[0];
+      return;
+    }
+
     this.zipConcatenatedPaths = urls.join(',');
     this.zipPaths = urls;
 
     // this.shadowRoot.querySelector("#format") to get current format, match to url label?
-    this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}}`;
+    this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}`;
   }
 
   /**
