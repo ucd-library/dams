@@ -119,14 +119,13 @@ export default function render() {
       }
     </style>
 
-    <!--hidden$="${!this.isImage}" -->
-    <div class="image" id="imgRoot">
+    <div class="image" id="imgRoot" style="height: ${this.imageHeight}px;">
       <img
         id="img"
         src="${this.thumbnailUrl}"
-        style="height: ${this.imageHeight}px; width: 100%; display: block"
-        onload="this.style.display='block';"
-      />
+        style="height: ${this.imageHeight}px; width: 100%; display: none;"
+        onload="this.style.display = 'block';"
+        />
       <div ?hidden="${!this.isVideo}" class="video-thumbnail"></div>
       <div
           class="media-type"

@@ -132,11 +132,28 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
 
     this._calcImageHeight();
     this.dispatchEvent(new CustomEvent("rendered", { detail: this }));
+
+    requestAnimationFrame(() => {
+      let img = this.shadowRoot.querySelector("#img");
+      if (img.complete) {
+        img.style.display = "block";
+      } else {
+        img.onload = () => {
+          img.style.display = "block";
+        };
+      }
+    });
   }
 
   _calcImageHeight() {
     let img = this.shadowRoot.querySelector("#img");
-    let width = img.width || 1;
+    let width = 100;
+    if( img ) {
+      img.style.display = "block";
+      width = img.width;
+      img.style.display = "none";  
+    }
+
     let imageHeight = this.size.height || this.bounds?.[1]?.[0] || 100;
     let imageWidth = this.size.width || this.bounds?.[1]?.[1] || 100;
     let ratio = imageHeight / imageWidth;
