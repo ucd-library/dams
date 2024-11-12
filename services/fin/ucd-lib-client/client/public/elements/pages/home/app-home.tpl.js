@@ -668,7 +668,14 @@ export default function render() {
 
     <ucd-theme-header>
       <ucd-theme-primary-nav>
-        <a href=/browse>Browse</a>
+        <a href="/" class="home-link" mobile-only>Home</a>
+        <ul link-text="Browse" href="/browse">
+          <li><a href="/browse/collections/15">Collections</a></li>
+          <li><a href="/search">Items</a></li>
+          <li><a href="/browse/creator/30">Creators</a></li>
+          <li><a href="/browse/format/30">Formats</a></li>
+          <li><a href="/browse/subject/30">Subjects</a></li>
+        </ul>
         <a href="/about">About</a>
       </ucd-theme-primary-nav>
     </ucd-theme-header>
