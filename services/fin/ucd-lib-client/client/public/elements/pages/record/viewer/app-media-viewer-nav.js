@@ -298,7 +298,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
   _reset() {
     this.singleImage = false;
-    this.isBookReader = false;
+    // this.isBookReader = false;
     this.brFullscreen = false;
     this.thumbnails = [];
   }
