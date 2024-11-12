@@ -101,12 +101,12 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
   }
 
   _onAppStateUpdate(e) {
+    if( this.AppStateModel.location.page !== 'item' ) this._reset();
     if (e.mediaViewerNavLeftMostThumbnail === undefined) return;
     if (e.mediaViewerNavLeftMostThumbnail === this.leftMostThumbnail) return;
 
     this.leftMostThumbnail = e.mediaViewerNavLeftMostThumbnail;
-    this._resize();
-    // if( this.AppStateModel.location.page !== 'item' ) this._onSearchResultsEmpty();
+    this._resize();    
   }
 
   _onBookreaderStateUpdate(e) {
@@ -294,6 +294,13 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.thumbnails.forEach((thumbnail, index) => {
       thumbnail.disabled = index < this.leftMostThumbnail || index >= lastThumb;
     });
+  }
+
+  _reset() {
+    this.singleImage = false;
+    this.isBookReader = false;
+    this.brFullscreen = false;
+    this.thumbnails = [];
   }
 
   /**

@@ -247,6 +247,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if( imageViewer ) imageViewer.destroy();
     // if( bookreaderViewer ) bookreaderViewer.destroy();
     this.noMedia = false;
+
+    this._onCollapseBookView();
   }
 
   _onSearchResultsChange(resultsByPage={}) {
