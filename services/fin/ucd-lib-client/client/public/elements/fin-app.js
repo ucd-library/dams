@@ -117,9 +117,10 @@ export class FinApp extends Mixin(LitElement)
    * @method _onAppStateUpdate
    */
   async _onAppStateUpdate(e) {
+    if( e.location.page === 'browse' ) this._updateScrollPosition(e);
     if (e.location.page === this.currentPage) return;
 
-    this._updateScrollPosition(e);
+    if( e.location.page !== 'browse' ) this._updateScrollPosition(e);
     this.currentPage = e.location.page;
 
     this.showBreadcrumb = this.BREADCRUMB_PAGES.includes(e.location.page);
