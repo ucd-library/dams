@@ -197,6 +197,25 @@ class RecordModel extends ElasticSearchModel {
           "@graph.name.raw": {
             "order": "asc"
           }
+        },
+        {
+          "@graph.@id": {
+            "order": "asc"
+          }
+        }
+      ];
+    } else {
+      searchDocument.sort = [
+        "_score",
+        {
+          "@graph.name.raw": {
+            "order": "asc"
+          }
+        },
+        {
+          "@graph.@id": {
+            "order": "asc"
+          }
         }
       ];
     }
@@ -297,7 +316,25 @@ class RecordModel extends ElasticSearchModel {
       return this.store.getSearch();
     }
 
-    if( !searchDocument.sort ) searchDocument.sort = [{ "@graph.name.raw": { "order": "asc" } }];
+    if( searchDocument.text && !searchDocument.sort ) {      
+      searchDocument.sort = [
+        '_score', 
+        { "@graph.name.raw": { "order": "asc" } },
+        { "@graph.@id": { "order": "asc" } }    
+      ];
+    } else if( !searchDocument.sort ) {
+      searchDocument.sort = [
+        { "@graph.name.raw": { "order": "asc" } },
+        { "@graph.@id": { "order": "asc" } }    
+      ];
+    }
+    if( searchDocument.text && !searchDocument.sort.find(s => s['_score']) ) {
+      searchDocument.sort.unshift('_score');
+    }
+
+    if( !searchDocument.sort.find(s => s['@graph.@id'])) {
+      searchDocument.sort.push({ "@graph.@id": { "order": "asc" } });
+    }
 
     try {
       await this.service.search(searchDocument, opts);
