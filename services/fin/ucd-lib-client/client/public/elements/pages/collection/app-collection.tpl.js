@@ -405,6 +405,7 @@ export default function render() {
 
     .collection-highlights h2 {
       margin-bottom: 0;
+      margin-top: 4rem;
     }
 
     .edit-collections-container > fieldset {
