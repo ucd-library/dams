@@ -170,6 +170,13 @@ export default function render() {
         .download-section {
           display: block;
         }
+
+        .part-of .collection-info h4 {
+          font-weight: 800;
+        }
+        .collection-info {
+          font-size: 1.1rem;
+        }
       }
 
     app-record .admin-edit .left-panel {
