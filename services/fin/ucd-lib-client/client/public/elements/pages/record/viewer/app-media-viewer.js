@@ -115,7 +115,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if( !mediaGroup ) {
       mediaGroups.forEach((media) => {
         let type = utils.getMediaType(media);
-        if (type) {
+        if (type && !mediaGroup) {
           mediaType = type.toLowerCase().replace(/object/i, "");
           mediaGroup = media;
         }
