@@ -190,14 +190,9 @@ export default function render() {
         padding-top: 3rem;
       }
 
-      app-collection .title-section .collection-header {
-        height: 11rem;
-      }
-
       app-collection .title-section > div {
         width: 80%;
         margin: auto;
-        height: 30vh;
       }
       
       .detail-section {
