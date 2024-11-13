@@ -170,6 +170,32 @@ export default function render() {
         .download-section {
           display: block;
         }
+
+        .part-of .collection-info {
+          margin: auto;
+        }
+
+        .part-of {
+          min-height: 0;
+        }
+
+        .part-of div {
+          margin: 2rem 1.5rem 2rem 1rem;
+        }
+
+        .part-of .collection-info h4 {
+          font-weight: 800;
+          font-size: 1.2rem;
+          margin: 0;
+        }
+
+        .part-of .collection-info > * {
+          padding: .25rem 0;
+        }
+
+        .collection-info {
+          font-size: 1.1rem;
+        }
       }
 
     app-record .admin-edit .left-panel {

@@ -37,6 +37,7 @@ return html`
       background-color: var(--color-aggie-gold);
       cursor: pointer;
       border: none;
+      font-size: 1.2rem;
     }
 
     .citation .btn-copy:hover {
@@ -48,7 +49,8 @@ return html`
       background-color: var(--color-aggie-blue-50);
       margin-right: .5rem;
       min-width: 8ch;
-      height: 3.18rem;
+      /* height: 3.18rem; */
+      font-size: 1.2rem;
 
       /* arrow styles */
       display: inline-block;
@@ -86,7 +88,8 @@ return html`
     .citation .header-dots {
       margin: 0;
       align-items: start;
-      padding-bottom: 1rem;
+      padding-bottom: 1.25rem;
+      padding-top: .25rem;
     }
 
     .cite-collection {
@@ -109,9 +112,16 @@ return html`
       margin-top: 0;
     }
 
+    @media (max-width: 756px) {
+      .cite-collection {
+        width: 85%;
+      }
+    }
+
     @media (max-width: 600px) {
       .citation {
         display: block;
+        padding: 2rem 0;
       }
 
       .cite-graphic {
@@ -119,7 +129,19 @@ return html`
       }
 
       .cite-collection {
-        padding-top: 0;
+        /* padding-top: 0; */
+        width: 95%;
+        padding: 1rem;
+      }
+
+      .cite-collection h2 { 
+        font-weight: 800;
+        font-size: 1.7rem;
+      }
+
+      .citation-text {
+        font-size: 1.1rem;
+        line-height: 1.7;
       }
     }
 
@@ -133,7 +155,7 @@ return html`
 
     ${ SharedHtml.headerDots() }
 
-    <p>
+    <p class="citation-text">
       ${unsafeHTML(this.selectedCitation.text)}
     </p>
 

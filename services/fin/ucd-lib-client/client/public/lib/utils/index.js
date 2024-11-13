@@ -211,7 +211,7 @@ class Utils {
       let record = clientMediaIndex[part["@id"]];
 
       // TODO some of the index graphs don't have clientMedia, so some pages missing
-      if (!record.clientMedia) {
+      if (!record?.clientMedia) {
         console.error("no clientMedia images for ", record);
         return;
       }
