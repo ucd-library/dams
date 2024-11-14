@@ -1,5 +1,5 @@
 {
-  "registry" : "gcr.io/ucdlib-dams",
+  "registry" : "us-west1-docker.pkg.dev/ucdlib-dams/pub",
 
   "repositories" : {
     "fin" : "https://github.com/ucd-library/fin",
