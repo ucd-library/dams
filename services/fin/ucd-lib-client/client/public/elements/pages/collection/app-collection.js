@@ -368,7 +368,8 @@ class AppCollection extends Mixin(LitElement)
       this.thumbnailUrlOverride = url?.pathname;
     }
 
-    this.itemCount = collectionEdits.itemCount || 6;
+    this.itemCount = typeof collectionEdits.itemCount === 'number' ? collectionEdits.itemCount : 6;
+
     this.itemDefaultDisplay = collectionEdits.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
 
     this.savedItems = collectionEdits.exampleOfWork;

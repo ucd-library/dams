@@ -81,6 +81,9 @@ class SearchVcModel extends BaseModel {
 
       if (mediaType) mediaType = mediaType.replace("Object", "");
 
+      let size = result.clientMedia?.mediaGroups?.[0]?.clientMedia?.images?.original?.size || {};
+      if( Array.isArray(size) ) size = size[0];
+
       matchedItems.push({
         id: result.root["@id"],
         collectionId,
@@ -90,7 +93,8 @@ class SearchVcModel extends BaseModel {
         collection: result.root.publisher ? result.root.publisher.name : "", // for detail display
         creator: result.root.creator ? result.root.creator.name : "", // for detail display
         date: result.root.yearPublished || 'Undated', // for detail display
-        format: mediaType ? [mediaType] : null // for detail display
+        format: mediaType ? [mediaType] : null, // for detail display,
+        size 
       });
     });
 

@@ -134,8 +134,8 @@ export default function render() {
         vertical-align: middle;
         text-align: center;
         fill: var(--color-aggie-blue-70);
-        width: 40px;
-        height: 40px;
+        width: 1.75rem;
+        height: 1.75rem;
       }
 
       .search-side-panel.fullscreen .search-content {
