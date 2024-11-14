@@ -1,6 +1,7 @@
 ARG FIN_SERVER_IMAGE
+ARG MEDIA_UTILS_IMAGE
 FROM ${FIN_SERVER_IMAGE} as fin-server
-FROM gcr.io/ucdlib-pubreg/media-utils:latest
+FROM ${MEDIA_UTILS_IMAGE}
 
 COPY --from=fin-server /fin/api /fin-api
 RUN cd /fin-api && npm link
