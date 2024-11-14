@@ -577,7 +577,7 @@ export default function render() {
 
     <div class="collection-highlights">
       <h2 ?hidden="${(this.highlightedItems.length === 0  || this.itemCount <= 0) && !this.editMode}">Highlights From This Collection</h2>
-      ${ SharedHtml.headerDots() }
+      ${ this.highlightedItems.length !== 0  && this.itemCount > 0 ? SharedHtml.headerDots() : '' }
       
       <div class="edit-collections-container" ?hidden="${!this.editMode || !this.isUiAdmin}">
 
