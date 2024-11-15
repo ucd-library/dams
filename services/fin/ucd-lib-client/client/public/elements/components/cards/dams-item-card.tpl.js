@@ -153,21 +153,21 @@ export default function render() {
         ></div>
         <div
           class="media-type"
-          ?hidden="${!this.mediaType || this.mediaType === "image"}"
+          ?hidden="${!this.mediaType || this.mediaType.toLowerCase() === "image"}"
         >
           <ucdlib-icon
-            ?hidden="${this.mediaType !== "imageList"}"
+            ?hidden="${this.mediaType.toLowerCase() !== "imagelist"}"
             class="vertical-link__image"
             icon="ucdlib-dams:item-stack-blank"
           ></ucdlib-icon>
           <ucdlib-icon
             style="margin-left: .2rem;"
-            ?hidden="${this.mediaType !== "video"}"
+            ?hidden="${this.mediaType.toLowerCase() !== "video"}"
             class="vertical-link__image"
             icon="ucdlib-dams:fa-play"
           ></ucdlib-icon>
           <ucdlib-icon
-            ?hidden="${this.mediaType !== "audio"}"
+            ?hidden="${this.mediaType.toLowerCase() !== "audio"}"
             class="vertical-link__image"
             icon="ucdlib-dams:fa-volume-high"
           ></ucdlib-icon>

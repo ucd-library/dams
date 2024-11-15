@@ -86,6 +86,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     this.title = this.record.name;
     this.itemUrl = this.record['@id'];
     this.id = this.record['@id'];
+    this.mediaType = this.record.mediaType;
 
     this._truncateTitle();
   }
