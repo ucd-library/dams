@@ -30,6 +30,7 @@ config.client = {
     FIN_SERVER_REPO_HASH : process.env.FIN_SERVER_REPO_HASH || '',
     APP_VERSION : process.env.APP_VERSION || '',
     BUILD_NUM : process.env.BUILD_NUM || '',
+    BUILD_DATETIME : process.env.BUILD_DATETIME || '',
     UCD_DAMS_REPO_BRANCH : process.env.UCD_DAMS_REPO_BRANCH || '',
     UCD_DAMS_REPO_TAG : process.env.UCD_DAMS_REPO_TAG || '',
     UCD_DAMS_REPO_SHA : process.env.UCD_DAMS_REPO_SHA || '',
@@ -86,155 +87,158 @@ config.client = {
       itemName : "Early Types Deep Tillage Tools, California",
       collectionName : "Department of Biological and Agricultural Engineering Photographs",
       itemLink : "/item/ark:/87293/d3ns0m251",
-      collectionLink : "/collection/ag_eng"
+      collectionLink : "/collection/ark:/13030/c8154mgs"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/BioAg-AR_012_570.jpg",
       itemName : "General Purpose Barn",
       collectionName : "Department of Biological and Agricultural Engineering Photographs",
       itemLink : "/item/ark:/87293/d3vd6p84d",
-      collectionLink : "/collection/ag_eng"
+      collectionLink : "/collection/ark:/13030/c8154mgs"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/eastman-B-1076.jpg",
       itemName : "Thompson Lake",
       collectionName : "Eastman's Originals Collection",
       itemLink : "/item/ark:/13030/tf1r29n5v8",
-      collectionLink : "/collection/eastman"
+      collectionLink : "/collection/ark:/13030/tf6w100646"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/eastman-B-1107.jpg",
       itemName : "Early Day Logging",
       collectionName : "Eastman's Originals Collection",
       itemLink : "/item/ark:/13030/tf7t1nb3p0",
-      collectionLink : "/collection/eastman"
+      collectionLink : "/collection/ark:/13030/tf6w100646"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/eastman-C-726.jpg",
       itemName : "Pelicans",
       collectionName : "Eastman's Originals Collection",
       itemLink : "/item/ark:/13030/tf138nb09d",
-      collectionLink : "/collection/eastman"
+      collectionLink : "/collection/ark:/13030/tf6w100646"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/eastman-P-0459.jpg",
       itemName : "Logging in 1895",
       collectionName : "Eastman's Originals Collection",
       itemLink : "/item/ark:/13030/tf4p3004rm",
-      collectionLink : "/collection/eastman"
+      collectionLink : "/collection/ark:/13030/tf6w100646"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/eastman-T-2094.jpg",
       itemName : "Rodeo + Races",
       collectionName : "Eastman's Originals Collection",
       itemLink : "/item/ark:/13030/tf200003s0",
-      collectionLink : "/collection/eastman"
+      collectionLink : "/collection/ark:/13030/tf6w100646"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/greene-D192_7_079.jpg",
       itemName : "Photo album p. 39, Traful River",
       collectionName : "Greene, Henry Dart Papers",
       itemLink : "/item/ark:/87293/d3kj54",
-      collectionLink : "/collection/greene-papers"
+      collectionLink : "/collection/ark:/87287/d7r94j/D-192"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/greene-D192_7_087.jpg",
       itemName : "Photo album p. 42, Mar del Plata",
       collectionName : "Greene, Henry Dart Papers",
       itemLink : "/item/ark:/87293/d3pb50",
-      collectionLink : "/collection/greene-papers"
+      collectionLink : "/collection/ark:/87287/d7r94j/D-192"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/henchey-d3cb3f.jpg",
       itemName : "Hydraulic Mines, Scales, Sierra County, California, SV-1164",
       collectionName : "Henchey (Paul L.) Photographs",
       itemLink : "/item/ark:/87293/d3cb3f",
-      collectionLink : "/collection/henchey"
+      collectionLink : "/collection/D-515"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/henchey-d3gm7n.jpg",
       itemName : "Lodge and Cabins built in 1860's",
       collectionName : "Henchey (Paul L.) Photographs",
       itemLink : "/item/ark:/87293/d3gm7n",
-      collectionLink : "/collection/henchey"
+      collectionLink : "/collection/D-515"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/hunt-D104_1_13.jpg",
       itemName : "511. Costa Rica: coconut palms near Port Limon",
       collectionName : "Hunt (Thomas Forsyth) Papers",
       itemLink : "/item/ark:/87293/d37t99",
-      collectionLink : "/collection/hunt"
+      collectionLink : "/collection/D-104"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/hunt-D104_1_50.jpg",
       itemName : "548. Costa Rica: beneficio at Mata Redonda belonging to Miguel Guisginiani",
       collectionName : "Hunt (Thomas Forsyth) Papers",
       itemLink : "/item/ark:/87293/d3g74q",
-      collectionLink : "/collection/hunt"
+      collectionLink : "/collection/D-104"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/irrigation-700-A-a-249.jpg",
       itemName : "Water Pouring Over Sweet Water Dam After Raising about 1911. California.",
       collectionName : "Department of Irrigation Photographs",
       itemLink : "/item/ark:/87293/d37n2x",
-      collectionLink : "/collection/irrigation"
+      collectionLink : "/collection/AR-058"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/irrigation-700-A-a-329-2.jpg",
       itemName : "Don Pedro Dam, spillway crest (2 neg.)",
       collectionName : "Department of Irrigation Photographs",
       itemLink : "/item/ark:/87293/d3k19g",
-      collectionLink : "/collection/irrigation"
+      collectionLink : "/collection/AR-058"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lehmann-d74s4s.jpg",
       itemName : "Christmas Catalog 1969",
       collectionName : "Sherry Lehmann Wine Catalogs",
       itemLink : "/item/ark:/87287/d74s4s",
-      collectionLink : "/collection/sherry-lehmann"
+      collectionLink : "/collection/ark:/13030/c8pc37z3"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lehmann-d7hg6v.jpg",
       itemName : "Annual Winter Sale 1952",
       collectionName : "Sherry Lehmann Wine Catalogs",
       itemLink : "/item/ark:/87287/d7hg6v",
-      collectionLink : "/collection/sherry-lehmann"
+      collectionLink : "/collection/ark:/13030/c8pc37z3"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lehmann-d7mm2n.jpg",
       itemName : "Holiday 1997: Season's Greetings from Sherry-Lehmann",
       collectionName : "Sherry Lehmann Wine Catalogs",
       itemLink : "/item/ark:/87287/d7mm2n",
-      collectionLink : "/collection/sherry-lehmann"
+      collectionLink : "/collection/ark:/13030/c8pc37z3"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lug-D211_22_43.jpg",
       itemName : "Arden Villa",
       collectionName : "Lug and Can Label Collection",
       itemLink : "/item/ark:/87293/d3tm7240c",
-      collectionLink : "/collection/lug_labels"
+      collectionLink : "/collection/D-211"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lug-D211_37_3.jpg",
       itemName : "Mariposa",
       collectionName : "Lug and Can Label Collection",
       itemLink : "/item/ark:/87293/d31z41w7c",
-      collectionLink : "/collection/lug_labels"
+      collectionLink : "/collection/D-211"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lug-D211_38_56.jpg",
       itemName : "BoLo",
       collectionName : "Lug and Can Label Collection",
       itemLink : "/item/ark:/87293/d3mw28h94",
-      collectionLink : "/collection/lug_labels"
+      collectionLink : "/collection/D-211"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lug-D211_38_68.jpg",
       itemName : "R-C",
       collectionName : "Lug and Can Label Collection",
       itemLink : "/item/ark:/87293/d32v2cd49",
-      collectionLink : "/collection/lug_labels"
+      collectionLink : "/collection/D-211"
     },  
+
+
+    // TODO fix 'Napa Valley Wine Library Reports' doesn't seem to be on sandbox, so items are missing the collection ark isPartOf ref
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/NVWL_report_spring_1991_page4.jpg",
       itemName : "Napa Valley Wine Library Report, Spring 1991",
@@ -242,20 +246,25 @@ config.client = {
       itemLink : "/item/ark:/87287/d7mt0z",
       collectionLink : "/collection/nvwl"
     },
+
+
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/NVWL_Slide_24.jpg",
       itemName : "Inglenook Vineyard, Rutherford, Napa County: Napa Valley",
       collectionName : "Wait (Frona Eunice) Lantern Slides of California Wine Country",
       itemLink : "/item/ark:/87293/d34j0b194",
-      collectionLink : "/collection/lantern_slides"
+      collectionLink : "/collection/D-694"
     },
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/NVWL_Slide_30.jpg",
       itemName : "Inglenook Vineyard, Rutherford, Napa County: Vineyard and Carriage House",
       collectionName : "Wait (Frona Eunice) Lantern Slides of California Wine Country",
       itemLink : "/item/ark:/87293/d3c24qr6h",
-      collectionLink : "/collection/lantern_slides"
+      collectionLink : "/collection/D-694"
     },
+
+
+    // TODO fix 'Pioneering Punjabis Digital Archive' seems to also be missing from sandbox, no isPartOf in items
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/punjabis-d33k6h-1989.jpg",
       itemName : "Vancouver Sikh Parade",
@@ -270,6 +279,9 @@ config.client = {
       itemLink : "/item/ark:/87293/d3mw2r",
       collectionLink : "/collection/pioneering-punjabis"
     },
+
+
+    // TODO not sure if the item/collection links are valid, not on sandbox yet
     {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/slater-d3m09f-180.jpg",
       itemName : "France versus United States at Colombes",

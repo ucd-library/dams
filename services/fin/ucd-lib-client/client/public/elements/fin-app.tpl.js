@@ -105,7 +105,7 @@ export default function render() {
       @expand-search-filters=${this._expandSearchFilters}
     ></app-search-header>
 
-      <div class="main-content">
+      <div class="main-content" style="min-height: 100vh">
         <ucdlib-pages
           selected="${this.page}"
           selectedAttribute="visible"

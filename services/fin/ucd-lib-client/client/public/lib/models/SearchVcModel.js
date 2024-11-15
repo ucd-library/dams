@@ -64,7 +64,9 @@ class SearchVcModel extends BaseModel {
       let mediaType = '';
       let imageList = mediaGroups.filter(m => utils.getMediaType(m) === 'ImageList')[0];
       if( imageList && imageList.hasPart && imageList.hasPart.length ) {
-        mediaType = imageList.hasPart.length + ' page' + (imageList.hasPart.length > 1 ? 's' : '')  + ', Image';
+        mediaType = utils.formatNumberWithCommas(imageList.hasPart.length) + ' page' + (imageList.hasPart.length > 1 ? 's' : '')  + ', Image';
+      } else if( imageList && typeof imageList.hasPart === 'object' && Object.keys(imageList.hasPart).length < 2 ) {
+        mediaType = 'Image';
       } else if( imageList && imageList.hasPart ) { // some items just point to the dl/pdf
         mediaType = 'Multi-page, Image';
       }
@@ -79,6 +81,9 @@ class SearchVcModel extends BaseModel {
 
       if (mediaType) mediaType = mediaType.replace("Object", "");
 
+      let size = result.clientMedia?.mediaGroups?.[0]?.clientMedia?.images?.original?.size || {};
+      if( Array.isArray(size) ) size = size[0];
+
       matchedItems.push({
         id: result.root["@id"],
         collectionId,
@@ -88,7 +93,8 @@ class SearchVcModel extends BaseModel {
         collection: result.root.publisher ? result.root.publisher.name : "", // for detail display
         creator: result.root.creator ? result.root.creator.name : "", // for detail display
         date: result.root.yearPublished || 'Undated', // for detail display
-        format: mediaType ? [mediaType] : null // for detail display
+        format: mediaType ? [mediaType] : null, // for detail display,
+        size 
       });
     });
 

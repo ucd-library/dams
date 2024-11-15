@@ -124,18 +124,18 @@ export default function render() {
         height: 40px;
         display: inline-block;
         margin: auto;
-        background-color: var(--color-aggie-blue-70);
-        border-radius: 50%;
         float: right;
         cursor: pointer;
+        margin-top: -3px;
       }
 
       .search-collapse-btn ucdlib-icon {
         margin: auto;
         vertical-align: middle;
         text-align: center;
-        fill: var(--color-aggie-gold-40);
-        padding-top: 0.6rem;
+        fill: var(--color-aggie-blue-70);
+        width: 1.75rem;
+        height: 1.75rem;
       }
 
       .search-side-panel.fullscreen .search-content {
@@ -150,7 +150,7 @@ export default function render() {
         overflow: auto;
         max-height: 430px;
         overflow-y: scroll;
-        padding: 1rem;
+        padding: 0 1rem 1rem 1rem;
         padding-bottom: 0;
         background-color: var(--color-aggie-gold-40);
       }
@@ -185,7 +185,8 @@ export default function render() {
       }
 
       ucdlib-bookreader {
-         padding-bottom: 3.5rem;
+        padding-top: 1.75rem;
+        padding-bottom: 3.5rem;
       }
 
       /* .br-fullscreen-active {
@@ -222,7 +223,7 @@ export default function render() {
         <app-audio-viewer id="audio"></app-audio-viewer>
       </ucdlib-pages>
 
-      <div ?hidden="${!this.noMedia}" style="height: 600px;">
+      <div ?hidden="${!this.noMedia}">
         <img src="/images/tree-bike-illustration.png" style="margin: 0 auto; display: block; height: 600px;" />
       </div>
 
@@ -233,13 +234,13 @@ export default function render() {
         ?hidden="${!this.isBookReader}"
       >
         <div>
-          <div style="padding: 1rem;">
-            <h2 style="color: var(--color-aggie-blue); display: inline;">
+          <div style="padding: 1.5rem 1rem;">
+            <h5 style="color: var(--color-aggie-blue); display: inline; font-size: 1.5rem">
               Search Inside
-            </h2>
+            </h5>
             <div class="search-collapse-btn" @click="${this._onToggleBRSearch}">
               <ucdlib-icon
-                icon="ucdlib-dams:fa-chevron-left"
+                icon="ucdlib-dams:fa-chevron-circle-left"
                 tabindex="0"
                 icon="chevron-left"
                 alt="Collapse search panel"
@@ -284,9 +285,9 @@ export default function render() {
                   data-page="${result?.page || 0}"
                   @click="${this._onSearchResultClick}"
                 >
-                  <h4 style="margin-bottom: 0">
+                  <h5 style="margin-bottom: 0; margin-top: 1rem">
                     Page ${parseInt(result?.page || 0)}
-                  </h4>
+                  </h5>
                   <p style="font-size: .9rem; margin-top: .3rem">
                     ${unsafeHTML(
                       result.text

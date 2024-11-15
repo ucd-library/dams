@@ -219,7 +219,7 @@ export default function render() {
       }
 
       .br-search-non-fs div.zoom {
-        background-color: var(--color-aggie-blue);
+        background-color: var(--color-aggie-blue-80);
         border-radius: 50%;
         display: inline-block;
         width: 50px;
@@ -288,7 +288,7 @@ export default function render() {
             icon="chevron-left"
             alt="Page thumbnails left"
             ?disabled="${!this.showNavLeft}"
-            ?hidden="${!this.showNavLeft || this.singleImage}"
+            ?hidden="${!this.showNavLeft || this.singleImage || this.isBookReader}"
             @click="${this._pageLeft}">
           </ucdlib-icon>
           <div

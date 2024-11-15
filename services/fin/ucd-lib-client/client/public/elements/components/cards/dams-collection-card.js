@@ -4,6 +4,8 @@ import render from "./dams-collection-card.tpl.js";
 
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
+import utils from "../../../lib/utils/index.js";
+
 /**
  * @class DamsCollectionCard
  * @description UI component class for displaying a collection preview card
@@ -78,7 +80,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
       this.imgSrc = "/images/tree-bike-illustration.png";
     }
     this.cardTitle = this.collection.title;
-    this.itemCt = this.collection.count;
+    this.itemCt = utils.formatNumberWithCommas(this.collection.count);
     this.href = this.collection.id;
     this.darkBg = this.attributes["data-dark-bg"] ? true : false;
   }

@@ -197,6 +197,25 @@ class RecordModel extends ElasticSearchModel {
           "@graph.name.raw": {
             "order": "asc"
           }
+        },
+        {
+          "@graph.@id": {
+            "order": "asc"
+          }
+        }
+      ];
+    } else {
+      searchDocument.sort = [
+        "_score",
+        {
+          "@graph.name.raw": {
+            "order": "asc"
+          }
+        },
+        {
+          "@graph.@id": {
+            "order": "asc"
+          }
         }
       ];
     }
@@ -295,6 +314,26 @@ class RecordModel extends ElasticSearchModel {
     if( searchDocument.limit + searchDocument.offset > this.MAX_WINDOW ) {
       this.store.setSearchError(searchDocument, new Error('Sorry, digital.ucdavis.edu does not serve more than 10,000 results for a query'), true);
       return this.store.getSearch();
+    }
+
+    if( searchDocument.text && !searchDocument.sort ) {      
+      searchDocument.sort = [
+        '_score', 
+        { "@graph.name.raw": { "order": "asc" } },
+        { "@graph.@id": { "order": "asc" } }    
+      ];
+    } else if( !searchDocument.sort ) {
+      searchDocument.sort = [
+        { "@graph.name.raw": { "order": "asc" } },
+        { "@graph.@id": { "order": "asc" } }    
+      ];
+    }
+    if( searchDocument.text && !searchDocument.sort.find(s => s['_score']) ) {
+      searchDocument.sort.unshift('_score');
+    }
+
+    if( !searchDocument.sort.find(s => s['@graph.@id'])) {
+      searchDocument.sort.push({ "@graph.@id": { "order": "asc" } });
     }
 
     try {

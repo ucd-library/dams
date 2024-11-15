@@ -190,14 +190,9 @@ export default function render() {
         padding-top: 3rem;
       }
 
-      app-collection .title-section .collection-header {
-        height: 11rem;
-      }
-
       app-collection .title-section > div {
         width: 80%;
         margin: auto;
-        height: 30vh;
       }
       
       .detail-section {
@@ -405,6 +400,7 @@ export default function render() {
 
     .collection-highlights h2 {
       margin-bottom: 0;
+      margin-top: 4rem;
     }
 
     .edit-collections-container > fieldset {
@@ -530,8 +526,7 @@ export default function render() {
       <div class="image-overlay">
         <img ?hidden="${!this.watercolorBgUrl}" class="watercolor-bg" src="${this.watercolorBgUrl}" width="100%" />
 
-        <!-- <img class="featured-image" src="${this.thumbnailUrl}" width="45%" alt="collection featured image" /> -->
-        <div class="featured-image" style="background-image: url(${this.thumbnailUrlOverride}), url(${this.thumbnailUrl})"></div>
+        <div class="featured-image"></div>
         <img ?hidden="${!this.watercolorFgUrl}" class="watercolor-fg" src="${this.watercolorFgUrl}" width="100%" />
       </div>
       <div class="collection-header">

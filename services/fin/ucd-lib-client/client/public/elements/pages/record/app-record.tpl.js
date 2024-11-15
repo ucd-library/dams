@@ -170,6 +170,32 @@ export default function render() {
         .download-section {
           display: block;
         }
+
+        .part-of .collection-info {
+          margin: auto;
+        }
+
+        .part-of {
+          min-height: 0;
+        }
+
+        .part-of div {
+          margin: 2rem 1.5rem 2rem 1rem;
+        }
+
+        .part-of .collection-info h4 {
+          font-weight: 800;
+          font-size: 1.2rem;
+          margin: 0;
+        }
+
+        .part-of .collection-info > * {
+          padding: .25rem 0;
+        }
+
+        .collection-info {
+          font-size: 1.1rem;
+        }
       }
 
     app-record .admin-edit .left-panel {
@@ -346,6 +372,11 @@ export default function render() {
       <div ?hidden="${!this.callNumber}" class="metadata-row" id="callNumber">
         <div class="attr">Call Number</div>
         <div class="value" id="callNumberValue">${this.callNumber}</div>
+      </div>
+
+      <div ?hidden="${!this.material}" class="metadata-row" id="material">
+        <div class="attr">Format</div>
+        <div class="value" id="materialValue">${this.material}</div>
       </div>
 
       <div class="metadata-row" id="identifier">

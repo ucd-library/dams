@@ -1,4 +1,4 @@
-const {BaseService} = require('@ucd-lib/cork-app-utils');
+const {BaseService, digest} = require('@ucd-lib/cork-app-utils');
 const CollectionStore = require('../stores/CollectionStore');
 const config = require('../config');
 const RecordGraph = require('../utils/RecordGraph.js');
@@ -125,23 +125,6 @@ class CollectionService extends BaseService {
 
   }
 
-}
-
-async function digest(message) {
-  if( typeof message !== 'string' ) {
-    message = JSON.stringify(message);
-  }
-  const encoder = new TextEncoder();
-  const data = encoder.encode(message);
-  const hash = await window.crypto.subtle.digest("SHA-256", data);
-  
-  let binary = '';
-  let bytes = new Uint8Array( hash );
-  let len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode( bytes[ i ] );
-  }
-  return btoa( binary );
 }
 
 module.exports = new CollectionService();

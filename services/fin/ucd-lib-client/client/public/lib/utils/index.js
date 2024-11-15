@@ -37,6 +37,14 @@ class Utils {
     return Array.isArray(value) ? value : [value];
   }
 
+  formatNumberWithCommas(num) {
+    try {
+      num = typeof num === 'string' ? parseFloat(num) : num;
+    } catch(e) {}
+    if( isNaN(num) ) return num;
+    return new Intl.NumberFormat('en-US').format(num);
+  }
+
   /**
    * @method findMediaFromId
    * @description given a record object, use the id (@id) to return
@@ -82,12 +90,16 @@ class Utils {
       return "BagOfFiles";
     }
 
+    if( record.fileFormat?.includes('image') && record.clientMedia?.images ) return "ImageObject";
+    
     return null;
   }
 
-  getThumbnailFromClientMedia(clientMedia) {
+  getThumbnailFromClientMedia(clientMedia={}) {
     let thumbnailUrl = "";
     let graph = clientMedia.graph;
+
+    if( !clientMedia.mediaGroups ) return thumbnailUrl;
 
     for (const mediaGroup of clientMedia.mediaGroups) {
       if (mediaGroup.clientMedia?.images?.medium?.url) {
@@ -111,6 +123,7 @@ class Utils {
         }
       }
     }
+
     return thumbnailUrl;
   }
 
@@ -198,7 +211,7 @@ class Utils {
       let record = clientMediaIndex[part["@id"]];
 
       // TODO some of the index graphs don't have clientMedia, so some pages missing
-      if (!record.clientMedia) {
+      if (!record?.clientMedia) {
         console.error("no clientMedia images for ", record);
         return;
       }

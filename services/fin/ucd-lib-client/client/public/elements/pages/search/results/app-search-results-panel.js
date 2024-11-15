@@ -81,6 +81,10 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     );
   }
 
+  firstUpdated() {
+    this._setSelectedDisplay();
+  }
+
   /**
    * @method _onAppStateUpdate
    * @description from AppStateInterface, called when app state updates
@@ -157,8 +161,12 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       return;
     } 
 
+    this.totalCollections = 0;
+
     let collectionIds = decodedUrl.split('@graph.isPartOf.@id","or","')[1].split('"]')[0].split(',');
-    this.totalCollections = collectionIds.length;
+    if( collectionIds.length > 1 ) {
+      this.totalCollections = collectionIds.length;
+    }
   }
 
   /**
@@ -344,10 +352,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     }, 50);
   }
 
-  _onGridItemRendered(e) {
-    this._resize();
-  }
-
   /**
    * @method _resize
    * @description resize masonary layout
@@ -360,6 +364,16 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
         .querySelector("#layout")
         .querySelector("app-search-grid-result");
       if( !firstDiv ) return;
+
+      if( this.isMosaicLayout ) {
+        // update image heights for mosaic layout
+        let grids = this.shadowRoot.querySelector("#layout")?.querySelectorAll("app-search-grid-result");
+        if( grids && grids.length ) {
+          grids.forEach(grid => {
+            grid._renderImage();
+          });  
+        }
+      }
 
       await this.updateComplete;
 
@@ -396,8 +410,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
     }
 
-    // JM scrolling on resize can be very bad
-    // window.scrollTo(0, 0);
   }
 
   /**
@@ -539,6 +551,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
         composed: true
       })
     );
+
+    window.scrollTo(0, 0);
   }
 }
 

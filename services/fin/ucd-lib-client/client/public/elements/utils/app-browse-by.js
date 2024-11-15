@@ -184,9 +184,9 @@ export default class AppBrowseBy extends Mixin(LitElement)
           if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
           return 0;
         } else {
-          if( a[sort.type].toLowerCase() > b[sort.type].toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
-          if( a[sort.type].toLowerCase() < b[sort.type].toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
-          return 0;   
+          return sort.dir === 'asc'
+            ? a[sort.type].toLowerCase().localeCompare(b[sort.type].toLowerCase())
+            : b[sort.type].toLowerCase().localeCompare(a[sort.type].toLowerCase());
         }
       });
       this.sortedAs = sort.type;
@@ -198,7 +198,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     );
 
     this._updateSideImages();
-    window.scrollTo(0, 0);
   }
 
   /**
@@ -237,7 +236,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     );
 
     this._updateSideImages();
-    window.scrollTo(0, 0);
   }
 
   async _searchBrowseByCollections() {

@@ -30,26 +30,14 @@ export default function render() {
       }
 
       img {
-        /* animation: show-img 300ms linear; */
         box-sizing: border-box;
         display: none;
-        /* width: var(--grid-cell-width); */
-        /* background-size: cover;
-    background-color: transparent;
-    background-position: center center; */
-        /* position: absolute;
-    top: 0;
-    left: 0; */
         cursor: pointer;
-        border: solid 2px transparent;
-        /* transition: border-color 0.3s ease-in-out; */
       }
 
       img:hover,
       img:focus {
         border-color: var(--default-secondary-color);
-        /* margin: -2px 0 0 -2px;
-    outline: none !important; */
       }
 
       .collection-name {
@@ -131,15 +119,13 @@ export default function render() {
       }
     </style>
 
-    <!--hidden$="${!this.isImage}" -->
-    <div class="image" id="imgRoot">
+    <div class="image" id="imgRoot" style="height: ${this.imageHeight}px;">
       <img
         id="img"
         src="${this.thumbnailUrl}"
-        style="height: ${this.imageHeight}; width: 100%; display:
-      block"
-        onload="this.style.display='block';"
-      />
+        style="height: ${this.imageHeight}px; width: 100%; display: none;"
+        onload="this.style.display = 'block';"
+        />
       <div ?hidden="${!this.isVideo}" class="video-thumbnail"></div>
       <div
           class="media-type"

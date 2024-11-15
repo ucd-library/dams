@@ -38,7 +38,7 @@ export class AppFilterPanel extends Mixin(LitElement)
     ele.valueMap = this.filter.valueMap || {};
     ele.isDollar = this.filter.isDollar;
 
-    ele.includeTypeahead = this.filter.includeTypeahead || false;
+    ele.includeTypeahead = false; // initially collapsed
     ele.typeaheadField = this.filter.typeaheadField;
 
     ele.addEventListener('update-visibility', (e) => {

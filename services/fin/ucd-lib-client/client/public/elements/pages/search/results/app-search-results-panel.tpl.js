@@ -1,6 +1,7 @@
 import { html } from "lit";
 
 import "@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.js";
+import utils from "../../../../lib/utils";
 
 export default function render() {
   return html`
@@ -379,7 +380,7 @@ export default function render() {
 
     <div class="header">
       <div class="header-results" style="flex: 2.25; display: flex;">
-        <div style="flex: 2.25; margin: auto; min-height: 2.1rem;" ?hidden="${!this.total}">
+        <div style="flex: 2.25; margin: auto; min-height: 2.1rem;" ?hidden="${!this.total || this.total === '0'}">
           <div class="photo-stack">
             <ucdlib-icon
               style="cursor: auto;"
@@ -388,7 +389,7 @@ export default function render() {
             ></ucdlib-icon>
           </div>
           
-          <span style="font-weight: bold">${this.total}${this.total === 10000 ? '+' : ''} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.totalCollections === 0}">
+          <span style="font-weight: bold">${utils.formatNumberWithCommas(this.total)}${this.total === 10000 ? '+' : ''} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.totalCollections === 0}">
             from
             <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collection${this.totalCollections > 1 ? 's' : ''}</a></span>
         </div>

@@ -8,15 +8,20 @@ const authUtils = require('../lib/auth');
 const appConfig = require('../lib/fcrepo-app-config');
 
 const {seo, models, logger} = require('@ucd-lib/fin-service-utils');
+const crypto = require('crypto');
 
 // const transform = seo.recordTransform;
 // const collectionTransform = seo.collectionTransform;
 
 appConfig.reload(true);
 
+let jsBundleHash = '';
+
+
 module.exports = async (app) => {
   let assetsDir = path.join(__dirname, '..', 'client', config.client.assets);
   logger.info('CLIENT_ENV='+config.client.env.CLIENT_ENV+', Serving static assets from '+assetsDir);
+  loadJsBundleHash(assetsDir);
 
   let collectionModel = await models.get('collection');
   collectionModel = collectionModel?.model;
@@ -74,7 +79,8 @@ module.exports = async (app) => {
         return next({
           jsonld,
           title : config.client.title,
-          description : ''
+          description : '',
+          jsBundleHash
         });
       }
 
@@ -86,7 +92,8 @@ module.exports = async (app) => {
           return next({
             jsonld,
             title : collection.name + ' - '+ config.client.title,
-            description : collection.description || ''
+            description : collection.description || '',
+            jsBundleHash
           })
 
         } else {
@@ -98,12 +105,13 @@ module.exports = async (app) => {
           return next({
             jsonld,
             title : (record.name || record.title) + ' - '+ config.client.title,
-            description : record.description || ''
+            description : record.description || '',
+            jsBundleHash
           })
 
         }
       } catch(e) {
-        console.log(e);
+        console.error(e);
         return next({
           jsonld,
           title : 'Server Error',
@@ -120,6 +128,21 @@ module.exports = async (app) => {
     immutable: true,
     maxAge: '1y'
   }));
+}
+
+function loadJsBundleHash(assetsDir) {
+  let hashFile = path.join(assetsDir, 'js', 'bundle.js');
+  if( fs.existsSync(hashFile) ) {
+    const fileBuffer = fs.readFileSync(hashFile);
+    const hashSum = crypto.createHash('sha256');
+    hashSum.update(fileBuffer);
+    jsBundleHash = hashSum.digest('hex').toString().substring(0, 8);
+    logger.info('Loaded js bundle hash: '+jsBundleHash);
+  } else {
+    setTimeout(() => {
+      loadJsBundleHash(assetsDir);
+    }, 5000);
+  }
 }
 
 function isSearchCollectionReq(req) {
