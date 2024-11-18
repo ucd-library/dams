@@ -372,8 +372,8 @@ class AppCollection extends Mixin(LitElement)
 
     this.itemDefaultDisplay = collectionEdits.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
 
-    this.savedItems = collectionEdits.exampleOfWork;
-    if( !Array.isArray(this.savedItems) ) this.savedItems = [];
+    this.savedItems = collectionEdits.exampleOfWork || [];
+    if( !Array.isArray(this.savedItems) ) this.savedItems = [this.savedItems];
     this.savedItems.sort((a,b) => a.position - b.position);
 
     // set item prefs

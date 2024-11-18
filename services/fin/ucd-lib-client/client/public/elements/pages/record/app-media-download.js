@@ -31,6 +31,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       zipConcatenatedPaths : { type: String },
       isTwoPageView : { type: Boolean },
       downloadAllMedia : { type: Boolean },
+      isBookreader : { type: Boolean },
     };
   }
 
@@ -38,6 +39,23 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     super();
 
     this.render = render.bind(this);
+   
+    this._reset();
+
+    this._injectModel(
+      "AppStateModel",
+      "MediaModel",
+      "CollectionModel",
+      "BookReaderModel"
+    );
+  }
+
+  async firstUpdated() {
+    let selectedRecord = await this.AppStateModel.getSelectedRecord();
+    if (selectedRecord) this._onSelectedRecordUpdate(selectedRecord);    
+  }
+
+  _reset() {
     this.active = true;
 
     this.defaultImage = true;
@@ -57,17 +75,11 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.zipConcatenatedPaths = "";
     this.isTwoPageView = false;
     this.downloadAllMedia = false;
-
-    this._injectModel(
-      "AppStateModel",
-      "MediaModel",
-      "CollectionModel",
-    );
+    this.isBookreader = false;
   }
 
-  async firstUpdated() {
-    let selectedRecord = await this.AppStateModel.getSelectedRecord();
-    if (selectedRecord) this._onSelectedRecordUpdate(selectedRecord);    
+  _onAppStateUpdate(e) {
+    if( e.location.page !== 'item' ) return this._reset();
   }
 
   _onSelectedRecordUpdate(record) {
@@ -135,61 +147,53 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
   }
 
   /**
-   * @method brPageChange
+   * @method _onBookreaderStateUpdate
+   * @description bookreader state update event handler
    * 
-   * @description bookreader page change event. set download sources to 2 pages if 2 page view, 
-   *  otherwise set to single page at currentPage
-   * @param {Object}} detail page change detail, page number and if single page or 2 page view 
+   * @param {Object} e bookreader state update event
    */
-  // async brPageChange(detail) { 
-  //   let { currentPage, onePageMode } = detail;
+  _onBookreaderStateUpdate(e) {
+    if( this.AppStateModel.location.page !== 'item' ) return;
 
-  //   let record = await this.AppStateModel.getSelectedRecord();
-  //   if (!record) return;
+    this.isBookreader = true;
+    let pageNumber = e.selectedPage + 1;
+    let onePageMode = e.selectedView === 'single';
+    let pages;
+    let imageList = this.clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
 
-  //   let { clientMedia, selectedMedia } = record;
+    if( imageList ) {
+      pages = imageList.clientMedia?.pages || [];
+    } else {
+      pages = this.selectedMedia?.clientMedia?.pages || [];
+    }
 
-  //   this.brCurrentPage = currentPage;
-  //   let pages;
-  //   let imageList = clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
-  //   if( imageList ) {
-  //     pages = imageList.clientMedia.pages;
-  //   } else {
-  //     pages = selectedMedia.clientMedia.pages;
-  //   }
+    if( !pages || !pages.length ) return;
 
-  //   if( onePageMode ) {
-  //     // set download href to single page
-  //     let href = pages[currentPage - 1]?.download?.url;  
-  //     this.isTwoPageView = false;
-  //     if( !href ) {
-  //       // no download besides pdf for selected page, show all files download with options
-  //       // this._noSinglePageDownload();
-  //       this._renderDownloadSingleFormat();
-  //     } else {
-  //       this.href = href;
-  //     }
-  //   } else {
-  //     this.isTwoPageView = true;      
+    if( onePageMode || pageNumber === 1 ) {
+      // single image download
+      let href = pages[pageNumber - 1]?.download?.url;  
+      this.isTwoPageView = false;
+      this.href = href || '';
+      this._renderDownloadSingleFormat();
+  
+    } else {
+      // 2 page image download
+      this.isTwoPageView = true;      
 
-  //     // set download href to 2 pages for archive download option
-  //     let image1 = pages[currentPage - 1]?.download?.url?.replace('/fcrepo/rest', '');
-  //     let image2 = pages[currentPage]?.download?.url?.replace('/fcrepo/rest', '');
-  //     let urls = [];
-  //     if( image1 ) urls.push(image1);
-  //     if( image2 ) urls.push(image2);
-  //     if( urls.length ) {
-  //       this._setZipPaths(urls);
-  //     } else {
-  //       // no download besides pdf for selected page, show all files download with options
-  //       // this._noSinglePageDownload();
-  //       this._renderDownloadSingleFormat();
-  //     }
-  //   }
-  // }
+      // set download href to 2 pages for archive download option
+      let image1 = pages[pageNumber - 1]?.download?.url?.replace('/fcrepo/rest', '');
+      let image2 = pages[pageNumber]?.download?.url?.replace('/fcrepo/rest', '');
+      let urls = [];
+      if( image1 ) urls.push(image1);
+      if( image2 ) urls.push(image2);
+      if( urls.length ) {
+        this._setZipPaths(urls);
+      }
+      this._renderDownloadSingleFormat(true);      
+    }
+  }
 
   _noSinglePageDownload() {
-    debugger;
     this.zipName = this.rootRecord.name
       .replace(/[^a-zA-Z0-9]/g, "-")
       .toLowerCase();
@@ -241,7 +245,6 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let firstMediaDownload = this.clientMedia.mediaGroups[0]?.clientMedia?.download?.[0]?.url;
 
     if( allFiles || this.isTwoPageView ) {
-      debugger;
       // build zip download url
       this.zipName = this.rootRecord.name
         .replace(/[^a-zA-Z0-9]/g, "-")
@@ -261,10 +264,13 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    * @method _renderDownloadSingleFormat
    * @private
    * @description render image formats for single page images, ie "Image (png)"
+   * 
+   * @param {Boolean} multipage if true, then render for 2 pages (combine file sizes)
    */
-  _renderDownloadSingleFormat() {
+  _renderDownloadSingleFormat(multipage=false) {
     let formats = [];
     let singlePdf = false;
+    let multiImageSize = 0;
     this.sources.forEach((source) => {
       let format = source.label || source.url.split('.').pop();
       // if( formats.includes(format) ) {
@@ -275,16 +281,25 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       if( format === 'pdf' ) {
         singlePdf = true;
       }
+      if( multipage ) {
+        if( this.archiveHref.indexOf(source.url?.split('/fcrepo/rest')?.[1]) > -1 ) multiImageSize += source.fileSize;
+      }
     });
 
     if( singlePdf && formats.length > 0 ) singlePdf = false; 
 
     let fileSize = this.sources.find(s => s.url === this.href)?.fileSize;
-    this.showDownloadLabel = true;
     let imageLabel = singlePdf ? 'pdf ' : '';
     if( formats.length ) imageLabel += formats.join(', ') + ' ';
-    if( fileSize ) imageLabel += '(' + bytes(fileSize).toLowerCase() + ')';
 
+    // if multipage, combine file sizes
+    if( multipage && multiImageSize ) {
+      imageLabel += '(' + bytes(multiImageSize).toLowerCase() + ')';
+    } else if( fileSize ) {
+      imageLabel += '(' + bytes(fileSize).toLowerCase() + ')';
+    }
+
+    if( !this.fullSetSelected ) this.showDownloadLabel = true;
     this.shadowRoot.querySelector("#media-format-label").innerHTML = imageLabel;
   }
 
@@ -323,6 +338,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         let imageLabel = format.format;
         if( format.fileSize && !isNaN(format.fileSize) ) imageLabel += ' (' + bytes(format.fileSize).toLowerCase() + ')';
         option.value = format.format;
+        option.innerHTML = imageLabel
         this.shadowRoot.querySelector("#format").appendChild(option);
       });
       this.showDownloadLabel = false;
@@ -372,7 +388,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    */
   _onFormatSelected() {
     let selectedFormat = this.shadowRoot.querySelector("#format").value;
-    let sources = this.sources.filter(s => s.label === selectedFormat);
+    let sources = this.sources.filter(s => s.label === selectedFormat || s.url?.split('.').pop() === selectedFormat);
     this._setZipPaths(sources.map(s => s.url.replace('/fcrepo/rest', '')));
   }
 
@@ -395,16 +411,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.showDownloadLabel = true;
     }
     
-    if( this.brCurrentPage && !this.fullSetSelected ) {
-      // bookreader and viewing single page, need to get 1/2 pages for zip
-      sources = this.sources.filter(s => s.label !== 'pdf');
-      let image1;
-      if( this.brCurrentPage > 1 ) {
-        image1 = sources[this.brCurrentPage - 1]?.url?.replace('/fcrepo/rest', '');
-      }
-      let image2 = sources[this.brCurrentPage]?.url?.replace('/fcrepo/rest', '');
-      if( image1 ) urls.push(image1);
-      if( image2 && this.isTwoPageView ) urls.push(image2);
+    if( this.isBookreader && !this.fullSetSelected ) {
+      this._onBookreaderStateUpdate(this.BookReaderModel.getState());
     } else {
       urls = sources.map(s => s.url.replace('/fcrepo/rest', ''));
     }

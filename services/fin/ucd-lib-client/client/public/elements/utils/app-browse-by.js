@@ -185,8 +185,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
           return 0;
         } else {
           return sort.dir === 'asc'
-            ? a[sort.type].toLowerCase().localeCompare(b[sort.type].toLowerCase())
-            : b[sort.type].toLowerCase().localeCompare(a[sort.type].toLowerCase());
+            ? a[sort.type].trim().toLowerCase().localeCompare(b[sort.type].trim().toLowerCase())
+            : b[sort.type].trim().toLowerCase().localeCompare(a[sort.type].trim().toLowerCase());
         }
       });
       this.sortedAs = sort.type;

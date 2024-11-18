@@ -1,4 +1,5 @@
 const config = require("../config");
+const utils = require("../../lib/utils");
 
 class RecordVcModel {
   
@@ -51,6 +52,24 @@ class RecordVcModel {
         }
       }
 
+      let mediaType = '';
+      let mediaGroups = e.payload.clientMedia?.mediaGroups || [];
+      let imageList = mediaGroups.filter(m => utils.getMediaType(m) === 'ImageList')[0];
+      if( imageList && imageList.hasPart && imageList.hasPart.length ) {
+        mediaType = 'ImageList';
+      } else if( imageList && typeof imageList.hasPart === 'object' && Object.keys(imageList.hasPart).length < 2 ) {
+        mediaType = 'Image';
+      }
+
+      if( !mediaType ) {
+        for (const mediaGroup of mediaGroups) {
+          mediaType = utils.getMediaType(mediaGroup);
+          if( mediaType ) break;
+        }
+      }
+
+      if (mediaType) mediaType = mediaType.replace("Object", "");
+
       // translate collection and related nodes/items to ui model
       const vcData = {
         "@id": root["@id"],
@@ -72,6 +91,7 @@ class RecordVcModel {
         // arkDoi,
         // fedoraLinks,
         root,
+        mediaType
       };
 
       e.vcData = vcData;
