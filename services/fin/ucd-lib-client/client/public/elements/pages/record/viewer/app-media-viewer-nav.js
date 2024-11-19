@@ -95,7 +95,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     }
 
     let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    if (screenWidth < 800) {
+    if( screenWidth < 800 ) {
       this.brSinglePage = true;
     }
   }
