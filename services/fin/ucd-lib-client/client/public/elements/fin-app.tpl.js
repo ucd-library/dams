@@ -51,7 +51,6 @@ export default function render() {
 
       app-search-header {
         position: relative;
-        z-index: 2000;
       }
 
       .loading-dots {
