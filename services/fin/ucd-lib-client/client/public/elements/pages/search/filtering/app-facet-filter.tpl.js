@@ -45,7 +45,7 @@ export default function render() {
     padding: 0 5px;
     background: var(--color-aggie-blue-30);
     border: none;
-    height: 61px;
+    height: 55px;
     padding-left: 1rem;
     outline: none;
     font-size: 1rem;
@@ -143,7 +143,7 @@ export default function render() {
   ucdlib-icon.typeahead-search-icon {
     position: absolute;
     right: 1rem;
-    top: 18px;
+    top: 17px;
     fill: var(--color-aggie-blue-50);
     width: 22px;
     height: 22px;
