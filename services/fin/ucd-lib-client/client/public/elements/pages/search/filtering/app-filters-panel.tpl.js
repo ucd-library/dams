@@ -10,7 +10,7 @@ export default function render() {
       }
 
       #filters {
-        margin-left: 10px;
+        margin-left: 12px;
       }
 
       .title {

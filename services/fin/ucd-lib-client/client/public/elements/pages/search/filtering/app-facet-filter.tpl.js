@@ -10,7 +10,6 @@ export default function render() {
   ${sharedStyles}
   :host {
     display: block;
-    padding-right: 0.8rem;
   }
 
   [hidden] { display: none !important; }
@@ -36,7 +35,9 @@ export default function render() {
   }
 
   .typehead-panel {
-    margin: 0 28px 10px 5px;
+    margin-right: 12px;
+    margin-bottom: 1rem;
+    position: relative;
   }
   #typeahead {
     width: 100%;
@@ -47,6 +48,7 @@ export default function render() {
     height: 61px;
     padding-left: 1rem;
     outline: none;
+    font-size: 1rem;
   }
 
   .active-filter {
@@ -83,6 +85,7 @@ export default function render() {
     overflow-y: auto;
     overflow-x: hidden;    
     max-height: 200px;
+    padding-right: 12px;
   }
 
   iron-list {
@@ -136,6 +139,22 @@ export default function render() {
       scrollbar-width: thin;
     }
   }
+
+  ucdlib-icon.typeahead-search-icon {
+    position: absolute;
+    right: 1rem;
+    top: 18px;
+    fill: var(--color-aggie-blue-50);
+    width: 22px;
+    height: 22px;
+    max-width: 22px;
+    max-height: 22px;
+    min-width: 22px;
+  }
+
+  #typeahead::placeholder {
+    color: var(--color-aggie-blue-80);
+  }
 </style>
 
 <!-- typeahead search -->
@@ -144,6 +163,7 @@ export default function render() {
     type="text" 
     placeholder="Search ${this.label}s" 
     @keyup="${this._onTypeaheadKeyup}" />
+    <ucdlib-icon class="typeahead-search-icon" icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
 </div>
 
 <div class="overflow" ?no-overflow="${this.noOverflow}">
