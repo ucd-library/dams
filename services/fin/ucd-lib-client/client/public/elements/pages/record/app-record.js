@@ -198,6 +198,13 @@ class AppRecord extends Mixin(LitElement)
     await this._parseDisplayData();
   }
 
+  _arkDoiClick(e) {
+    e.preventDefault();
+
+    history.pushState(null, '', e.target.getAttribute('href'));
+    window.scrollTo(0, 0);
+  }
+
   _updateSlimStyles() {
     let select = this.querySelector('ucd-theme-slim-select');
     if( !select ) return;

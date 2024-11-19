@@ -382,7 +382,7 @@ export default function render() {
       <div class="metadata-row" id="identifier">
         <div class="attr">ARK / DOI</div>
         <div class="value" id="identifierValue">
-          ${this.arkDoi.map((link) => html`<a href="${link}">${link.replace('/item', '')}</a>`)}
+          ${this.arkDoi.map((link) => html`<a @click="${this._arkDoiClick}" href="${link}">${link.replace('/item', '')}</a>`)}
         </div>
       </div>
 
