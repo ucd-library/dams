@@ -135,6 +135,8 @@ export class FinApp extends Mixin(LitElement)
     }
     await this.loadedPages[page];
 
+    this._updateViewHeight();
+
     this.page = page;
     this.pathInfo = e.location.pathname.split('/media')[0];
 
@@ -175,6 +177,20 @@ export class FinApp extends Mixin(LitElement)
     requestAnimationFrame(() => {      
       window.scrollTo(0, scrollPositionY);
     });
+  }
+
+  _updateViewHeight(e) {
+    // update .main-content vh to be height of current page
+    let mainContent = this.querySelector(".main-content");
+    if( !mainContent ) return;
+    
+    let selectedPage = this.querySelector('ucdlib-pages').querySelector('#'+this.page);
+    if( selectedPage ) {
+      let height = selectedPage.offsetHeight;
+      mainContent.style.minHeight = height+'px';
+    } else {
+      mainContent.style.minHeight = '100vh';
+    }
   }
 
   /**
