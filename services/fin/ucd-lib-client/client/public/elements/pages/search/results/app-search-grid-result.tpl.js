@@ -13,13 +13,6 @@ export default function render() {
         display: none !important;
       }
 
-      :host(:hover),
-      :host(:focus) {
-        /* border: 2px solid var(--default-secondary-color);
-    margin: -2px 0 0 -2px;
-    outline: none !important; */
-      }
-
       @keyframes show-img {
         from {
           opacity: 0;

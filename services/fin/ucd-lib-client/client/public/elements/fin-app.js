@@ -180,12 +180,12 @@ export class FinApp extends Mixin(LitElement)
   }
 
   _updateViewHeight(e) {
-    // update .main-content vh to be height of current page
+    // main-content should be height of the selected page, or 100vh during page load (so footer is at bottom during latent load)
     let mainContent = this.querySelector(".main-content");
     if( !mainContent ) return;
     
     let selectedPage = this.querySelector('ucdlib-pages').querySelector('#'+this.page);
-    if( selectedPage ) {
+    if( selectedPage?.offsetHeight ) {
       let height = selectedPage.offsetHeight;
       mainContent.style.minHeight = height+'px';
     } else {
