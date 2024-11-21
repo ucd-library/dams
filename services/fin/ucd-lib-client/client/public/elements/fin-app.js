@@ -117,7 +117,10 @@ export class FinApp extends Mixin(LitElement)
    * @method _onAppStateUpdate
    */
   async _onAppStateUpdate(e) {
-    if( e.location.page === 'browse' ) this._updateScrollPosition(e);
+    if( e.location.page === 'browse' ) {
+      this._updateViewHeight(e.location.page);
+      this._updateScrollPosition(e);
+    }
     if (e.location.page === this.currentPage) return;
 
     if( e.location.page !== 'browse' ) this._updateScrollPosition(e);
@@ -135,9 +138,9 @@ export class FinApp extends Mixin(LitElement)
     }
     await this.loadedPages[page];
 
+    this.page = page;
     this._updateViewHeight();
 
-    this.page = page;
     this.pathInfo = e.location.pathname.split('/media')[0];
 
     if( this.page === 'collection' ) {
@@ -179,12 +182,29 @@ export class FinApp extends Mixin(LitElement)
     });
   }
 
-  _updateViewHeight(e) {
+  async _updateViewHeight(page=this.page) {
     // main-content should be height of the selected page, or 100vh during page load (so footer is at bottom during latent load)
     let mainContent = this.querySelector(".main-content");
     if( !mainContent ) return;
+
+    let selectedPage = this.querySelector('ucdlib-pages').querySelector('#'+page);
+    await selectedPage.updateComplete;
+
+    if( page === 'browse' ) {
+      let browseByType = this.AppStateModel.location.path[1];
+      if( browseByType ) {
+        selectedPage = selectedPage.querySelector('#'+browseByType);
+      } else {
+        // browse landing page
+        let browseSection = selectedPage.querySelector('.browse-selection-section');
+        if( browseSection ) browseSection.removeAttribute('hidden');
+      }
+      if( selectedPage ) {
+        selectedPage.removeAttribute('hidden');
+        selectedPage.style.display = '';
+      }
+    }
     
-    let selectedPage = this.querySelector('ucdlib-pages').querySelector('#'+this.page);
     if( selectedPage?.offsetHeight ) {
       let height = selectedPage.offsetHeight;
       mainContent.style.minHeight = height+'px';
