@@ -458,9 +458,15 @@ export default function render() {
       float: none;
       padding: none;
     }    
+    .fg-header.centered {
+      display: block;
+      width: 100%;
+      margin: initial;
+      text-align: left
+    }
   }
   .about-content {
-    padding: 0 2rem 2rem 2rem;
+    padding: 0 5% 2rem 5%;
   }
 
   @media (min-width: 768px) {
@@ -523,7 +529,7 @@ export default function render() {
   }
 
   .about-content {
-    padding-right: 2rem;
+    /* padding-right: 2rem; */
     margin: auto;
   }
 
