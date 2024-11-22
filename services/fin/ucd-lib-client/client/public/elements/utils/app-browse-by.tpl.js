@@ -241,6 +241,11 @@ export default function render() {
           width: 90%;
         }
       }
+
+      .left-image,
+      .right-image {
+        clip-path: inset(0 0 5px 0);
+      }
     </style>
 
     <div class="header">
