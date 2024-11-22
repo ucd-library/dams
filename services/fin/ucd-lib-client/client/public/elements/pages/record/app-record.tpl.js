@@ -260,6 +260,10 @@ export default function render() {
       z-index: 400;
     }
 
+    ucdlib-md p {
+      margin-top: 0;
+    }
+
     </style>
 
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
