@@ -77,6 +77,7 @@ return html`
       outline: 0;
       padding-right: 1.5rem;
       margin-right: .7rem;
+      text-align: left;
     }
 
     .cite-graphic {
