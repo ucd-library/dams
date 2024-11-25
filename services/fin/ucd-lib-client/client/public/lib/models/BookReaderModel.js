@@ -196,7 +196,7 @@ class BookReaderModel extends BaseModel {
     }
 
     let manifest = this.store.data.bookManifest.get(id);
-    let index, image, ocrUrl, imageUrl, height, width, originalHeight, originalWidth, scale;
+    let index, image, ocrUrl, imageUrl, height, width, originalHeight, originalWidth, scale, filename;
     let bookViewData = {
       id,
       totalHeight : 0,
@@ -219,7 +219,22 @@ class BookReaderModel extends BaseModel {
       originalHeight = parseInt(page?.original?.size?.height || page?.large?.size?.height);
       originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
       scale = width / originalWidth;
-      return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth};
+      filename = page['@id'].split('/').pop()
+      return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth, page: page.page, filename};
+    });
+
+    bookViewData.pages.sort((a, b) => {
+      if( a.page < b.page ) return -1;
+      if( a.page > b.page ) return 1;
+
+      if( a.filename.toLowerCase() < b.filename.toLowerCase() ) return -1;
+      if( a.filename.toLowerCase() > b.filename.toLowerCase() ) return 1;
+
+      return 0;
+    });
+
+    bookViewData.pages.forEach((page, displayIndex) => {
+      page.displayIndex = displayIndex;
     });
 
     this.store.setState('bookViewData', bookViewData);

@@ -338,8 +338,8 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   _renderPageSizeSingle(readerHeight, readerWidth, page) {
     let realReaderHeight = readerHeight;
     this._setPageDimensions(readerHeight, readerWidth, page);
-    page.renderOffsetTop = (realReaderHeight*page.index)+this.pageBuffer;
-    page.renderOffsetTopForScroll = realReaderHeight*page.index;
+    page.renderOffsetTop = (realReaderHeight*page.displayIndex)+this.pageBuffer;
+    page.renderOffsetTopForScroll = realReaderHeight*page.displayIndex;
     page.renderOffsetLeft = 0;
 
     if( page.renderRatioDimension === 'width' ) {
@@ -360,7 +360,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   _renderPageSizeDouble(readerHeight, readerWidth, page) {
     // even pages are on the right
     // odd pages are on the left 
-    let isRight = page.index % 2 === 0;
+    let isRight = page.displayIndex % 2 === 0;
 
     this._setPageDimensions(readerHeight, readerWidth/2, page);
     page.renderOffsetTop = Math.floor((readerHeight - page.renderHeight) / 2);
