@@ -92,6 +92,20 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
     if (selectedRecord) {
       this._onSelectedRecordUpdate(selectedRecord);
+
+      // also update thumbnail set if we have a selected media
+      let selectedThumbnail = this.thumbnails.find(t => t.selected)?.position;
+      if( selectedThumbnail ) {
+        this.leftMostThumbnail = Math.floor(selectedThumbnail / Math.max(this.thumbnailsPerFrame, 1)) * this.thumbnailsPerFrame;
+
+        if( this.leftMostThumbnail > 0 ) {
+          this._resize();
+
+          this.AppStateModel.set({
+            mediaViewerNavLeftMostThumbnail: this.leftMostThumbnail,
+          });  
+        }
+      }
     }
 
     let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -346,9 +360,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       // .filter((element) => element.icon !== "blank-round");
 
 
-    this._resize();
-
-    // this.AppStateModel.set({mediaViewerNavLeftMostThumbnail: 0});
+    this._resize();   
   }
 
   _renderThumbnail(node, clientMediaPage, selectedMediaPage) {
