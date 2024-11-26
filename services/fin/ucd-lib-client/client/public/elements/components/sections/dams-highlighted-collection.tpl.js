@@ -50,7 +50,7 @@ return html`
   .text-container {
     flex-grow: 1;
     align-self: flex-start;
-    padding: 2rem;
+    padding: 2rem 0;
   }
   .title {
     /* color: var(--color-h3);
@@ -92,6 +92,7 @@ return html`
     }
     .text-container {
       align-self: center;
+      padding: 2rem;
     }
   }
 

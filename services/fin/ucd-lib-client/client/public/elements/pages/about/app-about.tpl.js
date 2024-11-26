@@ -124,7 +124,7 @@ export default function render() {
       <h4>Contact</h4>
       <div>
         <ul class="list--arrow">
-          <li><a href="mailto:eanebeker@ucdavis.edu">Eric A Nebeker</a> (Digital Assets Specialist)</li>
+          <li><a href="https://www.library.ucdavis.edu/person/eric-nebeker">Eric A Nebeker</a> (Digital Assets Specialist)</li>
         </ul>
       </div>
       

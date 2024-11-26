@@ -330,11 +330,11 @@ export default function render() {
 
         <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader || this.thumbnails.length < 2}">
           <div id="thumbnailInnerContainer">
-            ${this.thumbnails.map((item) => html`
+            ${this.thumbnails.map((item, index) => html`
               <a
                 class="thumbnail"
                 href="${item.id}"
-                alt="Page #${item.page}"
+                alt="Page #${index+1}"
                 ?selected="${item.selected}"
                 title="${item.id}"
                 media-id="${item.id}"

@@ -270,6 +270,21 @@ class Utils {
     
     return null;     
   }  
+
+  /**
+   * @method getSubjectUrl
+   * @description given a subject string, build search url 
+   * 
+   * @param {Object} recordModel
+   * @param {String} subject
+   * @returns {String} search url for subject
+   */
+  getSubjectUrl(recordModel, subject) {
+    let searchDocument = recordModel.emptySearchDocument();
+    let subjectFacet = '@graph.subjects.name';
+    recordModel.appendKeywordFilter(searchDocument, subjectFacet, subject);
+    return '/search/'+recordModel.searchDocumentToUrl(searchDocument);
+  }
 }
 
 module.exports = new Utils();

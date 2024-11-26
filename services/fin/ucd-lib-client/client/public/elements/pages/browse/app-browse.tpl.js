@@ -20,7 +20,7 @@ export default function render() {
       }
 
       .vertical-link--circle .vertical-link__figure:after {
-        opacity: 1;
+        opacity: 1 !important;
       }
 
       /* STYLES BELOW ARE ACTUALLY USED. NEED TO AUDIT ANYTHING ABOVE */
@@ -90,7 +90,7 @@ export default function render() {
       }
     </style>
 
-    <div ?hidden="${this.page !== "/browse"}">
+    <div class="browse-selection-section" ?hidden="${this.page !== "/browse"}">
       <div class="title-section">
         <h1>Browse<br /><span class="fw-light">Digital Collections</span></h1>
       </div>

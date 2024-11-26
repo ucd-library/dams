@@ -436,7 +436,7 @@ export default function render() {
       </div>
     </div>
 
-    <div ?hidden="${this.showError}">
+    <div ?hidden="${this.showError}" style="min-height: 100vh">
       <div ?hidden="${this.showLoading}">
         <div class="grid" ?hidden="${!this.loading || !this.isGridLayout}">
           ${[1,2,3,4,5,6,7,8.9,10].map(

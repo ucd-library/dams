@@ -260,6 +260,10 @@ export default function render() {
       z-index: 400;
     }
 
+    ucdlib-md p {
+      margin-top: 0;
+    }
+
     </style>
 
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
@@ -363,8 +367,7 @@ export default function render() {
         <div class="value" id="subjectValue">
           ${this.subjects.map(
             (about, index) =>
-              html`${index > 0 ? ", " : ""}<a href="${about["@id"]}"
-                  >${about["name"] || about["@id"]}</a>`
+              html`${index > 0 ? ", " : ""}<a href="${utils.getSubjectUrl(this.RecordModel, about["name"] || about["@id"])}">${about["name"] || about["@id"]}</a>`
           )}
         </div>
       </div>
@@ -382,7 +385,7 @@ export default function render() {
       <div class="metadata-row" id="identifier">
         <div class="attr">ARK / DOI</div>
         <div class="value" id="identifierValue">
-          ${this.arkDoi.map((link) => html`<a href="${link}">${link.replace('/item', '')}</a>`)}
+          ${this.arkDoi.map((link) => html`<a @click="${this._arkDoiClick}" href="${link}">${link.replace('/item', '')}</a>`)}
         </div>
       </div>
 

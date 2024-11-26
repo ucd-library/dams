@@ -395,21 +395,33 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
         .querySelector("#layout")
         .querySelectorAll("app-search-grid-result");
 
-      for (let i = 0; i < eles.length; i++) {
+      for (let i = 0; i < eles.length; i++) { 
+        let padding = this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 44 : 80;
+
+        await eles[i].updateComplete; 
+        let img = eles[i].shadowRoot?.querySelector('img');
+        if( img ) {
+          await new Promise((resolve) => {
+            if( img.complete ) {
+              resolve();
+            } else { 
+              img.addEventListener('load', resolve);
+              img.addEventListener('error', resolve);
+            }
+          });
+        }
+
         let col = this._findMinCol(colHeights);
         let cheight = colHeights[col];
 
         eles[i].style.left = leftOffset + col * w + "px";
         eles[i].style.top = cheight + "px";
-        // eles[i].style.visibility = 'visible';
-
-        colHeights[col] += eles[i].offsetHeight + 25;
+        colHeights[col] += eles[i].imageHeight + 25 + padding;
       }
 
       let maxHeight = Math.max.apply(Math, colHeights);
       this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
     }
-
   }
 
   /**

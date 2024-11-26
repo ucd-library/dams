@@ -557,8 +557,7 @@ export default function render() {
         <span class="collection-label">Subjects: </span> 
           ${this.subjects.map(
             (about, index) =>
-              html`${index > 0 ? ", " : ""}<a href="${about["@id"]}"
-                  >${about["name"] || about["@id"]}</a>`
+              html`${index > 0 ? ", " : ""}<a href="${utils.getSubjectUrl(this.RecordModel, about["name"] || about["@id"])}">${about["name"] || about["@id"]}</a>`
           )}
       </div>
       <div style="margin-bottom: .4rem;" ?hidden="${!this.material}">

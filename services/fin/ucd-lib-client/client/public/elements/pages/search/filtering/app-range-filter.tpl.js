@@ -28,10 +28,10 @@ export default function render() {
 
   input[type="number"] {
     border: 0;
-    width: 3rem;
+    width: 3.3rem;
     height: 61px;
     padding: 0 1rem;
-    margin: 0 0.5rem;
+    margin: 0;
     font-size: var(--fs-sm);
     background: var(--color-aggie-blue-30);
   }

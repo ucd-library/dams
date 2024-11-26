@@ -51,7 +51,6 @@ export default function render() {
 
       app-search-header {
         position: relative;
-        z-index: 2000;
       }
 
       .loading-dots {
@@ -127,81 +126,81 @@ export default function render() {
       </ucdlib-pages>
 
       <app-404 id="404" ?hidden="${this.page !== '404'}"></app-404>
+    </div>
 
-      <div class="footer site-frame">
-        <ucdlib-site-footer>
-          <ucdlib-site-footer-column header="Digital Collections">
-            <ul>
-              <li><a href="/browse/collections">Collections</a></li>
-              <li><a href="/search">Items</a></li>
-              <li><a href="/about">About Digital Collections</a></li>
-              <!-- <li><a href="">FAQ</a></li> -->
-            </ul>
-          </ucdlib-site-footer-column>
-          <ucdlib-site-footer-column header="Library Info">
-            <ul>
-              <li>
-                <a
-                  href="https://library.ucdavis.edu/special-collections/"
-                  target="_blank"
-                  rel="noopener"
-                  >Archives and Special Collections</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://library.ucdavis.edu/library/"
-                  target="_blank"
-                  rel="noopener"
-                  >Visit the Library</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://library.ucdavis.edu/news/"
-                  target="_blank"
-                  rel="noopener"
-                  >Library News</a
-                >
-              </li>
-              <li>
-                <a
-                  href="http://give.ucdavis.edu/ULIB"
-                  target="_blank"
-                  rel="noopener"
-                  >Give to the Library</a
-                >
-              </li>
-            </ul>
-          </ucdlib-site-footer-column>
-          <ucdlib-site-footer-column header="Account">
-            <ul>
-              <li><app-auth-footer></app-auth-footer></li>
-              <li class="fin-admin" ?hidden="${!this.isAdmin}">
-                <a href="/fin/admin/${this.pathInfo.length > 1 ? '#path-info' + this.pathInfo : ''}">Fin Admin</a>
-              </li>
-            </ul>
-          </ucdlib-site-footer-column>
-          <div insert-into="below-address" ?hidden="${this.showVersion}">
-            <div><b>Build Information</b></div>
-            <div>App Version: ${this.appVersion}</div>
-            <div>Build Time: ${this.localBuildTime}</div>
-            <div>Build Number: ${this.buildNum}</div>
-            <div>Client Env: ${this.clientEnv}</div>
-            <div>Fin App Version: ${this.finAppVersion}</div>
-            <div>Fin Branch Name: ${this.finBranchName}</div>
-            <div>Fin Repo Tag: ${this.finRepoTag}</div>
-            <div>Fin Server Image: ${this.finServerImage}</div>
-            <div>Fin Server Repo Hash: ${this.finServerRepoHash}</div>
-            <div>DAMS Deployment Branch: ${this.damsDeployBranch}</div>
-            <div>DAMS Deployment SHA: ${this.damsDeploySha}</div>
-            <div>DAMS Deployment Tag: ${this.damsDeployTag}</div>
-            <div>DAMS Repo Branch: ${this.damsRepoBranch}</div>
-            <div>DAMS Repo SHA: ${this.damsRepoSha}</div>
-            <div>DAMS Repo Tag: ${this.damsRepoTag}</div>
-          </div>
-        </ucdlib-site-footer>
-      </div>
+    <div class="footer site-frame">
+      <ucdlib-site-footer>
+        <ucdlib-site-footer-column header="Digital Collections">
+          <ul>
+            <li><a href="/browse/collections">Collections</a></li>
+            <li><a href="/search">Items</a></li>
+            <li><a href="/about">About Digital Collections</a></li>
+            <!-- <li><a href="">FAQ</a></li> -->
+          </ul>
+        </ucdlib-site-footer-column>
+        <ucdlib-site-footer-column header="Library Info">
+          <ul>
+            <li>
+              <a
+                href="https://library.ucdavis.edu/special-collections/"
+                target="_blank"
+                rel="noopener"
+                >Archives and Special Collections</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://library.ucdavis.edu/library/"
+                target="_blank"
+                rel="noopener"
+                >Visit the Library</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://library.ucdavis.edu/news/"
+                target="_blank"
+                rel="noopener"
+                >Library News</a
+              >
+            </li>
+            <li>
+              <a
+                href="http://give.ucdavis.edu/ULIB"
+                target="_blank"
+                rel="noopener"
+                >Give to the Library</a
+              >
+            </li>
+          </ul>
+        </ucdlib-site-footer-column>
+        <ucdlib-site-footer-column header="Account">
+          <ul>
+            <li><app-auth-footer></app-auth-footer></li>
+            <li class="fin-admin" ?hidden="${!this.isAdmin}">
+              <a href="/fin/admin/${this.pathInfo.length > 1 ? '#path-info' + this.pathInfo : ''}">Fin Admin</a>
+            </li>
+          </ul>
+        </ucdlib-site-footer-column>
+        <div insert-into="below-address" ?hidden="${this.showVersion}">
+          <div><b>Build Information</b></div>
+          <div>App Version: ${this.appVersion}</div>
+          <div>Build Time: ${this.localBuildTime}</div>
+          <div>Build Number: ${this.buildNum}</div>
+          <div>Client Env: ${this.clientEnv}</div>
+          <div>Fin App Version: ${this.finAppVersion}</div>
+          <div>Fin Branch Name: ${this.finBranchName}</div>
+          <div>Fin Repo Tag: ${this.finRepoTag}</div>
+          <div>Fin Server Image: ${this.finServerImage}</div>
+          <div>Fin Server Repo Hash: ${this.finServerRepoHash}</div>
+          <div>DAMS Deployment Branch: ${this.damsDeployBranch}</div>
+          <div>DAMS Deployment SHA: ${this.damsDeploySha}</div>
+          <div>DAMS Deployment Tag: ${this.damsDeployTag}</div>
+          <div>DAMS Repo Branch: ${this.damsRepoBranch}</div>
+          <div>DAMS Repo SHA: ${this.damsRepoSha}</div>
+          <div>DAMS Repo Tag: ${this.damsRepoTag}</div>
+        </div>
+      </ucdlib-site-footer>
     </div>
   `;
 }

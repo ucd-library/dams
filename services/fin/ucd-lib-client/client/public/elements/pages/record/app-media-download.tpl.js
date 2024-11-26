@@ -108,10 +108,6 @@ export default function render() {
         align-items: center;
       }
 
-      .layout.btns > * {
-        max-width: 30%;
-      }
-
       .radio {
         margin-bottom: 10px;
       }
@@ -119,17 +115,14 @@ export default function render() {
       .downloadBtn {
         padding: 13px 0;
         font-size: 0.9rem;
-        min-width: 6rem;
+        width: 6rem;
         text-transform: none;
+        height: 1.5rem;
       }
 
       .downloadBtn:hover {
         background-color: var(--color-aggie-blue);
         color: var(--color-aggie-gold);
-      }
-
-      .downloadBtn.archive {
-        width: 115px;
       }
 
       #format {
@@ -150,13 +143,11 @@ export default function render() {
         font-weight: bold;
         padding: 11px 1rem;
         border: solid 2px var(--color-aggie-blue-50);
+        height: 1.5rem;
+        white-space: nowrap;
       }
 
       @media (max-width: 600px) {
-        .layout.btns > * {
-          width: 33%;
-          max-width: 33%;
-        }
         .downloadBtn {
           min-width: auto;
           text-overflow: clip;

@@ -23,7 +23,7 @@ export default function render() {
     position: fixed;
     bottom: 1rem;
     right: calc(50% - 110px - 2rem);
-    width: 220px;
+    width: 11rem;
     font-size: 1rem;
     margin: 1rem;
     border-radius: 1.5rem;
