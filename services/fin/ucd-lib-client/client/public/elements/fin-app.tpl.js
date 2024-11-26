@@ -182,23 +182,22 @@ export default function render() {
             </li>
           </ul>
         </ucdlib-site-footer-column>
-        <div insert-into="below-address" ?hidden="${this.showVersion}">
-          <div><b>Build Information</b></div>
-          <div>App Version: ${this.appVersion}</div>
-          <div>Build Time: ${this.localBuildTime}</div>
-          <div>Build Number: ${this.buildNum}</div>
-          <div>Client Env: ${this.clientEnv}</div>
-          <div>Fin App Version: ${this.finAppVersion}</div>
-          <div>Fin Branch Name: ${this.finBranchName}</div>
-          <div>Fin Repo Tag: ${this.finRepoTag}</div>
-          <div>Fin Server Image: ${this.finServerImage}</div>
-          <div>Fin Server Repo Hash: ${this.finServerRepoHash}</div>
-          <div>DAMS Deployment Branch: ${this.damsDeployBranch}</div>
-          <div>DAMS Deployment SHA: ${this.damsDeploySha}</div>
-          <div>DAMS Deployment Tag: ${this.damsDeployTag}</div>
-          <div>DAMS Repo Branch: ${this.damsRepoBranch}</div>
-          <div>DAMS Repo SHA: ${this.damsRepoSha}</div>
-          <div>DAMS Repo Tag: ${this.damsRepoTag}</div>
+        <div insert-into="build-info" >
+          <div class="build-info">
+            ${this.buildInfo.map(
+              info => html`
+                <div>
+                  ${info.map(
+                    item => html`
+                      <div>
+                        <b>${item.label}</b>: ${item.value}
+                      </div>
+                    `
+                  )}
+                </div>
+              `
+            )}
+          </div>
         </div>
       </ucdlib-site-footer>
     </div>

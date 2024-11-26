@@ -34,29 +34,6 @@ class AppFooter extends Mixin(LitElement)
     this.active = true;
     this.render = render.bind(this);
 
-    this.showVersion = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH !== 'main';
-
-    this.appVersion = APP_CONFIG.env.APP_VERSION;    
-    this.buildNum = APP_CONFIG.env.BUILD_NUM;
-    this.clientEnv = APP_CONFIG.env.CLIENT_ENV;
-    this.finAppVersion = APP_CONFIG.env.FIN_APP_VERSION;
-    this.finBranchName = APP_CONFIG.env.FIN_BRANCH_NAME;
-    this.finRepoTag = APP_CONFIG.env.FIN_REPO_TAG;
-    this.finServerImage = APP_CONFIG.env.FIN_SERVER_IMAGE;
-    this.finServerRepoHash = APP_CONFIG.env.FIN_SERVER_REPO_HASH;
-    this.damsDeployBranch = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH;
-    this.damsDeploySha = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_SHA;
-    this.damsDeployTag = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_TAG;
-    this.damsRepoBranch = APP_CONFIG.env.UCD_DAMS_REPO_BRANCH;
-    this.damsRepoSha = APP_CONFIG.env.UCD_DAMS_REPO_SHA;
-    this.damsRepoTag = APP_CONFIG.env.UCD_DAMS_REPO_TAG;
-
-    if( APP_CONFIG.env.BUILD_TIME ) {
-      this.localBuildTime = new Date(APP_CONFIG.env.BUILD_TIME).toISOString().replace('T', ' ');
-    } else {
-      this.localBuildTime = 'Not set';
-    }   
-
     this._injectModel('AppStateModel');
   }  
 

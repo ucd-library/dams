@@ -16,6 +16,7 @@ const crypto = require('crypto');
 appConfig.reload(true);
 
 let jsBundleHash = '';
+let corkBuildInfo = null;
 
 
 module.exports = async (app) => {
@@ -55,6 +56,7 @@ module.exports = async (app) => {
         // recordCount: (await records.rootCount()).count,
         featuredImages : config.client.featuredImages,
         env : config.client.env,
+        buildInfo : loadCorkBuildInfo(),
         fcAppConfig : appConfig.config,
         title : config.client.title,
         logger : config.client.logger
@@ -128,6 +130,31 @@ module.exports = async (app) => {
     immutable: true,
     maxAge: '1y'
   }));
+}
+
+function loadCorkBuildInfo() {
+  if( !fs.existsSync('/cork-build-info') ) {
+    return {}
+  }
+
+  if( corkBuildInfo ) {
+    return corkBuildInfo;
+  }
+
+  corkBuildInfo = {};
+  let files = fs.readdirSync('/cork-build-info');
+  for( let file of files ) {
+    if( path.parse(file).ext !== '.json' ) {
+      continue;
+    }
+
+    try {
+      let data = JSON.parse(fs.readFileSync(path.join('/cork-build-info', file)));
+      corkBuildInfo[path.parse(file).name] = data;
+    } catch(e) {}
+  }
+
+  return corkBuildInfo;
 }
 
 function loadJsBundleHash(assetsDir) {

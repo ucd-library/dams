@@ -156,7 +156,17 @@ export function styles() {
       h2 {
         margin-left: 0;
       }
-    }    
+    }   
+      
+    .build-info {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      justify-content: center;
+    }
+    .build-info > div {
+      padding: 1rem;
+    }
   `;
 }
 
@@ -177,7 +187,6 @@ export function render() {
             <a href="tel:+1-530-752-8792" class="underline">530-752-8792</a><br /><br />
             <a href="mailto:library@ucdavis.edu" class="underline">library@ucdavis.edu</a>
           </address>
-          <div id="below-address" shadow-anchor="below-address"></div>
         </div>
       </div>
 
@@ -187,6 +196,7 @@ export function render() {
         </div>
       </div>
       <div class="section-campus-info">${this._renderCampusInfo()}</div>
+      <div id="build-info" shadow-anchor="build-info"></div>
     </div>
   `;
 }

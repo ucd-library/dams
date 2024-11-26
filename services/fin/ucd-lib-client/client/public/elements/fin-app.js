@@ -39,6 +39,7 @@ export class FinApp extends Mixin(LitElement)
       showVersion: { type: Boolean },
       isAdmin: { type: Boolean },
       pathInfo: { type: String },
+      buildInfo: { type: Array }
     };
   }
 
@@ -64,23 +65,10 @@ export class FinApp extends Mixin(LitElement)
     this.showSearchHeader = false;
     this.showBreadcrumb = false;
 
-    // App Version variables
-    this.showVersion = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH !== "main";
-
-    this.appVersion = APP_CONFIG.env.APP_VERSION;
-    this.buildNum = APP_CONFIG.env.BUILD_NUM;
-    this.clientEnv = APP_CONFIG.env.CLIENT_ENV;
-    this.finAppVersion = APP_CONFIG.env.FIN_APP_VERSION;
-    this.finBranchName = APP_CONFIG.env.FIN_BRANCH_NAME;
-    this.finRepoTag = APP_CONFIG.env.FIN_REPO_TAG;
-    this.finServerImage = APP_CONFIG.env.FIN_SERVER_IMAGE;
-    this.finServerRepoHash = APP_CONFIG.env.FIN_SERVER_REPO_HASH;
-    this.damsDeployBranch = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_BRANCH;
-    this.damsDeploySha = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_SHA;
-    this.damsDeployTag = APP_CONFIG.env.UCD_DAMS_DEPLOYMENT_TAG;
-    this.damsRepoBranch = APP_CONFIG.env.UCD_DAMS_REPO_BRANCH;
-    this.damsRepoSha = APP_CONFIG.env.UCD_DAMS_REPO_SHA;
-    this.damsRepoTag = APP_CONFIG.env.UCD_DAMS_REPO_TAG;
+    this.buildInfo = [];
+    if( APP_CONFIG.user && APP_CONFIG.user.admin ) {
+      this.renderBuildInfo();
+    }
 
     if (APP_CONFIG.env.BUILD_TIME) {
       this.localBuildTime = new Date(APP_CONFIG.env.BUILD_TIME)
@@ -152,6 +140,26 @@ export class FinApp extends Mixin(LitElement)
     }
 
     if( !['item', 'collection'].includes(this.page) ) this._updatePageMetadata();
+  }
+
+  renderBuildInfo() {
+    for( let buildName in APP_CONFIG.buildInfo ) {
+      let data = APP_CONFIG.buildInfo[buildName];
+      let info = [
+        {label: 'Repository', value: html`<a href="${data.remote}" target="_blank">${data.name}</a>`},
+        {label: 'Last Commit Time', value: new Date(data.date).toLocaleString()},
+        {label: 'Branch', value: html`<a href="${data.remote}/tree/${data.branch}" target="_blank">${data.branch}</a>`}
+      ];
+      if( data.tag ) {
+        info.push({label: 'Tag', value: html`<a href="${data.remote}/tree/${data.tag}" target="_blank">${data.tag}</a>`});
+      }
+      info.push({label: 'Commit', value: html`<a href="${data.remote}/commit/${data.commit}" target="_blank">${data.commit}</a>`});
+      info.push({label: 'Image', value: data.imageTag});      
+
+      this.buildInfo.push(info);
+    }
+
+    console.log(this.buildInfo);
   }
 
   /**
