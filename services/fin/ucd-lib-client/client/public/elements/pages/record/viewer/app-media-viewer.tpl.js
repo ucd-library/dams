@@ -185,7 +185,7 @@ export default function render() {
       }
 
       ucdlib-bookreader {
-        padding-top: 1.75rem;
+        padding-top: .5rem;
         padding-bottom: 3.5rem;
       }
 
