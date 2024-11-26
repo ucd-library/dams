@@ -124,7 +124,7 @@ export default function render() {
       }
 
       .add-filter {
-        width: 150px;
+        width: 8.5rem;
         height: 52px;
         background-color: var(--color-aggie-blue-80);
         color: white;

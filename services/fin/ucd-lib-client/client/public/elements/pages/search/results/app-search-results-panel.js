@@ -396,7 +396,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
         .querySelectorAll("app-search-grid-result");
 
       for (let i = 0; i < eles.length; i++) { 
-        let padding = this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 44 : 80;
+        let padding = (this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 44 : 80) + 25;
+        padding = window.innerWidth < 768 ? 0 : padding; // none needed for mobile
 
         await eles[i].updateComplete; 
         let img = eles[i].shadowRoot?.querySelector('img');
@@ -416,7 +417,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
 
         eles[i].style.left = leftOffset + col * w + "px";
         eles[i].style.top = cheight + "px";
-        colHeights[col] += eles[i].imageHeight + 25 + padding;
+        colHeights[col] += eles[i].imageHeight + padding;
       }
 
       let maxHeight = Math.max.apply(Math, colHeights);

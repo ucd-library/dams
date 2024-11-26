@@ -256,7 +256,7 @@ export default function render() {
           width: 85vw !important;
           position: initial;
           margin: auto;
-          padding-bottom: 3rem;
+          padding-bottom: .5rem;
         }
       }
 
