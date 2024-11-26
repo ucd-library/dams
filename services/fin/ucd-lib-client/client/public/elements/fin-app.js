@@ -148,8 +148,10 @@ export class FinApp extends Mixin(LitElement)
       let info = [
         {label: 'Repository', value: html`<a href="${data.remote}" target="_blank">${data.name}</a>`},
         {label: 'Last Commit Time', value: new Date(data.date).toLocaleString()},
-        {label: 'Branch', value: html`<a href="${data.remote}/tree/${data.branch}" target="_blank">${data.branch}</a>`}
       ];
+      if( data.branch && data.branch != 'HEAD' ) {
+        info.push({label: 'Branch', value: html`<a href="${data.remote}/tree/${data.branch}" target="_blank">${data.branch}</a>`});
+      }
       if( data.tag ) {
         info.push({label: 'Tag', value: html`<a href="${data.remote}/tree/${data.tag}" target="_blank">${data.tag}</a>`});
       }
