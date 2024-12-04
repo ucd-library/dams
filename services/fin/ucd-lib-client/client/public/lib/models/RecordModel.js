@@ -163,10 +163,11 @@ class RecordModel extends ElasticSearchModel {
    * @param {String} collectionId
    * @param {Boolean} compact return compacted data, @type only has creative work and UC Davis schema, and minimal timestamps and fedora info
    * @param {Boolean} singleNode return single node
+   * @package {Object} facets additional facets to filter on
    * 
    * @returns {Promise}
    */
-  async defaultSearch(collectionId, compact=false, singleNode=false) {
+  async defaultSearch(collectionId, compact=false, singleNode=false, facets={}) {
     let storeId = collectionId;
     if( !storeId ) storeId = 'default';
 
@@ -188,7 +189,7 @@ class RecordModel extends ElasticSearchModel {
     let searchDocument = this.emptySearchDocument();
 
     if( collectionId ) {
-      this.appendKeywordFilter(searchDocument, 'collectionId', collectionId, 'and');
+      this.appendKeywordFilter(searchDocument, '@graph.isPartOf.@id', collectionId, 'and');
     } 
 
     if( !searchDocument.text ) {
@@ -219,6 +220,8 @@ class RecordModel extends ElasticSearchModel {
         }
       ];
     }
+
+    if( Object.keys(facets).length ) searchDocument.facets = facets;
 
     await this.service.defaultSearch(storeId, searchDocument, compact, singleNode);
 
