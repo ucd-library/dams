@@ -40,7 +40,14 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
   //   super.connectedCallback();
   // }
 
-  firstUpdated() {
+  async firstUpdated() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
+    let searchDoc = this.RecordModel.getCurrentSearchDocument();
+    if( searchDoc ) {
+      this._onRecordSearchUpdate(await this.RecordModel.search(searchDoc));
+    }
+
     this.resize();
   }
 
