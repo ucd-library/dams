@@ -639,8 +639,8 @@ export default function render() {
       </ucdlib-md>
       </p>
 
-      <div style="margin-bottom: .4rem;">
-        <span class="collection-label">Coverage: </span> ${this.yearPublished}
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.publishedDateRange}">
+        <span class="collection-label">Coverage: </span> ${this.publishedDateRange}
       </div>
       <div style="margin-bottom: .4rem;" ?hidden="${!this.subjects?.length}">
         <span class="collection-label">Subjects: </span> 

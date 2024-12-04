@@ -38,6 +38,11 @@ class CollectionVcModel {
       clientEdits = e.payload.data['@graph'].find(g => g['@shortType'] === 'ClientEdit' || g['@shortType'].includes('ClientEdit'));
     } catch(e) {}
 
+    let publishedDateRange = '';
+    if( rootNode.publishedDateRange?.minYear && rootNode.publishedDateRange?.maxYear ) {
+      publishedDateRange = `${rootNode.publishedDateRange.minYear} - ${rootNode.publishedDateRange.maxYear}`;
+    }
+
     const vcData = {
       id: rootNode["@id"],
       description: rootNode.description,
@@ -47,6 +52,7 @@ class CollectionVcModel {
       callNumber,
       count: rootNode.itemCount,
       yearPublished: rootNode.yearPublished,
+      publishedDateRange,
       clientEdits
     };
 

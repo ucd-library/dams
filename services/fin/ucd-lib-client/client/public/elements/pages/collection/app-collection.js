@@ -29,7 +29,7 @@ class AppCollection extends Mixin(LitElement)
       languages : { type : Array },
       location : { type : String },
       items : { type : Number },
-      yearPublished : { type : Number },
+      publishedDateRange : { type : String },
       highlightedItems : { type : Array },
       savedItems : { type : Array },
       dbsync : { type : Object },
@@ -144,7 +144,7 @@ class AppCollection extends Mixin(LitElement)
     this.languages = !Array.isArray(root.language || []) ? [root.language] : root.language;
     this.location = root.location || '';
     this.items = utils.formatNumberWithCommas(e.vcData.count);
-    this.yearPublished = e.vcData.yearPublished;
+    this.publishedDateRange = e.vcData.publishedDateRange;
 
     this.citationRoot = root;
 
@@ -189,7 +189,7 @@ class AppCollection extends Mixin(LitElement)
     this.languages = [];
     this.location = '';
     this.items = 0;
-    this.yearPublished = 0;
+    this.publishedDateRange = '';
     this.highlightedItems = [];
     this.savedItems = [];
     this.dbsync = {};
