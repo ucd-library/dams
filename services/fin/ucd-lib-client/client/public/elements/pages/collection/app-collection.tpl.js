@@ -435,24 +435,28 @@ export default function render() {
     }
     
     .default-display {
-      background-color: var(--color-aggie-gold-20);
+      background-color: var(--color-aggie-gold-30);
       margin: 1rem;
-      padding-bottom: 1rem;
+      padding: 2rem;
     }
 
     .default-display h3 {
       font-style: italic;
       color: var(--color-aggie-blue);
       text-align: left;
-      padding: 2rem 0 0 1rem;
+      padding: 0;
       margin-bottom: 1rem;
+      margin-top: 0;
     }
 
     .default-display span.label {
       font-weight: bold;
     }
 
-    .default-item-display,
+    .default-item-display {
+      text-align: left;
+    }
+
     .exceptions {
       text-align: left;
       padding-left: 1rem;
@@ -485,6 +489,69 @@ export default function render() {
       color: inherit;
     }
 
+
+
+    .disclaimer-admin-toggle {
+      background-color: var(--color-aggie-gold-30);
+      /* margin: 1rem; */
+      padding: 2rem;
+      text-align: left;
+      position: relative;
+      z-index: 500;
+    }
+
+    .disclaimer-admin-toggle .disclaimer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .disclaimer-admin-toggle .disclaimer-header span {
+      font-weight: bold;
+    }
+
+    .disclaimer-admin-toggle .disclaimer-content {
+      font-style: italic;
+      line-height: 1.7rem;
+    }
+
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-button {
+      width: 35px;
+      height: 13px;
+      border-radius: 30px;
+      cursor: pointer;
+      position: relative;
+      background-color: var(--color-black-20);
+    }
+
+    .toggle-button::before {
+      position: absolute;
+      content: '';
+      background-color: white;
+      width: 22px;
+      height: 22px;
+      border-radius: 22px;
+      margin-top: -2px;
+      transition: 0.3s ease-in-out;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .toggle-switch input:checked + .toggle-button {
+      background-color: var(--color-aggie-blue-60);
+    }
+    .toggle-switch input:checked + .toggle-button::before {
+      transform: translateX(.8rem);
+      background-color: var(--color-aggie-blue-80);
+    }
+    .toggle-switch input {
+      display: none;
+    }
   </style>
   
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
@@ -538,10 +605,32 @@ export default function render() {
     </div>
 
     <div class="detail-section">
-      <div class="content-warning">
+      <div class="disclaimer-admin-toggle" ?hidden="${!this.editMode || !this.isUiAdmin}">
+        <div class="disclaimer-header">
+          <span>Disclaimer</span>
+          <div class="toggle-switch">
+            <input 
+              type="checkbox" 
+              id="toggle"
+              ?checked="${this.showDisclaimer}" 
+              @change="${this._onDisclaimerToggle}">
+            <label for="toggle" class="toggle-button"></label>
+          </div>
+        </div>
+        <div class="disclaimer-content">
+          <p>
+            Due to the nature of the historical items in this collection, some materials may be considered harmful, offensive or misrepresentative.
+            There may be occurences of language, positions and values that do not align with our current values and practices at UC Davis.
+          </p>
+        </div>
+      </div>
+
+      <div class="content-warning" ?hidden="${this.editMode || !this.showDisclaimer}">
         Due to the nature of the historical items in this collection, some materials may be considered harmful, offensive or misrepresentative.
         There may be occurences of language, positions and values that do not align with our current values and practices at UC Davis.
       </div>
+
+
       <p class="description">
       <ucdlib-md id="md">
         <ucdlib-md-content>
