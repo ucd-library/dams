@@ -217,8 +217,8 @@ export class FinApp extends Mixin(LitElement)
         selectedPage.style.display = '';
       }
     }
-    
-    if( selectedPage?.offsetHeight ) {
+
+    if( page === 'browse' && selectedPage?.offsetHeight ) {
       let height = selectedPage.offsetHeight;
       mainContent.style.minHeight = height+'px';
     } else {
