@@ -312,6 +312,10 @@ class AppRecord extends Mixin(LitElement)
 
   }
 
+  _onSubjectClick(e) {
+    this.AppStateModel.set({ resetScroll: true })
+  }
+
   /**
    * @method _onEditClicked
    * @description admin ui, edit button click event

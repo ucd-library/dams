@@ -162,11 +162,12 @@ export class FinApp extends Mixin(LitElement)
    */
   _updateScrollPosition(e) {
     let scrollPositionY = 0;
+
     // every page change should scroll to top, except on search page we want to store the scroll position if nav to an item and then back, 
     // so when nav back, we can scroll to the same position we started at
     if( e.location.page === 'item' && e.lastLocation.page === 'search' && !this.searchScrollPositionY ) {
       this.searchScrollPositionY = window.scrollY;
-    } else if( e.location.page === 'search' && e.lastLocation.page === 'item' ) {
+    } else if( e.location.page === 'search' && e.lastLocation.page === 'item' && !e.resetScroll ) {
       scrollPositionY = this.searchScrollPositionY;
       this.searchScrollPositionY = 0;
     } else if( e.location.page === 'search' && e.lastLocation.page === 'search' ) {
@@ -181,6 +182,8 @@ export class FinApp extends Mixin(LitElement)
     requestAnimationFrame(() => {      
       window.scrollTo(0, scrollPositionY);
     });
+
+    if( e.resetScroll ) this.AppStateModel.set({ resetScroll: false });
   }
 
   _resize() {
