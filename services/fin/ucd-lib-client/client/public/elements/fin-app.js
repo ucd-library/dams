@@ -101,6 +101,7 @@ export class FinApp extends Mixin(LitElement)
 
     // app header event to pass to app-search, to toggle filters in mobile view
     window.addEventListener('expand-search-filters', this._expandSearchFilters.bind(this));
+    window.addEventListener('resize', this._resize.bind(this));
   }
   
   ready() {
@@ -182,13 +183,25 @@ export class FinApp extends Mixin(LitElement)
     });
   }
 
+  _resize() {
+    this._updateViewHeight();
+  }
+
   async _updateViewHeight(page=this.page) {
     // main-content should be height of the selected page, or 100vh during page load (so footer is at bottom during latent load)
     let mainContent = this.querySelector(".main-content");
     if( !mainContent ) return;
 
     let selectedPage = this.querySelector('ucdlib-pages').querySelector('#'+page);
+
+    // wait for content and child components to render
     await selectedPage.updateComplete;
+    let childComponents = selectedPage.querySelectorAll('*');
+    await Promise.all(Array.from(childComponents).map(async (child) => {
+      if( child.updateComplete ) {
+        await child.updateComplete;
+      }
+    }));
 
     if( page === 'browse' ) {
       let browseByType = this.AppStateModel.location.path[1];
