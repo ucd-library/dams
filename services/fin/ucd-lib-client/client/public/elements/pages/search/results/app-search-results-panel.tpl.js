@@ -380,7 +380,7 @@ export default function render() {
 
     <div class="header">
       <div class="header-results" style="flex: 2.25; display: flex;">
-        <div style="flex: 2.25; margin: auto; min-height: 2.1rem;" ?hidden="${!this.total || this.total === '0'}">
+        <div style="flex: 2.25; margin: auto; min-height: 2.1rem;" ?hidden="${!this.total && this.total !== 0}">
           <div class="photo-stack">
             <ucdlib-icon
               style="cursor: auto;"
