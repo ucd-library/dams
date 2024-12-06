@@ -19,6 +19,11 @@ export default function render() {
       }
 
       .container {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: normal;
+
         width: 60%;
         margin: auto;
       }
@@ -64,7 +69,7 @@ export default function render() {
       .metadata-row,
       .download-section {
         display: flex;
-        margin: 0.85rem;
+        margin: 0.85rem 0;
       }
       .metadata-row .attr,
       .download-section .label {
@@ -370,6 +375,11 @@ export default function render() {
               html`${index > 0 ? ", " : ""}<a href="${utils.getSubjectUrl(this.RecordModel, about["name"] || about["@id"])}" @click="${this._onSubjectClick}">${about["name"] || about["@id"]}</a>`
           )}
         </div>
+      </div>
+
+      <div ?hidden="${!this.creator}" class="metadata-row" id="creator">
+        <div class="attr">Creator</div>
+        <div class="value" id="creatorValue">${this.creator}</div>
       </div>
 
       <div ?hidden="${!this.callNumber}" class="metadata-row" id="callNumber">
