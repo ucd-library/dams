@@ -100,7 +100,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     }
 
     this._setSelectedDisplay();
-    this._resizeAsync();
+    // this._resizeAsync();
     this.filterDisplayResults();
   }
 
@@ -358,71 +358,76 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    */
   async _resize() {
     if( this.AppStateModel.location.page !== 'search' ) return;
+    if( !this.isMosaicLayout ) return;
+    let firstDiv = this.shadowRoot
+      .querySelector("#layout")
+      .querySelector("app-search-grid-result");
+    if( !firstDiv ) return;
 
-    if( !this.isListLayout ) {
-      let firstDiv = this.shadowRoot
-        .querySelector("#layout")
-        .querySelector("app-search-grid-result");
-      if( !firstDiv ) return;
-
-      if( this.isMosaicLayout ) {
-        // update image heights for mosaic layout
-        let grids = this.shadowRoot.querySelector("#layout")?.querySelectorAll("app-search-grid-result");
-        if( grids && grids.length ) {
-          grids.forEach(grid => {
-            grid._renderImage();
-          });  
-        }
-      }
-
-      await this.updateComplete;
-
-      let ew = this.offsetWidth;
-      let w = firstDiv.offsetWidth + 25;
-
-      let numCols = 3;
-      if( window.innerWidth < 1024 ) numCols = 2;
-      if( window.innerWidth < 768 ) numCols = 1;
-
-      // this makes sure columns are centered
-      let leftOffset = Math.floor((ew - numCols * w) / 2);
-
-      let colHeights = [];
-      for (let i = 0; i < numCols; i++) colHeights.push(0);
-
-      if( leftOffset > 20 ) leftOffset = 20;
-      let eles = this.shadowRoot
-        .querySelector("#layout")
-        .querySelectorAll("app-search-grid-result");
-
-      for (let i = 0; i < eles.length; i++) { 
-        let padding = (this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 44 : 80) + 25;
-        padding = window.innerWidth < 768 ? 0 : padding; // none needed for mobile
-
-        await eles[i].updateComplete; 
-        let img = eles[i].shadowRoot?.querySelector('img');
-        if( img ) {
-          await new Promise((resolve) => {
-            if( img.complete ) {
-              resolve();
-            } else { 
-              img.addEventListener('load', resolve);
-              img.addEventListener('error', resolve);
-            }
-          });
-        }
-
-        let col = this._findMinCol(colHeights);
-        let cheight = colHeights[col];
-
-        eles[i].style.left = leftOffset + col * w + "px";
-        eles[i].style.top = cheight + "px";
-        colHeights[col] += eles[i].imageHeight + padding;
-      }
-
-      let maxHeight = Math.max.apply(Math, colHeights);
-      this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
+    // update image heights for mosaic layout
+    let grids = this.shadowRoot.querySelector("#layout")?.querySelectorAll("app-search-grid-result");
+    if( grids && grids.length ) {
+      grids.forEach(grid => {
+        grid._renderImage();
+      });  
     }
+    await this.updateComplete;
+
+    let ew = this.offsetWidth;
+    let w = firstDiv.offsetWidth + 25;
+
+    let numCols = 3;
+    if( window.innerWidth < 1024 ) numCols = 2;
+    if( window.innerWidth < 768 ) numCols = 1;
+
+    // this makes sure columns are centered
+    let leftOffset = Math.floor((ew - numCols * w) / 2);
+
+    let colHeights = [];
+    for (let i = 0; i < numCols; i++) colHeights.push(0);
+
+    if( leftOffset > 20 ) leftOffset = 20;
+    let eles = this.shadowRoot
+      .querySelector("#layout")
+      .querySelectorAll("app-search-grid-result");
+
+    for (let i = 0; i < eles.length; i++) { 
+      let padding = (this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 22 : 40) + 25;
+      padding = window.innerWidth < 768 ? 0 : padding; // none needed for mobile
+
+      await eles[i].updateComplete; 
+      let img = eles[i].shadowRoot?.querySelector('img');
+      if( img ) {
+        await new Promise((resolve) => {
+          if( img.complete ) {
+            resolve();
+          } else { 
+            img.addEventListener('load', resolve);
+            img.addEventListener('error', resolve);
+          }
+        });
+      }
+
+      let containerWidth = eles[i].offsetWidth || (w * .92); // hack to get around offsetWidth intermittently being 0, not rendered yet?
+      let naturalWidth = img.naturalWidth;
+      let naturalHeight = img.naturalHeight;
+      let aspectRatio = naturalHeight / naturalWidth;
+      let scaledHeight = containerWidth * aspectRatio;
+      
+      let col = this._findMinCol(colHeights);
+      let cheight = colHeights[col];
+      eles[i].style.left = leftOffset + col * w + "px";
+      eles[i].style.top = cheight + "px";
+      colHeights[col] += Math.ceil(scaledHeight + padding);
+    }
+
+    let maxHeight = Math.max.apply(Math, colHeights);
+    if( numCols === 1 ) {
+      maxHeight += 1500;
+    }
+    this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
+
+    this.requestUpdate();
   }
 
   /**
