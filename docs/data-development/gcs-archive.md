@@ -26,11 +26,19 @@ gcloud auth activate-service-account --key-file=/service-account.json
 ```
 
 
-## Sync data to coldline bucket
+## Sync data 
+
+### To bucket from container
 
 ```bash
 cd /data
-gsutil -m rsync -c -J -r -y ".git" -n . gs://dams-collections/[collection-name]
+gsutil -m rsync -c -J -r -y "^(\.git|.*\.jsonld\.json)$" -n /data gs://dams-collections/[collection-name]
+```
+
+### From bucket to container
+
+```bash
+gsutil -m rsync -c -J -r -y ".*\.jsonld\.json$"   gs://dams-collections/[collection-name] /data
 ```
 
 `-n` flag is dry run.  Remove to actually sync.  Note this doesn't delete.  See docs here: https://cloud.google.com/storage/docs/gsutil/commands/rsync

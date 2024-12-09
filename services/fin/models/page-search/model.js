@@ -77,6 +77,7 @@ class PageSearch extends FinEsDataModel {
               should: [
                 { term: { "@graph.identifier": id } },
                 { term: { "@graph.@id": id } },
+                { term: { "@graph.encodesCreativeWork": id } },
                 { term: { "@id": id } },
               ],
             },
@@ -137,7 +138,7 @@ class PageSearch extends FinEsDataModel {
         }
       }
 
-      let matchWords = Array.from(terms).map((term) => new RegExp(term, "i"));
+      let matchWords = Array.from(terms).map((term) => new RegExp(term));
 
       let node = result["@graph"][0];
       parseString(node.content, (error, result) => {
@@ -146,7 +147,7 @@ class PageSearch extends FinEsDataModel {
         let pageData = {
           width: parseInt(result?.OBJECT?.$?.width),
           height: parseInt(result?.OBJECT?.$?.height),
-          page: parseInt(node.position) - 1,
+          page: parseInt(node.position),
         };
 
         result?.OBJECT?.HIDDENTEXT?.forEach((item) => {
@@ -285,10 +286,10 @@ class PageSearch extends FinEsDataModel {
     // position is set by container data, should be base 1.  If not set,
     // use the page number from the manifest, which uses base 0
     if (pageManifest.page !== undefined) {
-      node.position = pageManifest.page + 1;
+      node.position = pageManifest.page;
     }
     if (node.position === undefined) {
-      node.position = (pageManifest.page || 0) + 1;
+      node.position = (pageManifest.page || 0);
     }
     node.identifier = node["@id"] + "/" + node.position;
 
@@ -328,6 +329,8 @@ class PageSearch extends FinEsDataModel {
 
     // if we have a result, check the hashes
     let exists = results.hits.total.value > 0;
+    let ocrDataFetchMessage = null;
+    let skipOcrFetch = false;
     if (exists) {
       let currentGraph = results.hits.hits[0]._source;
       let currentNode = currentGraph ? currentGraph["@graph"] : null;
@@ -339,34 +342,48 @@ class PageSearch extends FinEsDataModel {
           currentNode.clientMedia &&
           currentNode.clientMedia.ocrHash === pageMetadata.md5Hash
         ) {
-          let message = `ES Indexer skipping ${this.modelName} update: ${node["@id"]}.  OCR data and metadata hashes have not changed.`;
-          logger.info(message);
-          return { message };
+          ocrDataFetchMessage = `ES Indexer skipping ${this.modelName} ocr data fetch: ${node["@id"]}.  OCR data and metadata hashes have not changed.`;
+          logger.info(ocrDataFetchMessage);
+
+          node.clientMedia.ocrHash = pageMetadata.md5Hash;
+          node.content = currentNode.content;
+
+          skipOcrFetch = true;
         }
       }
     }
 
-    // fetch the ocr data
-    node.clientMedia.ocrHash = pageMetadata.md5Hash;
-    node.content = await gcs.loadFileIntoMemory(gcsPath);
+    if( !skipOcrFetch ) {
+      ocrDataFetchMessage = `ES Indexer fetched ${this.modelName} ocr data: ${node["@id"]}`;
 
-    // remove old page
-    if (exists) {
-      try {
-        await this.client.delete({
-          index,
-          id: node.identifier,
-        });
-      } catch (e) {
-        logger.warn("failed to remove page", e);
-      }
+      logger.info('fetching ocr data for page search', gcsPath);
+
+      // fetch the ocr data
+      node.clientMedia.ocrHash = pageMetadata.md5Hash;
+      node.content = await gcs.loadFileIntoMemory(gcsPath);
     }
+
+    // remove old page... why?
+    // if (exists) {
+    //   try {
+    //     await this.client.delete({
+    //       index,
+    //       id: node.identifier,
+    //     });
+    //   } catch (e) {
+    //     logger.warn("failed to remove page", e);
+    //   }
+    // }
 
     let response = await this.client.index({
       index,
       id: node.identifier,
       body: json,
     });
+
+    if( ocrDataFetchMessage ) {
+      response.ocrDataFetchMessage = ocrDataFetchMessage;
+    }
 
     return response;
   }

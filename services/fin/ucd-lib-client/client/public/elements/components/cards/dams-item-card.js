@@ -1,5 +1,9 @@
 import { LitElement } from "lit";
+
 import render from "./dams-item-card.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 
 /**
@@ -48,10 +52,6 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
    */
   willUpdate(props) {
     if (this.data.id) {
-
-      debugger;
-      // TODO if single page imagelist, need to not show imageList media icon as it's confusing
-
       this.itemUrl = this.data.id;
       this.thumbnailUrl = this.data.thumbnailUrl;
       this.mediaType = this.data.mediaType;
@@ -63,7 +63,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
         this.mediaType = "audio";
       } else {
         this.mediaType = "imageList";
-        let imageCount = this.data.format[0].split(' ')[0];
+        let imageCount = this.data.format?.[0]?.split(' ')[0];
         if( imageCount && parseInt(imageCount) < 2 ) {
           this.mediaType = 'image';
         }
@@ -78,9 +78,6 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
   async _onRecordUpdate(e) {
     if (e.state !== "loaded" || e.id !== this.id) return;
 
-    debugger;
-    // TODO if single page imagelist, need to not show imageList media icon as it's confusing
-
     this.record = e.vcData;
     if( this.record.images ) {
       let images = this.record.images;
@@ -89,6 +86,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     this.title = this.record.name;
     this.itemUrl = this.record['@id'];
     this.id = this.record['@id'];
+    this.mediaType = this.record.mediaType;
 
     this._truncateTitle();
   }

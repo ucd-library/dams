@@ -1,5 +1,10 @@
 import { LitElement } from "lit";
+
 import render from "./dams-highlighted-collection.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
+import utils from "../../../lib/utils/index.js";
 
 /**
  * @class DamsHighlightedCollection
@@ -16,11 +21,11 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
       collection: { type: Object },
       collectionId: { type: String, attribute: "collection-id" },
       imageRight: { type: Boolean, attribute: "image-right" },
-      _collectionTitle: { type: String, attribute: "collection-title" },
-      _imgSrc: { type: String, attribute: "img-src" },
-      _collectionDesc: { type: String, attribute: "collection-desc" },
-      _itemCt: { type: Number, attribute: "item-ct" },
-      _href: { type: String },
+      collectionTitle: { type: String, attribute: "collection-title" },
+      imgSrc: { type: String, attribute: "img-src" },
+      collectionDesc: { type: String, attribute: "collection-desc" },
+      itemCt: { type: Number, attribute: "item-ct" },
+      href: { type: String },
     };
   }
 
@@ -28,12 +33,14 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
     super();
     this.render = render.bind(this);
     this.collection = {};
+    this.collectionId = "";
+    this.renderedCollectionid = "";
     this.imageRight = false;
-    this._collectionTitle = "";
-    this._imgSrc = "";
-    this._collectionDesc = "";
-    this._itemCt = 0;
-    this._href = "";
+    this.collectionTitle = "";
+    this.imgSrc = "";
+    this.collectionDesc = "";
+    this.itemCt = 0;
+    this.href = "";
 
     this._injectModel("CollectionModel");
   }
@@ -60,25 +67,27 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
         : this.collection.associatedMedia.thumbnailUrl;
       this._itemCt = this.collection.associatedMedia.recordCount;
       this._href = this.collection.associatedMedia["@id"];
-    } else if (this.collectionId) {
+    } else if (this.collectionId && this.collectionId !== this.renderedCollectionid) {
+      this.renderedCollectionid = this.collectionId;
       this._getCollection(this.collectionId);
     }
   }
 
   async _getCollection(id) {
-    await this.CollectionModel.get(id);
-  }
+    let res = await this.CollectionModel.get(id);
 
-  _onCollectionVcUpdate(e) {
-    if (e.state !== "loaded" || e.payload.results.id === this.id) return;
-
-    // this.collection = e.payload.results;
-    this._imgSrc = this.collection.thumbnailUrl;
-    this._collectionTitle = this.collection.title;
-    this.itemCt = e.payload.results.count;
-    this.href = this.collection.id;
-    // TODO description if _collectionDesc is empty
-    //  also image and title need to be populated
+    let overriddenFeatureImage = res.vcData.clientEdits?.['@id'] || '';
+    if (overriddenFeatureImage) {
+      this.imgSrc = '/fcrepo/rest' + overriddenFeatureImage + '/featuredImage.jpg';
+    } else if( res.vcData.images ) {
+      let images = res.vcData.images;
+      this.imgSrc = images.medium ? images.medium.url : images.original.url;
+    } else {
+      this.imgSrc = "/images/tree-bike-illustration.png";
+    }
+    this.collectionTitle = res.vcData.title;
+    this.itemCt = utils.formatNumberWithCommas(res.vcData.count);
+    this.href = res.id;
   }
 }
 

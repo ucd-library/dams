@@ -20,11 +20,11 @@ return html`
 
     [hidden] { display: none !important; }
 
-    h4 {
+    h3 {
       color: var(--color-aggie-gold);
       font-weight: 700;
       margin: 0;
-      padding: 3rem 3rem 0.5rem 4rem;
+      padding: 3rem 3rem 0.5rem 4.5%;
     }
 
     .card-grid {
@@ -41,24 +41,40 @@ return html`
       box-sizing: border-box;
     }
 
+    @media (max-width: 768px) {
+      .card-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        max-width: 90%;
+      }
+    }
+
+    .collections-in-search {
+      padding-bottom: 35px;
+    }
+
   </style>
 
-  <div class="collections" ?hidden="${!this.showResults}">
+  <div class="collections collections-in-search" ?hidden="${!this.showResults}">
     <div>
-      <h4>Collections Relevant to Your Search (${this.results.length})</h4>
+      <h3>Collections Relevant to Your Search (${this.results.length})</h3>
       <div style="text-align:center" class="collections-content">
         <div class="card-grid">
-          ${this.results.map(res => html`
+          ${this.resultsDisplayed.map(res => html`
             <dams-collection-card data-dark-bg data-id="${res['@id']}" @click=${this._onCollectionClicked}></dams-collection-card>
           `)}
         </div>  
       </div>
     </div>
+    <ucd-theme-pagination
+      ?hidden="${this.paginationTotal < 2}"
+      current-page=${this.currentPage}
+      max-pages=${this.paginationTotal}
+      @page-change=${this._onPageClicked}
+      xs-screen
+      darkmode
+      ellipses>
+    </ucd-theme-pagination>
   </div>
 
-  <ucd-theme-pagination
-    current-page=${this.currentPage}
-    max-pages=${this.paginationTotal}
-    @page-change=${this._onPageClicked}>
-  </ucd-theme-pagination>
+  
 `;}

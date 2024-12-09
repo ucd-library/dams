@@ -8,29 +8,27 @@ const authUtils = require('../lib/auth');
 const appConfig = require('../lib/fcrepo-app-config');
 
 const {seo, models, logger} = require('@ucd-lib/fin-service-utils');
+const crypto = require('crypto');
 
 // const transform = seo.recordTransform;
 // const collectionTransform = seo.collectionTransform;
 
-const loaderPath = path.join(__dirname, '..', 'client', config.client.assets, 'loader', 'loader.js');
-const loaderSrc = fs.readFileSync(loaderPath, 'utf-8');
-const bundle = `
-  <script>
-    var CORK_LOADER_VERSIONS = {
-      loader : '${config.client.versions.loader}',
-      bundle : '${config.client.versions.bundle}'
-    }
-  </script>
-  <script>${loaderSrc}</script>`;
-
 appConfig.reload(true);
+
+let jsBundleHash = '';
+let corkBuildInfo = null;
+
 
 module.exports = async (app) => {
   let assetsDir = path.join(__dirname, '..', 'client', config.client.assets);
   logger.info('CLIENT_ENV='+config.client.env.CLIENT_ENV+', Serving static assets from '+assetsDir);
+  loadJsBundleHash(assetsDir);
 
   let collectionModel = await models.get('collection');
-  collectionModel = collectionModel.model;
+  collectionModel = collectionModel?.model;
+
+  let recordModel = await models.get('item');
+  recordModel = recordModel?.model;
 
   /**
    * Setup SPA app routes
@@ -56,80 +54,70 @@ module.exports = async (app) => {
         user : user,
         appRoutes : config.client.appRoutes,
         // recordCount: (await records.rootCount()).count,
+        featuredImages : config.client.featuredImages,
         env : config.client.env,
-        fcAppConfig : appConfig.config
+        buildInfo : loadCorkBuildInfo(),
+        fcAppConfig : appConfig.config,
+        title : config.client.title,
+        logger : config.client.logger
       });
     },
     template : async (req, res, next) => {
       let jsonld = '';
-
       let isRecord = false;
       let isCollection = false;
 
       let parts = req.originalUrl.split('/').filter(p => p ? true : false);
+
       if( parts[0] === 'collection' ) {
-        if( parts.length === 2 ) isCollection = '/'+parts.join('/');
-        else isRecord = true;
+        isCollection = '/'+parts.join('/');
+      } else if( parts[0] === 'item' ) {
+        isRecord = true;
       } else if( parts[0] === 'search' ) {
         isCollection = isSearchCollectionReq(req);
       }
 
       if( !isRecord && !isCollection ) {
         return next({
-          jsonld, bundle,
+          jsonld,
           title : config.client.title,
           description : '',
-          keywords : ''
+          jsBundleHash
         });
       }
 
       try {
         if( isCollection ) {
-          let collection = await collections.get(isCollection);
-          // collection = collectionTransform(collection._source);
+          let collection = await collectionModel.get(isCollection);
           jsonld = JSON.stringify(collection, '  ', '  ');
     
-          let keywords = [];
-          if( collection.keywords ) {
-            if( !Array.isArray(collection.keywords) ) keywords = [collection.keywords];
-            else keywords = collection.keywords;
-          }
-    
           return next({
-            jsonld, bundle,
+            jsonld,
             title : collection.name + ' - '+ config.client.title,
             description : collection.description || '',
-            keywords : keywords.join(', ')
+            jsBundleHash
           })
 
         } else {
-
           let id = req.originalUrl;
-          let record = await records.esGet(id);
-          // record = transform(record._source);
+          let record = await recordModel.get(id);
+          record = record['@graph'].filter(r => r['@id'] === id)[0];
           jsonld = JSON.stringify(record, '  ', '  ');
-    
-          let keywords = [];
-          if( record.keywords ) {
-            if( !Array.isArray(record.keywords) ) keywords = [record.keywords];
-            else keywords = record.keywords;
-          }
 
           return next({
-            jsonld, bundle,
+            jsonld,
             title : (record.name || record.title) + ' - '+ config.client.title,
             description : record.description || '',
-            keywords : keywords.join(', ')
+            jsBundleHash
           })
 
         }
       } catch(e) {
-        console.log(e);
+        console.error(e);
         return next({
-          jsonld, bundle,
+          jsonld,
           title : 'Server Error',
-          description : 'Invalid URL: '+req.originalUrl,
-          keywords : ''
+          description : 'Invalid URL: '+req.originalUrl
         })
       }
     }
@@ -142,6 +130,46 @@ module.exports = async (app) => {
     immutable: true,
     maxAge: '1y'
   }));
+}
+
+function loadCorkBuildInfo() {
+  if( !fs.existsSync('/cork-build-info') ) {
+    return {}
+  }
+
+  if( corkBuildInfo ) {
+    return corkBuildInfo;
+  }
+
+  corkBuildInfo = {};
+  let files = fs.readdirSync('/cork-build-info');
+  for( let file of files ) {
+    if( path.parse(file).ext !== '.json' ) {
+      continue;
+    }
+
+    try {
+      let data = JSON.parse(fs.readFileSync(path.join('/cork-build-info', file)));
+      corkBuildInfo[path.parse(file).name] = data;
+    } catch(e) {}
+  }
+
+  return corkBuildInfo;
+}
+
+function loadJsBundleHash(assetsDir) {
+  let hashFile = path.join(assetsDir, 'js', 'bundle.js');
+  if( fs.existsSync(hashFile) ) {
+    const fileBuffer = fs.readFileSync(hashFile);
+    const hashSum = crypto.createHash('sha256');
+    hashSum.update(fileBuffer);
+    jsBundleHash = hashSum.digest('hex').toString().substring(0, 8);
+    logger.info('Loaded js bundle hash: '+jsBundleHash);
+  } else {
+    setTimeout(() => {
+      loadJsBundleHash(assetsDir);
+    }, 5000);
+  }
 }
 
 function isSearchCollectionReq(req) {

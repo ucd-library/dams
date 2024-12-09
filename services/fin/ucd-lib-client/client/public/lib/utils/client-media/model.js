@@ -1,6 +1,12 @@
 const definition = require('./definition.js');
 
 // for CommonJS to ES6 module import
+let getLoggerProm = import('@ucd-lib/cork-app-utils');
+let getLogger;
+getLoggerProm.then(module => {
+  getLogger = module.getLogger;
+});
+
 let loadingMediaProm = import('../../models/MediaModel.mjs')
 let mediaModel;
 loadingMediaProm.then(module => {
@@ -13,7 +19,9 @@ class ClientMedia {
     this.id = id;
     this.opts = opts;
 
+    this.logger = getLogger('ClientMedia');
 
+    this.missingNodes = new Set();
 
     // if( graph.node ) graph = graph.node; 
     if( graph['@graph'] ) graph = graph['@graph'];
@@ -39,7 +47,7 @@ class ClientMedia {
     // just loop all nodes in graph for media
     if( this.mediaGroups.length === 0 ) {
       if( typeof window !== 'undefined' ) {
-        console.warn('No media found for '+id, graph);
+        this.logger.warn('No media found for '+id, graph);
       }
     }
 
@@ -107,16 +115,17 @@ class ClientMedia {
 
       if( !node.clientMedia.download ) {
         if( displayType !== 'imagelist' ) {
-          node.clientMedia.download = {
-            url : '/fcrepo/rest'+node['@id']
-          }
+          node.clientMedia.download = [{
+            url : '/fcrepo/rest'+node['@id'],
+            fileSize : node.fileSize
+          }];
         } else {
-          node.clientMedia.download = {
+          node.clientMedia.download = [{
             archive : {
               binary : true,
               metadata : false
             }
-          }
+          }];
         }
       }
     }
@@ -206,7 +215,7 @@ class ClientMedia {
       .filter(node => node);
 
     if( !node.clientMedia.pages ) {
-      console.warn('No images found for list '+node['@id']);
+      this.logger.warn('No images found for list '+node['@id']);
       node.clientMedia.pages = [];
     }
 
@@ -214,6 +223,10 @@ class ClientMedia {
       if( a.page < b.page ) return -1;
       if( a.page > b.page ) return 1;
       return 0;
+    });
+
+    node.clientMedia.download = node.clientMedia.pages.map(page => {
+      return page.download;      
     });
 
     if( !node.clientMedia.images ) {
@@ -232,7 +245,7 @@ class ClientMedia {
   handlePdf(node) {
     if( !node.clientMedia ) {
       if( typeof window !== 'undefined' ) {
-        console.warn('No clientMedia for pdf '+node['@id']);
+        this.logger.warn('No clientMedia for pdf '+node['@id']);
       }
       node.clientMedia = {};
     }
@@ -246,9 +259,11 @@ class ClientMedia {
     }
 
     if( !node.clientMedia.download ) {
-      node.clientMedia.download = {
-        url : '/fcrepo/rest'+node['@id']
-      }
+      node.clientMedia.download = [{
+        url : '/fcrepo/rest'+node['@id'],
+        label : 'pdf',
+        fileSize : node.fileSize
+      }];
     }
   }
 
@@ -261,7 +276,7 @@ class ClientMedia {
   handleImage(node) {
     if( !node.clientMedia ) {
       if( typeof window !== 'undefined' ) {
-        console.warn('No clientMedia for '+node['@id']);
+        this.logger.warn('No clientMedia for '+node['@id']);
       }
       node.clientMedia = {};
     }
@@ -278,8 +293,10 @@ class ClientMedia {
 
     if( !node.clientMedia.download ) {
       node.clientMedia.download = {
-        url : node.clientMedia.images.original.url
-      }
+        url : node.clientMedia.images.original.url,
+        label : node.clientMedia.images.original.url.split('.').pop(),
+        fileSize : node.fileSize
+      };
     }
   }
 
@@ -293,11 +310,17 @@ class ClientMedia {
    **/
   getNode(node) {
     if( typeof node === 'string' ) {
+      if( this.index[node] === undefined ) {
+        this.missingNodes.add(node);
+      }
       return this.index[node];
     }
 
     // TODO talk with Justin, this is a hack for /collection/sherry-lehmann
     // the image "/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg" is an object with an id but doesn't exist as a graph in this.index graph
+    if( this.index[node['@id']] === undefined ) {
+      this.missingNodes.add(node['@id']);
+    }
     return this.index[node['@id']]; // || node;
   }
 
@@ -333,7 +356,10 @@ class ClientMedia {
    */
   _crawlMedia(node, crawled={}) {
     node = this.getNode(node);
-    if( !node ) return; 
+    if( !node ) {
+      this.logger.warn('Could not find media node for ', node);
+      return;
+    } 
 
     // make sure no cycles
     if( crawled[node['@id']] ) return;
@@ -371,7 +397,7 @@ class ClientMedia {
     // if( !type && node.fileFormat?.includes('image') ) {
     //   type = 'ImageObject';
     //   node['@type'].push('http://schema.org/ImageObject');
-    //   console.warn('@type is empty for node ', node);
+    //   this.logger.warn('@type is empty for node ', node);
     // }
 
     // or node['@id'] === '/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg' 
@@ -379,7 +405,7 @@ class ClientMedia {
     // if( !type && node['@id'] === '/item/ark:/87287/d7dw8t/media/images/d7dw8t-001.jpg' ) {
     //   node['@type'] = ['http://schema.org/ImageObject'];
     //   type = 'ImageObject';
-    //   console.warn('@type is empty for node ', node);
+    //   this.logger.warn('@type is empty for node ', node);
     // }
 
     return type.split(/(#|\/)/).pop();

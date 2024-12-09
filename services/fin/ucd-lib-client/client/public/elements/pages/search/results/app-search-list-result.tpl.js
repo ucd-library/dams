@@ -20,12 +20,14 @@ export default function render() {
       }
 
       .img {
+        flex: 1;
         height: 250px;
         width: var(--grid-cell-width);
         background-size: contain;
         background-position: center center;
         background-repeat: no-repeat;
         width: 33%;
+        /* flex: 33%;         */
       }
 
       .collection-title {
@@ -68,7 +70,7 @@ export default function render() {
 
       .data {
         padding: 0 0 0 2.5rem;
-        flex: 1;
+        flex: 2;
         overflow: hidden;
       }
 
@@ -89,6 +91,7 @@ export default function render() {
         .img {
           height: auto;
           width: 150px;
+          background-position: initial;
         }
 
         .data {
@@ -117,9 +120,9 @@ export default function render() {
 
           <div class="collection-details">
             <p><span class="label">Collection:</span> ${this.collection}</p>
-            <p><span class="label">Creator:</span> ${this.creator}</p>
-            <p><span class="label">Date:</span> ${this.date}</p>
-            <p><span class="label">Format:</span> ${this.format}</p>
+            <p ?hidden="${!this.creator}"><span class="label">Creator:</span> ${this.creator}</p>
+            <p ?hidden="${!this.date}"><span class="label">Date:</span> ${this.date}</p>
+            <p ?hidden="${!this.format}"><span class="label">Format:</span> ${this.format}</p>
           </div>
         </div>
       </div>

@@ -9,8 +9,8 @@ main:
       - init:
           assign:
             - location: us-central1
-            - project_id: digital-ucdavis-edu
-            - client_email: dams-local-dev
+            - project_id: ucdlib-dams
+            - client_email: dams-production
       - setup_process_image_job:
           call: googleapis.run.v1.namespaces.jobs.create
           args:
@@ -44,8 +44,13 @@ main:
                                                     cpu: "2000m"
                                             command: "node"
                                             args: ${["cli/process-image.js", args.finWorkflowId]}
+                                            env:
+                                              - name: GOOGLE_CLOUD_WORKFLOW_BUCKET
+                                                value: ${args.gcsBucket}
+                                              - name: GOOGLE_CLOUD_WORKFLOW_TMP_BUCKET
+                                                value: ${args.tmpGcsBucket}
                                             # imagePullPolicy: "Always"
-                                      timeoutSeconds: 600
+                                      timeoutSeconds: 3600
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - process_image:
@@ -53,6 +58,8 @@ main:
           args:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
               location: ${location}
+              connector_params:
+                timeout: 7200
           result: job_execution
       - check_job_status:
           switch:

@@ -7,12 +7,8 @@ class FcAppConfigStore extends BaseStore {
     super();
 
     this.data = {
-      byId : {},
-      // by collection id
-      defaultSearch : {},
-      search : {
-        state : this.STATE.INIT
-      }
+      itemAppData : {},
+      collectionAppData : {}
     }
 
     this.events = {
@@ -21,50 +17,99 @@ class FcAppConfigStore extends BaseStore {
 
   }
 
-  /*
-  getRecord(id) {
-    let parts = id.split('/').filter(p => p !== '');
-    for( let i = parts.length-1; i >= 0; i-- ) {
-      let pid = '/'+parts.join('/');
-      if( this.data.byId[pid] ) {
-        return this.data.byId[pid];
-      }
-      parts.splice(i, 1);
-    }
-    return null;
+  setDefaultImagesConfig(config) {
+    this.data.defaultImages = config;
+    // this.emit(this.events.COLLECTION_VC_UPDATE);
   }
 
-  setRecordLoading(id, promise) {
-    this._setRecordState({
-      state: this.STATE.LOADING, 
-      id,
-      request : promise
+  setDefaultImagesConfigLoading(request) {
+    this.data.defaultImages = {
+      state : 'loading',
+      request
+    };
+    // this.emit(this.events.COLLECTION_VC_UPDATE);
+  }
+
+  setDefaultImagesConfigError(error) {
+    this.data.defaultImages = {
+      state : 'error',
+      error
+    };
+    // this.emit(this.events.COLLECTION_VC_UPDATE);
+  }
+
+  setApiApplicationLoading(request) {
+    this.data.apiApplication = {
+      state : 'loading',
+      request
+    };
+    // this.emit(this.events.COLLECTION_VC_UPDATE);
+  }
+
+  setApiApplicationError(error) {
+    this.data.apiApplication = {
+      state : 'error',
+      error
+    };
+    // this.emit(this.events.COLLECTION_VC_UPDATE);
+  }
+
+  setApiApplication(data) {
+    this.data.apiApplication = data;
+    // this.emit(this.events.COLLECTION_VC_UPDATE);
+  }
+
+  setCollectionAppDataLoading(id, request) {
+    this._setCollectionAppData(id, {
+      state : 'loading',
+      request
     });
   }
 
-  setRecordLoaded(id, payload) {
-    this._setRecordState({
-      state: this.STATE.LOADED,
-      rootId : payload.id,
-      payload, id
+  setCollectionAppData(id, data) {
+    this._setCollectionAppData(id, {
+      state : 'loaded',
+      data
     });
   }
 
-  setRecordError(id, error) {
-    this._setRecordState({
-      state: this.STATE.ERROR,   
-      error, id
+  setCollectionAppDataError(id, error) {
+    this._setCollectionAppData(id, {
+      state : 'error',
+      error
     });
   }
 
-  _setRecordState(state) {
-    this.data.byId[state.id] = state;
-    if( state.rootId ) {
-      this.data.byId[state.rootId] = state;
-    }
-    this.emit(this.events.RECORD_UPDATE, state);
+  _setCollectionAppData(id, data) {
+    this.data.collectionAppData[id] = data;
+    // this.emit(this.events.COLLECTION_VC_UPDATE);
   }
-  */
+
+  setItemAppDataLoading(id, request) {
+    this._setItemAppData(id, {
+      state : 'loading',
+      request
+    });
+  }
+
+  setItemAppData(id, data) {
+    this._setItemAppData(id, {
+      state : 'loaded',
+      data
+    });
+  }
+
+  setItemAppDataError(id, error) {
+    this._setItemAppData(id, {
+      state : 'error',
+      error
+    });
+  }
+
+  _setItemAppData(id, data) {
+    this.data.itemAppData[id] = data;
+    // this.emit(this.events.COLLECTION_VC_UPDATE);
+  }
 }
 
 module.exports = new FcAppConfigStore();

@@ -3,9 +3,13 @@
 // https://github.com/google/shaka-player/tree/master/docs/tutorials
 
 import { LitElement } from "lit";
+
 import render from "./app-audio-viewer.tpl.js";
 
-import "@ucd-lib/cork-app-utils";
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
+import "../../../utils/app-share-btn";
+
 import config from "../../../../lib/config";
 import utils from "../../../../lib/utils";
 import videoLibs from "../../../../lib/utils/video-lib-loader";
@@ -38,6 +42,7 @@ export default class AppAudioViewer extends Mixin(LitElement)
     }
 
     this.fullPath = e.location.fullpath;
+    this._updateStyles();
   }
 
   async firstUpdated(e) {
@@ -56,6 +61,10 @@ export default class AppAudioViewer extends Mixin(LitElement)
     }
     this.shadowRoot.querySelector('#sprite-plyr').innerHTML = SPRITE_SHEET;
 
+    this._updateStyles();
+  }
+
+  _updateStyles() {
     // decide where to put css
     // The PLYR library isn't aware of shadydom so we need to manually
     // place our styles in document.head w/o shadydom touching them.
@@ -99,6 +108,8 @@ export default class AppAudioViewer extends Mixin(LitElement)
     this.style.display = 'block';
     this.libsLoaded = true;
     this._loadAudio();
+
+    this._updateStyles();
   }
 
   _loadAudio() {

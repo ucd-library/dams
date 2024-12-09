@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
+
 import render from "./app-media-viewer-nav.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 // import "@polymer/paper-icon-button"
 import "../../../utils/app-share-btn";
@@ -26,6 +29,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       hideZoom: { type: Boolean },
       brSinglePage: { type: Boolean },
       brFullscreen: { type: Boolean },
+      overrideImageList: { type: Boolean },
       singleImage: { type: Boolean },
       mediaList: { type: Array },
       showOpenLightbox: { type: Boolean },
@@ -58,6 +62,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.isBookReader = false;
     this.hideZoom = false;
     this.brSinglePage = false;
+    this.overrideImageList = false;
     this.brFullscreen = false;
     this.singleImage = false;
     this.mediaList = [];
@@ -75,22 +80,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     window.addEventListener("touchmove", (e) => this._onTouchMove(e));
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
-    this._injectModel("AppStateModel", "MediaModel");
-
-    window.addEventListener(
-      "BookReader:pageChanged",
-      this._onBRPageChange.bind(this)
-    );
-
-    window.addEventListener(
-      "BookReader:SearchCallback",
-      this._onSearchResultsChange.bind(this)
-    );
-
-    window.addEventListener(
-      "BookReader:SearchCallbackEmpty",
-      this._onSearchResultsEmpty.bind(this)
-    );
+    this._injectModel("AppStateModel", "MediaModel", "BookReaderModel");
   }
 
   connectedCallback() {
@@ -102,20 +92,50 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
     if (selectedRecord) {
       this._onSelectedRecordUpdate(selectedRecord);
+
+      // also update thumbnail set if we have a selected media
+      let selectedThumbnail = this.thumbnails.find(t => t.selected)?.position;
+      if( selectedThumbnail ) {
+        this.leftMostThumbnail = Math.floor(selectedThumbnail / Math.max(this.thumbnailsPerFrame, 1)) * this.thumbnailsPerFrame;
+
+        if( this.leftMostThumbnail > 0 ) {
+          this._resize();
+
+          this.AppStateModel.set({
+            mediaViewerNavLeftMostThumbnail: this.leftMostThumbnail,
+          });  
+        }
+      }
     }
 
-    // also set brSinglePage if width is less than 801px
-    if (window.innerWidth < 801) {
+    let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    if( screenWidth < 800 ) {
       this.brSinglePage = true;
     }
   }
 
   _onAppStateUpdate(e) {
+    if( this.AppStateModel.location.page !== 'item' ) this._reset();
     if (e.mediaViewerNavLeftMostThumbnail === undefined) return;
     if (e.mediaViewerNavLeftMostThumbnail === this.leftMostThumbnail) return;
 
     this.leftMostThumbnail = e.mediaViewerNavLeftMostThumbnail;
-    this._resize();
+    this._resize();    
+  }
+
+  _onBookreaderStateUpdate(e) {
+    this.brFullscreen = e.fullscreen;
+    this.selectedResult = e.selectedSearchResult + 1;
+
+    this.searchResults = [];
+    if( e.searchResults?.state === 'loaded' ) {
+      let searchResults = e.searchResults.payload || {};
+      searchResults = Object.keys(searchResults).map(key => searchResults[key]);
+      searchResults.forEach(result => {
+        this.searchResults.push(...result);
+      });
+    }
+    this.searchResultsCount = this.searchResults.length;
   }
 
   /**
@@ -175,7 +195,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     // grrrr
     if (w === 0) {
-      // console.log('Ignoreing resize')
       // setTimeout(() => this._resize(), 200);
       return;
     }
@@ -270,15 +289,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     );
   }
 
-  _onSearchResultsChange(e) {
-    let results = e.detail?.props?.results;
-    this.searchResultsCount = results.matches.length;
-  }
-
-  _onSearchResultsEmpty(e) {
-    this.searchResultsCount = 0;
-  }
-
   _showingLastThumbFrame() {
     if (
       this.leftMostThumbnail + this.thumbnailsPerFrame >
@@ -300,6 +310,13 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     });
   }
 
+  _reset() {
+    this.singleImage = false;
+    // this.isBookReader = false;
+    this.brFullscreen = false;
+    this.thumbnails = [];
+  }
+
   /**
    * @method _onSelectedRecordUpdate
    * @description from AppStateInterface, called when a record is selected
@@ -310,7 +327,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     if( !item ) return;
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = item;
-  
+
     if ( clientMedia.mediaGroups.length === 1 &&
           selectedMediaPage === -1 ) {
       this.singleImage = true;
@@ -319,24 +336,31 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     let thumbnails = [];
     for( let node of clientMedia.mediaGroups ) {
-      if( !node.clientMedia.pages ) {
+      if( !node.clientMedia.pages && !this.overrideImageList ) {
         thumbnails.push(this._renderThumbnail(selectedMedia, node.clientMedia.images, selectedMediaPage));
         continue;
       }
+      if( !node.clientMedia.pages ) continue;
       for( let page of node.clientMedia.pages ) {
         thumbnails.push(this._renderThumbnail(selectedMedia, page, selectedMediaPage));
       }
     }
 
+    const ids = [];
     this.thumbnails = thumbnails
       .filter((element) => element !== null)
+      .filter( (element) => {
+        if ( ids.includes(element.id) ) {
+          return false;
+        }
+        ids.push(element.id);
+        return true;
+      })
       // TODO: Filtering out the text based files for now until we get the PDF/text viewer set up correctly
-      .filter((element) => element.icon !== "blank-round");
+      // .filter((element) => element.icon !== "blank-round");
 
 
-    this._resize();
- 
-    // this.AppStateModel.set({mediaViewerNavLeftMostThumbnail: 0});
+    this._resize();   
   }
 
   _renderThumbnail(node, clientMediaPage, selectedMediaPage) {
@@ -358,10 +382,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     // }
 
     let thumbnail = {
-      id: node["@id"]+(clientMediaPage.page === undefined ? '' : ':'+clientMediaPage.page),
+      id: node["@id"]+(!clientMediaPage.page || clientMediaPage.page === undefined ? '' : ':'+(clientMediaPage.page-1)),
       icon: iconType,
       position: clientMediaPage.page,
-      selected: clientMediaPage.page === selectedMediaPage,
+      selected: (clientMediaPage.page-1) === selectedMediaPage,
       disabled: false,
       src: thumbnailUrl,
       // thumbnail: url
@@ -465,8 +489,9 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onToggleBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-bookview-toggle"));
+    // this.dispatchEvent(new CustomEvent("br-bookview-toggle"));  
     this.brSinglePage = !this.brSinglePage;
+    this.BookReaderModel.setView(this.brSinglePage ? 'single' : 'double');
   }
 
   /**
@@ -476,7 +501,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onExpandBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-expand-view"));
+    this.BookReaderModel.setFullscreen(true);
+    // this.dispatchEvent(new CustomEvent("br-expand-view"));
     this.brFullscreen = true;
   }
 
@@ -487,7 +513,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @param {Object} e HTML click event
    */
   _onCollapseBookView(e) {
-    this.dispatchEvent(new CustomEvent("br-collapse-view"));
+    this.BookReaderModel.setFullscreen(false);
+    // this.dispatchEvent(new CustomEvent("br-collapse-view"));
     this.brFullscreen = false;
   }
 
@@ -516,8 +543,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @description set focus to first clickable element
    */
   setFocus() {
-    if (this.singleImage) {
-      if (!this.breakControls) this.$.zoomOut1.focus();
+    if ( this.singleImage && this.$ ) {
+      if( !this.breakControls ) this.$.zoomOut1.focus();
       else this.$.zoomOut2.focus();
     } else {
       let firstBtn = this.shadowRoot.querySelector("button");
@@ -532,33 +559,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    */
   _onSearchToggled(e) {
     this.searching = !this.searching;
+    this.BookReaderModel.setSearchActive(this.searching);
     this.dispatchEvent(new CustomEvent("br-search-toggle"));
-  }
-
-  _onBRPageChange(e) {
-    // TODO similar logic for calulating current page needs to be called when single vs double page is toggled
-    // also when search term changes, the current search result selected needs to be recalculated based on currently viewed page
-    if (!this.searchResults.length) return;
-    let singlePageDiff = this.singleImage ? 1 : 0;
-    let pageIndex = e.detail.props.currentIndex();
-
-    // check if page has a matched search term
-    let matchedSearchResult = this.searchResults.findIndex(
-      (r) => r.par[0].page === pageIndex + singlePageDiff
-    );
-    if (matchedSearchResult === -1) {
-      // loop over this.searchResults to determine the closest page that is less that pageIndex
-      this.searchResults.forEach((result, index) => {
-        if (result.par[0].page < pageIndex + singlePageDiff) {
-          matchedSearchResult = index;
-        }
-      });
-    }
-
-    if (!matchedSearchResult || matchedSearchResult < 0)
-      matchedSearchResult = 0;
-
-    this.selectedResult = matchedSearchResult + 1;
   }
 }
 

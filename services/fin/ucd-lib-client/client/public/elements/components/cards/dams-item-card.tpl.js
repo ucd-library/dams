@@ -119,13 +119,14 @@ export default function render() {
         position: absolute;
         right: 0.25rem;
         bottom: 0.25rem;
-        width: 40px;
-        height: 40px;
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
         background-color: var(--color-aggie-blue-80);
         display: flex;
         justify-content: center;
         align-items: center;
+        margin: 0.5rem;
       }
 
       .media-type__icon {
@@ -133,8 +134,8 @@ export default function render() {
       }
 
       ucdlib-icon {
-        width: 25px;
-        height: 25px;
+        width: 1.2rem;
+        height: 1.2rem;
         fill: white;
       }
     </style>
@@ -152,21 +153,21 @@ export default function render() {
         ></div>
         <div
           class="media-type"
-          ?hidden="${!this.mediaType || this.mediaType === "image"}"
+          ?hidden="${!this.mediaType || this.mediaType.toLowerCase() === "image"}"
         >
           <ucdlib-icon
-            ?hidden="${this.mediaType !== "imageList"}"
+            ?hidden="${this.mediaType.toLowerCase() !== "imagelist"}"
             class="vertical-link__image"
             icon="ucdlib-dams:item-stack-blank"
           ></ucdlib-icon>
           <ucdlib-icon
             style="margin-left: .2rem;"
-            ?hidden="${this.mediaType !== "video"}"
+            ?hidden="${this.mediaType.toLowerCase() !== "video"}"
             class="vertical-link__image"
             icon="ucdlib-dams:fa-play"
           ></ucdlib-icon>
           <ucdlib-icon
-            ?hidden="${this.mediaType !== "audio"}"
+            ?hidden="${this.mediaType.toLowerCase() !== "audio"}"
             class="vertical-link__image"
             icon="ucdlib-dams:fa-volume-high"
           ></ucdlib-icon>

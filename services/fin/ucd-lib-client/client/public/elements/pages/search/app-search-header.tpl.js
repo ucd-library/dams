@@ -93,6 +93,7 @@ export default function render() {
         align-items: center;
         background-color: var(--color-aggie-blue-30);
         padding-bottom: 1rem;
+        min-height: 16px;
       }
       .site-name-search {
         display: none;
@@ -117,7 +118,7 @@ export default function render() {
       }
       @media (max-width: 450px) {
         app-search-box {
-          width: 60%;
+          width: 90%;
           margin: 0 auto;
         }
       }
@@ -170,7 +171,7 @@ export default function render() {
     </div>
 
     <div class="searchContainer">
-      <div style="margin: 1rem auto 0;">
+      <div style="margin: 1rem auto 0; max-width: 100%;">
         <h2 class="site-name-search"><a href="/">Digital Collections</a></h2>
         <app-search-box
           id="searchBox"

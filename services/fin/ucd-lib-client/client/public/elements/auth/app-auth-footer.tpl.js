@@ -1,5 +1,5 @@
 import { html } from "lit";
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+
 export default function render() {
   return html`
     <style include="shared-styles">
@@ -16,17 +16,19 @@ export default function render() {
     display: block;
     padding: var(--spacing-half);
     text-decoration: underline;
+    padding-left: 0;
   }
-  a:hover {
-    background-color: var(--color-aggie-blue-80);
-    border-radius: 4px;
-    color: var(--color-white);
+  @media (max-width: 768px) {
+    .gold,
+    span.logged-in-as {
+      padding-left: 0;
+    }
   }
 </style>
 
 <div>
-  <span ?hidden="${!this.loggedIn}">Logged in as: ${this.user.preferred_username}</span>
-  <a ?hidden="${this.loggedIn}" @click="${this._login}">Login</a>
+  <span class="logged-in-as" ?hidden="${!this.loggedIn}">Logged in as: ${this.user.preferred_username}</span>
+  <a ?hidden="${this.loggedIn}" href="/auth/login?redirectUrl=${this.path}">Login</a>
   <div ?hidden="${!this.loggedIn}">
     <a @click="${this._logout}" class="gold">Log Out</a>
   </div>

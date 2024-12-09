@@ -1,9 +1,11 @@
-const {config} = require('@ucd-lib/fin-service-utils');
+const {config, pg} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 const fetch = require('node-fetch');
 
 const BINARY = 'http://fedora.info/definitions/v4/repository#Binary';
-const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
+// const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
+const ARCHIVAL_GROUP_REGEX = /^\/item\/(ark:\/[a-z0-9]+\/[a-z0-9]+)/;
+
 
 const PDF_IMAGE_PRODUCTS = 'pdf-image-products';
 const STREAMING_VIDEO_WORKFLOW = 'video-to-stream';
@@ -106,7 +108,6 @@ module.exports = async function(path, graph, headers, utils) {
     attr : 'fileFormatSimple',
     value : ['ebucore', 'hasMimeType'],
     parser : (value) => {
-      console.log('VALUE', value, value.split('/'));
       let parts = value.split('/');
 
       if( parts[0] === 'video' ) return 'video';
@@ -162,22 +163,10 @@ module.exports = async function(path, graph, headers, utils) {
     type : 'id'
   });
 
-  // both schema:keywords and schema:about are used for subjects
   await utils.add({
     attr : 'subjects',
     value : ['schema', 'about'],
     type : 'id'
-  });
-
-  await utils.add({
-    attr : 'subjects',
-    value : ['schema', 'keywords'],
-    parser : (value) => {
-      if( typeof value === 'string' ) {
-        return {name: value};
-      }
-      return value;
-    }
   });
 
   // remove duplicate subjects
@@ -193,9 +182,10 @@ module.exports = async function(path, graph, headers, utils) {
 
   await utils.add({
     attr : 'language',
-    value : ['schema', 'inLanguage']
+    value : ['schema', 'inLanguage'],
+    type : 'id'
   });
-
+  
   await utils.add({
     attr : 'lastModified',
     value : ['fedora', 'lastModified'],
@@ -289,26 +279,35 @@ module.exports = async function(path, graph, headers, utils) {
 
   utils.stripFinHost(headers)
 
+  let fetchOpts = {headers: {}}
+  utils.getAuthHeader(fetchOpts.headers);
+
+  // regex match for ark based fin archival group
+  let ag = item['@id'].match(ARCHIVAL_GROUP_REGEX);
+  if( ag ) {
+    item._.graphId = '/item/'+ag[1];
+  }
+
   if( headers.link ) {
-    if( headers.link['archival-group'] ) {
-      item._['archival-group'] = headers.link['archival-group'].map(item => item.url);
-      item._.graphId = item._['archival-group'][0];
-    } else if( headers.link.type && 
-      headers.link.type.find(item => item.rel === 'type' && item.url === ARCHIVAL_GROUP) ) {
-      item._['archival-group'] = item['@id'];
-      item._.graphId = item['@id'];
-    }
+    // if( headers.link['archival-group'] ) {
+    //   item._['archival-group'] = headers.link['archival-group'].map(item => item.url);
+    //   item._.graphId = item._['archival-group'][0];
+    // } else if( headers.link.type && 
+    //   headers.link.type.find(item => item.rel === 'type' && item.url === ARCHIVAL_GROUP) ) {
+    //   item._['archival-group'] = item['@id'];
+    //   item._.graphId = item['@id'];
+    // }
 
     // check for completed ia reader workflow
     if( headers.link.workflow ) {
       let pdfImageProducts = headers.link.workflow.find(item => PDF_IMAGE_PRODUCTS === item.type);
       let imageProducts = headers.link.workflow.find(item => IMAGE_PRODUCTS === item.type);
       if( pdfImageProducts ) {
-        let workflowInfo = await fetch(getGatewayUrl(pdfImageProducts.url));
+        let workflowInfo = await fetch(getGatewayUrl(pdfImageProducts.url), fetchOpts);
         workflowInfo = await workflowInfo.json()
 
         // fetch the first image product
-        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/0/manifest.json');
+        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/0/manifest.json', fetchOpts);
         item.clientMedia.images = await manifest.json();
 
         // set the full manifest url, this could be big, we will not fetch
@@ -316,15 +315,15 @@ module.exports = async function(path, graph, headers, utils) {
           manifest : config.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
         }
       } else if( imageProducts ) {
-        let workflowInfo = await fetch(getGatewayUrl(imageProducts.url));
+        let workflowInfo = await fetch(getGatewayUrl(imageProducts.url), fetchOpts);
         workflowInfo = await workflowInfo.json()
-        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json');
+        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json', fetchOpts);
         item.clientMedia.images = await manifest.json();
       }
 
       let streamVideoSupport = headers.link.workflow.find(item => STREAMING_VIDEO_WORKFLOW === item.type);
       if( streamVideoSupport ) {
-        let workflowInfo = await fetch(getGatewayUrl(streamVideoSupport.url));
+        let workflowInfo = await fetch(getGatewayUrl(streamVideoSupport.url), fetchOpts);
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.streamingVideo = {
@@ -351,6 +350,18 @@ module.exports = async function(path, graph, headers, utils) {
     }
     item._.source.type = 'git';
   }
+
+  // let edits = await pg.query('SELECT * FROM fin_cache.dams_edits WHERE target = $1', ['info:fedora'+item['@id']]);
+  // if( edits.rows.length > 0 ) {
+  //   item.damsEdits = {};
+  //   for( let edit of edits.rows ) {
+  //     item.damsEdits[edit.property.replace('http://digital.ucdavis.edu/schema#', '')] = {
+  //       'value' : edit.value,
+  //       '@id' : edit.edit_id,
+  //     }
+  //   }
+  //   item.damsEdits.exists = true;
+  // }
 
   graph = {
     '@id' : item._.graphId,

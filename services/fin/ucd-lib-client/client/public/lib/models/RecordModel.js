@@ -55,6 +55,7 @@ class RecordModel extends ElasticSearchModel {
       return;
     }
 
+    AppStateModel.set({page: 'item'});
     let id = '/' + e.location.path.join('/');
     let mediaPage = -1;
 
@@ -64,13 +65,20 @@ class RecordModel extends ElasticSearchModel {
       id = id.replace(/:\d+$/, '');
     }
 
-    let result = await this.get(id);
-    await result.payload.clientMedia.loadManifests();
+    let result;
+    try {
+      result = await this.get(id);
+      await result.payload.clientMedia.loadManifests();
+    } catch(e) {
+      console.warn('Error retrieving item', e);
+      AppStateModel.setSelectedRecord(null);
+      AppStateModel.set({page: '404'});
+    }
 
     // item view controller event vs stuff below?
-
+    
     // only trigger a change if the root record changed.
-    if( result.id !== this.currentRecordId || this.selectedMediaPage !== mediaPage ) {
+    if( result && (result.id !== this.currentRecordId || this.selectedMediaPage !== mediaPage) ) {
       this.currentRecordId = result.id;
       this.selectedMediaPage = mediaPage;
 
@@ -181,6 +189,35 @@ class RecordModel extends ElasticSearchModel {
 
     if( collectionId ) {
       this.appendKeywordFilter(searchDocument, 'collectionId', collectionId, 'and');
+    } 
+
+    if( !searchDocument.text ) {
+      searchDocument.sort = [
+        {
+          "@graph.name.raw": {
+            "order": "asc"
+          }
+        },
+        {
+          "@graph.@id": {
+            "order": "asc"
+          }
+        }
+      ];
+    } else {
+      searchDocument.sort = [
+        "_score",
+        {
+          "@graph.name.raw": {
+            "order": "asc"
+          }
+        },
+        {
+          "@graph.@id": {
+            "order": "asc"
+          }
+        }
+      ];
     }
 
     await this.service.defaultSearch(storeId, searchDocument, compact, singleNode);
@@ -216,17 +253,17 @@ class RecordModel extends ElasticSearchModel {
     return this.store.getDefaultSearch(storeId);
   }
 
-  /**
-     * @method getIaBookManifest
-     * @description load a records IA bookreader page data by id
-     * 
-     * @param {String} url the manifest url
-     * 
-     * @returns {Promise} resolves to record
-     */
-  async getIaBookManifest(url) {
-    return await this.service.getIaBookManifest(url);
-  }
+  // /**
+  //    * @method getIaBookManifest
+  //    * @description load a records IA bookreader page data by id
+  //    * 
+  //    * @param {String} url the manifest url
+  //    * 
+  //    * @returns {Promise} resolves to record
+  //    */
+  // async getIaBookManifest(url) {
+  //   return await this.service.getIaBookManifest(url);
+  // }
     
 
   /**
@@ -277,6 +314,26 @@ class RecordModel extends ElasticSearchModel {
     if( searchDocument.limit + searchDocument.offset > this.MAX_WINDOW ) {
       this.store.setSearchError(searchDocument, new Error('Sorry, digital.ucdavis.edu does not serve more than 10,000 results for a query'), true);
       return this.store.getSearch();
+    }
+
+    if( searchDocument.text && !searchDocument.sort ) {      
+      searchDocument.sort = [
+        '_score', 
+        { "@graph.name.raw": { "order": "asc" } },
+        { "@graph.@id": { "order": "asc" } }    
+      ];
+    } else if( !searchDocument.sort ) {
+      searchDocument.sort = [
+        { "@graph.name.raw": { "order": "asc" } },
+        { "@graph.@id": { "order": "asc" } }    
+      ];
+    }
+    if( searchDocument.text && !searchDocument.sort.find(s => s['_score']) ) {
+      searchDocument.sort.unshift('_score');
+    }
+
+    if( !searchDocument.sort.find(s => s['@graph.@id'])) {
+      searchDocument.sort.push({ "@graph.@id": { "order": "asc" } });
     }
 
     try {

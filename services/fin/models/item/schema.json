@@ -22,6 +22,10 @@
       }
     },
 
+    "@graph.about" : {
+      "type" : "text"
+    },
+
     "@graph.identifier" : {
       "type" : "text",
       "fields": {
@@ -50,10 +54,6 @@
           "type":  "text"
         }
       }
-    },
-
-    "@graph.keywords" : {
-      "type" : "text"
     },
 
     "@graph.license.@id" : {
@@ -95,21 +95,42 @@
       "type" : "integer"
     },
 
-    "@graph.name" : {
+   "@graph.name" : {
       "type": "text",
       "fields": {
-        "raw": { 
-          "type":  "keyword"
+        "raw": {
+          "type": "keyword"
+        },
+        "punctuation_insensitive": {
+          "type": "text",
+          "analyzer": "punctuation_insensitive",
+          "fielddata": true
         }
       }
+    },
+
+    "@graph.description" : {
+      "type": "text"
     },
 
     "@graph.alternativeHeadline" : {
       "type" : "text"
     },
 
+    "@graph.inLanguage.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.inLanguage.name" : {
+      "type" : "keyword"
+    },
+
     "@graph.indexableContent" : {
       "type": "text"
+    },
+
+    "@graph.damsEdits.exists" : {
+      "type": "boolean"
     },
 
     "@graph._.updated" : {

@@ -150,6 +150,9 @@ export default function render() {
     color:white;
     text-decoration: underline;
   }
+  .hero-main .sub-search a:hover {
+    text-decoration: none;
+  }
   #watercolor{
     background-color:transparent;
     height: 8rem;
@@ -207,7 +210,7 @@ export default function render() {
 
   .about-collections {
     display: flex;
-    height: 35rem;
+    /* height: 35rem; */
     background-color: var(--color-aggie-blue-80);
     background-image: url(/images/watercolors/watercolor-background-ucd-blue-20opacity.png);
     /* background-position: center;
@@ -228,9 +231,11 @@ export default function render() {
     align-items: center;
     margin-bottom: 4rem;
     margin-top: 20px;
+    padding: 0 5%;
   }
   .hero-top-left img {
-    height: 1.58rem;
+    height: 32px;
+    width: 186px;
   }
 
   .hero-top-right {
@@ -260,6 +265,7 @@ export default function render() {
   .hero-main .sub-heading {
     font-weight: var(--fw-p);
     margin-bottom: 3rem;
+    margin-top: 1rem;
   }
   /* .hero-main .sub-heading a {
     color: var(--color-dams-secondary);
@@ -273,7 +279,8 @@ export default function render() {
   }
   .hero-main .sub-search {
     color: var(--color-white);
-    font-weight: var(--fw-extrabold);
+    font-weight: bold;
+    font-style: italic;
     font-size: .875rem;
     margin-bottom: 2rem;
   }
@@ -372,12 +379,44 @@ export default function render() {
     display: grid;
     grid-gap: var(--spacing-default);
     grid-template-columns: auto;
-    margin-bottom: var(--spacing-sm);
+    /* margin-bottom: var(--spacing-sm); */
+    /* margin-bottom: 2rem 0; */
   }
   .fg-header h3 {
     margin: 0;
   }
-  .featured-more {
+
+  .fg-header.centered {
+    display: block;
+    width: 66%;
+    margin: auto;
+    text-align: center;
+  }
+  .fg-header.centered h3 {
+    margin-bottom: 1rem;
+  }
+
+  .fg-header.left-aligned {
+    display: block;
+    width: 66%;
+    margin: auto;
+    text-align: left;
+  }
+  .fg-header.left-aligned h3 {
+    text-align: left;
+    margin-bottom: 1rem;
+  }
+  .fg-header.left-aligned div {}
+
+  .fg-header.split {}
+  .fg-header.split h3 {}
+  .fg-header.split div {}
+
+  .featured-collections-public {
+    padding: 0 5%;
+  }
+
+  .featured-collections-public .featured-more {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -393,10 +432,13 @@ export default function render() {
     padding-bottom: 0;
   }
 
-  .featured-group {
-    padding-bottom: 2rem;
-  }
+  /* .featured-group {
+    padding: 1rem 0;
+  } */
 
+  .featured-collections-public > * {
+    padding: 1rem 0;
+  }
 
   @media (max-width: 767px) {
     /* mobile */
@@ -415,10 +457,16 @@ export default function render() {
     .about-collections .tree-illustration img {
       float: none;
       padding: none;
+    }    
+    .fg-header.centered {
+      display: block;
+      width: 100%;
+      margin: initial;
+      text-align: left
     }
-    .about-content {
-      padding: 0 2rem 2rem 2rem;
-    }
+  }
+  .about-content {
+    padding: 0 5% 2rem 5%;
   }
 
   @media (min-width: 768px) {
@@ -481,7 +529,7 @@ export default function render() {
   }
 
   .about-content {
-    padding-right: 2rem;
+    /* padding-right: 2rem; */
     margin: auto;
   }
 
@@ -557,7 +605,13 @@ export default function render() {
   }
 
   admin-featured-collections {
-    padding: 4rem 0;
+    padding: 4rem 5%;
+  }
+
+  .hero-main.site-frame,
+  .recent.site-frame {
+    width: 90%;
+    margin: 0 auto;
   }
 
   @media (min-width: 1060px) {
@@ -607,18 +661,28 @@ export default function render() {
     }
   }
 
+  .hero-top-right a {
+    text-decoration: none;
+  }
+
 </style>
 
-<dams-hero .srcOptions="${Object.keys(this.heroImgOptions)}" @src-change="${
+<dams-hero .srcOptions="${this.heroImgOptions}" selected-src-url="${this.heroUrl}" @src-change="${
     this._onHeroChange
   }">
   <div class="hero-content">
 
     <ucd-theme-header>
       <ucd-theme-primary-nav>
-        <a href=/browse>Browse</a>
+        <a href="/" class="home-link" mobile-only>Home</a>
+        <ul link-text="Browse" href="/browse">
+          <li><a href="/browse/collections/15">Collections</a></li>
+          <li><a href="/search">Items</a></li>
+          <li><a href="/browse/creator/30">Creators</a></li>
+          <li><a href="/browse/format/30">Formats</a></li>
+          <li><a href="/browse/subject/30">Subjects</a></li>
+        </ul>
         <a href="/about">About</a>
-        <!-- <a href="#">FAQ</a> -->
       </ucd-theme-primary-nav>
     </ucd-theme-header>
 
@@ -628,14 +692,12 @@ export default function render() {
         <a href="/browse">Browse</a>
         <span class="dot"></span>
         <a href="/about">About</a>
-        <!-- <span class="dot"></span> -->
-        <!-- <a href="#">FAQ</a> -->
       </div>
     </div>
 
     <div class="hero-main site-frame">
       <h1 class="color-light">Digital Collections</h1>
-      <div class="sub-heading h4 color-light">Explore digitized items from the <a href="https://library.ucdavis.edu/">UC Davis Library</a> collections.</div>
+      <h4 class="sub-heading h4 color-light">Explore digitized items from the <a href="https://library.ucdavis.edu/">UC Davis Library</a> collections.</h4>
       <app-search-box
         id="searchBox"
         @search="${this._onSearch}"
@@ -643,7 +705,7 @@ export default function render() {
         <iron-icon icon="fin-icons:search" class="search-icon" slot="button-content"></iron-icon>
       </app-search-box>
       <div class="sub-search">
-        Featured Image: |
+        Featured Image: <a href="${this.heroItemUrl}">${this.heroItemLabel}</a> | <a href="${this.heroCollectionUrl}">${this.heroCollectionLabel}</a>
       </div>
     </div>
   </div>
@@ -654,7 +716,7 @@ export default function render() {
 <section class="browse-buttons site-frame">
   <div class="priority-links">
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collections">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/collections/15">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-box-archive"></ucdlib-icon>
         </div>
@@ -670,7 +732,7 @@ export default function render() {
       </a>
     </div>
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/creator">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/creator/30">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-wand-magic-sparkles"></ucdlib-icon>
         </div>
@@ -678,7 +740,7 @@ export default function render() {
       </a>
     </div>
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/format">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/format/30">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-photo-film"></ucdlib-icon>
         </div>
@@ -686,7 +748,7 @@ export default function render() {
       </a>
     </div>
     <div class="priority-links__item">
-      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/subject">
+      <a class="vertical-link vertical-link--circle category-brand--secondary" href="/browse/subject/30">
         <div class="vertical-link__figure">
           <ucdlib-icon class="vertical-link__image" icon="ucdlib-dams:fa-star"></ucdlib-icon>
         </div>
@@ -709,121 +771,93 @@ export default function render() {
     (graph) =>
       html`
         <dams-collection-card
-          data-id="${graph.root['@id']}"
+          img-src="${graph.vcData.images?.[0] || ''}"
+          card-title="${graph.vcData.title || ''}"
+          item-ct="${graph.vcData.count ? graph.vcData.count : 0}"
+          href="${graph.vcData.id}"
         ></dams-collection-card>
       `
   )}
   </div>
 </section>
 
-${
-  this.featuredCollectionsCt > 0 || 1 == 1
-    ? html`
-
-  <section class="featured site-frame">
-    <div class="right-panel">
-      <div class="icon-wrapper" ?hidden="${
-        this.editMode || !this.isUiAdmin
-      }" @click="${this._onEditClicked}">
-        <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
-      </div>
-      <div class="icon-wrapper edit" ?hidden="${
-        !this.editMode || !this.isUiAdmin
-      }" @click="${this._onSaveClicked}">
-        <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
-      </div>
-      <div class="icon-wrapper edit" ?hidden="${
-        !this.editMode || !this.isUiAdmin
-      }" @click="${this._onCancelEditClicked}">
-        <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
-      </div>
+<section class="featured site-frame">
+  <div class="right-panel">
+    <div class="icon-wrapper" ?hidden="${
+      this.editMode || !this.isUiAdmin
+    }" @click="${this._onEditClicked}">
+      <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
     </div>
-    <h1>Featured <span class="fw-light">Collections</span></h1>
-    <div style="text-align:center;">
-      <img class="splat-stars" src="/images/watercolors/watercolor-splat-homepage-stars.png">
-      <!-- <dams-watercolor-overlay
-          overlay-template="stars">
-      </dams-watercolor-overlay> -->
-    </div>
-
-    <admin-featured-collections ?hidden="${
+    <div class="icon-wrapper edit" ?hidden="${
       !this.editMode || !this.isUiAdmin
-    }"></admin-featured-collections>
-    <!-- <div class="featured-collections-editor" ?hidden="${!this.editMode}">
+    }" @click="${this._onSaveClicked}">
+      <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
+    </div>
+    <div class="icon-wrapper edit" ?hidden="${
+      !this.editMode || !this.isUiAdmin
+    }" @click="${this._onCancelEditClicked}">
+      <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+    </div>
+  </div>
+  <h1>Featured <span class="fw-light">Collections</span></h1>
+  <div style="text-align:center;">
+    <img class="splat-stars" src="/images/watercolors/watercolor-splat-homepage-stars.png">
+  </div>
 
-
-      <div class="editor-row-control">
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${
-        this._onUpArrayClicked
-      }">
-          <ucdlib-icon icon="ucdlib-dams:fa-arrow-up"></ucdlib-icon>
-        </div>
-        <div class="icon-wrapper edit" style="margin-left: .3rem;" ?hidden="${!this
-          .editMode}" @click="${this._onDownArrayClicked}">
-          <ucdlib-icon icon="ucdlib-dams:fa-arrow-down"></ucdlib-icon>
-        </div>
-        <div class="dots flex-expand"></div>
-        <div style="background-color: var(--color-aggie-blue-40); height: 75px">
-          <img src="/images/icons/dams-admin-collection-single.svg" style="width: 150px" />
-        </div>
-        <div class="dots flex-expand"></div>
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode}" @click="${
-        this._onTrashClicked
-      }">
-          <ucdlib-icon icon="ucdlib-dams:fa-trash"></ucdlib-icon>
-        </div>
-      </div>
-
-
-    </div> -->
-
-    <div class="featured-collections-public" ?hidden="${this.editMode}">
-      ${this.displayData.map(
-        (data) => html`
-          ${data.type === "single"
-            ? html`
-                <dams-highlighted-collection
-                  collection-id="${data.collectionId}"
-                  collection-desc="${data.description}"
-                  ?image-right="${data.placement === "right"}"
-                >
-                </dams-highlighted-collection>
-              `
-            : ""}
-          ${data.type === "text"
-            ? html`
-                <div class="featured-group">
-                  <div class="fg-header ${data.placement}">
-                    <!-- TODO style based on placement class -->
-                    <h3 class="heading--primary">${data.heading}</h3>
-                    <div>${data.description}</div>
-                  </div>
+  <admin-featured-collections ?hidden="${
+    !this.editMode || !this.isUiAdmin
+  }"></admin-featured-collections>
+  
+  <div class="featured-collections-public" ?hidden="${this.editMode}">
+    ${this.displayData.map(
+      (data) => html`
+        ${data.type === "single"
+          ? html`
+              <dams-highlighted-collection
+                collection-id="${data.collectionId}"
+                collection-desc="${data.description}"
+                ?image-right="${data.placement === "right"}"
+              >
+              </dams-highlighted-collection>
+            `
+          : ""}
+        ${data.type === "text"
+          ? html`
+              <div class="featured-group">
+                <div class="fg-header ${data.placement}">
+                  <h3 class="heading--primary">${data.heading}</h3>
+                  <ucdlib-md id="md">
+                    <ucdlib-md-content>
+                      ${data.description}
+                    </ucdlib-md-content>
+                  </ucdlib-md>
                 </div>
-              `
-            : ""}
-          ${data.type === "cards"
-            ? html`
-                <div
-                  class="card-trio ${data.collectionIds.length === 3
-                    ? "three-total"
-                    : ""}"
-                >
-                  ${data.collectionIds.map(
-                    (collection) => html`
-                      <dams-collection-card
-                        data-id="${collection.selected}"
-                      ></dams-collection-card>
-                    `
-                  )}
-                </div>
-              `
-            : ""}
-        `
-      )}
+              </div>
+            `
+          : ""}
+        ${data.type === "cards"
+          ? html`
+              <div
+                class="card-trio ${data.collectionIds.length === 3
+                  ? "three-total"
+                  : ""}"
+              >
+                ${data.collectionIds.map(
+                  (collection) => html`
+                    <dams-collection-card
+                      data-id="${collection.selected}"
+                    ></dams-collection-card>
+                  `
+                )}
+              </div>
+            `
+          : ""}
+      `
+    )}
 
-      <div class="featured-more">
-        <a href="/browse/collections" class="btn btn--primary btn--lg">Browse all collections</a>
-      </div>
+    <div class="featured-more">
+      <a href="/browse/collections" class="btn btn--primary btn--lg">Browse all collections</a>
+    </div>
   </section>
 
   <section class="about-collections">
@@ -841,10 +875,5 @@ ${
       <a href="/about" class="btn--more-about btn--alt btn--round">More about this project</a>
     </div>
   </section>
-
-`
-    : html``
-}
-
 `;
 }

@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
+
 import render from "./app-search-results-panel.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./app-search-grid-result";
 import "./app-search-list-result";
@@ -19,7 +22,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     return {
       results: { type: Array }, // array of search results
       totalCollections: { type: Number },
-      // collectionResults : { type: Array }, // array of collection search results
+      collectionResults : { type: Array }, // array of collection search results
       gridMargin: { type: Number }, // size in px's between each masonary layout cell
       isGridLayout: { type: Boolean }, // are we in grid layout
       isListLayout: { type: Boolean },
@@ -34,6 +37,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       paginationTotal: { type: Number }, // total number for pagination widget, we max out at 10000
       totalOverMaxWindow: { type: Boolean },
       currentPage: { type: Number },
+      loading: { type: Boolean },
+      lastSearch: { type: String }
     };
   }
 
@@ -42,8 +47,6 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this.active = true;
     this.render = render.bind(this);
 
-    this.results = [];
-    this.collectionResults = [];
     this.gridMargin = 15;
 
     if (initIsListLayout === "grid") {
@@ -60,17 +63,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       this.isMosaicLayout = true;
     }
 
-    this.totalCollections = 0;
-    this.total = "0";
-    this.numPerPage = 20;
-    this.currentIndex = 0;
-    this.currentPage = 1;
-    this.showCollectionResults = false;
-    this.showError = false;
-    this.showLoading = false;
-    this.errorMsg = false;
-    this.paginationTotal = false;
-    this.totalOverMaxWindow = false;
+    this._reset();
 
     this.resizeTimer = -1;
     window.addEventListener("resize", () => this._resizeAsync());
@@ -80,11 +73,16 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       "CollectionModel",
       "RecordModel",
       "MediaModel",
-      "SearchVcModel"
+      "SearchVcModel",
+      "FiltersModel"
     );
     this.EventBus().on("show-collection-search-results", (show) =>
       this._updateCollectionResultsVisibility(show)
     );
+  }
+
+  firstUpdated() {
+    this._setSelectedDisplay();
   }
 
   /**
@@ -95,13 +93,80 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    */
   _onAppStateUpdate(e) {
     if (e.location.page !== "search") return;
+
+    if( this.AppStateModel.location.fullpath !== this.lastSearch ) {
+      this._reset();
+      this.lastSearch = this.AppStateModel.location.fullpath;
+    }
+
     this._setSelectedDisplay();
     this._resizeAsync();
+    this.filterDisplayResults();
+  }
+
+  _reset() {
+    this.results = [];
+    this.collectionResults = [];
+    this.totalCollections = 0;
+    this.total = "0";
+    this.numPerPage = 20;
+    this.currentIndex = 0;
+    this.currentPage = 1;
+    this.showCollectionResults = false;
+    this.showError = false;
+    this.showLoading = false;
+    this.errorMsg = false;
+    this.paginationTotal = 0;
+    this.totalOverMaxWindow = false;
+    this.loading = true;
+  }
+
+  /**
+   * @method _onFilterBucketsUpdate
+   * @description called when collection/record search events occur, aggregation query results
+   * @param {Object} e
+   */
+  _onFilterBucketsUpdate(e) {
+    if( e.filter !== '@graph.isPartOf.@id' ) return;
+    // temp remove oac isPartOf records
+    e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org') && b.doc_count > 0);
+    
+    this.collectionResults = e.buckets.map(r => {
+      return {
+        '@id' : r.key,
+      };
+    });
+
+    let searchText = this.SearchVcModel.getSearch()?.searchDocument?.text;
+    let searchFilters =  this.SearchVcModel.getSearch()?.searchDocument?.filters || {};
+    if( searchText || ( Object.keys(searchFilters).length && Object.keys(searchFilters).filter(k => k !== '@graph.isPartOf.@id' ).length ) ) {
+      this.totalCollections = this.collectionResults.length || 0;
+      this.filterDisplayResults();      
+    } else {
+      this.totalCollections = 0;
+    }
   }
 
   willUpdate() {
     let search = this.SearchVcModel.getSearch();
-    this.totalCollections = search?.payload?.matchedCollections?.length || 0;
+    // this.totalCollections = search?.payload?.matchedCollections?.length || 0;
+  }
+
+  filterDisplayResults() {    
+    // need to respond to filters being clicked for collection
+    // if a single collection is selected in filters, need to only show that collection in this.results
+    let decodedUrl = decodeURIComponent(this.AppStateModel.location.pathname);
+    if( !decodedUrl.includes('@graph.isPartOf.@id') ) {
+      this.collectionResults = [...this.collectionResults];
+      return;
+    } 
+
+    this.totalCollections = 0;
+
+    let collectionIds = decodedUrl.split('@graph.isPartOf.@id","or","')[1].split('"]')[0].split(',');
+    if( collectionIds.length > 1 ) {
+      this.totalCollections = collectionIds.length;
+    }
   }
 
   /**
@@ -114,6 +179,9 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Array} currentIndex index
    */
   renderResults(results, total, numPerPage, currentIndex) {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
+    this.lastSearch = this.AppStateModel.location.fullpath;
     this.results = [];
     this.showHeaderFooter = true;
     this.showError = false;
@@ -123,9 +191,9 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     requestAnimationFrame(() => {
       this.total = total;
       // make sure we don't have a page the returns results > 10000k
-      let t = Math.floor((10000 - numPerPage) / numPerPage) * numPerPage;
+      let t = Math.floor(10000 / numPerPage) * numPerPage;
       if (total > t) {
-        total = t;
+        this.total = t + "+";
         this.totalOverMaxWindow = true;
       } else {
         this.totalOverMaxWindow = false;
@@ -140,9 +208,12 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       // this.shadowRoot.querySelector('#numPerPageM').value = numPerPage+'';
       this.currentIndex = currentIndex;
       this.currentPage =
-        this.currentIndex === 0 ? 1 : this.currentIndex / 10 + 1;
+        this.currentIndex === 0 ? 1 : this.currentIndex / this.numPerPage + 1;
 
-      requestAnimationFrame(() => this._resize());
+      requestAnimationFrame(() => {
+        this._resize();
+        this.loading = false;
+      });
     });
   }
 
@@ -183,7 +254,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Event} e HTML click event
    */
   _onLayoutToggle(e) {
-    let type = e.currentTarget.getAttribute("type");
+    let type = e?.currentTarget?.getAttribute("type") || 'mosaic';
     if (type === "grid") {
       this.isGridLayout = true;
       this.isListLayout = false;
@@ -229,9 +300,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     }
     this._setSelectedDisplay();
 
-    // if( !this.isListLayout ) {
     requestAnimationFrame(() => this._resize());
-    // }
   }
 
   _setSelectedDisplay() {
@@ -274,6 +343,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @description buffer resize masonary layout call
    */
   _resizeAsync() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
     if (this.resizeTimer !== -1) clearTimeout(this.resizeTimer);
     this.resizeTimer = setTimeout(() => {
       this.resizeTimer = -1;
@@ -281,52 +352,76 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     }, 50);
   }
 
-  _onGridItemRendered(e) {
-    this._resize();
-  }
-
   /**
    * @method _resize
    * @description resize masonary layout
    */
-  _resize() {
-    if( this.isListLayout ) return;
-    let firstDiv = this.shadowRoot
-      .querySelector("#layout")
-      .querySelector("app-search-grid-result");
-    if( !firstDiv ) return;
+  async _resize() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
 
-    let ew = this.offsetWidth;
-    let w = firstDiv.offsetWidth + 25;
+    if( !this.isListLayout ) {
+      let firstDiv = this.shadowRoot
+        .querySelector("#layout")
+        .querySelector("app-search-grid-result");
+      if( !firstDiv ) return;
 
-    let numCols = Math.max(Math.floor(ew / w), 1);
-    if( numCols > 3 ) numCols = 3;
-    if( window.innerWidth < 1260 ) numCols = 2;
+      if( this.isMosaicLayout ) {
+        // update image heights for mosaic layout
+        let grids = this.shadowRoot.querySelector("#layout")?.querySelectorAll("app-search-grid-result");
+        if( grids && grids.length ) {
+          grids.forEach(grid => {
+            grid._renderImage();
+          });  
+        }
+      }
 
-    // this makes sure columns are centered
-    let leftOffset = Math.floor((ew - numCols * w) / 2);
+      await this.updateComplete;
 
-    let colHeights = [];
-    for (let i = 0; i < numCols; i++) colHeights.push(0);
+      let ew = this.offsetWidth;
+      let w = firstDiv.offsetWidth + 25;
 
-    if( leftOffset > 20 ) leftOffset = 20;
-    let eles = this.shadowRoot
-      .querySelector("#layout")
-      .querySelectorAll("app-search-grid-result");
-    for (let i = 0; i < eles.length; i++) {
-      let col = this._findMinCol(colHeights);
-      let cheight = colHeights[col];
+      let numCols = 3;
+      if( window.innerWidth < 1024 ) numCols = 2;
+      if( window.innerWidth < 768 ) numCols = 1;
 
-      eles[i].style.left = leftOffset + col * w + "px";
-      eles[i].style.top = cheight + "px";
-      // eles[i].style.visibility = 'visible';
+      // this makes sure columns are centered
+      let leftOffset = Math.floor((ew - numCols * w) / 2);
 
-      colHeights[col] += eles[i].offsetHeight + 25;
+      let colHeights = [];
+      for (let i = 0; i < numCols; i++) colHeights.push(0);
+
+      if( leftOffset > 20 ) leftOffset = 20;
+      let eles = this.shadowRoot
+        .querySelector("#layout")
+        .querySelectorAll("app-search-grid-result");
+
+      for (let i = 0; i < eles.length; i++) { 
+        let padding = this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 44 : 80;
+
+        await eles[i].updateComplete; 
+        let img = eles[i].shadowRoot?.querySelector('img');
+        if( img ) {
+          await new Promise((resolve) => {
+            if( img.complete ) {
+              resolve();
+            } else { 
+              img.addEventListener('load', resolve);
+              img.addEventListener('error', resolve);
+            }
+          });
+        }
+
+        let col = this._findMinCol(colHeights);
+        let cheight = colHeights[col];
+
+        eles[i].style.left = leftOffset + col * w + "px";
+        eles[i].style.top = cheight + "px";
+        colHeights[col] += eles[i].imageHeight + 25 + padding;
+      }
+
+      let maxHeight = Math.max.apply(Math, colHeights);
+      this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
     }
-
-    let maxHeight = Math.max.apply(Math, colHeights);
-    this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
-    this.requestUpdate();
   }
 
   /**
@@ -363,9 +458,14 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * alerting new page size
    */
   _onPageSizeChange(e) {
+    let detail = {
+      startIndex: 0,
+      itemsPerPage: parseInt(e.currentTarget.value)
+    };
+
     this.dispatchEvent(
-      new CustomEvent("page-size-change", {
-        detail: { itemsPerPage: parseInt(e.currentTarget.value) },
+      new CustomEvent("page-change", {
+        detail,
         bubbles: true,
         composed: true
       })
@@ -398,23 +498,25 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @description _onSearchVcUpdate, fired when record search viewController updates
    * @param {*} e
    */
-  _onSearchVcUpdate(e) {
-    if (e.state !== "loaded") return;
+  // _onSearchVcUpdate(e) {
+  //   if (e.state !== "loaded") return;
 
-    let collections = [];
-    e.payload.results.forEach((result) => {
-      if (
-        result.collectionId &&
-        !collections.includes(result.collectionId["@id"])
-      ) {
-        collections.push(result.collectionId["@id"]);
-      }
-    });
+  //   this.logger.info('e.payload.results', e.payload.results);
 
-    this.totalCollections = collections.length;
-    console.log('this.totalCollections', this.totalCollections);
+  //   let collections = [];
+  //   e.payload.results.forEach((result) => {
+  //     if (
+  //       result.collectionId &&
+  //       !collections.includes(result.collectionId["@id"])
+  //     ) {
+  //       collections.push(result.collectionId["@id"]);
+  //     }
+  //   });
 
-  }
+  //   this.totalCollections = collections.length;
+  //   this.logger.info('this.totalCollections', this.totalCollections);
+
+  // }
 
   /**
    * @method _onCollectionClicked
@@ -453,9 +555,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    * @param {Object} e click|keyup event
    */
   _onPaginationChange(e) {
-    debugger
-    e.detail.startIndex = e.detail.page * 10 - 10;
-    // this.currentPage = e.detail.page - 1;
+    e.detail.startIndex = e.detail.page * this.numPerPage - this.numPerPage;
     this.dispatchEvent(
       new CustomEvent("page-change", {
         detail: e.detail,
@@ -463,6 +563,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
         composed: true
       })
     );
+
+    window.scrollTo(0, 0);
   }
 }
 

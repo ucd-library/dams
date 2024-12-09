@@ -6,9 +6,21 @@ return html`
 <style>
   :host {
     display: none;
-    padding: 20px;
-    background: black;
+    padding: 20px 20px 0 20px;
     box-sizing: border-box;
+  }
+
+  :host app-share-btn {
+    fill: var(--color-aggie-blue-80);
+  }
+
+  .button {
+    background-color: var(--color-aggie-blue-80);
+    border-radius: 50%;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    margin-left: 0.4rem;
   }
 
   .container {
@@ -31,6 +43,10 @@ return html`
   .layout {
     display: flex;
     justify-content: center;
+    border-bottom: 6px dotted var(--color-aggie-gold);
+    width: 60%;
+    margin: 0 auto;
+    padding-bottom: 0.7rem;
   }
 
   .plyr--audio {
@@ -43,9 +59,18 @@ return html`
     color: #daaa00 !important;
   }
 
-  button.plyr__control.plyr__control--overlaid,
+  button.plyr__control.plyr__control--overlaid, 
   button.plyr__control.plyr__control:hover {
-    background: rgba(218,170,0,1.0);
+    background: var(--color-dams-secondary, #FFBF00);
+  }
+  .plyr--full-ui input[type=range] { 
+    color: var(--color-dams-secondary, #FFBF00) !important;
+  }
+
+  .volume-icon {
+    fill: var(--color-aggie-blue-50, #B0D0ED);
+    height: 107px;
+    margin: 0 auto;
   }
 
   @media(max-width: 768px) {
@@ -55,6 +80,7 @@ return html`
   ${plyrCss}
 </style>
 <div class="container">
+  <ucdlib-icon class="volume-icon" icon="ucdlib-dams:fa-volume-high"></ucdlib-icon>
   <div id="sprite-plyr" style="display: none;"></div>
   <div id="audio_poster"></div>
 
@@ -62,6 +88,7 @@ return html`
     <audio id="audio_player" controls>
       <source>
     </audio>
+    <div class="button"><app-share-btn></app-share-btn></div>
   </div>
 
 </div>

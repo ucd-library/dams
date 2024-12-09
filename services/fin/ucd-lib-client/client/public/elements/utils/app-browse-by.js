@@ -1,5 +1,8 @@
 import { LitElement } from 'lit';
+
 import render from "./app-browse-by.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "../components/cards/dams-collection-card";
 
@@ -53,7 +56,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
 
     this.reset();
 
-    this._injectModel('BrowseByModel', 'AppStateModel', 'RecordModel', 'CollectionModel');
+    this._injectModel('BrowseByModel', 'AppStateModel', 'RecordModel', 'FcAppConfigModel', 'CollectionModel');
   }
 
   async firstUpdated() {
@@ -66,8 +69,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
         {label : 'Item Quantity', dir : 'dsc', type: 'count'}
       ];
     }
-
-    let browseByImages = APP_CONFIG.fcAppConfig['/application/ucd-lib-client/images/config.json'];
+    
+    let browseByImages = await this.FcAppConfigModel.getDefaultImagesConfig();
     if( browseByImages ) {
       browseByImages = browseByImages.body.browseByImages;
       switch (this.label.toLowerCase()) {
@@ -86,7 +89,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
       }  
     }
 
-    // this._loadResults();
+    this._updateSideImages();
+    this._loadResults();
   }
 
   /**
@@ -122,27 +126,29 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( e.location.path[1] !== this.id ) return; // the page
     
     this.isCollectionPage = this.label.toLowerCase() === 'collection';
-    this._loadResults(e);
+    this._loadResults();
   }
-
-  // _onCollectionVcUpdate(e) {
-  //   if ( e.state !== 'loaded' ) return;
-  //   if( this.collectionResults.filter(r => r.id === e.payload.results.id)[0] ) return;
-  //   this.collectionResults.push(e.payload.results);
-  //   this._renderCollections(e);
-  // }
 
   /**
    * @method _loadResults
    * @description load results based on currentPage
-   *
-   * @param {Object} e event object if called from _onAppStateUpdate
    */
-  async _loadResults(e) {
+  async _loadResults() {    
+    this.resultsPerPage = this.isCollectionPage ? 15 : 30;
+
+    if( this.AppStateModel.location && this.AppStateModel.location.path.length > 2 ) {
+      this.resultsPerPage = parseInt(this.AppStateModel.location.path[2] || this.resultsPerPage);
+      this.currentIndex = parseInt(this.AppStateModel.location.path[3]) || 0;
+    } else {
+      this.currentIndex = 0;
+    }    
+
+    this.currentPage = this.currentIndex ? (this.currentIndex / this.resultsPerPage) + 1 : 1;
+    
     if( this.totalResults === 0 ) {
       this.loading = true;
       if( this.isCollectionPage ) { 
-        this._searchBrowseByCollections();        
+        await this._searchBrowseByCollections();        
       } else {
         this.allResults = await this.BrowseByModel.getFacets(this.facetQueryName);
         this.totalResults = this.allResults.payload.length;
@@ -155,19 +161,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     let pagination = this.shadowRoot.querySelector('ucd-theme-pagination');
     if( pagination ) pagination.requestUpdate('maxPages', this.totalPages);
 
-    if( e && e.location.path.length > 2 ) {
-      this.currentIndex = parseInt(e.location.path[2]);
-    } else {
-      this.currentIndex = 0;
-    }
-
-    let sort = 0;
-    if( e && e.location.path.length > 2 ) {
-      sort = parseInt(e.location.path[2]);
-    }
-
-    this.sortByOptions.forEach((item, index) => item.selected = (sort === index));
-
     this._renderResults();
   }
 
@@ -178,8 +171,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
    */
   _renderResults() {
     if( this.isCollectionPage ) {
-      // this._renderCollections();
-      this._updateSideImages();
+      this._renderCollections();
       return;
     }
 
@@ -192,15 +184,53 @@ export default class AppBrowseBy extends Mixin(LitElement)
           if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
           return 0;
         } else {
-          if( a[sort.type].toLowerCase() > b[sort.type].toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
-          if( a[sort.type].toLowerCase() < b[sort.type].toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
-          return 0;   
+          return sort.dir === 'asc'
+            ? a[sort.type].trim().toLowerCase().localeCompare(b[sort.type].trim().toLowerCase())
+            : b[sort.type].trim().toLowerCase().localeCompare(a[sort.type].trim().toLowerCase());
         }
       });
       this.sortedAs = sort.type;
     }
     
     this.results = this.allResults.payload.slice(
+      this.currentIndex, 
+      this.currentIndex + this.resultsPerPage 
+    );
+
+    this._updateSideImages();
+  }
+
+  /**
+   * @method _renderCollections
+   * @description render the results array of collections based on currentPage and sort
+   * params
+   */
+  _renderCollections() {
+    let sort = this.sortByOptions.find(item => item.selected);
+    
+    if( this.sortedAs !== sort.type ) {
+      if( sort.type === 'count' ) {
+        this.allResults.sort((a, b) => {
+          if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
+          if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
+          return 0;
+        });
+      } else {
+        // sort by title
+        this.allResults.sort((a, b) => {
+          if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
+          if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
+          return 0;   
+        });
+      }
+    }  
+
+    this.collectionResults = this.allResults.slice(
+      this.currentIndex, 
+      this.currentIndex + this.resultsPerPage 
+    );
+    
+    this.results = this.allResults.slice(
       this.currentIndex, 
       this.currentIndex + this.resultsPerPage 
     );
@@ -225,22 +255,21 @@ export default class AppBrowseBy extends Mixin(LitElement)
       sort : [
         sort
       ],
-      limit : this.resultsPerPage,
-      offset : this.currentIndex,
+      limit : 0,
+      offset : 0,
       facets : {}
     }
 
     this.allResults = await this.CollectionModel.search(searchDocument);
-    this.allResults = this.allResults.body.results.map(r => {
+    this.allResults = this.allResults.payload.results.map(r => {
       return {
-        thumbnailUrl : r.root.image['@id'], 
+        thumbnailUrl : r.root.image?.['@id'], 
         title : r.root.name,
         count : r.root.itemCount,
         id : r.root['@id']
       }
     });
 
-    
     if( sortBy.type === 'count' ) {
       this.allResults.sort((a, b) => {
         if( a[sortBy.type] > b[sortBy.type] ) return (sortBy.dir === 'asc') ? 1 : -1;
@@ -248,8 +277,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
         return 0;
       });
     } else {
-      // TODO handle sort by date
-
       // sort by title
       this.allResults.sort((a, b) => {
         if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sortBy.dir === 'asc') ? 1 : -1;
@@ -264,9 +291,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     );
 
     this.totalResults = this.allResults.length;
-
-    // TODO images not updating, titles/counts are
-
     
     // this.shadowRoot.querySelectorAll('dams-collection-card').forEach(c => c.requestUpdate());
   }
@@ -301,6 +325,11 @@ export default class AppBrowseBy extends Mixin(LitElement)
   _onPageClicked(e) {
     this.currentPage = e.detail.page;
     this.currentIndex = (this.currentPage - 1) * this.resultsPerPage;
+    let path = '/browse/'+this.id+'/'+this.resultsPerPage;
+    if( this.currentIndex > 0 ) {
+      path += '/'+this.currentIndex;
+    }
+    this.AppStateModel.setLocation(path);
     this._renderResults();
   }
 

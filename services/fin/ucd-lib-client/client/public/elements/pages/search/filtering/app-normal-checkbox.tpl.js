@@ -16,6 +16,14 @@ export default function render() {
     outline: var(--default-outline);
   }
 
+  :host(:hover) #close ucdlib-icon {
+      fill: var(--color-aggie-gold-80);
+      border-radius: 50%;
+      background-color: var(--color-aggie-blue-90);
+      transition: background-color 0.3s ease-in-out;
+      transition: fill 0.3s ease-in-out;
+    }
+
   :host([disabled]) {
     cursor: default;
     outline: none !important;
@@ -38,7 +46,7 @@ export default function render() {
   }
 
   span {
-    padding-top: 3px;
+    /* padding-top: 3px; */
     line-height: normal;
   }
 
@@ -50,6 +58,7 @@ export default function render() {
     font-weight: bold;
     display: flex;
     align-items: center;
+    color: var(--color-aggie-blue);
   }
 
   div[disabled] #close,
@@ -61,21 +70,31 @@ export default function render() {
     color: var(--gray-text);
   }
   div[checked] #close {
-    width: 50px;
+    max-width: 35px;
     height: 50px;
     display: inline-flex;
     align-items: center;
-    /* justify-content: center; */
+    justify-content: center;
   }
   ucdlib-icon {
     fill: var(--color-aggie-blue-80);
+    width: 1rem;
+    height: 1rem;
   }
+
+  #close ucdlib-icon {
+    padding: 3px;
+    min-width: 1.2rem;
+    min-height: 1.2rem;
+    margin-right: 0.2rem;
+  }
+
 </style>
 
 <div ?checked="${this.checked}" ?disabled="${this.disabled}">
 
   <div id="close">
-    <ucdlib-icon icon="ucdlib-dams:fa-xmark" @click="${this._onClick}"></ucdlib-icon>
+    <ucdlib-icon icon="ucdlib-dams:fa-times" @click="${this._onClick}"></ucdlib-icon>
   </div>   
 
   <span class="value">${this._realLabel()}</span>

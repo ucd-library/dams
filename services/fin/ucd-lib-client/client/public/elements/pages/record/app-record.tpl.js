@@ -4,6 +4,8 @@ import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
 import buttonsCss from "@ucd-lib/theme-sass/2_base_class/_buttons.css";
 import headingsCss from "@ucd-lib/theme-sass/2_base_class/_headings.css";
 
+import utils from '../../../lib/utils/index.js';
+
 export default function render() {
   return html`
     <style include="shared-styles">
@@ -22,8 +24,7 @@ export default function render() {
       }
 
       .container h3 {
-        font-size: 1.7rem;
-        font-weight: 700;
+        font-weight: 800;
         text-align: center;
         color: var(--color-black-60);
         margin-bottom: 0.5rem;
@@ -81,15 +82,30 @@ export default function render() {
         background-image: url(/images/watercolors/blue--1.webp);
         background-size: cover;
         display: flex;
-        height: 12rem;
+        min-height: 12rem;
         margin: 3rem 0;
+        background-color: var(--color-aggie-blue-30);
       }
 
-      .part-of img {
+      /* .part-of img {
         max-width: 100%;
         max-height: 100%;
         height: auto;
         width: auto;
+      } */
+
+      .part-of-img-container {
+        overflow: hidden;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .part-of img {
+        position: relative;
+        /* top: calc(-65%); */
       }
 
       .part-of div {
@@ -108,12 +124,15 @@ export default function render() {
 
       .part-of .collection-info h4 {
         margin: 0.3rem 0 0;
-        font-size: 1.2rem;
+        font-weight: 600;
       }
 
       .part-of .collection-info h4 a {
         color: var(--color-aggie-blue);
         text-decoration: none;
+      }
+      .part-of .collection-info h4 a:hover {
+        text-decoration: underline;
       }
 
       .part-of .collection-info p {
@@ -151,24 +170,155 @@ export default function render() {
         .download-section {
           display: block;
         }
+
+        .part-of .collection-info {
+          margin: auto;
+        }
+
+        .part-of {
+          min-height: 0;
+        }
+
+        .part-of div {
+          margin: 2rem 1.5rem 2rem 1rem;
+        }
+
+        .part-of .collection-info h4 {
+          font-weight: 800;
+          font-size: 1.2rem;
+          margin: 0;
+        }
+
+        .part-of .collection-info > * {
+          padding: .25rem 0;
+        }
+
+        .collection-info {
+          font-size: 1.1rem;
+        }
       }
+
+    app-record .admin-edit .left-panel {
+      position: absolute;
+      left: 20%;
+      width: 60%;
+      top: calc(170px + 3rem);
+      z-index: 500;
+      border-bottom: 6px dotted var(--color-aggie-gold);
+      padding-bottom: 1.5rem;
+    }
+
+    app-record .admin-edit .right-panel {
+      position: absolute;
+      right: 3rem;
+      top: calc(170px + 3rem);
+      z-index: 500;
+    }
+
+    app-record .admin-edit .icon-wrapper {
+      height: 50px;
+      width: 50px;
+      background-color: var(--color-aggie-blue-70);
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: .3rem;
+      cursor: pointer;
+    }
+
+    app-record .admin-edit ucdlib-icon {
+      fill: white;
+      width: 50%;
+      height: 50%;
+      margin: auto;
+      padding-top: 0.6rem;      
+    }
+
+    app-record .admin-edit .icon-wrapper.edit {
+      background-color: var(--color-aggie-blue);
+    }
+
+    app-record .admin-edit .icon-wrapper:hover {
+      background-color: var(--color-aggie-blue);
+    }
+
+    app-record .admin-edit .icon-wrapper.edit:hover {
+      background-color: var(--color-aggie-gold);
+    }
+
+    app-record .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
+      fill: var(--color-aggie-blue);
+    }
+
+    .edit-overlay {
+      background: white;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      opacity: .55;
+      z-index: 400;
+    }
+
+    ucdlib-md p {
+      margin-top: 0;
+    }
+
     </style>
 
-    <app-media-viewer @br-page-change="${this._onBookViewPageChange}"></app-media-viewer>
+    <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
+    </div>
+    <div class="admin-edit" ?hidden="${!this.isUiAdmin}">
+      <div class="left-panel" ?hidden="${!this.editMode || !this.isUiAdmin}">
+        <span class="form-label" style="font-weight: bold;">Item Display:</span>
+        <ucd-theme-slim-select
+          @change="${this._ssSelectBlur}"
+          @focusin="${this._ssSelectFocus}"
+          @click="${this._ssSelectFocus}"
+          @blur="${this._ssSelectBlur}">
+          <select>
+              <option .value=${this.itemDefaultDisplay} ?selected=${this.itemDisplay === this.itemDefaultDisplay}>
+                Collection Default (${this.itemDefaultDisplay})
+              </option>
+              <option .value=${utils.itemDisplayType.brTwoPage} ?selected=${this.itemDisplay !== this.itemDefaultDisplay && this.itemDisplay === utils.itemDisplayType.brTwoPage}>
+                ${utils.itemDisplayType.brTwoPage}
+              </option>
+              <option .value=${utils.itemDisplayType.brOnePage} ?selected=${this.itemDisplay !== this.itemDefaultDisplay && this.itemDisplay === utils.itemDisplayType.brOnePage}>
+                ${utils.itemDisplayType.brOnePage}
+              </option>
+              <option .value=${utils.itemDisplayType.imageList} ?selected=${this.itemDisplay !== this.itemDefaultDisplay && this.itemDisplay === utils.itemDisplayType.imageList}>
+                ${utils.itemDisplayType.imageList}
+              </option>
+          </select>
+        </ucd-theme-slim-select>
+      </div>
+
+      <div class="right-panel">
+        <div class="icon-wrapper" ?hidden="${this.editMode || !this.isUiAdmin}" @click="${this._onEditClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
+        </div>
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onSaveClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
+        </div>
+        <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onCancelEditClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+        </div>
+      </div>
+    </div>
+
+
+    <app-media-viewer></app-media-viewer>
 
     <div class="container" style="padding-bottom: 50px">
       <h3>${this.name}</h3>
       <div class="copyright">
         <span>&copy;</span>
-        <a
-          href="http://rightsstatements.org/vocab/InC-NC/1.0/"
-          class="copyright-text"
-          >In Copyright - Non-Commercial Use Permitted</a
-        >
+        <a href="http://rightsstatements.org/vocab/InC-NC/1.0/"
+          class="copyright-text">In Copyright - Non-Commercial Use Permitted</a>
       </div>
 
       <div class="part-of">
-        <div><img src="${this.collectionImg}" alt="" /></div>
+        <div class="part-of-img-container"><img src="${this.collectionImg}" alt="" /></div>
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
           <h4><a href="${this.collectionId}">${this.collectionName}</a></h4>
@@ -181,18 +331,27 @@ export default function render() {
         <div class="download-options">
           <app-media-download
             id="download"
-            ?hidden="${this.isBagOfFiles}"
-          ></app-media-download>
+            ?hidden="${this.isBagOfFiles}"></app-media-download>
           <app-fs-media-download
             id="download"
-            ?hidden="${!this.isBagOfFiles}"
-          ></app-fs-media-download>
+            ?hidden="${!this.isBagOfFiles}"></app-fs-media-download>
         </div>
       </div>
 
       <div ?hidden="${!this.date}" class="metadata-row">
         <div class="attr">Date</div>
         <div class="value" id="dateValue">${this.date}</div>
+      </div>
+
+      <div ?hidden="${!this.description || !this.description.length}" class="metadata-row">
+        <div class="attr">Description</div>
+        <div class="value" id="descriptionValue">
+          <ucdlib-md id="md">
+            <ucdlib-md-content>
+              ${this.description}
+            </ucdlib-md-content>
+          </ucdlib-md>
+        </div>
       </div>
 
       <div ?hidden="${!this.publisher}" class="metadata-row" id="publisher">
@@ -208,8 +367,7 @@ export default function render() {
         <div class="value" id="subjectValue">
           ${this.subjects.map(
             (about, index) =>
-              html`${index > 0 ? ", " : ""}<a href="${about["@id"]}"
-                  >${about["name"] || about["@id"]}</a>`
+              html`${index > 0 ? ", " : ""}<a href="${utils.getSubjectUrl(this.RecordModel, about["name"] || about["@id"])}">${about["name"] || about["@id"]}</a>`
           )}
         </div>
       </div>
@@ -219,17 +377,22 @@ export default function render() {
         <div class="value" id="callNumberValue">${this.callNumber}</div>
       </div>
 
+      <div ?hidden="${!this.material}" class="metadata-row" id="material">
+        <div class="attr">Format</div>
+        <div class="value" id="materialValue">${this.material}</div>
+      </div>
+
       <div class="metadata-row" id="identifier">
         <div class="attr">ARK / DOI</div>
         <div class="value" id="identifierValue">
-          ${this.arkDoi.map((link) => html`<a href="${link}">${link}</a>`)}
+          ${this.arkDoi.map((link) => html`<a @click="${this._arkDoiClick}" href="${link}">${link.replace('/item', '')}</a>`)}
         </div>
       </div>
 
       <div class="metadata-row">
         <div class="attr">Fedora Link</div>
         <div class="value" id="fedoraValue">
-          ${this.fedoraLinks.map((link) => html`<a href="${link}">${link}</a>`)}
+          ${this.fedoraLinks.map((link) => html`<a href="${link}">${link.replace('/fcr:metadata', '')}</a>`)}
         </div>
       </div>
     </div>

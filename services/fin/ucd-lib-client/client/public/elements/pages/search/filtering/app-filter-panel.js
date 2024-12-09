@@ -1,8 +1,10 @@
 import { LitElement } from "lit";
+import render from "./app-filter-panel.tpl.js";
 
-import "./app-range-filter"
-import render from "./app-filter-panel.tpl.js"
-import "./app-facet-filter"
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
+import "./app-range-filter";
+import "./app-facet-filter";
 
 export class AppFilterPanel extends Mixin(LitElement)
     .with(LitCorkUtils) {
@@ -22,11 +24,9 @@ export class AppFilterPanel extends Mixin(LitElement)
 
     this.filter = {};
     this.opened = false;
-    this.selected = []
+    this.selected = [];
   }
 
-  // this used to be an observer to filter changing..
-  //   willUpdate doesn't work and updated renders the filters twice, but one of them works
   firstUpdated() {
     if( !this.filter ) return;
 
@@ -37,22 +37,26 @@ export class AppFilterPanel extends Mixin(LitElement)
     ele.ignore = this.filter.ignore;
     ele.valueMap = this.filter.valueMap || {};
     ele.isDollar = this.filter.isDollar;
-    ele.includeTypeahead = this.filter.includeTypeahead || false;
+
+    ele.includeTypeahead = false; // initially collapsed
     ele.typeaheadField = this.filter.typeaheadField;
 
     ele.addEventListener('update-visibility', (e) => {
       this.style.display = e.detail.show ? 'block' : 'none';
+      this._toggleViewableFacets(e);
     });
     ele.addEventListener('add-selected', (e) => {
       let index = this.selected.findIndex(item => item.label === e.detail.label);
       if( index > -1 ) return;
       e.detail.niceLabel = this._getLabel(e.detail.label);
       this.selected.push(e.detail);
+      this._toggleViewableFacets(e);
     });
     ele.addEventListener('remove-selected', (e) => {
       let index = this.selected.findIndex(item => item.label === e.detail.label);
       if( index === -1 ) return;
       this.selected.splice(index, 1);
+      this._toggleViewableFacets(e);
     });
     ele.addEventListener('set-selected', (e) => {
       if( e.detail.selected ) {
@@ -66,6 +70,33 @@ export class AppFilterPanel extends Mixin(LitElement)
     this.ele = ele;
     
     this.shadowRoot.querySelector('#filters').appendChild(ele);
+    this._toggleViewableFacets();
+  }
+
+  _toggleViewableFacets(e) {
+    // even collapsed filter view, selected filters shouldn't be hidden
+    let searchFilters = this.shadowRoot.querySelectorAll('app-facet-filter');
+
+    searchFilters.forEach(searchFilter => {
+      let filters = searchFilter.shadowRoot.querySelectorAll('.filter');
+      filters.forEach(filter => {        
+        let checkbox = filter.querySelector('app-normal-checkbox');
+        if( checkbox.hasAttribute('checked') ) {
+          filter.style.display = 'flex';
+        } else {
+          filter.style.display = this.opened ? 'flex' : 'none';
+        }
+      });
+      let typeahead = searchFilter.shadowRoot.querySelector('.typehead-panel');
+      if( typeahead ) {
+        typeahead.style.display = this.opened ? 'block' : 'none';
+      }
+    });
+
+    let rangeFilter = this.shadowRoot.querySelector('app-range-filter');
+    if( rangeFilter ) {
+      rangeFilter.parentElement.style.display = this.opened ? 'block' : 'none';
+    }
   }
 
   _getLabel(label) {
@@ -82,6 +113,7 @@ export class AppFilterPanel extends Mixin(LitElement)
    */
   toggle() {
     this.opened = !this.opened;
+    this._toggleViewableFacets();
     this._toggleOpened();
   }
 

@@ -1,9 +1,10 @@
 import { LitElement} from 'lit';
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "../../utils/app-collection-card";
 
+import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md';
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-iconset/ucdlib-iconset";
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-icons/ucdlib-icons';
@@ -34,7 +35,7 @@ import render from './app-home.tpl.js';
  * @prop {Object[]} recentCollections - Array of recently uploaded collections.
  * @prop {Boolean} showCollectionGroup - Displays the featured multi-collection section.
  * @prop {Object} textTrio - ApplicationTextContainer for the collection group.
- * @prop {Object} heroImgOptions - Data options for the hero image (src, collection name, etc)
+ * @prop {Array} heroImgOptions - Data options for the hero image (src, collection name, etc)
  * @prop {Object} heroImgCurrent - The currently displayed hero image.
  */
 class AppHome extends Mixin(LitElement)
@@ -47,8 +48,13 @@ class AppHome extends Mixin(LitElement)
       recentCollections: {type: Array},
       showCollectionGroup: {type: Boolean},
       textTrio: {type: Object},
-      heroImgOptions: {type: Object},
+      heroImgOptions: {type: Array},
       heroImgCurrent: {type: Object},
+      heroUrl: {type: String},
+      heroItemLabel: {type: String},
+      heroItemUrl: {type: String},
+      heroCollectionLabel: {type: String},
+      heroCollectionUrl: {type: String},
       editMode: {type: Boolean},
       displayData: {type: Array},
       isUiAdmin: {type: Boolean}
@@ -64,8 +70,13 @@ class AppHome extends Mixin(LitElement)
     this.showCollectionGroup = false;
     this.recentCollections = [];
     this.textTrio = {};
-    this.heroImgOptions = {};
+    this.heroImgOptions = [];
     this.heroImgCurrent = {};
+    this.heroUrl = '';
+    this.heroItemLabel = '';
+    this.heroItemUrl = '';
+    this.heroCollectionLabel = '...';
+    this.heroCollectionUrl = '...';
     this.displayData = [];
     this.editMode = false;
     this.isUiAdmin = false;
@@ -79,54 +90,62 @@ class AppHome extends Mixin(LitElement)
   async firstUpdated() {
     this.isUiAdmin = user.canEditUi();
 
-    // Get featured collections
-    let displayData = APP_CONFIG.fcAppConfig['/application/ucd-lib-client/featured-collections/config.json'];
-    if( displayData && displayData.body && Array.isArray(displayData.body) ) this.displayData = displayData.body;
-    if( !displayData ) {
-      displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
+    this._setFeaturedImage();
+
+    try {
+      let displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
       if( displayData && displayData.body ) {
         if( typeof displayData.body === 'string' ) displayData.body = JSON.parse(displayData.body);
         this.displayData = displayData.body;
+
+        let adminPanel = document.querySelector('admin-featured-collections');
+        if( adminPanel ) {
+          adminPanel.loadAdminData(this.displayData);
+        }
       }
-    }
-
-    // filter out collections that don't exist in fcrepo
-    let cardsPanels = this.displayData.filter(d => d.type === 'cards');
-    cardsPanels.forEach(async panel => {
-      let collectionIds = [];
-
-      panel.collectionIds.forEach(collectionId => {
-        if( APP_CONFIG.collectionLabels[collectionId] ) collectionIds.push(collectionId);
+  
+      // filter out collections that don't exist in fcrepo
+      let cardsPanels = this.displayData.filter(d => d.type === 'cards');
+      cardsPanels.forEach(async panel => {
+        let collectionIds = [];
+  
+        panel.collectionIds.forEach(collectionId => {
+          if( APP_CONFIG.collectionLabels[collectionId.selected] ) collectionIds.push(collectionId);
+        });
+        panel.collectionIds = collectionIds;
       });
-      panel.collectionIds = collectionIds;
-      
-      // if( panel.collectionIds.length < 3) {
-      //   let data = await this.CollectionModel.getRecentCollections(3 - panel.collectionIds.length + 1);
-      //   if( data.response.ok && data.body.results.length ) {
-      //     panel.collectionIds.push(data.body.results.map((r, index) => { 
-      //       return  { position: index, selected: r.root['@id'] };
-      //     }));
-      //   }
-      // }
-    });
-
-    let data = await this.CollectionModel.getHomepageDefaultCollections();
-    if( data.response.ok && data.body.results.length ) {
-      this.featuredCollections = data.body.results;
-      this.featuredCollectionsCt = this.featuredCollections.length;
+    } catch(e) {
+      this.logger.warn('No featured collections admin data found', e);
     }
 
     // get recent collections
-    data = await this.CollectionModel.getRecentCollections();
-    
-    if( data.response.ok && data.body.results.length ) {
-      this.recentCollections = data.body.results;
+    let data = await this.CollectionModel.getRecentCollections();
+    if( data?.payload?.results?.length ) {
+      this.recentCollections = data?.payload?.results?.slice(0, 3);
     }
 
-    // Get hero image options
-    this.heroImgOptions = this.FcAppConfigModel.getHomepageHeroOptions();
-
     this.requestUpdate();
+  }
+
+  _setFeaturedImage() {
+    this.heroImgOptions = (APP_CONFIG.featuredImages || []);
+
+    // if collection doesn't exist for a featured image, remove it from the list
+    this.heroImgOptions = this.heroImgOptions.filter(i => {
+      return APP_CONFIG.collectionLabels[i.collectionLink];
+    });
+
+    let i = Math.floor(Math.random() *  this.heroImgOptions.length);
+    let src = this.heroImgOptions[i];
+
+    this.heroUrl = src.imageUrl;
+    this.heroItemLabel = src.itemName;
+    this.heroItemUrl = src.itemLink;
+    this.heroCollectionLabel = src.collectionName;
+    this.heroCollectionUrl = src.collectionLink;
+
+    if( this.heroItemLabel.length > 75 ) this.heroItemLabel = this.heroItemLabel.substring(0, 75) + '...';
+    if( this.heroCollectionLabel.length > 75 ) this.heroCollectionLabel = this.heroCollectionLabel.substring(0, 75) + '...';
   }
 
   /**
@@ -135,10 +154,9 @@ class AppHome extends Mixin(LitElement)
    * @param {CustomEvent} e 
    */
   _onHeroChange(e) {
-    let img = e.target._selectedSrc;
-    if ( !img ) return;
-    this.heroImgCurrent = this.heroImgOptions[img];
-
+    let imageUrl = e.target._selectedSrc;
+    if ( !imageUrl ) return;
+    this.heroImgCurrent = this.heroImgOptions.filter(i => i.imageUrl === imageUrl)[0];
   }
 
   /**
@@ -160,6 +178,7 @@ class AppHome extends Mixin(LitElement)
    */
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
+    this.editMode = false;
     // save to fcrepo container
     //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
     let adminPanel = document.querySelector('admin-featured-collections');
@@ -168,7 +187,6 @@ class AppHome extends Mixin(LitElement)
       this.displayData = adminPanel.panels;
     }
     await this.FcAppConfigModel.saveFeaturedCollectionAppData(this.displayData);
-    this.editMode = false;
   }
 
   /**

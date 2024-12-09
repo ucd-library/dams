@@ -1,4 +1,4 @@
-var {BaseStore} = require('@ucd-lib/cork-app-utils');
+var {BaseStore, LruStore} = require('@ucd-lib/cork-app-utils');
 const vcModel = require('../models/CollectionVcModel');
 
 class CollectionStore extends BaseStore {
@@ -8,20 +8,30 @@ class CollectionStore extends BaseStore {
 
     this.data = {
       byId : {},
+      edits : {},
       overview : {
         state : this.STATE.INIT
       },
-      search : {
-        state : this.STATE.INIT
-      }
+      search : new LruStore({name: 'collection-search', max: 20})
     }
 
     this.events = {
       COLLECTION_OVERVIEW_UPDATE : 'collection-overview-update',
       COLLECTION_UPDATE : 'collection-update',
+      COLLECTION_EDITS_UPDATE : 'collection-edits-update',
       COLLECTION_SEARCH_UPDATE : 'collection-search-update'
     }
   }
+
+  // set(payload, store, event) {
+  //   if( !payload.state ) {
+  //     if( payload.request ) payload.state = this.STATE.LOADING;
+  //     else if( payload.payload ) payload.state = this.STATE.LOADED;
+  //     else if( payload.error ) payload.state = this.STATE.ERROR;
+  //   }
+
+  //   super.set(payload, store, event);
+  // }
 
   getCollection(id='') {
     return this.data.byId[id];
@@ -30,17 +40,17 @@ class CollectionStore extends BaseStore {
   /**
    * Search
    */
-  setSearchLoading(searchDocument, request) {
+  setSearchLoading(searchDocument, request, cacheId) {
     this._setSearchState({
       state : this.STATE.LOADING,
-      request, searchDocument
+      request, searchDocument, cacheId
     })
   }
 
-  setSearchLoaded(searchDocument, payload) {
+  setSearchLoaded(searchDocument, payload, cacheId) {
     this._setSearchState({
       state : this.STATE.LOADED,
-      searchDocument, payload
+      searchDocument, payload, cacheId
     })
   }
 
@@ -52,6 +62,9 @@ class CollectionStore extends BaseStore {
   }
 
   _setSearchState(state) {
+    if( state.state === this.STATE.LOADED ) {
+      vcModel.renderCollections(state);
+    }
     this.data.search = state;
     this.emit(this.events.COLLECTION_SEARCH_UPDATE, this.data.search);
   }
@@ -132,6 +145,35 @@ class CollectionStore extends BaseStore {
     }
     this.data.byId[state.id] = state;
     this.emit(this.events.COLLECTION_UPDATE, state);
+  }
+
+  setCollectionEditLoading(id, promise) { 
+    this._setCollectionEditState({
+      id,
+      state: this.STATE.LOADING,
+      request : promise
+    });
+  }
+
+  setCollectionEditLoaded(id, edit) {
+    this._setCollectionEditState({
+      id,
+      payload: edit,
+      state: this.STATE.LOADED,
+    });
+  }
+
+  setCollectionEditError(id, error) {
+    this._setCollectionEditState({
+      id,
+      state: this.STATE.ERROR,
+      error
+    });
+  }
+
+  _setCollectionEditState(state) {
+    this.data.edits[state.id] = state;
+    this.emit(this.events.COLLECTION_EDIT_UPDATE, state);
   }
 
 

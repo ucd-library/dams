@@ -37,19 +37,11 @@ export default function render() {
         color: var(--color-grey);
       }
 
-      iron-pages {
-        /* flex: 1; */
-        /* min-height: 250px;
-        display: flex;
-        justify-content: center;
-        flex-direction: column; */
-      }
-
       img {
         max-width: 100%;
       }
 
-      app-bookreader-viewer.fullscreen {
+      /* app-bookreader-viewer.fullscreen {
         background-color: white;
         position: fixed;
         padding: 0px;
@@ -58,34 +50,34 @@ export default function render() {
         left: 0px;
         width: 100%;
         height: 100%;
-        z-index: 1000;
-      }
+        z-index: 3000;
+      } */
 
       #br-search-input,
       #br-search-input:focus {
         border: none;
       }
 
-      .overflow::-webkit-scrollbar {
+      .search-side-panel .overflow::-webkit-scrollbar {
         width: 10px;
       }
-      .overflow::-webkit-scrollbar-track {
+      .search-side-panel .overflow::-webkit-scrollbar-track {
         background: var(--color-aggie-gold-70);
         /* border-left: 4px solid var(--color-aggie-gold-70);
         border-right: 4px solid var(--color-aggie-gold-70); */
       }
-      .overflow[no-overflow]::-webkit-scrollbar-track {
+      .search-side-panel .overflow[no-overflow]::-webkit-scrollbar-track {
         background: transparent;
         border: none;
       }
-      .overflow::-webkit-scrollbar-thumb {
+      .search-side-panel .overflow::-webkit-scrollbar-thumb {
         border-radius: 6px;
         background: var(--color-aggie-gold);
       }
 
       /* basic support for FF. Chrome/Safari should support -webkit styles above */
       @supports (scrollbar-color: red blue) {
-        * {
+        .search-side-panel * {
           scrollbar-color: var(--color-aggie-gold) var(--color-aggie-gold-70);
           scrollbar-width: thin;
         }
@@ -108,7 +100,7 @@ export default function render() {
         width: 350px;
         height: 570px;
         background: var(--color-aggie-gold-40);
-        z-index: 500;
+        z-index: 1000;
         border-radius: 0 30px 30px 0;
         box-shadow: 0px 3px 6px #00000029;
         transition: all 0.3s;
@@ -120,7 +112,7 @@ export default function render() {
         left: 0;
         width: 350px;
         background: var(--color-aggie-gold-40);
-        z-index: 1000;
+        z-index: 3000;
         border-radius: 0 30px 30px 0;
         height: calc(90vh - 100px);
         box-shadow: 0px 3px 6px #00000029;
@@ -132,18 +124,18 @@ export default function render() {
         height: 40px;
         display: inline-block;
         margin: auto;
-        background-color: var(--color-aggie-blue-70);
-        border-radius: 50%;
         float: right;
         cursor: pointer;
+        margin-top: -3px;
       }
 
       .search-collapse-btn ucdlib-icon {
         margin: auto;
         vertical-align: middle;
         text-align: center;
-        fill: var(--color-aggie-gold-40);
-        padding-top: 0.6rem;
+        fill: var(--color-aggie-blue-70);
+        width: 1.75rem;
+        height: 1.75rem;
       }
 
       .search-side-panel.fullscreen .search-content {
@@ -158,8 +150,9 @@ export default function render() {
         overflow: auto;
         max-height: 430px;
         overflow-y: scroll;
-        padding: 1rem;
+        padding: 0 1rem 1rem 1rem;
         padding-bottom: 0;
+        background-color: var(--color-aggie-gold-40);
       }
 
       #br-search-input {
@@ -190,6 +183,20 @@ export default function render() {
         fill: var(--color-aggie-blue-90);
         padding-top: 0.6rem;
       }
+
+      ucdlib-bookreader {
+        padding-top: 1.75rem;
+        padding-bottom: 3.5rem;
+      }
+
+      /* .br-fullscreen-active {
+          html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+      } */
     </style>
 
     <div class="wrapper" style="position: relative;">
@@ -211,16 +218,14 @@ export default function render() {
           />
         </div>
         <app-image-viewer id="image"></app-image-viewer>
-        <app-bookreader-viewer
-          id="bookreader"
-          .fullscreen="${this.brFullscreen}"
-          .bookData="${this.bookData}"
-          bookItemId="${this.bookItemId}"
-          @br-page-change="${this._onBookViewPageChange}">
-        </app-bookreader-viewer>
+        <ucdlib-bookreader ?fullscreen="${this.brFullscreen}" id="bookreader" max-height="634"></ucdlib-bookreader>
         <app-video-viewer id="video"></app-video-viewer>
         <app-audio-viewer id="audio"></app-audio-viewer>
       </ucdlib-pages>
+
+      <div ?hidden="${!this.noMedia}">
+        <img src="/images/tree-bike-illustration.png" style="margin: 0 auto; display: block; height: 600px;" />
+      </div>
 
       <div
         class="search-side-panel ${this.brFullscreen
@@ -229,13 +234,13 @@ export default function render() {
         ?hidden="${!this.isBookReader}"
       >
         <div>
-          <div style="padding: 1rem;">
-            <h2 style="color: var(--color-aggie-blue); display: inline;">
+          <div style="padding: 1.5rem 1rem;">
+            <h5 style="color: var(--color-aggie-blue); display: inline; font-size: 1.5rem">
               Search Inside
-            </h2>
+            </h5>
             <div class="search-collapse-btn" @click="${this._onToggleBRSearch}">
               <ucdlib-icon
-                icon="ucdlib-dams:fa-chevron-left"
+                icon="ucdlib-dams:fa-chevron-circle-left"
                 tabindex="0"
                 icon="chevron-left"
                 alt="Collapse search panel"
@@ -249,6 +254,7 @@ export default function render() {
               <input
                 type="text"
                 id="br-search-input"
+                autocomplete="off"
                 @change="${this._onBRSearch}"
               />
 
@@ -276,11 +282,12 @@ export default function render() {
                   style="margin: 0 0 2rem; cursor: pointer;"
                   data-match-index="${result.matchIndex}"
                   data-array-index="${index}"
+                  data-page="${result?.page || 0}"
                   @click="${this._onSearchResultClick}"
                 >
-                  <h4 style="margin-bottom: 0">
-                    Page ${result.displayPageNumber.replace("n", "")}
-                  </h4>
+                  <h5 style="margin-bottom: 0; margin-top: 1rem">
+                    Page ${parseInt(result?.page || 0)}
+                  </h5>
                   <p style="font-size: .9rem; margin-top: .3rem">
                     ${unsafeHTML(
                       result.text
@@ -296,10 +303,12 @@ export default function render() {
       </div>
 
       <app-media-viewer-nav
+        ?hidden="${!this.mediaType || this.mediaType === "audio"}"
         .isBookReader="${this.isBookReader}"
-        .hideZoom="${this.mediaType === "bookreader" ||
-        this.mediaType === "video"}"
+        .hideZoom="${this.mediaType === "bookreader" || this.mediaType === "video"}"
         .searchResults="${this.searchResults}"
+        ?brsinglepage="${this.singlePage}"
+        overrideImageList="${this.overrideImageList}"
         @zoom-in="${this._onZoomIn}"
         @br-bookview-toggle="${this._onToggleBookView}"
         @br-expand-view="${this._onExpandBookView}"

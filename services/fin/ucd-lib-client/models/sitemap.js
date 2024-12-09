@@ -1,5 +1,9 @@
-const {records, collections} = require('@ucd-lib/fin-service-utils');
 const config = require('../config');
+let collections = require('../../models/collection/index.js');
+let items = require('../../models/item/index.js');
+
+collections = collections.model;
+items = items.model;
 
 const COLLECTIONS_SITEMAP = '_collections';
 
@@ -18,6 +22,7 @@ class SitemapModel {
     }
 
     app.get(/^\/sitemap.*/, (req, res) => this._onRequest(req, res));
+    app.get('/all-items.txt', (req, res) => this.allItems(res));
     app.get('/robots.txt', (req, res) => {
       res.set('Content-Type', 'text/plain');
       res.send(`User-agent: * 
@@ -138,8 +143,7 @@ Sitemap: ${config.server.url}/sitemap.xml`);
     let query = {
       bool: {
         filter: [
-          {term: {isRootRecord: true}},
-          {term: {'isPartOf.@id': `/collection/${id}`}}
+          {term: {'@graph.isPartOf.@id': `/collection/${id}`}}
         ]
       }
     };
@@ -148,7 +152,7 @@ Sitemap: ${config.server.url}/sitemap.xml`);
     let time = '30s';
 
     // find records and start scroll
-    let result = await records.esSearch({
+    let result = await items.esSearch({
       _source : ['name'],
       query : query,
       size: 250
@@ -169,6 +173,36 @@ Sitemap: ${config.server.url}/sitemap.xml`);
 
     // finish our sitemap xml and end response
     resp.write('</urlset>');
+    resp.end();
+  }
+
+  async allItems(resp) {
+    resp.set('Content-Type', 'text/plain');
+
+    // create our es query
+    let query = {};
+    let time = '30s';
+
+    // find records and start scroll
+    let result = await items.esSearch({
+      _source : ['name'],
+      size: 250
+    }, {scroll: time});
+
+    let sent = result.hits.hits.length;
+    result.hits.hits.forEach(result => resp.write(`${config.server.url}${result._id}\n`));
+    
+    while( result.hits.total > sent ) {
+      result = await records.esScroll({
+        scrollId: result._scroll_id,
+        scroll: time
+      });
+
+      result.hits.hits.forEach(result => resp.write(`${config.server.url}${result._id}\n`));
+      sent += result.hits.hits.length;
+    }
+
+    // finish our response
     resp.end();
   }
 

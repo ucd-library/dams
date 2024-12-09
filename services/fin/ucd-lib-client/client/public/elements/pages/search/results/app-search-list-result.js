@@ -1,7 +1,9 @@
 import { LitElement } from "lit";
 
-import AppSearchResult from "./app-search-result";
+// import AppSearchResult from "./app-search-result";
 import render from "./app-search-list-result.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 /**
  * @class AppSearchListResult
@@ -57,11 +59,12 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
    */
   willUpdate(props) {
     if (this.data.id) {
+      let collectionName = APP_CONFIG.collectionLabels[this.data.collectionId?.['@id']] || '';
       this.itemUrl = this.data.id;
       this.thumbnailUrl = this.data.thumbnailUrl;
       this.title = this.data.title;
       this.date = this.data.date;
-      this.collection = this.data.collection;
+      this.collection = collectionName;
       this.format = this.data.format;
       this.creator = this.data.creator;
     } else {

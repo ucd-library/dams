@@ -5,6 +5,12 @@ const LANG_MAP = {
 };
 
 class Utils {
+  itemDisplayType = {
+    imageList: "Image List",
+    brOnePage: "Book Reader - 1 Page",
+    brTwoPage: "Book Reader - 2 Page",
+  };
+
   getYearFromDate(date) {
     if (!date) return "";
     date = date + "";
@@ -29,6 +35,14 @@ class Utils {
   asArray(item = {}, key) {
     let value = item[key] || [];
     return Array.isArray(value) ? value : [value];
+  }
+
+  formatNumberWithCommas(num) {
+    try {
+      num = typeof num === 'string' ? parseFloat(num) : num;
+    } catch(e) {}
+    if( isNaN(num) ) return num;
+    return new Intl.NumberFormat('en-US').format(num);
   }
 
   /**
@@ -76,12 +90,16 @@ class Utils {
       return "BagOfFiles";
     }
 
+    if( record.fileFormat?.includes('image') && record.clientMedia?.images ) return "ImageObject";
+    
     return null;
   }
 
-  getThumbnailFromClientMedia(clientMedia) {
+  getThumbnailFromClientMedia(clientMedia={}) {
     let thumbnailUrl = "";
     let graph = clientMedia.graph;
+
+    if( !clientMedia.mediaGroups ) return thumbnailUrl;
 
     for (const mediaGroup of clientMedia.mediaGroups) {
       if (mediaGroup.clientMedia?.images?.medium?.url) {
@@ -105,6 +123,7 @@ class Utils {
         }
       }
     }
+
     return thumbnailUrl;
   }
 
@@ -192,7 +211,7 @@ class Utils {
       let record = clientMediaIndex[part["@id"]];
 
       // TODO some of the index graphs don't have clientMedia, so some pages missing
-      if (!record.clientMedia) {
+      if (!record?.clientMedia) {
         console.error("no clientMedia images for ", record);
         return;
       }
@@ -208,6 +227,63 @@ class Utils {
     });
 
     return { pages };
+  }
+
+  /**
+   * @method getAppConfigCollectionGraph
+   * @description given an id, get app_config collection graph if exists, or hit the API
+   * 
+   * @param {String} id
+   * @param {Object} fcAppConfigModel reference to model
+   */
+  async getAppConfigCollectionGraph(id, fcAppConfigModel) {
+    // let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/collection', '')}.jsonld.json`];
+    // if( savedData ) return savedData;
+    let savedData;
+    try {
+      savedData = await fcAppConfigModel.getCollectionAppData(id);  
+    } catch( error ) {
+      console.warn('Error getting app config collection graph for ' + id, error);
+    }
+    if( savedData && savedData.body ) return JSON.parse(savedData.body);
+    
+    return null;
+  }
+
+  /**
+   * @method getAppConfigItemGraph
+   * @description given an id, get app_config collection graph if exists, or hit the API
+   * 
+   * @param {String} id
+   * @param {Object} fcAppConfigModel reference to model
+   */
+  async getAppConfigItemGraph(id, fcAppConfigModel) {
+    // let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/item', '')}.jsonld.json`];
+    // if( savedData ) return savedData;
+    let savedData;
+    try {
+      savedData = await fcAppConfigModel.getItemAppData(id);  
+    } catch( error ) {
+      console.warn('Error getting app config item graph for ' + id, error);
+    }
+    if( savedData && savedData.body ) return JSON.parse(savedData.body);
+    
+    return null;     
+  }  
+
+  /**
+   * @method getSubjectUrl
+   * @description given a subject string, build search url 
+   * 
+   * @param {Object} recordModel
+   * @param {String} subject
+   * @returns {String} search url for subject
+   */
+  getSubjectUrl(recordModel, subject) {
+    let searchDocument = recordModel.emptySearchDocument();
+    let subjectFacet = '@graph.subjects.name';
+    recordModel.appendKeywordFilter(searchDocument, subjectFacet, subject);
+    return '/search/'+recordModel.searchDocumentToUrl(searchDocument);
   }
 }
 

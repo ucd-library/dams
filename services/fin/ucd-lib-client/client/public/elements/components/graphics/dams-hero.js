@@ -1,5 +1,8 @@
 import { LitElement } from 'lit';
+
 import render from "./dams-hero.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '@ucd-lib/theme-elements/brand/ucd-theme-header/ucd-theme-header.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-primary-nav/ucd-theme-primary-nav.js';
@@ -12,15 +15,17 @@ import "./dams-watercolor";
  * @prop {Array} srcOptions - Set of image sources to randomly display
  * @prop {String} src - Fallback background image source
  * @prop {String} watercolor - Watercolor type
+ * @prop {String} selectedSrcUrl - The currently displayed image source
  */
-export default class DamsHero extends LitElement {
+export default class DamsHero extends Mixin(LitElement)
+.with(LitCorkUtils) {
 
   static get properties() {
     return {
       src: {type: String},
       srcOptions: {type: Array, attribute: "src-options"},
       watercolor: {type: String},
-      _selectedSrc: {type: String}
+      selectedSrcUrl: {type: String, attribute: "selected-src-url"}
     };
   }
 
@@ -29,7 +34,7 @@ export default class DamsHero extends LitElement {
     this.render = render.bind(this);
     this.src = "";
     this.srcOptions = [];
-    this._selectedSrc = "";
+    this.selectedSrcUrl = "";
     this.watercolor = "border-white";
 
     this._srcChange = new CustomEvent('src-change', {
@@ -37,16 +42,8 @@ export default class DamsHero extends LitElement {
         message: 'A new image has been loaded'
       }
     });
-  }
 
-  /**
-   * @method updated
-   * @description Lit lifecyle method fired when element is updated.
-   * 
-   * @param {Map} props - Change properties
-   */
-  updated(props){
-    if (props.has('srcOptions')) this._setSrc();
+    this._injectModel('FcAppConfigModel');
   }
 
 
@@ -58,24 +55,51 @@ export default class DamsHero extends LitElement {
    */
   shuffleImage(){
     this._setSrc();
-    return this._selectedSrc;
+    return this.selectedSrcUrl;
+  }
+
+  updated(changedProperties) {
+    if( changedProperties.has('selectedSrcUrl') && this.selectedSrcUrl.length > 0 ) {
+      let img = new Image();
+      img.src = this.selectedSrcUrl;
+
+      img.onload = () => {
+        let element = this.shadowRoot.querySelector('.image');
+        element.style.backgroundImage += 'var(--gradient-ag-putah), url(' + img.src + ')';
+        element.style.backgroundSize = 'cover';
+        element.style.opacity = '1';
+      };
+    }
   }
 
   /**
    * @method _setSrc
    * @description Sets the background image src property.
    */
-  _setSrc(){
-    let src = "";
-    let setCt = this.srcOptions.length;
-    if ( setCt === 0 && this.src ) {
-      src = this.src;
+  async _setSrc(){
+    // let featuredImages = await this.FcAppConfigModel.getDefaultImagesConfig();
+    // this.srcOptions = featuredImages?.body?.featuredImages;
+
+    if( !this.srcOptions || this.srcOptions.length < 1 ) {
+      this.selectedSrcUrl = '/images/defaults/annual-winter-sale1952.jpg';
+      this.dispatchEvent(this._srcChange);
+      return;
     }
-    else if ( setCt > 0 ) {
-      let i = Math.floor(Math.random() *  setCt);
-      src = this.srcOptions[i];
-    }
-    this._selectedSrc = '/images/defaults/annual-winter-sale1952.jpg' ; //src; // todo later shuffle from curated list
+
+    let i = Math.floor(Math.random() *  this.srcOptions.length);
+    let src = this.srcOptions[i];
+    this.selectedSrcUrl = src.imageUrl;
+
+    let img = new Image();
+    img.src = this.selectedSrcUrl;
+
+    img.onload = () => {
+      let element = this.shadowRoot.querySelector('.image');
+      element.style.backgroundImage += 'var(--gradient-ag-putah), url(' + img.src + ')';
+      element.style.opacity = '1';
+    };
+
+    
     this.dispatchEvent(this._srcChange);
   }
 
@@ -89,7 +113,6 @@ export default class DamsHero extends LitElement {
     let styles = {
       'background-image': 'var(--gradient-ag-putah)'
     };
-    if ( this._selectedSrc ) styles['background-image'] += `, url(${this._selectedSrc})`;
     return styles;
   }
 

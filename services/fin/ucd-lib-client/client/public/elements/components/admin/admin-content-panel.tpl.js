@@ -136,7 +136,7 @@ export default function render() {
         font-size: 0.8rem;
         font-weight: bold;
         white-space: nowrap;
-        min-width: 175px;
+        min-width: 9rem;
       }
 
       .add-collection-label ucdlib-icon {
@@ -160,6 +160,10 @@ export default function render() {
 
       .collection-list ucd-theme-slim-select {
         padding-top: 0.5rem;
+      }
+
+      .remove-collection ucdlib-icon {
+        fill: var(--color-aggie-blue-80)
       }
 
       @media (max-width: 991px) {
@@ -294,7 +298,7 @@ export default function render() {
             class="heading-text"
             type="text"
             .value=${this.heading}
-            style="width: -webkit-fill-available;";
+            style="width: -webkit-fill-available; font-size: 0.9rem;";
             @change="${(e) => (this.heading = e.currentTarget.value)}"
           />
         </div>
@@ -304,36 +308,39 @@ export default function render() {
         <span class="form-label">Collections</span>
         ${this.collectionIds.map(
           (c, index) => html`
-            <ucd-theme-slim-select
-              @change="${this._onCollectionListChange}"
-              @focusin="${this._ssSelectFocusIn}"
-              @blur="${this._ssSelectBlur}"
-              data-position="${c.position}"
-              class="list"
-              .options="${{
-                settings: {
-                  openPosition: "up",
-                },
-              }}"
-            >
-              <!-- <select class="collections">
-          <option></option>
-        </select> -->
-              <select class="collections">
-                <option></option>
-                ${this.sortedCollectionsList.map(
-                  (sc) => html`
-                    <option
-                      .value=${sc[0]}
-                      ?selected="${this.collectionIds[index].selected ===
-                      sc[0]}"
-                    >
-                      ${sc[1]}
-                    </option>
-                  `
-                )}
-              </select>
-            </ucd-theme-slim-select>
+            <div class="collection-list-row" style="display: flex; align-items: center; padding-top: .5rem; margin-top: .5rem">
+              <ucd-theme-slim-select
+                style="flex: 1; padding-top: 0; margin-top: 0"
+                @change="${this._onCollectionListChange}"
+                @focusin="${this._ssSelectFocusIn}"
+                @blur="${this._ssSelectBlur}"
+                data-position="${c.position}"
+                class="list"
+                .options="${{
+                  settings: {
+                    openPosition: "up",
+                  },
+                }}"
+              >
+                <select class="collections">
+                  <option></option>
+                  ${this.sortedCollectionsList.map(
+                    (sc) => html`
+                      <option
+                        .value=${sc[0]}
+                        ?selected="${this.collectionIds[index].selected ===
+                        sc[0]}"
+                      >
+                        ${sc[1]}
+                      </option>
+                    `
+                  )}
+                </select>
+              </ucd-theme-slim-select>
+              <div class="remove-collection" data-index="${index}" @click="${this._removeCollection}" style="cursor: pointer; flex: .1; margin-left: 1rem"> 
+                <ucdlib-icon icon="ucdlib-dams:fa-trash"></ucdlib-icon>              
+              </div>
+            </div>
           `
         )}
 

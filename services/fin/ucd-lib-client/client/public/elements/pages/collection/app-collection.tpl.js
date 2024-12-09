@@ -2,6 +2,8 @@ import { html, unsafeCSS } from 'lit';
 
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md.js';
 
+import utils from '../../../lib/utils/index.js';
+
 import { sharedStyles } from "../../styles/shared-styles";
 import SharedHtml from '../../utils/shared-html';
 import linksCss from "@ucd-lib/theme-sass/1_base_html/_links.css";
@@ -42,22 +44,22 @@ export default function render() {
       font-weight: 700;
     }
 
-    .title-section {
+    app-collection .title-section {
       display: flex;
       min-height: 42vw;
     }
 
-    .title-section > div {
+    app-collection .title-section > div {
       flex: 1;
       padding: 2rem;
       width: 50%;
     }
 
-    .collection-header {
+    app-collection .collection-header {
       margin: auto;
     }
 
-    .collection-header h1 {
+    app-collection .collection-header h1 {
       margin: 0.5rem 0;
     }
 
@@ -89,7 +91,7 @@ export default function render() {
 
     .featured-image {
       z-index: 50;
-      top: 27%;
+      top: 17%;
       left: 0;
       right: 0;
       bottom: 0;
@@ -130,7 +132,7 @@ export default function render() {
       margin: 2rem 0;
     }
 
-    .label {
+    .collection-label {
       font-weight: bold;
       padding-right: 0.3rem;
     }
@@ -182,17 +184,15 @@ export default function render() {
     }
 
     @media (max-width: 600px) {
-      
-      .title-section {
+      app-collection .title-section {
         display: block;
-        min-height: 90vh;
         overflow-y: -webkit-paged-x;
+        padding-top: 3rem;
       }
 
-      .title-section > div {
+      app-collection .title-section > div {
         width: 80%;
         margin: auto;
-        height: 30vh;
       }
       
       .detail-section {
@@ -230,7 +230,7 @@ export default function render() {
       /* align-items: center;
       justify-content: center; */
       text-align: center;
-      font-size: .8rem;
+      font-size: 16px;
       font-weight: bold;
       white-space: nowrap;
       min-width: 150px;
@@ -242,6 +242,7 @@ export default function render() {
 
     .left-panel .file-upload-label ucdlib-icon {
       height: 50%;
+      width: 25px;
       position: relative;
       top: 5%;
       left: -5%;
@@ -252,10 +253,11 @@ export default function render() {
       background-color: var(--color-aggie-blue);
     }
 
-    .left-panel  .file-upload-label span {
+    .left-panel .file-upload-label span {
       position: relative;
       top: 20%;
       right: 20%;
+      padding-left: .2rem;
     }
 
     .selected-file {
@@ -266,14 +268,14 @@ export default function render() {
     .admin-edit .left-panel {
       position: absolute;
       left: 3rem;
-      top: 2rem;
+      top: calc(170px + 3rem);
       z-index: 500;
     }
 
     .admin-edit .right-panel {
       position: absolute;
       right: 3rem;
-      top: 2rem;
+      top: calc(170px + 3rem);
       z-index: 500;
     }
 
@@ -313,7 +315,7 @@ export default function render() {
 
     .edit-overlay {
       background: white;
-      position: absolute;
+      position: fixed;
       top: 0;
       right: 0;
       bottom: 0;
@@ -398,6 +400,7 @@ export default function render() {
 
     .collection-highlights h2 {
       margin-bottom: 0;
+      margin-top: 4rem;
     }
 
     .edit-collections-container > fieldset {
@@ -411,12 +414,19 @@ export default function render() {
     }
 
     .list--reset {
-      display: inline-block;
+      margin: 0;
+      padding: 0 0 0 1.25rem;
+      padding-left: 0;
+      list-style: none;
     }
 
     .list--reset > li {
       display: inline-block;
       padding-right: .5rem;
+    }
+
+    .radio label {
+      padding-top: .2rem;
     }
 
     .radio label:before {
@@ -427,6 +437,7 @@ export default function render() {
     .default-display {
       background-color: var(--color-aggie-gold-20);
       margin: 1rem;
+      padding-bottom: 1rem;
     }
 
     .default-display h3 {
@@ -459,8 +470,19 @@ export default function render() {
       top: -0.5rem;
     }    
 
-    fieldset label {
-      padding-top: .2rem;
+    .exceptions fieldset li,
+    .default-item-display fieldset li {
+      padding-top: .5rem;
+    }
+
+    .exceptions fieldset label,
+    .default-item-display fieldset label {
+      display: inline-block;
+    }
+
+    .exceptions fieldset label {
+      font-weight: normal;
+      color: inherit;
     }
 
   </style>
@@ -502,11 +524,10 @@ export default function render() {
 
     <div class="title-section">
       <div class="image-overlay">
-        <img class="watercolor-bg" src="/images/watercolors/collection-watercolor-${this.watercolor}-back-white.jpg" width="100%" alt="watercolor background" />
+        <img ?hidden="${!this.watercolorBgUrl}" class="watercolor-bg" src="${this.watercolorBgUrl}" width="100%" />
 
-        <!-- <img class="featured-image" src="${this.thumbnailUrl}" width="45%" alt="collection featured image" /> -->
-        <div class="featured-image" style="background-image: url(${this.thumbnailUrlOverride}), url(${this.thumbnailUrl})"></div>
-        <img class="watercolor-fg" src="/images/watercolors/collection-watercolor-${this.watercolor}-front.png" width="100%" alt="watercolor foreground" />
+        <div class="featured-image"></div>
+        <img ?hidden="${!this.watercolorFgUrl}" class="watercolor-fg" src="${this.watercolorFgUrl}" width="100%" />
       </div>
       <div class="collection-header">
         
@@ -530,54 +551,66 @@ export default function render() {
       </p>
 
       <div style="margin-bottom: .4rem;">
-        <span class="label">Coverage: </span> ${this.yearPublished}
+        <span class="collection-label">Coverage: </span> ${this.yearPublished}
       </div>
-      <div style="margin-bottom: .4rem;" ?hidden="${!this.keywords || !this.keywords.length}">
-        <span class="label">Subjects: </span> 
-        ${this.keywords.map((item, index) => html`${index > 0 ? ', ' : ''}<a href="${item.href}">${item.label}</a>`)}
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.subjects?.length}">
+        <span class="collection-label">Subjects: </span> 
+          ${this.subjects.map(
+            (about, index) =>
+              html`${index > 0 ? ", " : ""}<a href="${utils.getSubjectUrl(this.RecordModel, about["name"] || about["@id"])}">${about["name"] || about["@id"]}</a>`
+          )}
       </div>
-      <div style="margin-bottom: 3rem;">
-        <span class="label">Finding Aid: </span> <a href="">Online Archive of California</a>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.material}">
+        <span class="collection-label">Format: </span> ${this.material}
+      </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.languages?.length}">
+        <span class="collection-label">Language: </span> 
+        ${this.languages?.map(
+          (language, index) => html`<span>${language.name}</span>${index < (this.languages?.length - 1) ? ', ' : ''} `
+        )}
+      </div>
+      <div style="margin-bottom: .4rem;" ?hidden="${!this.location}">
+        <span class="collection-label">Location: </span> ${this.location}
       </div>
     </div>
 
-    <div class="collection-highlights" ?hidden="${this.highlightedItems.length === 0}">
-      <h2>Highlights From This Collection</h2>
-      ${ SharedHtml.headerDots() }
+    <div class="collection-highlights">
+      <h2 ?hidden="${(this.highlightedItems.length === 0  || this.itemCount <= 0) && !this.editMode}">Highlights From This Collection</h2>
+      ${ this.highlightedItems.length !== 0  && this.itemCount > 0 ? SharedHtml.headerDots() : '' }
       
       <div class="edit-collections-container" ?hidden="${!this.editMode || !this.isUiAdmin}">
 
       <fieldset class="radio" style="border: none; margin: 0; padding: 0;">      
         <div>
-          <span class="form-label">Highlight Display</span>
-          <ul class="list--reset">
+          <span class="form-label">Highlight Display:</span>
+          <ul class="list--reset" style="display: inline;">
             <li>
               <input id="six" 
-                name="radio" 
+                name="radio-items-per-page" 
                 type="radio" 
                 class="radio" 
                 value="6" 
-                ?checked="${this.itemDisplayCount === 6}" 
+                ?checked="${this.itemCount === 6}" 
                 @change="${this._onItemDisplayChange}">
               <label for="six">6 (recommended)</label>
             </li>
             <li>
               <input id="three" 
-                name="radio" 
+                name="radio-items-per-page" 
                 type="radio" 
                 class="radio" 
                 value="3" 
-                ?checked="${this.itemDisplayCount === 3}" 
+                ?checked="${this.itemCount === 3}" 
                 @change="${this._onItemDisplayChange}">
               <label for="three">3</label>
             </li>
             <li>
               <input id="zero" 
-                name="radio" 
+                name="radio-items-per-page" 
                 type="radio" 
                 class="radio" 
                 value="0" 
-                ?checked="${this.itemDisplayCount === 0}" 
+                ?checked="${this.itemCount === 0}" 
                 @change="${this._onItemDisplayChange}">
               <label for="zero">0</label>
             </li>
@@ -585,143 +618,149 @@ export default function render() {
         </div>
       </fieldset>
 
-        <div class="card-trio" ?hidden="${this.itemDisplayCount === 0}">      
+        <div class="card-trio" ?hidden="${this.itemCount === 0}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-1 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[0] ? '/item'+this.savedItems[0]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[0] ? this.savedItems[0]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-2 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[1] ? '/item'+this.savedItems[1]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[1] ? this.savedItems[1]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-3 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[2] ? '/item'+this.savedItems[2]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[2] ? this.savedItems[2]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
         </div>
       
-        <div class="card-trio" ?hidden="${this.itemDisplayCount !== 6}">      
+        <div class="card-trio" ?hidden="${this.itemCount !== 6}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-4 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[3] ? '/item'+this.savedItems[3]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[3] ? this.savedItems[3]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-5 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[4] ? '/item'+this.savedItems[4]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[4] ? this.savedItems[4]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
 
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-6 item-ark-input" 
               type="text" 
-              .value="${this.savedItems[5] ? '/item'+this.savedItems[5]['@id'].split('/item')[1] : ''}" 
-              placeholder="/item/ark:/..." />
+              .value="${this.savedItems[5] ? this.savedItems[5]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
           </div>
         </div>
 
         <div class="default-display">
-          <h3>Default Display on Collection Item Pages</h3>
+          <h3>Display Settings for Collection Item Pages</h3>
 
           <div class="default-item-display">
-            <span class="label">Default Item Display</span>
+            <span class="label" style="display: block;">Default Display for Multipage Items</span>
+            <span style="font-style: italic; margin-bottom: 0.5rem; display: inline-block;">Single page items and multimedia are not affected by these settings.</span>
+            
             <fieldset class="radio default-item-display-fs">
               <div>
                 <ul class="list--reset" style="padding-inline-start: 0;">
                   <li>
                     <input id="two" 
-                      name="radio" 
+                      name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="two" 
-                      ?checked="${this.itemDisplayDefault === 'two'}" 
-                      @change="${this._onItemDisplayDefaultChange}">
-                    <label for="two">Book Reader - 2 Page</label>
+                      value="${utils.itemDisplayType.brTwoPage}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.brTwoPage}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage)}">
+                    <label for="two">${utils.itemDisplayType.brTwoPage}</label>
                   </li>
                   <li>
                     <input id="one" 
-                      name="radio" 
+                      name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="one" 
-                      ?checked="${this.itemDisplayDefault === 'one'}" 
-                      @change="${this._onItemDisplayDefaultChange}">
-                    <label for="one">Book Reader - 1 Page</label>
+                      value="${utils.itemDisplayType.brOnePage}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.brOnePage}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.brOnePage)}">
+                    <label for="one">${utils.itemDisplayType.brOnePage}</label>
                   </li>
                   <li>
                     <input id="list" 
-                      name="radio" 
+                      name="radio-default-display" 
                       type="radio" 
                       class="radio" 
-                      value="list" 
-                      ?checked="${this.itemDisplayDefault === 'list'}" 
-                      @change="${this._onItemDisplayDefaultChange}">
-                    <label for="list">Image List</label>
+                      value="${utils.itemDisplayType.imageList}" 
+                      ?checked="${this.itemDefaultDisplay === utils.itemDisplayType.imageList}" 
+                      @change="${(e) => (this.itemDefaultDisplay = utils.itemDisplayType.imageList)}">
+                    <label for="list">${utils.itemDisplayType.imageList}</label>
                   </li>
                 </ul>
               </div>
             </fieldset>
           </div>
-          <div class="exceptions">
+          <div class="exceptions" ?hidden="${this.itemEdits.length < 1}">
             <span class="label">Exceptions</span>
             <p style="margin-top: 0.3rem; padding-bottom: 0; margin-bottom: 0;">
               Checked items in this list will be reset to the default item display when saved. 
               Display overrides can also be managed directly on an item page.
             </p>
             <fieldset style="border: none; padding-left: 0; padding-top: 0; margin-top: 0;">
-              <ul class="list--reset" style="padding-inline-start: 0;">
-                <li>
-                  <label for="checkbox1">
-                    <input id="checkbox1" 
+              <ul class="list--reset" style="padding-inline-start: 0; width: 100%;">
+                <li style="width: 33%; padding-right: 0;">
+                  <input id="checkbox-all" 
+                    name="checkbox-all" 
+                    type="checkbox" 
+                    @change="${this._onSelectAllExceptionsChange}">
+                  <label for="checkbox-all">Select all exceptions</label>
+                </li>
+
+                <!-- items with exceptions set -->
+                ${this.itemEdits.map((item, index) => html`
+                  <li style="width: 33%; padding-right: 0;">
+                    
+                    <input id="checkbox${index}" 
                       name="checkbox" 
-                      type="checkbox" 
-                      checked="checked">Select all exceptions
+                      type="checkbox"
+                      data-item-id="${item.id}">
+                    <label for="checkbox${index}">
+                      <a href="${item.id}">${item.linkLabel}</a>
+                      <span style="font-style: italic;">
+                        (${item.defaultDisplay})
+                      </span>
                     </label>
                   </li>
-
-
-                <!-- TODO loop over items with exceptions set -->
-                <li><label for="checkbox2"><input id="checkbox2" name="checkbox" type="checkbox"> Choice B</label></li>
-                <li><label for="checkbox3"><input id="checkbox3" name="checkbox" type="checkbox"> Choice C</label></li>
-
-
+                `)}
+          
               </ul>
             </fieldset>
           </div>
         </div>
       
       </div>
-      <div ?hidden="${this.editMode}">
-        <div class="card-trio">
+      <div ?hidden="${this.editMode}" style="padding: 0 2rem;">
+        <div class="card-trio" ?hidden="${this.itemCount < 3}">
           ${this.highlightedItems.map((item, index) => html`
-            ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
-          `)}
-          ${this.savedItems.map((item, index) => html`
             ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
         </div>
-        <div class="card-trio">
+        <div class="card-trio" ?hidden="${this.itemCount < 6}">
           ${this.highlightedItems.map((item, index) => html`
-            ${index >= 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
-          `)}
-          ${this.savedItems.map((item, index) => html`
             ${index >= 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
           `)}
         </div>
@@ -732,27 +771,5 @@ export default function render() {
     </div>
 
     <app-citation .record="${this.citationRoot}"></app-citation>
-
-    <!-- <h2 class="admin-heading">Debug ${this.collectionId}</h2>
-    <div class="admin-content">
-      <h4 class="admin-box-title">dbsync</h4> -->
-      <!-- json injected admin data -->
-    <!-- </div> -->
-
-    <!-- <h2 class="display-pref-heading">Admin Display Preferences</h2>
-    <div class="display-editor-root">
-    
-    </div> -->
-    
-    <!-- <div class="file-upload-container">    
-      <label for="file-upload" class="file-upload-label">
-        Upload Featured Image 
-      </label>
-      <input id="file-upload" type="file" accept="image/jpeg" @change="${this._onFileChange}" />
-      <span class="selected-file">
-      </span>
-    </div>
-
-    <a href="" class="btn--alt" style="margin: 0 2rem 2rem 2rem" @click="${this._onSave}">Save</a> -->
 
   `;}

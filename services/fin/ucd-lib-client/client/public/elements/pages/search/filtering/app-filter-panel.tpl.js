@@ -10,6 +10,14 @@ export default function render() {
       display: block;
     }
 
+    .active-filter:hover #close ucdlib-icon {
+      fill: var(--color-aggie-gold-80);
+      border-radius: 50%;
+      background-color: var(--color-aggie-blue-90);
+      transition: background-color 0.3s ease-in-out;
+      transition: fill 0.3s ease-in-out;
+    }
+
     [hidden] { display: none !important; }
 
     .label {
@@ -36,10 +44,6 @@ export default function render() {
       display: block;
     }
 
-    #activeFilters > div {
-      padding: 4px 5px;
-    }
-
     .filter {
       display: flex;
       cursor: pointer;
@@ -63,6 +67,43 @@ export default function render() {
       height: 18px;
     }
 
+    .active-filter {
+      color: var(--color-aggie-blue);
+    }
+
+    #close {
+      width: 50px;
+      height: 50px;
+      display: inline-flex;
+      align-items: center;
+      margin-right: 0.5rem;
+    }
+
+    #close ucdlib-icon {
+      padding: 3px;
+      min-width: 1.2rem;
+      min-height: 1.2rem;
+    }
+
+    .value {
+      display: flex;
+      align-items: center;
+      line-height: normal;
+    }
+
+    .count {
+      color: var(--text-disabled);
+      flex: 1;
+      text-align: right;
+      min-width: 40px;
+      padding: 0 10px;
+      font-weight: 400;
+    }
+
+    .active-filter {
+      flex: 2;
+    }
+
     /* JM - think this is redundant, scroll inforced by app-*-filter element */
     /* #filters {
       overflow-y: auto;
@@ -82,26 +123,8 @@ export default function render() {
     <div class="highlight"></div>
   </div>
 
-  <div id="activeFilters" ?hidden="${this.opened}">
-    <div ?hidden="${!this.selected.length}">
-
-      ${this.selected.map((item, index) => html`
-        <div class="filter" 
-          @click="${this._onFilterClicked}"
-          @keyup="${this._onFilterClicked}" 
-          ?label="${item.label}"
-          tabindex="0" 
-          role="button">
-            <!-- <iron-icon icon="fin-icons:close" clear></iron-icon> -->
-            
-
-          <div>${item.niceLabel}</div>
-        </div>
-      `)}
-
-    </div>
-  </div>
-
-  <div id="filters" ?hidden="${!this.opened}"></div>
+  <div id="filters"></div>
+  <!-- <div id="filters" ?hidden="${!this.opened}"></div> -->
+  
 
 `;}

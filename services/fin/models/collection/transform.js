@@ -1,6 +1,8 @@
+const {config, pg} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 
-const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
+// const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
+const ARCHIVAL_GROUP_REGEX = /^\/collection\/([A-Z]+-\d+|ark:\/[a-z0-9]+\/[a-z0-9]+(\/[A-Z]+-\d+)?)/;
 
 const PDF_IMAGE_PRODUCTS = 'pdf-image-products';
 const STREAMING_VIDEO_WORKFLOW = 'video-to-stream';
@@ -64,8 +66,7 @@ module.exports = async function(path, graph, headers, utils) {
 
   await utils.add({
     attr : 'publisher',
-    value : ['schema', 'publisher'],
-    type : 'id'
+    value : ['schema', 'publisher']
   });
 
   await utils.add({
@@ -162,8 +163,18 @@ module.exports = async function(path, graph, headers, utils) {
   });
 
   await utils.add({
-    attr : 'source',
-    value : ['schema', 'material'],
+    attr : 'material',
+    value : ['schema', 'material']
+  });
+
+  await utils.add({
+    attr : 'location',
+    value : ['schema', 'location']
+  });
+
+  await utils.add({
+    attr : 'language',
+    value : ['schema', 'inLanguage'],
     type : 'id'
   });
 
@@ -182,15 +193,23 @@ module.exports = async function(path, graph, headers, utils) {
   item._ = {};
   utils.stripFinHost(headers);
 
+  // regex match for ark based fin archival group
+  let ag = item['@id'].match(ARCHIVAL_GROUP_REGEX);
+  if( ag ) {
+    item._.graphId = '/collection/'+ag[1];
+  }
+
   if( headers.link ) {
-    if( headers.link['archival-group'] ) {
-      item._['archival-group'] = headers.link['archival-group'].map(item => item.url);
-      item._.graphId = item._['archival-group'][0];
-    } else if( headers.link.type && 
-      headers.link.type.find(item => item.rel === 'type' && item.url === ARCHIVAL_GROUP) ) {
-      item._['archival-group'] = item['@id'];
-      item._.graphId = item['@id'];
-    }
+    // if( headers.link['archival-group'] ) {
+    //   item._['archival-group'] = headers.link['archival-group'].map(item => item.url);
+    //   item._.graphId = item._['archival-group'][0];
+    // } else if( headers.link.type && 
+    //   headers.link.type.find(item => item.rel === 'type' && item.url === ARCHIVAL_GROUP) ) {
+    //   item._['archival-group'] = item['@id'];
+    //   item._.graphId = item['@id'];
+    // }
+
+    item.clientMedia = {};
 
     // check for completed ia reader workflow
     if( headers.link.workflow ) {
@@ -240,6 +259,18 @@ module.exports = async function(path, graph, headers, utils) {
     item._.source.type = 'git';
   }
 
+  // let edits = await pg.query('SELECT * FROM fin_cache.dams_edits WHERE target = $1', ['info:fedora'+item['@id']]);
+  // if( edits.rows.length > 0 ) {
+  //   item.damsEdits = {};
+  //   for( let edit of edits.rows ) {
+  //     item.damsEdits[edit.property.replace('http://digital.ucdavis.edu/schema#', '')] = {
+  //       'value' : edit.value,
+  //       '@id' : edit.edit_id,
+  //     }
+  //   }
+  //   item.damsEdits.exists = true;
+  // }
+
   graph = {
     '@id' : item._.graphId,
     '@graph' : [item],
@@ -252,4 +283,14 @@ module.exports = async function(path, graph, headers, utils) {
   }
 
   return graph;
+}
+
+function getGatewayUrl(url='') {
+  if( url.startsWith('http') ) {
+    url = new URL(url);
+    return config.gateway.host+url.pathname+url.search;
+  } else if( url.startsWith('/fcrepo/rest') ) {
+    return config.gateway.host+url;
+  }
+  return config.gateway.host+'/fcrepo/rest'+url;
 }

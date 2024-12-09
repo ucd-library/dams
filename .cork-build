@@ -1,0 +1,36 @@
+{
+  "registry" : "us-west1-docker.pkg.dev/ucdlib-dams/pub",
+
+  "repositories" : {
+    "fin" : "https://github.com/ucd-library/fin",
+    "ucdlib-media-utils" : "https://github.com/ucd-library/ucdlib-media-utils"
+  },
+
+  "images" : {
+    "dams-base-service" : {
+      "contextPath" : ".",
+      "dockerfile" : "services/fin/Dockerfile",
+      "options" : {
+        "build-arg" : "FIN_SERVER_IMAGE=${fin.fin-base-service}"
+      }
+    },
+    "dams-init" : {
+      "contextPath" : "services/init",
+      "options" : {
+        "build-arg" : "FIN_INIT=${fin.fin-init}"
+      }
+    },
+    "dams-iipimage-server" : {
+      "contextPath" : "services/iipimage"
+    },
+    "dams-image-utils" : {
+      "contextPath" : "services/image-utils",
+      "options" : {
+        "build-arg" : [
+          "FIN_SERVER_IMAGE=${fin.fin-base-service}",
+          "MEDIA_UTILS_IMAGE=${ucdlib-media-utils.media-utils}"
+        ]
+      }
+    }
+  }
+}

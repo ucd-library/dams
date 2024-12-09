@@ -5,12 +5,16 @@ const CollectionService = require('../services/CollectionService');
 const RecordStore = require('../stores/RecordStore');
 const AppStateModel = require('./AppStateModel');
 
+const {getLogger} = require('@ucd-lib/cork-app-utils');
+
 class CollectionModel extends BaseModel {
   
     constructor() {
       super();
       this.store = CollectionStore;
       this.service = CollectionService;
+
+      // this.logger = getLogger('CollectionModel');
 
       // the selected collection functionality is just a shortcut for listening
       // to es filters and seeing if a collection is being filtered on. This is
@@ -96,8 +100,10 @@ class CollectionModel extends BaseModel {
       return this.store.data.selected;
     }
 
-    search(searchDocument) {
-      return this.service.search(searchDocument);
+    async search(searchDocument) {
+      let resp = await this.service.search(searchDocument);
+      if( resp.request ) await resp.request;
+      return this.store.data.search.get(resp.id);
     }
 
     getRecentCollections(limit=3) {
@@ -109,12 +115,12 @@ class CollectionModel extends BaseModel {
         }]
       };
       // searchDocument = {limit: 3};
-      return this.service.search(searchDocument);
+      return this.search(searchDocument);
     }
 
     getHomepageDefaultCollections() {
       let searchDocument = {limit: 3};
-      return this.service.search(searchDocument);
+      return this.search(searchDocument);
     }
 
     /**
@@ -145,6 +151,22 @@ class CollectionModel extends BaseModel {
 
       AppStateModel.setSelectedCollection(selected);
       AppStateModel.set({searchCollection: selected});
+    }
+
+    /**
+     * @method getCollectionEdits
+     * @description get all item edits for a collection
+     * 
+     * @param {String} id collection id
+     */
+    async getCollectionEdits(id) {
+      let state = await this.service.getCollectionEdits(id);
+
+      if( state && state.request ) {
+        await state.request;
+      }
+
+      return this.store.data.edits[id];
     }
 }
 

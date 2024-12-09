@@ -4,6 +4,8 @@ import "./app-filter-panel";
 
 import render from "./app-filters-panel.tpl.js";
 
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 // init facet filters from template
 import config from "../../../../lib/config";
 const facetFilters = [];

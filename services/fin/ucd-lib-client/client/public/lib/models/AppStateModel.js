@@ -1,5 +1,8 @@
 const {AppStateModel} = require('@ucd-lib/cork-app-state');
 const AppStateStore = require('../stores/AppStateStore');
+
+const {getLogger} = require('@ucd-lib/cork-app-utils');
+
 const config = require('../config');
 const clone = require('clone');
 
@@ -8,10 +11,9 @@ class AppStateModelImpl extends AppStateModel {
   constructor() {
     super();
     this.store = AppStateStore;
-
+    // this.logger = getLogger('AppStateModel');
 
     this.init(APP_CONFIG.appRoutes);
-
     this._sendGA();
   }
 
@@ -33,13 +35,12 @@ class AppStateModelImpl extends AppStateModel {
       //     page = 'record';
       //   }
       // }
-      
+
       update.location.page = page;
     }
 
     this._sendGA();
 
-    // console.log('AppStateModel.set()', update);
     return super.set(update);
   }
 
@@ -48,7 +49,7 @@ class AppStateModelImpl extends AppStateModel {
    * @description send a google analytics event if pathname has changed
    */
   _sendGA() {
-    if( !window.gtag ) return console.warn('No global gtag variable set for analytics events');
+    if( !window.gtag ) return this.logger.warn('No global gtag variable set for analytics events');
     if( this.lastGaLocation === window.location.pathname ) return;
     this.lastGaLocation = window.location.pathname;
 

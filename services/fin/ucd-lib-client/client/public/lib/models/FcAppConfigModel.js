@@ -50,6 +50,27 @@ class FcAppConfigModel extends BaseModel {
     this.register('FcAppConfigModel');
   }
 
+  async getDefaultImagesConfig() {
+    let resp = await this.service.getDefaultImagesConfig();
+    if( resp && resp.state === 'loading' ) {
+      await resp.request;
+    }
+    return this.store.data.defaultImages;
+  }
+
+  async getApiAppData() {
+    let resp = await this.service.getApiAppData();
+    if( resp && resp.state === 'loading' ) {
+      await resp.request;
+    }
+
+    return this.store.data.apiApplication;
+  }
+
+  async getAdminData(id) {
+    return await this.service.getAdminData(id);
+  }
+
   /**
    * @method getFeaturedCollections
    * @description return any defined featured collections
@@ -136,8 +157,104 @@ class FcAppConfigModel extends BaseModel {
      * @returns {Promise} resolves to a jsonld graph
      */
   async getCollectionAppData(id) {
-    return await this.service.getCollectionAppData(id);
+    let resp = await this.service.getCollectionAppData(id);
+    if( resp && resp.state === 'loading' ) {
+      await resp.request;
+    }
+    return this.store.data.collectionAppData[id];
   }
+
+  /**
+     * @method getItemAppData
+     * @description load an items application container display data by id
+     * 
+     * @param {String} id item id
+     * 
+     * @returns {Promise} resolves to a jsonld graph
+     */
+  async getItemAppData(id) {
+    let resp = await this.service.getItemAppData(id);
+    if( resp && resp.state === 'loading' ) {
+      await resp.request;
+    }
+    return this.store.data.itemAppData[id];
+  }
+
+  /**
+   * @method getCollectionDisplayData
+   * @description returns a formatted jsonld object for a collection
+   * 
+   * @param {String} id collection id
+   * @param {Object} opts options object with properties to save
+   * 
+   * @returns {Promise} resolves to record
+   */
+  getCollectionDisplayData(id, opts={}) {
+    const {
+      title, 
+      watercolor, 
+      itemCount, 
+      itemDefaultDisplay, 
+      savedItems
+    } = opts;
+    let data = {
+      "@context" : {
+        "@vocab" : "http://schema.org/",
+        "fedora" : "http://fedora.info/definitions/v4/repository#",
+        "ldp" : "www.w3.org/ns/ldp#",
+        "schema" : "http://schema.org/",
+        "ucdlib" : "http://digital.ucdavis.edu/schema#",
+        "xsd" : "http://www.w3.org/2001/XMLSchema#",
+        "collection" : {
+          "@type" : "@id",
+          "@id" : "ucdlib:collection"
+        },
+        "watercolors" : {
+          "@type" : "@id",
+          "@id" : "ucdlib:watercolors"
+        },
+        "foreground" : {
+          "@type" : "xsd:text",
+          "@id" : "ucdlib:foreground"
+        },
+        "background" : {
+          "@type" : "xsd:text",
+          "@id" : "ucdlib:background"
+        },
+        "ldp:membershipResource" : {
+          "@type" : "@id"
+        },
+        "ldp:hasMemberRelation" : {
+          "@type" : "@id"
+        }
+      },
+      "@id" : '',
+      "watercolors" : [
+        {
+          "@id" : `info:fedora/application/ucd-lib-client${id}#watercolor`,
+          "css" : watercolor,
+          "foreground" : "",
+          "background" : ""
+        }
+      ],
+      'schema:isPartOf': {'@id': `info:fedora${id}`},
+      "name" : title,
+      "ucdlib:itemCount" : itemCount,
+      "ucdlib:itemDefaultDisplay" : itemDefaultDisplay,
+      "exampleOfWork" : savedItems,
+      "isPartOf" : {
+        "@id" : `info:fedora${id}`
+      }
+    };
+
+    if( opts.newFileUploadName || opts.thumbnailUrlOverride ) {
+      data['thumbnailUrl'] = {
+        "@id" : `info:fedora/application/ucd-lib-client${id}/featuredImage.jpg`
+      };
+    }
+
+    return data;
+  }  
 
   /**
    * @method saveCollectionDisplayData
@@ -145,12 +262,23 @@ class FcAppConfigModel extends BaseModel {
    * 
    * @param {String} id collection id
    * @param {Array} displayData record id
-   * @param {Object} file featured image file object
    * 
    * @returns {Promise} resolves to record
    */
-  async saveCollectionDisplayData(id, displayData, featuredImage) {
-    return await this.service.saveCollectionDisplayData(id, displayData, featuredImage);
+  async saveCollectionDisplayData(id, displayData) {
+    return await this.service.saveCollectionDisplayData(id, displayData);
+  }
+
+  /**
+   * @method saveCollectionFeaturedImage
+   * @description save collection featured image
+   * 
+   * @param {String} id collection id
+   * @param {Array} featuredImage record id
+   *  
+   */
+  async saveCollectionFeaturedImage(id, featuredImage) {
+    return await this.service.saveCollectionFeaturedImage(id, featuredImage);
   }
 
   /**
@@ -173,6 +301,71 @@ class FcAppConfigModel extends BaseModel {
    */
   async saveFeaturedCollectionAppData(displayData) {
     return await this.service.saveFeaturedCollectionDisplayData(displayData);
+  }
+
+  /**
+     * @method getItemDisplayData
+     * @description returns a formatted jsonld object for an item
+     * 
+     * @param {String} id record id
+     * @param {String} itemDisplay display override
+     * 
+     * @returns {Object} jsonld object
+     */
+  getItemDisplayData(id, itemDisplay) {
+    return {
+      "@context" : {
+        "@vocab" : "http://schema.org/",
+        "fedora" : "http://fedora.info/definitions/v4/repository#",
+        "ldp" : "www.w3.org/ns/ldp#",
+        "schema" : "http://schema.org/",
+        "ucdlib" : "http://digital.ucdavis.edu/schema#",
+        "xsd" : "http://www.w3.org/2001/XMLSchema#",
+        "item" : {
+          "@type" : "@id",
+          "@id" : "ucdlib:item"
+        },
+        "ldp:membershipResource" : {
+          "@type" : "@id"
+        },
+        "ldp:hasMemberRelation" : {
+          "@type" : "@id"
+        }
+      },
+      "@id" : '',
+      "ucdlib:itemDefaultDisplay" : itemDisplay,
+      "isPartOf" : {
+        "@id" : `info:fedora${id}`
+      }
+    }
+  }
+
+  /**
+     * @method getItemDisplayData
+     * @description returns a formatted jsonld object for an item
+     * 
+     * @param {Array} itemExceptions array of record ids
+     * 
+     * @returns {Object} jsonld object
+     */
+  async updateItemDisplayExceptions(itemExceptions) {
+    for( let itemId of itemExceptions ) {
+      let newDisplayData = this.getItemDisplayData(itemId, '');
+      await this.service.saveItemDisplayData(itemId, newDisplayData);
+    }
+  }
+
+  /**
+   * @method saveItemDisplayData
+   * @description save an items display data
+   * 
+   * @param {String} id record id
+   * @param {Array} displayData record id
+   * 
+   * @returns {Promise} resolves to record
+   */
+  async saveItemDisplayData(id, displayData) {
+    return await this.service.saveItemDisplayData(id, displayData);
   }
 
 }

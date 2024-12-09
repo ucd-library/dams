@@ -10,7 +10,7 @@ import headingsCss from "@ucd-lib/theme-sass/2_base_class/_headings.css";
 // import index5Css from "@ucd-lib/theme-sass/5_layout/_index.css";
 // import index6Css from "@ucd-lib/theme-sass/6_utility/_index.css";
 // import faCss from "@fortawesome/fontawesome-free/css/all.css";
-// console.log(faCss);
+// this.logger.info(faCss);
 
 export default function render() { 
 return html`
@@ -31,11 +31,11 @@ return html`
     position: relative;
     padding-top: 75%;
     width: 100%;
-    background-image: url(/images/logos/logo-white-512.png);
+    /* background-image: url(/images/logos/logo-white-512.png);
     background-color: var(--color-black-20);
     background-size: contain;
     background-repeat: no-repeat;
-    background-position: center center;
+    background-position: center center; */
   }
   .img-flex {
     flex-grow: 1;
@@ -50,12 +50,12 @@ return html`
   .text-container {
     flex-grow: 1;
     align-self: flex-start;
-    padding-left: 2rem;
+    padding: 2rem 0;
   }
   .title {
-    color: var(--color-h3);
+    /* color: var(--color-h3);
     font-size: var(--fs-h3);
-    font-weight: var(--fw-h3);
+    font-weight: var(--fw-h3); */
     margin-bottom: 5px;
     margin-top: 40px;
   }
@@ -67,7 +67,7 @@ return html`
   }
   .description {
     color: var(--color-p);
-    font-size: var(--fs-p);
+    /* font-size: var(--fs-p); */
     font-weight: var(--fw-p);
     margin-bottom: 40px;
   }
@@ -92,6 +92,7 @@ return html`
     }
     .text-container {
       align-self: center;
+      padding: 2rem;
     }
   }
 
@@ -111,18 +112,24 @@ return html`
 
   <div class="img-flex">
     <div class="img-container">
-      ${this._imgSrc ? html`
-        <img src="${this._imgSrc}">
+      ${this.imgSrc ? html`
+        <img src="${this.imgSrc}">
       ` : html``}
       <!-- <img src="/images/eastman-demo.jpeg"> -->
     </div>
   </div>
 
   <div class="text-container">
-    <div class="title" role="heading" aria-level="2">${this._collectionTitle}</div>
-    <div class="subtitle">${this._itemCt} item${this._itemCt === 1 ? "" : "s"}</div>
-    <div class="description">${this._collectionDesc}</div>
-    <a href="${this._href}" class="btn--alt btn--round">Explore this collection</a>
+    <h3 class="title heading--primary" role="heading" aria-level="2">${this.collectionTitle}</h3>
+    <div class="subtitle">${this.itemCt} item${this.itemCt === 1 ? "" : "s"}</div>
+    <div class="description">
+    <ucdlib-md id="md">
+        <ucdlib-md-content>
+          ${this.collectionDesc}
+        </ucdlib-md-content>
+      </ucdlib-md>  
+    </div>
+    <a href="${this.href}" class="btn--alt btn--round">Explore this collection</a>
   </div>
 
   <!-- <div class="text-container">

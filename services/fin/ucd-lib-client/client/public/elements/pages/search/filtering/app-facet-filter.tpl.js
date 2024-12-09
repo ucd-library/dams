@@ -1,6 +1,8 @@
 import { html } from 'lit';
 import { sharedStyles } from '../../../styles/shared-styles';
 
+import utils from '../../../../lib/utils';
+
 export default function render() { 
   return html`
 
@@ -8,13 +10,12 @@ export default function render() {
   ${sharedStyles}
   :host {
     display: block;
-    padding-right: 0.8rem;
   }
 
   [hidden] { display: none !important; }
 
   .filter {
-    padding: 4px 5px;
+    padding: 4px 0;
     display: flex;
     align-items: center;
   }
@@ -34,17 +35,20 @@ export default function render() {
   }
 
   .typehead-panel {
-    margin: 0 28px 10px 5px;
+    margin-right: 12px;
+    margin-bottom: 1rem;
+    position: relative;
   }
   #typeahead {
     width: 100%;
     box-sizing: border-box;
     padding: 0 5px;
-    background: var( --super-light-background-color);
+    background: var(--color-aggie-blue-30);
     border: none;
-    height: 61px;
+    height: 55px;
     padding-left: 1rem;
     outline: none;
+    font-size: 1rem;
   }
 
   .active-filter {
@@ -68,13 +72,20 @@ export default function render() {
     color: var(--text-disabled);
     flex: 1;
     text-align: right;
-    min-width : 40px;
-    padding: 0 10px;
+    min-width : 1.5rem;
+    padding: 0 0 0 10px;
+    box-sizing: border-box;
+    min-width: fit-content;
+  }
+  .count.has-count {
+    color: black;
   }
 
   .overflow {
-    overflow: auto;
-    max-height: 215px;
+    overflow-y: auto;
+    overflow-x: hidden;    
+    max-height: 200px;
+    padding-right: 12px;
   }
 
   iron-list {
@@ -113,6 +124,9 @@ export default function render() {
     background: transparent;
     border: none;
   }
+  .overflow[no-overflow] {
+    scrollbar-color: transparent transparent;
+  }
   .overflow::-webkit-scrollbar-thumb {
     border-radius: 6px;
     background: var(--color-aggie-blue-80);
@@ -121,9 +135,25 @@ export default function render() {
   /* basic support for FF. Chrome/Safari should support -webkit styles above */
   @supports(scrollbar-color: red blue) {
     * {
-      scrollbar-color: var(--color-aggie-blue-80) var(--color-aggie-blue-50);
+      scrollbar-color: var(--color-aggie-blue-80) var(--color-aggie-blue-40);
       scrollbar-width: thin;
     }
+  }
+
+  ucdlib-icon.typeahead-search-icon {
+    position: absolute;
+    right: 1rem;
+    top: 17px;
+    fill: var(--color-aggie-blue-50);
+    width: 22px;
+    height: 22px;
+    max-width: 22px;
+    max-height: 22px;
+    min-width: 22px;
+  }
+
+  #typeahead::placeholder {
+    color: var(--color-aggie-blue-80);
   }
 </style>
 
@@ -133,28 +163,9 @@ export default function render() {
     type="text" 
     placeholder="Search ${this.label}s" 
     @keyup="${this._onTypeaheadKeyup}" />
+    <ucdlib-icon class="typeahead-search-icon" icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
 </div>
 
-<!-- used for large lists -->
-<div id="list">
-  ${this.bucketsIronList.map((item, index) => html`
-    <div class="filter">
-      <app-normal-checkbox
-        type="${item.label}"
-        index="${index}"
-        value="${item.key}"
-        .label-map="${item.valueMap}"
-        ?checked="${item.active}" 
-        @change="${this._toggleFilter}"
-        ?disabled="${item.disabled}">
-      </app-normal-checkbox>
-
-      <div class="count">${item.doc_count}</div>
-    </div>
-  `)}
-</div>
-
-<!-- used for small lists -->
 <div class="overflow" ?no-overflow="${this.noOverflow}">
   <div>  
     ${this.buckets.map((item, index) => html`
@@ -170,7 +181,7 @@ export default function render() {
         ?disabled="${item.disabled}">
       </app-normal-checkbox>
 
-      <div class="count">${item.doc_count}</div>
+      <div class="count ${item.doc_count > 0 ? 'has-count' : ''}">${utils.formatNumberWithCommas(item.doc_count)}</div>
     </div>
     `)}
   </div>

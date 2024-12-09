@@ -1,6 +1,9 @@
 import { LitElement } from "lit";
+
 // import AppSearchResult from "./app-search-result"
 import render from "./app-search-grid-result.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 /**
  * @class AppSearchGridResult
@@ -22,6 +25,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
       thumbnailUrl: { type: String },
       title: { type: String },
       bounds: { type: Array },
+      size: { type: Object },
       imageHeight: { type: Number },
       mediaType: { type: String }
     };
@@ -38,6 +42,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.itemUrl = "";
     this.thumbnailUrl = "";
     this.bounds = [];
+    this.size = {};
     this.imageHeight = 0;
     this.mediaType = '';
 
@@ -54,6 +59,8 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
       this.title = this.data.title;
       this.itemUrl = this.data.id;
       this.thumbnailUrl = this.data.thumbnailUrl;
+      this.size = this.data.size;
+
       if (this.thumbnailUrl) this._renderImage();
       if (this.data.mediaType === "Image") {
         this.mediaType = "image";
@@ -63,7 +70,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
         this.mediaType = "audio";
       } else {
         this.mediaType = "imageList";
-        let imageCount = this.data.format[0].split(' ')[0];
+        let imageCount = this.data.format?.[0]?.split(' ')[0];
         if( imageCount && parseInt(imageCount) < 2 ) {
           this.mediaType = 'image';
         }
@@ -119,16 +126,39 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
   }
 
   async _renderImage() {
-    await this._loadImage(this.thumbnailUrl);
+    if( !this.size.width || !this.size.height ) {
+      await this._loadImage(this.thumbnailUrl);
+    }
 
+    this._calcImageHeight();
+    this.dispatchEvent(new CustomEvent("rendered", { detail: this }));
+
+    requestAnimationFrame(() => {
+      let img = this.shadowRoot.querySelector("#img");
+      if (img.complete) {
+        img.style.display = "block";
+      } else {
+        img.onload = () => {
+          img.style.display = "block";
+        };
+      }
+    });
+  }
+
+  _calcImageHeight() {
     let img = this.shadowRoot.querySelector("#img");
-    let width = img.width || 1;
-    let imageHeight = this.bounds[1][0];
-    let imageWidth = this.bounds[1][1];
+    let width = 100;
+    if( img ) {
+      img.style.display = "block";
+      width = img.width;
+      img.style.display = "none";  
+    }
+
+    let imageHeight = this.size.height || this.bounds?.[1]?.[0] || 100;
+    let imageWidth = this.size.width || this.bounds?.[1]?.[1] || 100;
     let ratio = imageHeight / imageWidth;
     let height = width * ratio;
     this.imageHeight = height;
-    this.dispatchEvent(new CustomEvent("rendered", { detail: this }));
   }
 }
 

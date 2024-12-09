@@ -41,11 +41,16 @@ export default function render() {
         position: absolute;
         left: 0;
         right: 0;
+        z-index: -1;
       }
 
       .main-content {
         flex: 1;
         width: 100%;
+      }
+
+      app-search-header {
+        position: relative;
       }
 
       .loading-dots {
@@ -60,8 +65,7 @@ export default function render() {
         margin-right: 0.2em;
         position: relative;
         font-size: 3.5em;
-        opacity: 0;
-        animation: showHideDot 2.5s ease-in-out infinite;
+        opacity: 1;
       }
 
       .dot.one {
@@ -88,6 +92,11 @@ export default function render() {
           opacity: 0;
         }
       }
+      @media (max-width: 768px) {
+        .footer.site-frame {
+          padding: 0.5rem;
+        }
+      }
     </style>
 
     <app-search-header
@@ -95,7 +104,7 @@ export default function render() {
       @expand-search-filters=${this._expandSearchFilters}
     ></app-search-header>
 
-      <div class="main-content">
+      <div class="main-content" style="min-height: 100vh">
         <ucdlib-pages
           selected="${this.page}"
           selectedAttribute="visible"
@@ -110,85 +119,87 @@ export default function render() {
         </div>
         <app-home id="home"></app-home>
         <app-search id="search"></app-search>
-        <app-record id="item"></app-record>
+        <app-record id="item" @show-404="${(e) => this.page = '404'}"></app-record>
         <app-browse id="browse"></app-browse>
         <app-about id="about"></app-about>
-        <app-collection id="collection"></app-collection>
+        <app-collection id="collection" @show-404="${(e) => this.page = '404'}"></app-collection>        
       </ucdlib-pages>
-      <div class="footer site-frame">
-        <ucdlib-site-footer>
-          <ucdlib-site-footer-column header="Digital Collections">
-            <ul>
-              <li><a href="/browse/collections">Collections</a></li>
-              <li><a href="/search">Items</a></li>
-              <li><a href="/about">About Digital Collections</a></li>
-              <!-- <li><a href="">FAQ</a></li> -->
-            </ul>
-          </ucdlib-site-footer-column>
-          <ucdlib-site-footer-column header="Library Info">
-            <ul>
-              <li>
-                <a
-                  href="https://library.ucdavis.edu/special-collections/"
-                  target="_blank"
-                  rel="noopener"
-                  >Archives and Special Collections</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://library.ucdavis.edu/library/"
-                  target="_blank"
-                  rel="noopener"
-                  >Visit the Library</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://library.ucdavis.edu/news/"
-                  target="_blank"
-                  rel="noopener"
-                  >Library News</a
-                >
-              </li>
-              <li>
-                <a
-                  href="http://give.ucdavis.edu/ULIB"
-                  target="_blank"
-                  rel="noopener"
-                  >Give to the Library</a
-                >
-              </li>
-            </ul>
-          </ucdlib-site-footer-column>
-          <ucdlib-site-footer-column header="Account">
-            <ul>
-              <li><app-auth-footer></app-auth-footer></li>
-              <li class="fin-admin" ?hidden="${!this.isAdmin}">
-                <a href="/fin/admin/${this.pathInfo.length > 1 ? '#path-info' + this.pathInfo : ''}">Fin Admin</a>
-              </li>
-            </ul>
-          </ucdlib-site-footer-column>
-          <div insert-into="below-address" ?hidden="${this.showVersion}">
-            <div><b>Build Information</b></div>
-            <div>App Version: ${this.appVersion}</div>
-            <div>Build Time: ${this.localBuildTime}</div>
-            <div>Build Number: ${this.buildNum}</div>
-            <div>Client Env: ${this.clientEnv}</div>
-            <div>Fin App Version: ${this.finAppVersion}</div>
-            <div>Fin Branch Name: ${this.finBranchName}</div>
-            <div>Fin Repo Tag: ${this.finRepoTag}</div>
-            <div>Fin Server Image: ${this.finServerImage}</div>
-            <div>Fin Server Repo Hash: ${this.finServerRepoHash}</div>
-            <div>DAMS Deployment Branch: ${this.damsDeployBranch}</div>
-            <div>DAMS Deployment SHA: ${this.damsDeploySha}</div>
-            <div>DAMS Deployment Tag: ${this.damsDeployTag}</div>
-            <div>DAMS Repo Branch: ${this.damsRepoBranch}</div>
-            <div>DAMS Repo SHA: ${this.damsRepoSha}</div>
-            <div>DAMS Repo Tag: ${this.damsRepoTag}</div>
+
+      <app-404 id="404" ?hidden="${this.page !== '404'}"></app-404>
+    </div>
+
+    <div class="footer site-frame">
+      <ucdlib-site-footer>
+        <ucdlib-site-footer-column header="Digital Collections">
+          <ul>
+            <li><a href="/browse/collections">Collections</a></li>
+            <li><a href="/search">Items</a></li>
+            <li><a href="/about">About Digital Collections</a></li>
+            <!-- <li><a href="">FAQ</a></li> -->
+          </ul>
+        </ucdlib-site-footer-column>
+        <ucdlib-site-footer-column header="Library Info">
+          <ul>
+            <li>
+              <a
+                href="https://library.ucdavis.edu/special-collections/"
+                target="_blank"
+                rel="noopener"
+                >Archives and Special Collections</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://library.ucdavis.edu/library/"
+                target="_blank"
+                rel="noopener"
+                >Visit the Library</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://library.ucdavis.edu/news/"
+                target="_blank"
+                rel="noopener"
+                >Library News</a
+              >
+            </li>
+            <li>
+              <a
+                href="http://give.ucdavis.edu/ULIB"
+                target="_blank"
+                rel="noopener"
+                >Give to the Library</a
+              >
+            </li>
+          </ul>
+        </ucdlib-site-footer-column>
+        <ucdlib-site-footer-column header="Account">
+          <ul>
+            <li><app-auth-footer></app-auth-footer></li>
+            <li class="fin-admin" ?hidden="${!this.isAdmin}">
+              <a href="/fin/admin/${this.pathInfo.length > 1 ? '#path-info' + this.pathInfo : ''}">Fin Admin</a>
+            </li>
+          </ul>
+        </ucdlib-site-footer-column>
+        <div insert-into="build-info" >
+          <div class="build-info">
+            ${this.buildInfo.map(
+              info => html`
+                <div>
+                  ${info.map(
+                    item => html`
+                      <div>
+                        <b>${item.label}</b>: ${item.value}
+                      </div>
+                    `
+                  )}
+                </div>
+              `
+            )}
           </div>
-        </ucdlib-site-footer>
-      </div>
+        </div>
+      </ucdlib-site-footer>
     </div>
   `;
 }

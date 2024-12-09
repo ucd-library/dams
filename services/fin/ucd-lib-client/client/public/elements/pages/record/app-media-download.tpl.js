@@ -108,19 +108,16 @@ export default function render() {
         align-items: center;
       }
 
-      .layout.btns > * {
-        max-width: 30%;
-      }
-
       .radio {
         margin-bottom: 10px;
       }
 
       .downloadBtn {
-        padding: 0.75rem 0;
+        padding: 13px 0;
         font-size: 0.9rem;
-        min-width: 6rem;
+        width: 6rem;
         text-transform: none;
+        height: 1.5rem;
       }
 
       .downloadBtn:hover {
@@ -128,40 +125,29 @@ export default function render() {
         color: var(--color-aggie-gold);
       }
 
-      .downloadBtn.archive {
-        width: 115px;
-      }
-
-      #downloadOptions,
       #format {
-        min-height: 2.7rem;
+        height: 50px;
         background-color: var(--color-aggie-blue-50);
         font-size: 0.9rem;
         font-weight: bold;
         padding: 0 1.5rem 0 1rem;
+        min-width: 35%;
+        max-width: 6rem;
       }
 
-      #downloadOptions {
-        max-width: 10rem;
-      }
-
-      #format {
-        max-width: 5rem;
-      }
-
+      #media-format-label,
+      #media-all-format-label,
       #multimedia-format-label {
         font-size: 0.9rem;
         margin-right: 0.75rem;
         font-weight: bold;
-        padding: 0.55rem 1rem;
+        padding: 11px 1rem;
         border: solid 2px var(--color-aggie-blue-50);
+        height: 1.5rem;
+        white-space: nowrap;
       }
 
       @media (max-width: 600px) {
-        .layout.btns > * {
-          width: 33%;
-          max-width: 33%;
-        }
         .downloadBtn {
           min-width: auto;
           text-overflow: clip;
@@ -177,7 +163,7 @@ export default function render() {
     </style>
 
     <div id="wrapper">
-      <div class="layout" ?hidden="${!this.hasMultipleDownloadMedia}">
+      <div class="layout" ?hidden="${!this.hasMultipleDownloadMedia || this.downloadAllMedia}">
         <div class="radio" style="margin-right: 1rem">
           <input
             id="single"
@@ -195,7 +181,7 @@ export default function render() {
             name="set-size"
             @click="${this._toggleMultipleDownload}"
           />
-          <label for="fullset">All Pages (${this.fullSetCount})</label>
+          <label for="fullset">All Files (${this.fullSetCount})</label>
         </div>
       </div>
     </div>
@@ -204,19 +190,14 @@ export default function render() {
       <div class="layout btns"
         style="margin-bottom: 5px;"
         ?hidden="${!this.selectedMediaHasSources}">
-        <select ?hidden="${this.isMultimedia}"
-          id="downloadOptions"
-          @change="${this._onChangeDownloadOptions}">
-        </select>
         <span id="multimedia-format-label"
           ?hidden="${!this.isMultimedia}">
         </span>
-        <select id="format"
-          @change="${this._onFormatSelected}"
-          ?hidden="${!this.showImageFormats}">
-        </select>
+        <span id="media-format-label"
+          ?hidden="${!this.showDownloadLabel || this.isMultimedia}">
+        </span>
         <a class="downloadBtn"
-          ?hidden="${this.isTwoPageView}"
+          ?hidden="${(this.isTwoPageView || this.downloadAllMedia) && this.sources.length > 1}"
           href="${this.href}"
           @click="${this._onDownloadClicked}"
           download
@@ -226,7 +207,7 @@ export default function render() {
           <span> Download </span>
         </a>
         <a class="downloadBtn archive"
-          ?hidden="${!this.isTwoPageView}"
+          ?hidden="${(!this.isTwoPageView && !this.downloadAllMedia) || this.sources.length === 1}"
           href="${this.archiveHref}"
           @click="${this._onDownloadFullSetClicked}"
           target="_blank"
@@ -238,22 +219,33 @@ export default function render() {
       </div>
     </div>
 
-    <div ?hidden="${this.fullSetSelected || this.isTwoPageView}">
+    <div ?hidden="${(this.fullSetSelected || this.isTwoPageView) && this.selectedMediaHasSources}">
       <div ?hidden="${this.selectedMediaHasSources}">
         <em>No downloadable items available</em>
       </div>
     </div>
 
-    <a class="downloadBtn archive"
-      ?hidden="${!this.fullSetSelected}"
-      href="${this.archiveHref}"
-      @click="${this._onDownloadFullSetClicked}"
-      target="_blank"
-      rel="noopener"
-      download
-      style="white-space: nowrap; text-align: center;">
-      <span> Download </span>
-    </a>
+    <div style="display: flex;">
+      <span id="media-all-format-label"
+        style="display: inline-block;"  
+        ?hidden="${!this.fullSetSelected || !this.showDownloadLabel}">
+        </span>
+      <select id="format"
+        style="display: inline-block"
+        @change="${this._onFormatSelected}"
+        ?hidden="${!this.fullSetSelected || !this.showImageFormats || this.sources.length < 2}">
+      </select>
+      <a class="downloadBtn archive"
+        ?hidden="${!this.fullSetSelected}"
+        href="${this.archiveHref}"
+        @click="${this._onDownloadFullSetClicked}"
+        target="_blank"
+        rel="noopener"
+        download
+        style="white-space: nowrap; text-align: center; display: inline-block;">
+        <span> Download </span>
+      </a>
+    </div>
 
     <!-- <form id="downloadZip" 
       action="/fin/archive" 

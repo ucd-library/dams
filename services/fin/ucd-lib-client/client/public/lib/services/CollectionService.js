@@ -1,20 +1,21 @@
-const {BaseService} = require('@ucd-lib/cork-app-utils');
+const {BaseService, digest} = require('@ucd-lib/cork-app-utils');
 const CollectionStore = require('../stores/CollectionStore');
 const config = require('../config');
 const RecordGraph = require('../utils/RecordGraph.js');
+const vcModel = require('../models/CollectionVcModel');
+
 
 class CollectionService extends BaseService {
 
   constructor() {
     super();
     this.store = CollectionStore;
-
     this.baseUrl = '/api/collection';
   }
 
   get(id) {
     return this.request({
-      url : `${this.baseUrl}${id.replace('/collection', '')}`, // TODO add back? but we need image for collection cards ?compact=true`,
+      url : `${this.baseUrl}${id.replace('/collection', '')}`,
       checkCached : () => this.store.getCollection(id),
       onLoading : request => this.store.setCollectionLoading(id, request),
       onLoad : result => this.store.setCollectionLoaded(id, new RecordGraph(result.body)),
@@ -79,23 +80,49 @@ class CollectionService extends BaseService {
     if( !opts.compact ) opts.compact = true;
 
     searchDocument.textFields = config.elasticSearch.textFields.collection;
-    return this.request({
+    searchDocument.limit = 1000;
+    
+    let id = await digest(searchDocument);
+
+    let request = this.request({
       url : this.baseUrl,
       qs : opts,
       json : true,
       fetchOptions : {
         method : 'POST',
-        body : JSON.searchDocument
+        body : searchDocument
       },
-      onLoading : promise => this.store.setSearchLoading(searchDocument, promise),
+      checkCached : () => this.store.data.search.get(id),
+      onLoading : request => this.store.set({searchDocument, request, id}, this.store.data.search),
       onLoad : result => {
         if( result.body.results ) {
           result.body.results = result.body.results.map(record => new RecordGraph(record));
         }
-        this.store.setSearchLoaded(searchDocument, result.body)
+        let payload = {searchDocument, payload: result.body, id};
+        vcModel.renderCollections(payload);
+        this.store.set(payload, this.store.data.search)
       },
-      onError : e => this.store.setSearchError(searchDocument, e)
+      onError : error => this.store.setSearchError({searchDocument, error, id}, this.store.data.search)
     });
+
+    return {id, request}
+  }
+
+  /**
+   * @method getCollectionEdits
+   * @description get all item edits for a collection
+   * 
+   * @param {String} id collection id
+   */
+  async getCollectionEdits(id) {
+    return this.request({
+      url : `/api/client-edits${id}`,
+      checkCached : () => this.store.data.edits[id],
+      onLoading : request => this.store.setCollectionEditLoading(id, request),
+      onLoad : result => this.store.setCollectionEditLoaded(id, result.body),
+      onError : e => this.store.setCollectionEditError(id, e)
+    });
+
   }
 
 }

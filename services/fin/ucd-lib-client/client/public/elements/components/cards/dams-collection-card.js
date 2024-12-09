@@ -1,5 +1,10 @@
 import { LitElement } from "lit";
+
 import render from "./dams-collection-card.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
+import utils from "../../../lib/utils/index.js";
 
 /**
  * @class DamsCollectionCard
@@ -24,6 +29,7 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
       itemCt: { type: Number, attribute: "item-ct" },
       href: { type: String },
       darkBg: { type: Boolean, attribute: "data-dark-bg" },
+      loading: { type: Boolean }
     };
   }
 
@@ -33,35 +39,48 @@ export default class DamsCollectionCard extends Mixin(LitElement).with(
 
     this.collection = {};
     this.id = "";
+    this.renderedId = "";
     this.imgSrc = "";
     this.cardTitle = "";
     this.itemCt = 0;
     this.href = "";
     this.darkBg = false;
+    this.loading = true;
 
-    this._injectModel("CollectionModel");
+    this._injectModel("CollectionModel", "FcAppConfigModel");
   }
 
-  async updated(props) {
-    if (props.has("id") && this.id ) {
-      this._onCollectionUpdate(
-        await this.CollectionModel.get(this.id)
-      );
+  async updated(props) {    
+    if (props.has("id") && this.id && this.id !== this.renderedId ) {
+      try {
+        this._onCollectionUpdate(await this.CollectionModel.get(this.id));
+      } catch(e) {
+        this.logger.warn('Collection not found', e);
+        this.loading = false;
+      }
+    } else if( props.has("href") && !this.id ) {
+      this.id = this.href;
     }
   }
 
-  _onCollectionUpdate(e) {
-    if (e.state !== "loaded" || e.id !== this.id) return;
+  async _onCollectionUpdate(e) {
+    if( e.state !== "loaded" || e.id !== this.id || this.renderedId === this.id ) return;
+    this.loading = false;
+    this.renderedId = this.id;
 
     this.collection = e.vcData;
-    if( this.collection.images ) {
+
+    let overriddenFeatureImage = this.collection.clientEdits?.['@id'] || '';
+    if (overriddenFeatureImage) {
+      this.imgSrc = '/fcrepo/rest' + overriddenFeatureImage + '/featuredImage.jpg';
+    } else if( this.collection.images ) {
       let images = this.collection.images;
       this.imgSrc = images.medium ? images.medium.url : images.original.url;
     } else {
       this.imgSrc = "/images/tree-bike-illustration.png";
     }
     this.cardTitle = this.collection.title;
-    this.itemCt = this.collection.count;
+    this.itemCt = utils.formatNumberWithCommas(this.collection.count);
     this.href = this.collection.id;
     this.darkBg = this.attributes["data-dark-bg"] ? true : false;
   }

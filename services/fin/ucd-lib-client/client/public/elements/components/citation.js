@@ -3,6 +3,8 @@ import render from './citation.tpl.js';
 
 import citations from '../../lib/models/CitationsModel';
 
+import '../utils/app-toast-popup.js';
+
 /**
  * @class Citation
  * @description Styleized UI component for Citations
@@ -61,8 +63,10 @@ export class Citation extends LitElement {
   async _copyCiteText(e) {
     try {
       await navigator.clipboard.writeText(this.shadowRoot.querySelector('.csl-entry').innerHTML);
+      let toastPopup = this.shadowRoot.querySelector('app-toast-popup');
+      if( toastPopup ) toastPopup.showPopup();
     } catch (err) {
-      console.error('Failed to copy citation: ', err);
+      this.logger.error('Failed to copy citation: ', err);
     }
   }
 

@@ -1,7 +1,7 @@
 import { LitElement, html } from "lit";
 import render from "./app-search.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement } from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "./results/app-search-results-panel";
 import "./filtering/app-filters-panel";
@@ -45,6 +45,8 @@ export class AppSearch extends Mixin(LitElement)
   }
 
   async firstUpdated() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
+
     this._onAppStateUpdate(await this.AppStateModel.get());
 
     if( this.appState.location.path[0] === 'search' ) {
@@ -53,7 +55,6 @@ export class AppSearch extends Mixin(LitElement)
     }
     window.addEventListener('collapse-filters', this._onCollapseFilters.bind(this));
     window.addEventListener("page-change", this._onPaginationChange.bind(this));
-    window.addEventListener("page-size-change", this._onPageSizeChange.bind(this));
   }
 
   /**
@@ -61,6 +62,8 @@ export class AppSearch extends Mixin(LitElement)
    * @param {*} e
    */
   _onAppStateUpdate(e) {
+    if( e.location.page !== 'search' ) return;
+
     this.drawerOpen = e.filtersDrawerOpen ? true : false;
     this.appState = e;
   }
@@ -89,18 +92,6 @@ export class AppSearch extends Mixin(LitElement)
   }
 
   /**
-   * @method _onPageSizeChange
-   * @description fired when then user selects a new page size
-   *
-   * @param {Object} e
-   */
-  _onPageSizeChange(e) {
-    let searchDoc = this.RecordModel.getCurrentSearchDocument();
-    this.RecordModel.setPaging(searchDoc, searchDoc.offset, e.detail.itemsPerPage || searchDoc.limit);
-    this.RecordModel.setSearchLocation(searchDoc);
-  }
-
-  /**
    * @method _onPaginationChange
    * @description fired when pagination button is clicked
    *
@@ -108,7 +99,7 @@ export class AppSearch extends Mixin(LitElement)
    */
   _onPaginationChange(e) {
     let searchDoc = this.RecordModel.getCurrentSearchDocument();
-    this.RecordModel.setPaging(searchDoc, e.detail.startIndex);
+    this.RecordModel.setPaging(searchDoc, e.detail.startIndex, e.detail.itemsPerPage || searchDoc.limit);
     this.RecordModel.setSearchLocation(searchDoc);
   }
 

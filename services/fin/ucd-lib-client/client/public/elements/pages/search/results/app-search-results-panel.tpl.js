@@ -1,13 +1,13 @@
 import { html } from "lit";
 
 import "@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.js";
+import utils from "../../../../lib/utils";
 
 export default function render() {
   return html`
     <style include="shared-styles">
       :host {
         display: block;
-        /* max-width: 1150px; */
         position: relative;
         margin: 0 5px;
       }
@@ -68,29 +68,15 @@ export default function render() {
       .grid {
         margin: 10px;
         position: relative;
-        display: flex;
+        display: grid;
         flex-direction: row;
         flex-wrap: wrap;
-        width: 100%;
+        width: 95%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .grid dams-item-card {
-        flex: 30%;
-        padding: .5rem;
-        max-width: 30%;
-      }
-
-      @media (max-width: 1260px) {
-        .grid dams-item-card {
-          flex: 38%;
-        }
-
-        /* .masonry .item {
-          width: 38% !important;
-          position: initial !important;
-          margin: auto;
-          padding-bottom: 3rem;
-        } */
+        padding: 1.5rem;
       }
 
       .masonry {
@@ -99,7 +85,7 @@ export default function render() {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        width: 100%;
+        width: 95%;
       }
 
       .list {
@@ -194,8 +180,8 @@ export default function render() {
         cursor: pointer;
         z-index: 0;
         line-height: 1;
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         -webkit-tap-highlight-color: transparent;
         box-sizing: border-box !important;
@@ -211,7 +197,8 @@ export default function render() {
       .masonry .item {
         display: block;
         position: absolute;
-        width: 30%;
+        width: 27%;
+        padding: 1.5rem;
         /* visibility: hidden; */
         top: 25px;
         left: 25px;
@@ -231,6 +218,10 @@ export default function render() {
         cursor: pointer;
       }
 
+      .header .photo-stack {
+        display: inline-block;
+      }
+
       .header .photo-stack ucdlib-icon {
         fill: var(--color-aggie-blue-60);
       }
@@ -242,17 +233,17 @@ export default function render() {
       @media (max-width: 545px) {
         .grid dams-item-card {
           flex: 100%;
-          padding: 1rem;
+          padding: 1.5rem;
           max-width: 85vw;
+        }
+        .header {
+          padding-left: 0.5rem;
         }
       }
 
-      @media (max-width: 1260px) {
+      @media (max-width: 1023px) {
         .masonry .item {
           width: 38% !important;
-          position: initial !important;
-          margin: auto;
-          padding-bottom: 3rem;
         }
       }
 
@@ -260,12 +251,9 @@ export default function render() {
         .truncated-text-mobile {
           display: none;
         }
-        .grid dams-item-card {
-          flex: 100%;
-          max-width: 100%;
-        }
+        
         .masonry .item {
-          width: 100% !important;
+          width: 85vw !important;
           position: initial;
           margin: auto;
           padding-bottom: 3rem;
@@ -279,6 +267,18 @@ export default function render() {
         /* .mobile-header {
           display: none;
         } */
+      }
+
+      @media (max-width: 1023px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 767px) {
+       .grid {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
       }
 
       @media (max-width: 1182px) {
@@ -305,27 +305,99 @@ export default function render() {
           flex: 3;
         }
       }
+
+      .teaser {
+        padding: 1.5rem; 
+      }
+      .teaser__image {
+        background-color: #dcdcdc;
+        width: 100%;
+        padding-top: 75%;
+      }
+      .teaser__title {
+        background-color: #dcdcdc;
+        height: 1.5rem;
+        width: 80%;
+        margin: .8rem auto 0;
+      }
+
+      .masonry {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .masonry .col-1,
+      .masonry .col-2,
+      .masonry .col-3 {
+        flex: 1 1 calc(33.333% - 16px);
+        box-sizing: border-box;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 16px;
+      }
+
+      .masonry .teaser .teaser__image {
+        width: 100%;
+        height: auto;
+        background-color: #dcdcdc;
+        padding-top: 0;
+      }
+
+      .masonry .teaser .teaser__title {
+        padding: 8px;
+        font-size: 1rem;
+        text-align: center;
+        background-color: #dcdcdc;
+      }
+
+      .list .teaser {
+        display: flex;
+      }
+      .list .teaser__image {
+        height: 250px;
+        width: 33%;
+        padding-top: 0;
+      }
+      .list .teaser__content {
+        width: 75%;
+        margin-left: 3rem;
+      }
+      .list .teaser__title {
+        margin: .8rem auto 0 0;
+      }
+      .list .teaser__content .teaser__details {
+        padding-top: 1rem;
+        width: 80%;
+        margin: .8rem auto 0 0;
+      }
+      .list .teaser__content .teaser__details > * {
+        margin: 0.5rem 0;
+        height: 1rem;
+        background-color: #dcdcdc; 
+      }
     </style>
 
     <div class="header">
       <div class="header-results" style="flex: 2.25; display: flex;">
-        <div style="flex: .25" class="photo-stack">
-          <ucdlib-icon
-            style="cursor: auto;"
-            class="vertical-link__image"
-            icon="ucdlib-dams:photo-stack"
-          ></ucdlib-icon>
-        </div>
-        <div style="flex: 2; margin: auto;">
-          <span style="font-weight: bold">${this.total} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.results.length === 0}">
+        <div style="flex: 2.25; margin: auto; min-height: 2.1rem;" ?hidden="${!this.total || this.total === '0'}">
+          <div class="photo-stack">
+            <ucdlib-icon
+              style="cursor: auto;"
+              class="vertical-link__image"
+              icon="ucdlib-dams:photo-stack"
+            ></ucdlib-icon>
+          </div>
+          
+          <span style="font-weight: bold">${utils.formatNumberWithCommas(this.total)}${this.total === 10000 ? '+' : ''} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.totalCollections === 0}">
             from
-            <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collections</a></span>
+            <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collection${this.totalCollections > 1 ? 's' : ''}</a></span>
         </div>
       </div>
 
       <div class="header-pagination"
         style="flex: 3; display: flex; justify-content: end">
-        <span style="text-align: right; margin: auto 0; padding-right: .5rem">Display:</span>
+        <span style="text-align: right; margin: auto 0; padding-right: .5rem; padding-left: 5px;">Display:</span>
         <div>
           <ucdlib-icon
             icon="ucdlib-dams:result-display-grid"
@@ -358,14 +430,25 @@ export default function render() {
           <option value="20" selected>20</option>
           <option value="10">10</option>
         </select>
-        <div style="margin: 0 10px; font-size: .875rem; margin: auto 0 auto 1rem">
+        <div style="margin: 0 10px; font-size: .875rem; margin: auto 0 auto 0.5rem">
           <span class="truncated-text-mobile">items</span> per page
         </div>
       </div>
     </div>
 
-    <div ?hidden="${this.showError}">
+    <div ?hidden="${this.showError}" style="min-height: 100vh">
       <div ?hidden="${this.showLoading}">
+        <div class="grid" ?hidden="${!this.loading || !this.isGridLayout}">
+          ${[1,2,3,4,5,6,7,8.9,10].map(
+            () => html`
+              <div class="teaser">
+                <div class="teaser__image"></div>
+                <div class="teaser__title"></div>
+              </div>  
+            `
+          )}
+        </div>
+
         <div class="grid" id="gridLayout" ?hidden="${!this.isGridLayout}">
           ${this.results.map(
             (res) => html`
@@ -378,6 +461,51 @@ export default function render() {
           )}
         </div>
 
+        <div class="masonry" ?hidden="${!this.loading || !this.isMosaicLayout}">
+          <div class="col-1">
+            <div class="teaser">
+              <div class="teaser__image" style="height: 350px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 150px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 300px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+          </div>
+          <div class="col-2">
+            <div class="teaser">
+              <div class="teaser__image" style="height: 200px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 275px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 200px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+          </div>
+          <div class="col-3">
+            <div class="teaser">
+              <div class="teaser__image" style="height: 250px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 150px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+            <div class="teaser">
+              <div class="teaser__image" style="height: 250px;"></div>
+              <div class="teaser__title"></div>
+            </div>  
+          </div>
+        </div>
+        
         <div class="masonry" id="layout" ?hidden="${!this.isMosaicLayout}">
           ${this.results.map(
             (res) => html`
@@ -393,6 +521,23 @@ export default function render() {
         </div>
 
         <div class="list" ?hidden="${!this.isListLayout}">
+          <div ?hidden="${!this.loading}">
+            ${[1,2,3,4,5,6,7,8.9,10].map(
+              () => html`
+                <div class="teaser">
+                  <div class="teaser__image"></div>
+                  <div class="teaser__content">
+                    <div class="teaser__title"></div>
+                    <div class="teaser__details">
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                </div>  
+              `
+            )}
+          </div>
           ${this.results.map(
             (res) => html`
               <app-search-list-result
@@ -411,35 +556,21 @@ export default function render() {
     </div>
 
     <ucd-theme-pagination
+      ?hidden="${this.paginationTotal < 2}"
       current-page=${this.currentPage}
       max-pages=${this.paginationTotal}
-      @page-change=${this._onPaginationChange}>
+      @page-change=${this._onPaginationChange}
+      xs-screen
+      ellipses>
     </ucd-theme-pagination>
 
     <div
-      ?hidden="${!this.totalOverMaxWindow}"
+      ?hidden="${!this.totalOverMaxWindow && this.total !== 10000}"
       style="text-align: center"
       class="limit-results"
     >
       Digital Collections limits results to 10,000. Use keywords and/or filters
       to refine search.
     </div>
-
-    <!-- <div class="collections" ?hidden="${!this.showCollectionResults}">
-  <div>
-    <h3>Collections</h3>
-    <div style="text-align:center" class="collections-content">
-      ${this.collectionResults.map(
-      (res) => html`
-        <dams-collection-card
-          .collection="${res}"
-          data-collectionid="${res.collectionId}"
-          @click=${this._onCollectionClicked}
-        ></dams-collection-card>
-      `
-    )}
-    </div>
-  </div>
-</div> -->
   `;
 }

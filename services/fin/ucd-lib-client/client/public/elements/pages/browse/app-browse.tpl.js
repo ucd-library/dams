@@ -20,7 +20,7 @@ export default function render() {
       }
 
       .vertical-link--circle .vertical-link__figure:after {
-        opacity: 1;
+        opacity: 1 !important;
       }
 
       /* STYLES BELOW ARE ACTUALLY USED. NEED TO AUDIT ANYTHING ABOVE */
@@ -80,16 +80,17 @@ export default function render() {
         line-height: 1.2;
       }
 
-      .title-section {
+      app-browse .title-section {
         text-align: center;
+        border: none;
       }
 
       .header-icon {
-        width: 135px;
+        width: 6rem;
       }
     </style>
 
-    <div ?hidden="${this.page !== "/browse"}">
+    <div class="browse-selection-section" ?hidden="${this.page !== "/browse"}">
       <div class="title-section">
         <h1>Browse<br /><span class="fw-light">Digital Collections</span></h1>
       </div>
@@ -98,7 +99,7 @@ export default function render() {
           <div class="priority-links__item">
             <a
               class="vertical-link vertical-link--circle category-brand--secondary"
-              href="/browse/collections"
+              href="/browse/collections/15"
             >
               <div class="vertical-link__figure">
                 <!-- <ucdlib-icon class="vertical-link__image" src="http://localhost:3000/images/ucd-logo.svg"></ucdlib-icon> -->
@@ -128,7 +129,7 @@ export default function render() {
           <div class="priority-links__item">
             <a
               class="vertical-link vertical-link--circle category-brand--secondary"
-              href="/browse/creator"
+              href="/browse/creator/30"
             >
               <div class="vertical-link__figure">
                 <ucdlib-icon
@@ -142,7 +143,7 @@ export default function render() {
           <div class="priority-links__item">
             <a
               class="vertical-link vertical-link--circle category-brand--secondary"
-              href="/browse/format"
+              href="/browse/format/30"
             >
               <div class="vertical-link__figure">
                 <ucdlib-icon
@@ -156,7 +157,7 @@ export default function render() {
           <div class="priority-links__item">
             <a
               class="vertical-link vertical-link--circle category-brand--secondary"
-              href="/browse/subject"
+              href="/browse/subject/30"
             >
               <div class="vertical-link__figure">
                 <ucdlib-icon
@@ -208,7 +209,7 @@ export default function render() {
     <app-browse-by
       id="format"
       label="Format"
-      facet-query-name="@graph.fileFormat"
+      facet-query-name="@graph.fileFormatSimple"
       ?hidden="${this.page !== "/browse/format"}">
       <img
         class="header-icon"

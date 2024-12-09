@@ -1,5 +1,10 @@
 import { LitElement } from 'lit';
-import render from "./app-share-btn.tpl.js"
+
+import render from "./app-share-btn.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
+import './app-toast-popup.js';
 
 
 const BASE_SHARE_LINKS = {
@@ -24,7 +29,20 @@ export default class AppShareBtn extends Mixin(LitElement)
     this.active = true;
 
     this.visible = false;
-    this._injectModel('AppStateModel', 'MediaModel');
+    this._injectModel('AppStateModel', 'MediaModel', 'RecordModel');
+  }
+
+  /**
+   * @method _onAppStateUpdate
+   * @description bound to AppStateModel app-state-update event
+   * 
+   * @param {Object} e app-state-update event
+   * 
+  */
+  _onAppStateUpdate(e) {
+    if( e.location.page !== 'item' ) {
+      this.visible = false;
+    }
   }
 
   /**
@@ -39,6 +57,10 @@ export default class AppShareBtn extends Mixin(LitElement)
     e.stopPropagation();
   }
 
+  _clickPopop(e) {
+    e.stopPropagation();
+  }
+
   /**
    * @method _onCopyLink
    * @description bound to share icon copy link button
@@ -48,8 +70,10 @@ export default class AppShareBtn extends Mixin(LitElement)
   async _onCopyLink(e) {
     try {
       await navigator.clipboard.writeText(window.location.href);
+      let toastPopup = this.shadowRoot.querySelector('app-toast-popup');
+      if( toastPopup ) toastPopup.showPopup();
     } catch (err) {
-      console.error('Failed to copy url: ', err);
+      this.logger.error('Failed to copy url: ', err);
     }
   }
 
@@ -68,12 +92,21 @@ export default class AppShareBtn extends Mixin(LitElement)
 
     let url = BASE_SHARE_LINKS[id];
     let qso = {};
-    let name = (media.name || media.title || record.name || record.title);
-
+    let name = (media.name || media.title || record.name || record.title || record.graph.root.name);
+    
     if( id === 'pinterest' ) {  
-      let path = this.MediaModel.getImgPath(media)
+      let path;
+      let images = record.clientMedia?.mediaGroups?.[0]?.clientMedia?.images;
+      if( images?.originalMedia?.missing || !images?.originalMedia?.url ) {
+        path = images?.large?.url ||
+                images?.medium?.url ||
+                images?.small?.url;
+      } else {
+        path = images?.originalMedia?.url;
+      }
+
       if( path ) {
-        qso.media = window.location.protocol+'//'+window.location.host+this.MediaModel.getImgUrl(path);
+        qso.media = window.location.protocol+'//'+window.location.host+path;
       }
       qso.description = name;
       qso.url = window.location.href;

@@ -3,6 +3,10 @@
     "id" : "collection",
     "types" : ["http://schema.org/Collection"],
     "basePath" : "/collection",
+    "virtualArchiveGroup" : {
+      "predicate" : "http://schema.org/identifier",
+      "regex" : "^([A-Z]+-\\d+|ark:/[a-z0-9]+/[a-z0-9]+([A-Z]+-\\d+)?)$"
+    },
     "virtualIndirectContainers" : {
       "links" : {
         "http://www.w3.org/ns/ldp#hasMemberRelation" : "http://schema.org/hasPart",
@@ -13,6 +17,10 @@
   }],
   "default" : {
     "id" : "item",
-    "basePath" : "/item"
+    "basePath" : "/item",
+    "virtualArchiveGroup" : {
+      "predicate" : "http://schema.org/identifier",
+      "regex" : "^ark:/[a-z0-9]+/[a-z0-9]+$"
+    }
   }
 }

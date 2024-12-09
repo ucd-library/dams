@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
 import render from "./admin-featured-collections.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
+
 import "./admin-content-panel";
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
@@ -13,7 +16,7 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
 ) {
   static get properties() {
     return {
-      panels: { type: Array },
+      panels : { type : Array },
     };
   }
 
@@ -28,35 +31,21 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
   }
 
   /**
-   * @method firstUpdated
-   * @description Lit lifecycle method called when element is first updated
-   */
-  async firstUpdated() {
-    // get any saved featured collections
-    let displayData =
-      APP_CONFIG.fcAppConfig[
-        "/application/ucd-lib-client/featured-collections/config.json"
-      ];
-    if (displayData && displayData.body && Array.isArray(displayData.body) ) {
-      this.panels = displayData.body;
-    }
-    if (!displayData) {
-      displayData = await this.FcAppConfigModel.getFeaturedCollectionAppData();
-      if (displayData && displayData.body) {
-        if( typeof displayData.body === 'string' ) {
-          displayData.body = JSON.parse(displayData.body);
-        }
-        this.panels = displayData.body;
-      }
-    }
-  }
-
-  /**
    * @method updated
    * @description Lit lifecycle method
    */
   updated() {
     this._updateUiStyles(null, true);
+  }
+
+  /**
+   * @method loadAdminData
+   * @description load admin panel data
+   * 
+   * @param {Array} data
+   */
+  loadAdminData(data) {
+    this.panels = data;
   }
 
   /**
@@ -113,10 +102,8 @@ export class AdminFeaturedCollections extends Mixin(LitElement).with(
     selects.forEach((select) => {
       let ssMain = select.shadowRoot.querySelector(".ss-main");
       if (ssMain) {
-        // ssMain.style.borderColor = "var(--color-aggie-blue-50)";
         ssMain.style.border = 'none';
         ssMain.style.backgroundColor = 'transparent';
-
       }
 
       let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");

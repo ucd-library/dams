@@ -27,15 +27,15 @@ class RecordService extends BaseService {
     });
   }
 
-  getIaBookManifest(url) {
-    return this.request({
-      url,
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
-    });
-  }
+  // getIaBookManifest(url) {
+  //   return this.request({
+  //     url,
+  //     checkCached : () => null,
+  //     onLoading : null,
+  //     onLoad : null,
+  //     onError : null
+  //   });
+  // }
 
   /**
    * @method search

@@ -1,5 +1,8 @@
 import { LitElement} from 'lit';
+
 import render from './nav-bar.tpl.js';
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-header/ucdlib-header.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-primary-nav/ucdlib-primary-nav.js';
@@ -9,22 +12,16 @@ import '@ucd-lib/theme-elements/ucdlib/ucdlib-primary-nav/ucdlib-primary-nav.js'
  * @class AppNavBar
  * @description UI component for the Navigation Bar
  */
-export class AppNavBar extends LitElement {
+export class AppNavBar extends Mixin(LitElement)
+.with(LitCorkUtils) {
 
   static get properties() {
     return {
-      placeholder : {
-        type : String,
-      },
-      browse : {
-        type : Object,
-      },
-      background : {
-        type: String,
-      },
-      choices: {
-        type: Array
-      }
+      placeholder : { type : String },
+      browse : { type : Object },
+      background : { type: String },
+      choices: { type: Array },
+      currentPage: { type: String }
     };
 
   }
@@ -36,8 +33,22 @@ export class AppNavBar extends LitElement {
     this.searchValue = "";
     this.background = '/images/home-gradient.png';
     this.choices = [];
+    this.currentPage = '';
+
+    this._injectModel('AppStateModel');
 
     window.addEventListener('click', () => this.hideDropdowns());
+  }
+
+  async _onAppStateUpdate(e) {
+    // close nav on page change, for mobile in particular
+    if( e.location.fullpath !== this.currentPage ) {
+      this.currentPage = e.location.fullpath;
+      let headerNav = this.shadowRoot.querySelector('ucdlib-header');
+      if( headerNav ) {
+        await headerNav.close();
+      }
+    }
   }
 
   /**
@@ -56,7 +67,6 @@ export class AppNavBar extends LitElement {
   }
 
   updated(e) {
-    // debugger;
     // hide home link if not mobile (width < 768px)
     if( window.innerWidth > 767 ) {
       let header = this.shadowRoot.querySelector('ucdlib-header');
@@ -142,7 +152,6 @@ export class AppNavBar extends LitElement {
     this.dropdownVisible = false;
     this.requestUpdate();
   }
-
 
 }
 customElements.define('app-nav-bar', AppNavBar);

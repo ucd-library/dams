@@ -152,7 +152,7 @@ class SeoModel extends BaseModel {
 
     record = transform(record.root, record.clientMedia);
 
-    this.ele.innerHTML = JSON.stringify(record, '  ', '  ');
+    if( this.ele?.innerHTML ) this.ele.innerHTML = JSON.stringify(record, '  ', '  ');
   }
 
   _setCollectionJsonLd(selectedCollection) {
@@ -163,11 +163,11 @@ class SeoModel extends BaseModel {
     }
     collection = collectionTransform(collection, window.location.protocol+'//'+window.location.host);
 
-    this.ele.innerHTML = JSON.stringify(collection, '  ', '  ');
+    if( this.ele?.innerHTML ) this.ele.innerHTML = JSON.stringify(collection, '  ', '  ');
   }
 
   _clearJsonLd() {
-    this.ele.innerHTML = '';
+    if( this.ele?.innerHTML ) this.ele.innerHTML = '';
   }
 
 }

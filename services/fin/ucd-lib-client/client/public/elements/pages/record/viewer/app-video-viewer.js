@@ -3,9 +3,9 @@
 // https://github.com/google/shaka-player/tree/master/docs/tutorials
 
 import { LitElement } from "lit"
-import render from "./app-video-viewer.tpl.js"
+import render from "./app-video-viewer.tpl.js";
 
-import "@ucd-lib/cork-app-utils"
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import config from "../../../../lib/config"
 import utils from "../../../../lib/utils"
@@ -138,13 +138,12 @@ export default class AppVideoViewer extends Mixin(LitElement)
 
     let videoEle = this.shadowRoot.getElementById('video');
 
-
     this.plyr = new plyr(videoEle, {
       hideControls: this.hideControls,
-      fullscreen : {enabled: false},
+      fullscreen : { enabled: true, fallback: true, iosNative: true },
       captions: {update: false},
       // keyboard: {global: true},
-      controls : ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume']
+      controls : ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
     });
 
     // Construct a Player to wrap around the <video> tag.
@@ -153,7 +152,7 @@ export default class AppVideoViewer extends Mixin(LitElement)
       textDisplayFactory : SimpleTextDisplayer
     });
 
-    this.shaka.addEventListener('error', e => console.error('shaka error', e));
+    this.shaka.addEventListener('error', e => this.logger.error('shaka error', e));
     
     this.libsLoaded = true;
     await this._loadVideo();
@@ -178,7 +177,7 @@ export default class AppVideoViewer extends Mixin(LitElement)
     try {
       await this.shaka.load(manifestUri);
     } catch(error) {
-      console.error('Error code: ', error.code, 'object', error);
+      this.logger.error('Error code: ', error.code, 'object', error);
     }
   }
 

@@ -1,18 +1,10 @@
 <!doctype html>
 <html lang="en">
-  <!--[if lte IE 10]>
-  <script type="text/javascript">
-    if ( document.URL.indexOf( 'ie' ) === -1 ) {
-      window.location = '/ie.html';
-    }
-  </script>
-  <![endif]-->
   <head>
     <meta charset="utf-8" />
     <title>{{title}}</title>
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1">
     <meta name="description" content="{{description}}"/>
-    <meta name="keywords" content="{{keywords}}"/>
     <meta name="apple-mobile-web-app-title" content="UCD Digital">
     
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/vnd.microsoft.icon">
@@ -29,13 +21,6 @@
 
     <link rel="manifest" href="/manifest.json">
 
-    <!-- IE 10 detection -->
-    <script type="text/javascript">
-      window.polymerSkipLoadingFontRoboto = true;
-      if( window.navigator.appVersion.match(/MSIE 10/) ) {
-        window.location = '/ie.html';
-      }
-    </script>
     <style>
       #loading {
         position: absolute; 
@@ -67,8 +52,7 @@
         margin-right: 0.2em;
         position: relative;
         font-size: 3.5em;
-        opacity: 0;
-        animation: showHideDot 2.5s ease-in-out infinite;
+        opacity: 1;
       }
 
       .dot.one { animation-delay: 0.2s; }
@@ -104,6 +88,7 @@
         font-family: "Font Awesome 5 Free";
         font-weight: 900;
       } 
+      
     @font-face {
       font-family: Proxima-Nova;
       src: 
@@ -165,15 +150,27 @@
       font-weight: 900;
       font-style: normal;
       font-display:swap
-    }
+    } 
+    @font-face {
+      font-family: proxima-nova;
+      src: 
+        url("/fonts/proximanova-extrabold-webfont.woff2") format("woff2"),
+        url("/fonts/proximanova-extrabold-webfont.eot?#iefix") format("embedded-opentype"),
+        url("/fonts/proximanova/proximanova-extrabold-webfont.woff") format("woff"),
+        url("/fonts/proximanova-extrabold-webfont.ttf") format("truetype"),
+        url("/fonts/proximanova-extrabold-webfont.svg#proxima-nova") format("svg");
+      font-weight: 800;
+      font-style: normal;
+      font-display:swap
+    } 
     </style>
     
     <meta name="google-site-verification" content="iK2-C5oxLcdP0n7QBgKtXPd7hvEuMIHqB4d1sSe-okw" />
-
-    {{bundle}}
     
     <!-- from spa-router-middleware -->
     {{config}}
+
+    <script src="/js/bundle.js?_={{jsBundleHash}}"></script>
   </head>
 
   <body>

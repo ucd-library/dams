@@ -27,7 +27,7 @@ class SearchVcModel extends BaseModel {
 
     // translate RecordGraph's to ui model
     const matchedItems = [];
-    const matchedCollections = [];
+    let matchedCollections = [];
 
     e.payload.results.forEach((result) => {
       if( !result.root ) return;
@@ -59,34 +59,31 @@ class SearchVcModel extends BaseModel {
         });
       }
 
-      let mediaType = utils.getMediaType(result.root);
-      if (!mediaType && result.root.associatedMedia) {
-        let associatedMedia = Array.isArray(result.root.associatedMedia)
-          ? result.root.associatedMedia
-          : [result.root.associatedMedia];
-        for (const media of associatedMedia) {
-          if (media["@id"].indexOf("images") > -1) {
-            let matchedImageList = result.clientMedia.graph.filter(
-              (g) => g["@id"] === media["@id"]
-            )[0];
-            let imageCount = 0;
-            if( matchedImageList?.hasPart && !Array.isArray(matchedImageList?.hasPart) ) matchedImageList.hasPart = [matchedImageList?.hasPart];
-            if (matchedImageList?.hasPart?.length) {
-              imageCount = matchedImageList.hasPart.length;
-            }
-            mediaType = imageCount + " pages, Image";
-            break;
-          } else {
-            let matchedAssociatedMedia = result.clientMedia.graph.filter(
-              (g) => g["@id"] === result.root.associatedMedia["@id"]
-            )[0];
-            if (matchedAssociatedMedia) {
-              mediaType = utils.getMediaType(matchedAssociatedMedia);
-            }
-          }
+      // check if imageList
+      let mediaGroups = result?.clientMedia?.mediaGroups || [];
+      let mediaType = '';
+      let imageList = mediaGroups.filter(m => utils.getMediaType(m) === 'ImageList')[0];
+      if( imageList && imageList.hasPart && imageList.hasPart.length ) {
+        mediaType = utils.formatNumberWithCommas(imageList.hasPart.length) + ' page' + (imageList.hasPart.length > 1 ? 's' : '')  + ', Image';
+      } else if( imageList && typeof imageList.hasPart === 'object' && Object.keys(imageList.hasPart).length < 2 ) {
+        mediaType = 'Image';
+      } else if( imageList && imageList.hasPart ) { // some items just point to the dl/pdf
+        mediaType = 'Multi-page, Image';
+      }
+
+      if( !mediaType ) {
+        // else find first mediaType
+        for (const mediaGroup of mediaGroups) {
+          mediaType = utils.getMediaType(mediaGroup);
+          if( mediaType ) break;
         }
       }
+
       if (mediaType) mediaType = mediaType.replace("Object", "");
+
+      let size = result.clientMedia?.mediaGroups?.[0]?.clientMedia?.images?.original?.size || {};
+      if( Array.isArray(size) ) size = size[0];
+
       matchedItems.push({
         id: result.root["@id"],
         collectionId,
@@ -95,11 +92,13 @@ class SearchVcModel extends BaseModel {
         mediaType,
         collection: result.root.publisher ? result.root.publisher.name : "", // for detail display
         creator: result.root.creator ? result.root.creator.name : "", // for detail display
-        date: result.root.yearPublished, // for detail display
-        format: [mediaType], // for detail display
+        date: result.root.yearPublished || 'Undated', // for detail display
+        format: mediaType ? [mediaType] : null, // for detail display,
+        size 
       });
     });
 
+    // if( e.searchDocument.text === '' ) matchedCollections = [];
     e.payload.results = matchedItems;
     e.payload.matchedCollections = matchedCollections;
     // todo save translated data to store

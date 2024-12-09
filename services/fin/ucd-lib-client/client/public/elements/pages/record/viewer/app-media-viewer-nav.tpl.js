@@ -18,14 +18,13 @@ export default function render() {
       :host([single-image]) app-share-btn,
       :host app-share-btn,
       :host paper-icon-button {
-        /* background-color: var(--default-primary-color); */
-        color: var(--color-aggie-blue-80);
+        fill: var(--color-aggie-blue-80);
       }
 
       [hidden] {
         display: none !important;
       }
-
+      
       input {
         padding: 15px;
         display: block;
@@ -119,6 +118,7 @@ export default function render() {
       #navLeft,
       #navRight {
         width: 36px;
+        margin: auto;
       }
 
       iron-icon {
@@ -219,13 +219,13 @@ export default function render() {
       }
 
       .br-search-non-fs div.zoom {
-        background-color: var(--color-aggie-blue);
+        background-color: var(--color-aggie-blue-80);
         border-radius: 50%;
         display: inline-block;
         width: 50px;
         height: 50px;
-        margin-left: 25px;
-        margin-top: 12.5px;
+        /* margin-left: 25px; */
+        margin-top: 5px;
       }
 
       .br-search-non-fs div.zoom {
@@ -270,20 +270,6 @@ export default function render() {
           height: 150px;
         }
 
-        /* .break {
-          width: 100%;
-        } */
-
-        #buttonWrapper.wrap {
-          padding-top: 1rem;
-          /* position: relative;
-          left: 62vw; */
-        }
-
-
-
-
-
         #thumbnails {
           width: 80% !important;
         }
@@ -302,7 +288,7 @@ export default function render() {
             icon="chevron-left"
             alt="Page thumbnails left"
             ?disabled="${!this.showNavLeft}"
-            ?hidden="${!this.showNavLeft || this.singleImage}"
+            ?hidden="${!this.showNavLeft || this.singleImage || this.isBookReader}"
             @click="${this._pageLeft}">
           </ucdlib-icon>
           <div
@@ -344,11 +330,11 @@ export default function render() {
 
         <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader || this.thumbnails.length < 2}">
           <div id="thumbnailInnerContainer">
-            ${this.thumbnails.map((item) => html`
+            ${this.thumbnails.map((item, index) => html`
               <a
                 class="thumbnail"
                 href="${item.id}"
-                alt="Page #${item.page}"
+                alt="Page #${index+1}"
                 ?selected="${item.selected}"
                 title="${item.id}"
                 media-id="${item.id}"
@@ -382,7 +368,7 @@ export default function render() {
         style="white-space: nowrap"
         ?hidden="${this.isLightbox}"
       >
-        <div @click="${this._onToggleBookView}" ?hidden="${!this.isBookReader}">
+        <div @click="${this._onToggleBookView}" class="page-toggle" ?hidden="${!this.isBookReader}">
           <ucdlib-icon
             icon="ucdlib-dams:fa-book-open"
             ?hidden="${!this.brSinglePage}"
@@ -431,7 +417,7 @@ export default function render() {
           ?hidden="${this.isBookReader || this.hideZoom}"
         >
           <ucdlib-icon
-            icon="ucdlib-dams:fa-magnifying-glass-plus"
+            icon="ucdlib-dams:fa-up-right-and-down-left-from-center"
           ></ucdlib-icon>
         </div>
         <div ?hidden="${this.brFullscreen}">
@@ -439,12 +425,12 @@ export default function render() {
         </div>
 
         <!-- this is moved next to the bookreader slider in app-media-viewer in full screen -->
-        <div class="br-search" ?hidden="${!this.brFullscreen}">
+        <!-- <div class="br-search" style="display: none;">
           <div
             class="zoom ${this.searching ? "searching" : ""}"
             @click="${this._onSearchToggled}"
           >
-            <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
+            <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass" class="fullscreen-search"></ucdlib-icon>
           </div>
           <div
             class="search-pagination"
@@ -475,7 +461,7 @@ export default function render() {
               <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div
@@ -497,6 +483,11 @@ export default function render() {
         <div @click="${this._onZoomInClicked}">
           <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
         </div>
+
+        <div @click="${this._onCloseClicked}">
+          <ucdlib-icon icon="ucdlib-dams:fa-down-left-and-up-right-to-center"></ucdlib-icon>
+        </div>
+
       </div>
     </div>
   `;

@@ -54,6 +54,14 @@
       "type": "text"
     },
 
+    "@graph.about" : {
+      "type": "text"
+    },
+
+    "@graph.keywords" : {
+      "type": "text"
+    },
+
     "@graph.itemCount" : {
       "type": "integer"
     },
@@ -69,6 +77,22 @@
           "type":  "keyword"
         }
       }
+    },
+
+    "@graph.material" : {
+      "type": "text"
+    },
+
+    "@graph.location" : {
+      "type": "text"
+    },
+
+    "@graph.inLanguage.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.inLanguage.name" : {
+      "type" : "keyword"
     },
 
     "@graph._.updated" : {

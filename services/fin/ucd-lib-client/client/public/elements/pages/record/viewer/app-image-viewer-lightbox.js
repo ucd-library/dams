@@ -1,5 +1,8 @@
 import { LitElement } from "lit";
+
 import render from "./app-image-viewer-lightbox.tpl.js";
+
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "leaflet";
 import "leaflet-iiif";
@@ -32,6 +35,8 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       if (this.visible && e.which === 27) this.hide();
     });
 
+    window.addEventListener('popstate', this._onPopState.bind(this));
+
     this._injectModel("AppStateModel", "MediaModel");
   }
 
@@ -48,6 +53,12 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     let selectedRecord = await this.AppStateModel.getSelectedRecord();
     if (selectedRecord ) {
       this._onSelectedRecordUpdate(selectedRecord);
+    }
+  }
+
+  _onPopState(e) {
+    if ( this.AppStateModel.store.data.showLightbox ) {
+      this.AppStateModel.set({ showLightbox: false });
     }
   }
 
@@ -72,9 +83,9 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   _onSelectedRecordUpdate(e) {
     if( !e ) return;
     let {graph, clientMedia, selectedMedia, selectedMediaPage} = e;
-    
+
     let currentMedia = this.record?.selectedMedia || {};
-    if( currentMedia['@id'] === selectedMedia['@id'] && 
+    if( currentMedia['@id'] === selectedMedia['@id'] &&
       selectedMediaPage === this.record?.selectedMediaPage ) {
       return;
     }
@@ -152,7 +163,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       return;
     }
 
-    this.renderedMedia = selectedMedia.clientMedia.pages.filter(media => media.page === selectedMediaPage)[0];
+    this.renderedMedia = selectedMedia.clientMedia?.pages?.filter(media => media.page === selectedMediaPage)[0];
     // on first page load, selectedMediaPage is -1, so just show first page from clientMedia.images
     if( !this.renderedMedia ) {
       this.renderedMedia = selectedMedia.clientMedia.images;
@@ -162,10 +173,10 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.viewer = L.map(this.shadowRoot.querySelector("#viewer"), {
         center: [0, 0],
         crs: L.CRS.Simple,
-        zoom: 0,
+        zoom: 0
       });
     }
-    
+
     if (this.currentLayer) {
       this.viewer.removeLayer(this.currentLayer);
     }
@@ -173,12 +184,16 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     if (this.renderedMedia.tiled) {
       let tiledUrl = this.renderedMedia.tiled.iiif + "/info.json";
       this.currentLayer = L.tileLayer.iiif(tiledUrl);
+
     } else {
-      let original = this.renderedMedia.original;
+      let image = this.renderedMedia.original ||
+                  this.renderedMedia.large ||
+                  this.renderedMedia.medium ||
+                  this.renderedMedia.small;
 
       // we might not have size
-      let size = await this.getImageSize(original);
-      
+      let size = await this.getImageSize(image);
+
       // determine the pixel dimensions of the image
       let imageWidthInPixels = parseInt(size.width);
       let imageHeightInPixels = parseInt(size.height);
@@ -204,21 +219,17 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       let zoomLevel = 0; // Adjust as needed
       this.viewer.setView([centerLat, centerLon], zoomLevel);
 
-      this.currentLayer = L.imageOverlay(original.url, imageBounds).addTo(this.viewer);
+      this.currentLayer = L.imageOverlay(image.url, imageBounds).addTo(this.viewer);
     }
 
     this.currentLayer.addTo(this.viewer);
 
     // listen to load event to stop spinner
     if( this.renderedMedia.tiled ) {
-      this.currentLayer.on('load', function() {
-        this.loading = false;
-      });
-    } else {      
+      this.currentLayer.on('load', this._loaded.bind(this));
+    } else {
       let imageElement = this.currentLayer.getElement();
-      imageElement.addEventListener('load', () => {
-        this.loading = false;
-      });
+      imageElement.addEventListener('load', this._loaded.bind(this));
     }
 
     // TODO this is a hack to get the viewer to resize correctly
@@ -227,7 +238,13 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     }, 1000);
 
     this.shadowRoot.querySelector('.leaflet-control-attribution').style.display = 'none';
-    this.shadowRoot.querySelector(".leaflet-control-container").style.display = 'none';  
+    this.shadowRoot.querySelector(".leaflet-control-container").style.display = 'none';
+  }
+
+  _loaded() {
+    this.loading = false;
+    let spinner = this.shadowRoot.querySelector('.spinner');
+    if( spinner ) spinner.style.display = 'none';
   }
 
   getImageSize(original) {
@@ -238,9 +255,9 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       img.src = original.url;
       img.onload = () => {
         resolve(original.size = {
-          height : img.naturalHeight, 
+          height : img.naturalHeight,
           width : img.naturalWidth
-        }); 
+        });
       };
     });
   }
@@ -250,7 +267,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @description bound to view nav close event
    */
   _onCloseClicked() {
-    // this.showLightbox = false;
     this.AppStateModel.set({ showLightbox: false });
   }
 

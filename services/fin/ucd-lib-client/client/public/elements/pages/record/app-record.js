@@ -1,18 +1,22 @@
 import { LitElement } from "lit";
 import render from "./app-record.tpl.js";
-import {Mixin, MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
-import { LitCorkUtils } from '@ucd-lib/cork-app-utils';
+import { MainDomElement } from '@ucd-lib/theme-elements/utils/mixins';
+import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import { markdown } from "markdown";
 import rightsDefinitions from "../../../lib/rights.json";
 import citations from "../../../lib/models/CitationsModel";
-import utils from "../../../lib/utils";
+import utils from "../../../lib/utils/index.js";
+
+import '@ucd-lib/theme-elements/ucdlib/ucdlib-md/ucdlib-md.js';
+import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js";
 
 import "./app-media-download";
 import "./app-fs-media-download";
 import "./viewer/app-media-viewer";
 import "../../components/citation";
 
+import user from '../../../lib/utils/user.js';
 class AppRecord extends Mixin(LitElement)
   .with(MainDomElement, LitCorkUtils) {
   
@@ -25,18 +29,26 @@ class AppRecord extends Mixin(LitElement)
       collectionImg: { type: String },
       collectionId: { type: String },
       collectionItemCount: { type: Number },
+      description: { type: String },
       date: { type: String },
       publisher: { type: String },
       subjects: { type: Array },
       callNumber: { type: String },
+      material: { type: String },
       size: { type: String },
       rights: { type: Object },
       metadata: { type: Array },
       isBagOfFiles: { type: Boolean },
       arkDoi: { type: Array },
       fedoraLinks: { type: Array },
+      isUiAdmin : { type : Boolean },
+      editMode : { type : Boolean },
       // citations : {type: Array}
       citationRoot: { type: Object },
+      itemDefaultDisplay: { type: String }, // collection default display
+      itemDisplay: { type: String },
+      displayData: { type: Object },
+      savedCollectionData: { type: Object },
     };
   }
 
@@ -54,8 +66,12 @@ class AppRecord extends Mixin(LitElement)
     this.publisher = "";
     this.subjects = [];
     this.callNumber = "";
+    this.material = "";
     this.collectionImg = "";
+    this.defaultCollectionImg = "/images/tree-bike-illustration.png";
     this.collectionId = "";
+    this.renderedCollectionId = "";
+    this.description = "";
 
     this.size = "";
     this.rights = {};
@@ -66,19 +82,37 @@ class AppRecord extends Mixin(LitElement)
     // this.citations = [];
     this.citationRoot = {};
     this.collectionItemCount = 0;
+    this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage;
+    this.itemDisplay = '';
+
+    this.isUiAdmin = user.canEditUi();
+    this.editMode = false;
+    this.displayData = {};
+    this.savedCollectionData = {};
 
     this._injectModel(
       "AppStateModel",
       "RecordModel",
       "CollectionModel",
-      "SeoModel"
+      "SeoModel",
+      "FcAppConfigModel"
     );
+
+    window.addEventListener('click', () => this._onPageClick());
+  }
+
+  _onPageClick(e) {
+    let appShareBtn = this.querySelector('app-media-viewer-nav')?.shadowRoot?.querySelector('app-share-btn');
+    if( appShareBtn ) appShareBtn.visible = false;
   }
 
   async firstUpdated() {
     // this._onRecordUpdate(await this.RecordModel.get(this.AppStateModel.location.fullpath)); // this causes badness with ie /media/images:4 paths
-    this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
-    this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+    this._onAppStateUpdate(await this.AppStateModel.get());
+    if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
+    if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+
+    this._updateSlimStyles();
   }
 
   /**
@@ -91,7 +125,7 @@ class AppRecord extends Mixin(LitElement)
     if (e.state !== "loaded") return;
 
     let record = e.vcData;
-    if( !record ) return;
+    if( !record || this.renderedRecordId === record['@id'] ) return;
 
     this.renderedRecordId = record["@id"];
     this.record = record;
@@ -99,14 +133,12 @@ class AppRecord extends Mixin(LitElement)
     this.currentRecordId = this.record["@id"];
     this.name = this.record.name;
     this.collectionName = this.record.collectionName;
+    this.description = this.record.description;
     this.date = this.record.date;
     this.publisher = this.record.publisher;
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
-    this.collectionImg = this.record.images?.small?.url                   
-                      || this.record.images?.medium?.url 
-                      || this.record.images?.large?.url
-                      || this.record.images?.original?.url;
+    this.material = this.record.material;
 
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
@@ -114,19 +146,121 @@ class AppRecord extends Mixin(LitElement)
     this._updateLinks(this.AppStateModel.location, record);
   }
 
-  _onCollectionUpdate(e) {
-    if (e.state !== "loaded") return;
+  async _onCollectionUpdate(e) {
+    if( e.state !== "loaded" || e.id === this.renderedCollectionId ) return;
+
     this.collectionItemCount = e.vcData?.count || 0;
+    this.renderedCollectionId = e.id;
+    this.collectionId = e.id;
+
+    let overriddenFeatureImage = e.vcData?.clientEdits?.['@id'] || '';
+    if (overriddenFeatureImage) {
+      this.collectionImg = '/fcrepo/rest' + overriddenFeatureImage + '/featuredImage.jpg';;
+    } else {
+      this.collectionImg = e.vcData?.images?.small?.url                   
+      || e.vcData?.images?.medium?.url 
+      || e.vcData?.images?.large?.url
+      || e.vcData?.images?.original?.url;
+    }
+
+    if( !this.collectionImg ) this.collectionImg = this.defaultCollectionImg;    
   }
 
   /**
    * @method _onAppStateUpdate
    */
   async _onAppStateUpdate(e) {
-    // if (e.state !== "loaded") return;
-    this._updateLinks(e.location);
-    if( this.RecordModel.currentRecordId ) this._onRecordUpdate(await this.RecordModel.get(this.RecordModel.currentRecordId));
+    if( e.location.page !== 'item' ) return;
+
+    this._updateSlimStyles();
+
+    let hasError = false;
+    if( this.RecordModel.currentRecordId ) {
+      try {
+        let record = await this.RecordModel.get(this.RecordModel.currentRecordId);
+        this._onRecordUpdate(record);
+      } catch(e) {
+        hasError = true;
+      }
+    }
+
+    if( e.page === '404' || hasError ) {
+      this.dispatchEvent(
+        new CustomEvent("show-404", {})
+      );
+      return;
+    }
+    
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
+
+    this._updateLinks(e.location);
+    
+    await this._parseDisplayData();
+  }
+
+  _arkDoiClick(e) {
+    e.preventDefault();
+
+    history.pushState(null, '', e.target.getAttribute('href'));
+    window.scrollTo(0, 0);
+  }
+
+  _updateSlimStyles() {
+    let select = this.querySelector('ucd-theme-slim-select');
+    if( !select ) return;
+
+    let ssMain = select.shadowRoot.querySelector(".ss-main");
+    if (ssMain) {
+      ssMain.style.border = 'none';
+      ssMain.style.backgroundColor = 'transparent';
+    }
+
+    let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");
+    if (ssSingle) {
+      ssSingle.style.border = "none";
+      ssSingle.style.height = "49px";
+      ssSingle.style.paddingLeft = "1rem";
+      ssSingle.style.backgroundColor = "var(--color-aggie-blue-50)";
+      ssSingle.style.borderRadius = '0';
+      ssSingle.style.fontWeight = "bold";
+      ssSingle.style.color = "var(--color-aggie-blue)";
+    }
+
+    let search = select.shadowRoot.querySelector('.ss-search');
+    if( search ) {
+      search.style.display = "none";
+    }
+  }
+  
+  /**
+   * @method _ssSelectFocus
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectFocus(e) {
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    if( ssSingleSelected?.classList.value === 'ss-single-selected ss-open-below' ) {
+      ssSingleSelected.style.backgroundColor = '#FFF4D2'; // gold-30
+      ssMain.style.borderColor = '#FFBF00'; // gold
+    } else {
+      ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+      ssMain.style.borderColor = '#B0D0ED'; // blue-50
+    }
+  }
+
+  /**
+   * @method _ssSelectBlur
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectBlur(e) {
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+    ssMain.style.borderColor = '#B0D0ED'; // blue-50
   }
 
   /**
@@ -146,7 +280,7 @@ class AppRecord extends Mixin(LitElement)
     let imagePath = '';
 
     // check if we are on a specific /media path
-    let isMediaUrl = location.pathname; // path.indexOf('/media') > -1;
+    let isMediaUrl = path.indexOf('/media') > -1;
     if( isMediaUrl ) {
       // find media in graph
       let media = selectedRecord.clientMedia.graph
@@ -158,10 +292,10 @@ class AppRecord extends Mixin(LitElement)
         // path = media['@id'].split('/media')[0];
         imagePath = media['@id'];
       }
+    } 
 
-    } else if (mediaGroup?.['@shortType']?.includes('ImageList')) {
-      imagePath = mediaGroup.clientMedia?.images?.original?.url || path;
-
+    if (!imagePath && mediaGroup?.['@shortType']?.includes('ImageList')) {
+      imagePath = mediaGroup.encodesCreativeWork?.['@id'] || mediaGroup.clientMedia?.images?.original?.url || path;
     } else {
       imagePath = selectedRecord.selectedMedia?.['@id'];
     }
@@ -176,6 +310,131 @@ class AppRecord extends Mixin(LitElement)
       '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
     ];
 
+  }
+
+  /**
+   * @method _onEditClicked
+   * @description admin ui, edit button click event
+   * 
+   * @param {Object} e 
+   */
+  _onEditClicked(e) {
+    if( !this.isUiAdmin ) return;
+    this._updateSlimStyles();
+    this.editMode = true;
+    
+    this._changeMediaViewerDisplay('none');
+  }
+
+  /**
+   * @method _onSaveClicked
+   * @description admin ui, save button click event
+   * 
+   * @param {Object} e 
+   */
+  async _onSaveClicked(e) {
+    if( !this.isUiAdmin ) return;
+    
+    this.itemDisplay = document.querySelector('ucd-theme-slim-select')?.slimSelect?.selected();
+    this._updateDisplayData();
+    await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
+
+    this.editMode = false;
+
+    this._changeMediaViewerDisplay('', true);
+  }
+
+  /**
+   * @method _onCancelEditClicked
+   * @description admin ui, cancel editing button click event
+   * 
+   * @param {Object} e 
+   */
+  _onCancelEditClicked(e) {
+    if( !this.isUiAdmin ) return;
+    this.editMode = false;
+
+    this._changeMediaViewerDisplay('');
+  }
+
+  /**
+   * @description _parseDisplayData, get application container data to set collection specific display data (watercolors, highlighted items, featured image)
+   */
+  async _parseDisplayData() {
+    if( !this.collectionId ) return;
+
+    let edits = await this.CollectionModel.getCollectionEdits(this.collectionId);
+    if( !Object.keys(edits.payload).length ) {
+      this.appDataLoaded = true;
+      return;
+    }
+
+    edits = edits.payload;
+    this.itemDefaultDisplay = edits?.collection?.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
+    this.itemDisplay = edits?.items?.[this.currentRecordId]?.itemDefaultDisplay || this.itemDefaultDisplay;
+
+    this.appDataLoaded = true;
+    this._updateDisplayData();
+  }
+
+  _updateDisplayData() {
+    this.displayData = this.FcAppConfigModel.getItemDisplayData(this.renderedRecordId, this.itemDisplay);
+  }
+
+  async _changeMediaViewerDisplay(display, prefChange=false) {
+    let mediaViewer = this.querySelector('app-media-viewer');
+    if( !mediaViewer ) return;
+    let pages = mediaViewer.querySelector('ucdlib-pages');
+    let nav = mediaViewer.querySelector('app-media-viewer-nav');
+
+    if( nav ) nav.style.display = display;
+
+    if( !pages ) return;
+    if( display ) {
+      pages.style.opacity = 0;
+      pages.style.height = '150px';
+      pages.style.display = 'block';
+    } else {
+      pages.style.opacity = 100;
+      pages.style.height = '';
+      pages.style.display = 'block';
+    }
+
+    if( mediaViewer.mediaType === 'video' ) return;
+
+    // on save display pref, reload media viewer with new image display type
+    if( prefChange ) {
+      // reload media viewer with new image display type
+      let newDisplayType = '';
+      let singlePage = false;
+
+      if( this.itemDisplay.includes('Image List') ) {
+        newDisplayType = 'image';
+      } else if ( this.itemDisplay.includes('1 Page') ) {
+        newDisplayType = 'bookreader';
+        singlePage = true;
+      } else if ( this.itemDisplay.includes('2 Page') ) {
+        newDisplayType = 'bookreader';
+      }
+
+      if( pages && nav && newDisplayType ) {
+        pages.selected = newDisplayType;
+
+        if( mediaViewer.singlePage !== singlePage ) {
+          mediaViewer.singlePage = singlePage;
+          // if( mediaViewer.querySelector('app-bookreader-viewer').br ) {
+          //   requestAnimationFrame(() => {
+          //     mediaViewer._onToggleBookView();
+          //   });
+          // } else {
+          //   // to reload br if not initiated
+          //   mediaViewer._onAppStateUpdate(await this.AppStateModel.get());
+          // }         
+        }
+        mediaViewer.isBookReader = newDisplayType === 'bookreader';
+        mediaViewer.mediaType = newDisplayType;
+      }
+    }    
   }
 
   /**
@@ -250,12 +509,12 @@ class AppRecord extends Mixin(LitElement)
     }, 3000);
   }
 
-  _onBookViewPageChange(e) {
-    let appMediaDownload = document.querySelector('app-media-download');
-    if( appMediaDownload ) {
-      appMediaDownload.brPageChange(e.detail);
-    }
-  }
+  // _onBookViewPageChange(e) {
+  //   let appMediaDownload = document.querySelector('app-media-download');
+  //   if( appMediaDownload ) {
+  //     appMediaDownload.brPageChange(e.detail);
+  //   }
+  // }
 }
 
 customElements.define("app-record", AppRecord);

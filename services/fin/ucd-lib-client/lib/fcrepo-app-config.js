@@ -1,8 +1,8 @@
 const config = require("../config.js");
 const api = require("@ucd-lib/fin-api");
-const { ActiveMqClient, logger, keycloak } = require("@ucd-lib/fin-service-utils");
+const { MessagingClients, logger, keycloak } = require("@ucd-lib/fin-service-utils");
 
-const { ActiveMqStompClient } = ActiveMqClient;
+const { RabbitMqClient } = MessagingClients;
 const CONTAINS = "http://www.w3.org/ns/ldp#contains";
 const BINARY = "http://fedora.info/definitions/v4/repository#Binary";
 const MIME_TYPE =
@@ -18,8 +18,9 @@ api.setConfig({
 
 class AppConfig {
   constructor() {
-    this.activemq = new ActiveMqStompClient(config.client.appName);
-    this.activemq.subscribe("/topic/fcrepo",
+    this.messaging = new RabbitMqClient(config.client.appName);
+    this.messaging.subscribe(
+      this.messaging.EXCLUSIVE_QUEUE,
       e => this.handleMessage(e),
     );
     this.ROOT_PATH = "/application/" + config.client.appName;
@@ -28,7 +29,7 @@ class AppConfig {
   }
 
   handleMessage(msg) {
-    let id = msg.headers[this.activemq.ACTIVE_MQ_HEADER_ID];
+    let id = msg.getFinId();
 
     if (!id.match(this.ROOT_PATH)) return;
 

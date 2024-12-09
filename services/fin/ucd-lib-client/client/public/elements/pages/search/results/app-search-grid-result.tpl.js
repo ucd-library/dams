@@ -13,13 +13,6 @@ export default function render() {
         display: none !important;
       }
 
-      :host(:hover),
-      :host(:focus) {
-        /* border: 2px solid var(--default-secondary-color);
-    margin: -2px 0 0 -2px;
-    outline: none !important; */
-      }
-
       @keyframes show-img {
         from {
           opacity: 0;
@@ -30,26 +23,14 @@ export default function render() {
       }
 
       img {
-        /* animation: show-img 300ms linear; */
         box-sizing: border-box;
         display: none;
-        /* width: var(--grid-cell-width); */
-        /* background-size: cover;
-    background-color: transparent;
-    background-position: center center; */
-        /* position: absolute;
-    top: 0;
-    left: 0; */
         cursor: pointer;
-        border: solid 2px transparent;
-        /* transition: border-color 0.3s ease-in-out; */
       }
 
       img:hover,
       img:focus {
         border-color: var(--default-secondary-color);
-        /* margin: -2px 0 0 -2px;
-    outline: none !important; */
       }
 
       .collection-name {
@@ -114,31 +95,30 @@ export default function render() {
         position: absolute;
         right: 0.25rem;
         bottom: 0.25rem;
-        width: 40px;
-        height: 40px;
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
         background-color: var(--color-aggie-blue-80);
         display: flex;
         justify-content: center;
         align-items: center;
+        margin: 0.5rem;
       }
 
       ucdlib-icon {
-        width: 25px;
-        height: 25px;
+        width: 1.2rem;
+        height: 1.2rem;
         fill: white;
       }
     </style>
 
-    <!--hidden$="${!this.isImage}" -->
-    <div class="image" id="imgRoot">
+    <div class="image" id="imgRoot" style="height: ${this.imageHeight}px;">
       <img
         id="img"
         src="${this.thumbnailUrl}"
-        style="height: ${this.imageHeight}; width: 100%; display:
-      block"
-        onload="this.style.display='block';"
-      />
+        style="height: ${this.imageHeight}px; width: 100%; display: none;"
+        onload="this.style.display = 'block';"
+        />
       <div ?hidden="${!this.isVideo}" class="video-thumbnail"></div>
       <div
           class="media-type"

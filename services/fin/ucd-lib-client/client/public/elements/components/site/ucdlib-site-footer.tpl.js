@@ -35,13 +35,18 @@ export function styles() {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      margin-top: var(--spacing-sm);
+      margin-top: 4rem;
     }
+
     #section-columns > * {
-      margin: 0 var(--spacing-default) var(--spacing-default);
+      margin-right: var(--spacing-default) var(--spacing-default);
       flex-grow: 1;
-      padding: 4rem 3rem;
+      margin-bottom: 2rem;
     }
+    #section-columns > *:last-child {
+      margin-right: 0;
+    }
+
     ucdlib-site-footer-column ul {
       margin: 0;
       padding: 0;
@@ -53,10 +58,12 @@ export function styles() {
     ucdlib-site-footer-column a {
       display: block;
       padding: var(--spacing-half);
+      padding-left: 0;
     }
-    ucdlib-site-footer-column a:hover {
-      background-color: var(--color-aggie-blue-80);
-      border-radius: 4px;
+
+    .container-footer {
+      width: 90%;
+      margin: 0 auto;
     }
     .button {
       margin-top: 15px;
@@ -77,6 +84,12 @@ export function styles() {
     address {
       font-style: normal;
     }
+    @media (max-width: 1200px) {
+      address {
+        font-size: 1rem;
+      }
+    }
+
     #below-address {
       margin-top: var(--spacing-default);
     }
@@ -86,7 +99,7 @@ export function styles() {
     .section-aggie-logo {
       display: flex;
       justify-content: center;
-      margin: var(--spacing-md) 0;
+      margin: 1rem 0;
     }
     .container-aggie-logo {
       max-width: 100%;
@@ -126,39 +139,64 @@ export function styles() {
     .campus-info span {
       text-align: center;
     }
+
+    @media (max-width: 992px) {
+      #section-columns > * {
+        width: 50%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      #section-columns > * {
+        width: 100%;
+      }
+      ucdlib-site-footer-column a {
+        padding-left: 0;
+      }
+      h2 {
+        margin-left: 0;
+      }
+    }   
+      
+    .build-info {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      justify-content: center;
+    }
+    .build-info > div {
+      padding: 1rem;
+    }
   `;
 }
 
 export function render() {
   return html`
-    <div class="container">
+    <div class="container container-footer">
+
       <div id="section-columns" shadow-anchor="section-columns">
         <div id="address-column">
           <div class="lib-logo-container">
-            <a href="https://library.ucdavis.edu" target="_blank"
-              >${this._renderLibraryLogo()}</a
-            >
+            <a href="https://library.ucdavis.edu" target="_blank">${this._renderLibraryLogo()}</a>
           </div>
           <address>
             UC Davis Library <br />
             100 NW Quad <br />
             University of California, Davis <br />
             Davis, CA 95616 <br /><br />
-            <a href="tel:+1-530-752-8792" class="underline">530-752-8792</a
-            ><br /><br />
-            <a href="mailto:library@ucdavis.edu" class="underline"
-              >library@ucdavis.edu</a
-            >
+            <a href="tel:+1-530-752-8792" class="underline">530-752-8792</a><br /><br />
+            <a href="mailto:library@ucdavis.edu" class="underline">library@ucdavis.edu</a>
           </address>
-          <div id="below-address" shadow-anchor="below-address"></div>
         </div>
       </div>
+
       <div class="section-aggie-logo">
         <div class="container-aggie-logo">
           <a href="https://www.ucdavis.edu">${this._renderAggieLogo()}</a>
         </div>
       </div>
       <div class="section-campus-info">${this._renderCampusInfo()}</div>
+      <div id="build-info" shadow-anchor="build-info"></div>
     </div>
   `;
 }
