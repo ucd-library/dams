@@ -40,7 +40,7 @@ require('./controllers/identifier')(app);
 /**
  * setup sitemap
  */
-// require('./models/sitemap').middleware(app);
+require('./models/sitemap').middleware(app);
 
 controllers.health.register(app);
 
