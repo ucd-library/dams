@@ -55,7 +55,7 @@ export default class AppTopActiveFilters extends Mixin(LitElement)
           bucket : key,
           type : 'range',
           value : value,
-          label :  'published: '+value.gte+' to '+value.lte
+          label :  'Published: '+value.gte+' to '+value.lte
         });
       }
     }
@@ -68,7 +68,7 @@ export default class AppTopActiveFilters extends Mixin(LitElement)
 
   _getLabel(bucket, label) {
     let conf = config.elasticSearch.facets[bucket] || {};
-    if( !conf.valueMap ) return label;
+    if( !conf.valueMap ) return label.substring(0, 1).toUpperCase() + label.substring(1);
     if( typeof conf.valueMap === 'object' ) {
       return conf.valueMap[label] || label;
     }

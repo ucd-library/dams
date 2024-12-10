@@ -183,6 +183,7 @@ class BookReaderModel extends BaseModel {
     let imageList = record.clientMedia?.mediaGroups?.find(item => item?.['@shortType'].includes('ImageList'));
     let pdf = record.clientMedia?.mediaGroups?.find(item => item?.fileFormatSimple === 'pdf');
 
+    // debugger;
     if( imageList ) {
       this.store.set(
         {id, payload: imageList.clientMedia.pages, state: this.store.STATE.LOADED, src: imageList}, 
@@ -208,19 +209,21 @@ class BookReaderModel extends BaseModel {
       isIndex0 = manifest.payload[0].page === 0;
     }
 
-    bookViewData.pages = manifest.payload.map(page => {
-      index = isIndex0 ? page.page : page.page - 1;
-      image = page[page.ocr.imageSize];
-      ocrUrl = page.ocr.url;
-      imageUrl = image.url;
+    bookViewData.pages = manifest.payload
+      .filter(page => this._isValidPage(page))
+      .map(page => {
+        index = isIndex0 ? page.page : page.page - 1;
+        image = page[page.ocr.imageSize];
+        ocrUrl = page.ocr.url;
+        imageUrl = image.url;
 
-      height = parseInt(image.size.height);
-      width = parseInt(image.size.width);
-      originalHeight = parseInt(page?.original?.size?.height || page?.large?.size?.height);
-      originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
-      scale = width / originalWidth;
-      filename = page['@id'].split('/').pop()
-      return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth, page: page.page, filename};
+        height = parseInt(image.size.height);
+        width = parseInt(image.size.width);
+        originalHeight = parseInt(page?.original?.size?.height || page?.large?.size?.height);
+        originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
+        scale = width / originalWidth;
+        filename = page['@id'].split('/').pop()
+        return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth, page: page.page, filename};
     });
 
     bookViewData.pages.sort((a, b) => {
@@ -238,6 +241,13 @@ class BookReaderModel extends BaseModel {
     });
 
     this.store.setState('bookViewData', bookViewData);
+  }
+
+  _isValidPage(page) {
+    if( isNaN(page.page) ) return false;
+    if( page.page === null || page.page === undefined ) return false;
+    if( !page.ocr?.url || !page.ocr?.size ) return false;
+    return true;
   }
 
   async getOcrData(page, itemId) {

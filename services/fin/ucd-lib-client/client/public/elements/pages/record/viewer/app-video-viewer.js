@@ -140,10 +140,10 @@ export default class AppVideoViewer extends Mixin(LitElement)
 
     this.plyr = new plyr(videoEle, {
       hideControls: this.hideControls,
-      fullscreen : { enabled: true, fallback: true, iosNative: true },
+      fullscreen : { enabled: false }, // fallback: true, iosNative: true },
       captions: {update: false},
       // keyboard: {global: true},
-      controls : ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+      controls : ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume'] //, 'fullscreen'],
     });
 
     // Construct a Player to wrap around the <video> tag.

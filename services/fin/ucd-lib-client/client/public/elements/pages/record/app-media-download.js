@@ -32,6 +32,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       isTwoPageView : { type: Boolean },
       downloadAllMedia : { type: Boolean },
       isBookreader : { type: Boolean },
+      disableDownload : { type: Boolean }
     };
   }
 
@@ -76,6 +77,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.isTwoPageView = false;
     this.downloadAllMedia = false;
     this.isBookreader = false;
+    this.disableDownload = (APP_CONFIG.disableFileDownloads && !APP_CONFIG.downloadMirrorUrl);
   }
 
   _onAppStateUpdate(e) {
@@ -239,6 +241,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     
     this.href = '';
     this.archiveHref = '';
+
+    if( this.disableDownload ) return;
 
     let allFiles = this.shadowRoot.querySelector('#fullset').checked;
     let imageList = this.clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
@@ -448,75 +452,10 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    * @description bound to download set button click event
    */
   async _onDownloadFullSetClicked(e) {
-    // this.shadowRoot.querySelector("#downloadZip").submit();
-    // let res = await this.MediaModel.downloadMediaZip(this.zipName, this.zipPaths);
-
-    // METHOD 0: just a get request, which works with zipConcatenatedPaths
-    // TODO other methods below for post requests have other issues
-
-    // e.preventDefault();
-
-    // METHOD 1: formdata
-    // TODO setting content type breaks the request if using formData, the content type is multipart formdata which the bodyparser doesn't handle
-    // const formData = new FormData();
-    // formData.append('name', this.zipName);
-    // formData.append('paths', JSON.stringify(this.zipPaths));
-    // const request = new XMLHttpRequest();
-    // request.open('POST', this.archiveHref);
-    // request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-    // request.send(formData);
-
-
-    // METHOD 2: xmlhttprequest vanilla with .onload
-    // TODO this uses the blob api, works, but doesn't show download in progress until everything is returned from the server
-    // const request = new XMLHttpRequest();
-    // request.open('POST', this.archiveHref);
-
-    //  TODO also trying just JSON.stringifying this.zipPaths instead of passing FormData, 
-    //   which downloads all the media in the api call but isn't handled by browser
-    // request.responseType = 'blob';
-    // request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-
-    // request.onload = (e) => {
-    //   var blob = e.currentTarget.response;
-    //   var contentDispo = e.currentTarget.getResponseHeader('Content-Disposition');
-    //   // https://stackoverflow.com/a/23054920/
-    //   var fileName = contentDispo.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
-
-    //   var a = document.createElement('a');
-    //   a.href = window.URL.createObjectURL(blob);
-    //   a.download = fileName;
-    //   a.dispatchEvent(new MouseEvent('click'));
-    // }
-
-    // request.send(JSON.stringify(this.zipPaths));
-
-
-    // METHOD 3: fetch api with blob streaming
-    // const res = await fetch(this.archiveHref, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(this.zipPaths),
-    //   duplex: 'half',
-    // });
-
-    // // const reader = res.body.getReader();
-    // const blob = await res.blob();
-    // const newBlob = new Blob([blob]);
-
-    // const blobUrl = window.URL.createObjectURL(newBlob);
-
-    // const link = document.createElement('a');
-    // link.href = blobUrl;
-    // link.setAttribute('download', this.zipName + '.zip');
-    // document.body.appendChild(link);
-    // link.click();
-    // link.parentNode.removeChild(link);
-
-    // // clean up Url
-    // window.URL.revokeObjectURL(blobUrl);
+    if( this.disableDownload ) {
+      e.preventDefault();
+      return;
+    }
 
     let path = this.rootRecord["@id"].replace(config.fcrepoBasePath, "");
     gtag("event", "download", {
@@ -530,7 +469,11 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
    * @method _onDownloadClicked
    * @description bound to download button click event, record analytics
    */
-  _onDownloadClicked() {
+  _onDownloadClicked(e) {
+    if( this.disableDownload ) {
+      e.preventDefault();
+      return;
+    }
     let path = this.href.replace(config.fcrepoBasePath, "");
 
     gtag("event", "download", {

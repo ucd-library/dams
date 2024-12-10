@@ -280,7 +280,7 @@ export default function render() {
       class="layout ${this.isLightbox ? "lightbox" : ""} ${this.brFullscreen
         ? "fullscreen"
         : ""}">
-      <div class="icon-nav" style="display: flex; max-width: 90vw;">
+      <div class="icon-nav" style="display: flex; max-width: 80vw;">
         <div id="navLeft">
           <ucdlib-icon
             icon="ucdlib-dams:fa-chevron-left"

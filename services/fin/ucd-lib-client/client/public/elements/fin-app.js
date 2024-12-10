@@ -89,6 +89,7 @@ export class FinApp extends Mixin(LitElement)
 
     // app header event to pass to app-search, to toggle filters in mobile view
     window.addEventListener('expand-search-filters', this._expandSearchFilters.bind(this));
+    window.addEventListener('resize', this._resize.bind(this));
   }
   
   ready() {
@@ -171,11 +172,12 @@ export class FinApp extends Mixin(LitElement)
    */
   _updateScrollPosition(e) {
     let scrollPositionY = 0;
+
     // every page change should scroll to top, except on search page we want to store the scroll position if nav to an item and then back, 
     // so when nav back, we can scroll to the same position we started at
     if( e.location.page === 'item' && e.lastLocation.page === 'search' && !this.searchScrollPositionY ) {
       this.searchScrollPositionY = window.scrollY;
-    } else if( e.location.page === 'search' && e.lastLocation.page === 'item' ) {
+    } else if( e.location.page === 'search' && e.lastLocation.page === 'item' && !e.resetScroll ) {
       scrollPositionY = this.searchScrollPositionY;
       this.searchScrollPositionY = 0;
     } else if( e.location.page === 'search' && e.lastLocation.page === 'search' ) {
@@ -190,6 +192,12 @@ export class FinApp extends Mixin(LitElement)
     requestAnimationFrame(() => {      
       window.scrollTo(0, scrollPositionY);
     });
+
+    if( e.resetScroll ) this.AppStateModel.set({ resetScroll: false });
+  }
+
+  _resize() {
+    this._updateViewHeight();
   }
 
   async _updateViewHeight(page=this.page) {
@@ -198,7 +206,15 @@ export class FinApp extends Mixin(LitElement)
     if( !mainContent ) return;
 
     let selectedPage = this.querySelector('ucdlib-pages').querySelector('#'+page);
+
+    // wait for content and child components to render
     await selectedPage.updateComplete;
+    let childComponents = selectedPage.querySelectorAll('*');
+    await Promise.all(Array.from(childComponents).map(async (child) => {
+      if( child.updateComplete ) {
+        await child.updateComplete;
+      }
+    }));
 
     if( page === 'browse' ) {
       let browseByType = this.AppStateModel.location.path[1];
@@ -214,8 +230,8 @@ export class FinApp extends Mixin(LitElement)
         selectedPage.style.display = '';
       }
     }
-    
-    if( selectedPage?.offsetHeight ) {
+
+    if( page === 'browse' && selectedPage?.offsetHeight ) {
       let height = selectedPage.offsetHeight;
       mainContent.style.minHeight = height+'px';
     } else {

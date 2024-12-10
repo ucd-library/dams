@@ -118,6 +118,26 @@ class FiltersModel extends BaseModel {
     this.emit(this.events.FILTER_BUCKETS_UPDATE, state)
   }
 
+  getFacets() {
+    return {
+      "@graph.isPartOf.@id": {
+          "type": "facet"
+      },
+      "@graph.fileFormatSimple": {
+          "type": "facet"
+      },
+      "@graph.creator.name": {
+          "type": "facet"
+      },
+      "@graph.subjects.name": {
+          "type": "facet"
+      },
+      "@graph.yearPublished": {
+          "type": "range"
+      }
+    }
+  }
+
 }
 
 module.exports = new FiltersModel();

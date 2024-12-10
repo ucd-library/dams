@@ -49,10 +49,10 @@ export class AppSearch extends Mixin(LitElement)
 
     this._onAppStateUpdate(await this.AppStateModel.get());
 
-    if( this.appState.location.path[0] === 'search' ) {
-      let state = this.SearchVcModel.getSearch();
-      if( state ) this._onSearchVcUpdate(state);
-    }
+    // if( this.appState.location.path[0] === 'search' ) {
+    //   let state = this.SearchVcModel.getSearch();
+    //   if( state ) this._onSearchVcUpdate(state);
+    // }
     window.addEventListener('collapse-filters', this._onCollapseFilters.bind(this));
     window.addEventListener("page-change", this._onPaginationChange.bind(this));
   }
