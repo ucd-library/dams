@@ -50,6 +50,7 @@ class AppRecord extends Mixin(LitElement)
       itemDisplay: { type: String },
       displayData: { type: Object },
       savedCollectionData: { type: Object },
+      disableDownload: { type: Boolean },
     };
   }
 
@@ -91,6 +92,7 @@ class AppRecord extends Mixin(LitElement)
     this.editMode = false;
     this.displayData = {};
     this.savedCollectionData = {};
+    this.disableDownload = (APP_CONFIG.disableFileDownloads && !APP_CONFIG.downloadMirrorUrl);
 
     this._injectModel(
       "AppStateModel",

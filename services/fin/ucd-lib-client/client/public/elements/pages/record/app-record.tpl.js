@@ -331,7 +331,7 @@ export default function render() {
         </div>
       </div>
 
-      <div class="download-section">
+      <div class="download-section" ?hidden="${this.disableDownload}">
         <div class="label">Download</div>
         <div class="download-options">
           <app-media-download
