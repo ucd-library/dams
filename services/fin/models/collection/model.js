@@ -43,6 +43,7 @@ class CollectionsModel extends FinEsDataModel {
 
       if( collection ) {
         collection.itemCount = await this.getItemCount(collection['@id']);
+        collection.publishedDateRange = await this.getPublishedDateRange(collection['@id']);
       }
     }
 
@@ -153,6 +154,39 @@ class CollectionsModel extends FinEsDataModel {
     });
 
     return result.count;
+  }
+
+  /**
+   * @method getPublishedDateRange
+   * @description get the published date range for a collection
+   * 
+   * @param {String} id collection id
+   * 
+   * @returns {Promise}
+   */ 
+  async getPublishedDateRange(id) {
+    let result = await this.client.search({
+      index: this.itemAlias,
+      body: {
+        query: {
+          bool: {
+            must: [
+              { term: { '@graph.isPartOf.@id': id } }
+            ]
+          }
+        },
+        aggs: {
+          min_year: { min: { field: '@graph.yearPublished' } },
+          max_year: { max: { field: '@graph.yearPublished' } }
+        },
+        size: 0
+      }
+    });
+  
+    const minYear = result.aggregations.min_year.value;
+    const maxYear = result.aggregations.max_year.value;
+  
+    return { minYear, maxYear };
   }
 
   /**

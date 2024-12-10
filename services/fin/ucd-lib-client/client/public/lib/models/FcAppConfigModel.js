@@ -195,7 +195,8 @@ class FcAppConfigModel extends BaseModel {
       watercolor, 
       itemCount, 
       itemDefaultDisplay, 
-      savedItems
+      savedItems,
+      showDisclaimer
     } = opts;
     let data = {
       "@context" : {
@@ -241,6 +242,7 @@ class FcAppConfigModel extends BaseModel {
       "name" : title,
       "ucdlib:itemCount" : itemCount,
       "ucdlib:itemDefaultDisplay" : itemDefaultDisplay,
+      "ucdlib:showDisclaimer" : showDisclaimer,
       "exampleOfWork" : savedItems,
       "isPartOf" : {
         "@id" : `info:fedora${id}`

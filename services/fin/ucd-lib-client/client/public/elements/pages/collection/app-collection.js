@@ -29,7 +29,7 @@ class AppCollection extends Mixin(LitElement)
       languages : { type : Array },
       location : { type : String },
       items : { type : Number },
-      yearPublished : { type : Number },
+      publishedDateRange : { type : String },
       highlightedItems : { type : Array },
       savedItems : { type : Array },
       dbsync : { type : Object },
@@ -44,7 +44,8 @@ class AppCollection extends Mixin(LitElement)
       collectionSearchHref : {type: String},
       citationRoot : { type: Object },
       itemDefaultDisplay : { type: String },
-      itemEdits : { type: Array }
+      itemEdits : { type: Array },
+      showDisclaimer : { type: Boolean }
     };
   }
 
@@ -143,7 +144,7 @@ class AppCollection extends Mixin(LitElement)
     this.languages = !Array.isArray(root.language || []) ? [root.language] : root.language;
     this.location = root.location || '';
     this.items = utils.formatNumberWithCommas(e.vcData.count);
-    this.yearPublished = e.vcData.yearPublished;
+    this.publishedDateRange = e.vcData.publishedDateRange;
 
     this.citationRoot = root;
 
@@ -188,7 +189,7 @@ class AppCollection extends Mixin(LitElement)
     this.languages = [];
     this.location = '';
     this.items = 0;
-    this.yearPublished = 0;
+    this.publishedDateRange = '';
     this.highlightedItems = [];
     this.savedItems = [];
     this.dbsync = {};
@@ -203,6 +204,7 @@ class AppCollection extends Mixin(LitElement)
     this.citationRoot = {};
     this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage; // one, list.. for admin pref on BR display type for items in this collection
     this.itemEdits = [];
+    this.showDisclaimer = false;
 
     let featuredImageElement = document.querySelector('.featured-image');
     if( featuredImageElement ) featuredImageElement.style.backgroundImage = '';
@@ -322,6 +324,18 @@ class AppCollection extends Mixin(LitElement)
   }
 
   /**
+   * @method _onDisclaimerToggle
+   * @description admin ui, change to show/hide disclaimer for this collection
+   */
+  _onDisclaimerToggle(e) {
+    if( !this.isUiAdmin ) return;
+    
+    this.showDisclaimer = e.currentTarget.checked;
+    // this.displayData.showDisclaimer = e.currentTarget.checked;
+    this._updateDisplayData();
+  }
+
+  /**
    * @method _onSelectAllExceptionsChange
    * @description admin ui, change to 'select all exceptions' checkbox
    *
@@ -372,6 +386,8 @@ class AppCollection extends Mixin(LitElement)
 
     this.itemDefaultDisplay = collectionEdits.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
 
+    this.showDisclaimer = collectionEdits.showDisclaimer || false;
+
     this.savedItems = collectionEdits.exampleOfWork || [];
     if( !Array.isArray(this.savedItems) ) this.savedItems = [this.savedItems];
     this.savedItems.sort((a,b) => a.position - b.position);
@@ -402,7 +418,8 @@ class AppCollection extends Mixin(LitElement)
       itemDefaultDisplay : this.itemDefaultDisplay,
       savedItems : this.savedItems,
       newFileUploadName,
-      thumbnailUrlOverride : this.thumbnailUrlOverride
+      thumbnailUrlOverride : this.thumbnailUrlOverride,
+      showDisclaimer : this.showDisclaimer
     };
     this.displayData = this.FcAppConfigModel.getCollectionDisplayData(this.collectionId, opts);
   }

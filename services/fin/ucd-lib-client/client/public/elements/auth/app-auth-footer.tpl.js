@@ -28,7 +28,7 @@ export default function render() {
 
 <div>
   <span class="logged-in-as" ?hidden="${!this.loggedIn}">Logged in as: ${this.user.preferred_username}</span>
-  <a ?hidden="${this.loggedIn}" href="/auth/login?redirectUrl=${this.path}">Login</a>
+  <a ?hidden="${this.loggedIn}" href="/auth/login?redirectUrl=${this.path}">Admin Login</a>
   <div ?hidden="${!this.loggedIn}">
     <a @click="${this._logout}" class="gold">Log Out</a>
   </div>
