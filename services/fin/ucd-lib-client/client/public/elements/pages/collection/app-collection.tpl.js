@@ -118,8 +118,13 @@ export default function render() {
 
     .content-warning {
       padding: 2rem;
+      margin-top: 2rem;
       background-color: var(--color-aggie-gold-30);
       font-style: italic;
+    }
+
+    .disclaimer-admin-toggle {
+      margin-top: 2rem;
     }
 
     .detail-section {
@@ -129,7 +134,7 @@ export default function render() {
     }
 
     .description {
-      margin: 2rem 0;
+      margin: 0 0 2rem 0;
     }
 
     .collection-label {
@@ -605,31 +610,6 @@ export default function render() {
     </div>
 
     <div class="detail-section">
-      <div class="disclaimer-admin-toggle" ?hidden="${!this.editMode || !this.isUiAdmin}">
-        <div class="disclaimer-header">
-          <span>Disclaimer</span>
-          <div class="toggle-switch">
-            <input 
-              type="checkbox" 
-              id="toggle"
-              ?checked="${this.showDisclaimer}" 
-              @change="${this._onDisclaimerToggle}">
-            <label for="toggle" class="toggle-button"></label>
-          </div>
-        </div>
-        <div class="disclaimer-content">
-          <p>
-            Due to the nature of the historical items in this collection, some materials may be considered harmful, offensive or misrepresentative.
-            There may be occurences of language, positions and values that do not align with our current values and practices at UC Davis.
-          </p>
-        </div>
-      </div>
-
-      <div class="content-warning" ?hidden="${this.editMode || !this.showDisclaimer}">
-        Due to the nature of the historical items in this collection, some materials may be considered harmful, offensive or misrepresentative.
-        There may be occurences of language, positions and values that do not align with our current values and practices at UC Davis.
-      </div>
-
 
       <p class="description">
       <ucdlib-md id="md">
@@ -661,6 +641,33 @@ export default function render() {
       <div style="margin-bottom: .4rem;" ?hidden="${!this.location}">
         <span class="collection-label">Location: </span> ${this.location}
       </div>
+
+      <div class="disclaimer-admin-toggle" ?hidden="${!this.editMode || !this.isUiAdmin}">
+        <div class="disclaimer-header">
+          <span>Disclaimer</span>
+          <div class="toggle-switch">
+            <input 
+              type="checkbox" 
+              id="toggle"
+              ?checked="${this.showDisclaimer}" 
+              @change="${this._onDisclaimerToggle}">
+            <label for="toggle" class="toggle-button"></label>
+          </div>
+        </div>
+        <div class="disclaimer-content">
+          <p>
+            Due to the nature of the historical items in this collection, some materials may be considered harmful, offensive or misrepresentative.
+            There may be occurences of language, positions and values that do not align with our current values and practices at UC Davis.
+          </p>
+        </div>
+      </div>
+
+      <div class="content-warning" ?hidden="${this.editMode || !this.showDisclaimer}">
+        Due to the nature of the historical items in this collection, some materials may be considered harmful, offensive or misrepresentative.
+        There may be occurences of language, positions and values that do not align with our current values and practices at UC Davis.
+      </div>
+
+
     </div>
 
     <div class="collection-highlights">
