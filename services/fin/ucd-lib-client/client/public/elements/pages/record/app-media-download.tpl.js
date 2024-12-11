@@ -137,7 +137,8 @@ export default function render() {
 
       #media-format-label,
       #media-all-format-label,
-      #multimedia-format-label {
+      #multimedia-format-label,
+      #multimedia-all-format-label {
         font-size: 0.9rem;
         margin-right: 0.75rem;
         font-weight: bold;
@@ -188,7 +189,6 @@ export default function render() {
 
     <div ?hidden="${this.fullSetSelected}">
       <div class="layout btns"
-        style="margin-bottom: 5px;"
         ?hidden="${!this.selectedMediaHasSources}">
         <span id="multimedia-format-label"
           ?hidden="${!this.isMultimedia}">
@@ -226,6 +226,9 @@ export default function render() {
     </div>
 
     <div style="display: flex;">
+      <span id="multimedia-all-format-label"
+        ?hidden="${!this.fullSetSelected || !this.isMultimedia}">
+      </span>
       <span id="media-all-format-label"
         style="display: inline-block;"  
         ?hidden="${!this.fullSetSelected || !this.showDownloadLabel}">

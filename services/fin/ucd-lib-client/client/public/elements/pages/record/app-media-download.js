@@ -127,7 +127,15 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( this.isMultimedia ) {
       let download = this.downloadOptions[0];
       this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = download.fileFormatSimple + ' (' + bytes(download.fileSize).toLowerCase() + ')';
-        this.showImageFormats = false;
+      this.showImageFormats = false;
+
+      // update all label to include video + other media (prob just thumbnail)
+      // multimedia-all-format-label
+      let filesize = this.sources.reduce((a, r) => a + r.fileSize, 0);
+      // let fileTypes = this.sources.map(s => s.url?.split('.')?.pop()).join(', ');
+      let label = 'video (' + bytes(filesize).toLowerCase() + ')';
+      this.shadowRoot.querySelector("#multimedia-all-format-label").innerHTML = label;
+
     } else {
       // check if the only main source with pages is pdf,
       // if so then just show archive download options instead of single page
