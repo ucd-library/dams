@@ -47,9 +47,9 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.render = render.bind(this);
     this.active = true;
 
-    this.totalThumbnailWidth = 64;
+    this.totalThumbnailWidth = 68;
     this.icon = "";
-    this.iconWidth = 40;
+    this.iconWidth = 36;
 
     this.thumbnails = [];
 
@@ -85,28 +85,11 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
   connectedCallback() {
     super.connectedCallback();
-    this._resize();
   }
 
   async firstUpdated() {
-    let selectedRecord = await this.AppStateModel.getSelectedRecord();
-    if (selectedRecord) {
-      this._onSelectedRecordUpdate(selectedRecord);
-
-      // also update thumbnail set if we have a selected media
-      let selectedThumbnail = this.thumbnails.find(t => t.selected)?.position;
-      if( selectedThumbnail ) {
-        this.leftMostThumbnail = Math.floor(selectedThumbnail / Math.max(this.thumbnailsPerFrame, 1)) * this.thumbnailsPerFrame;
-
-        if( this.leftMostThumbnail > 0 ) {
-          this._resize();
-
-          this.AppStateModel.set({
-            mediaViewerNavLeftMostThumbnail: this.leftMostThumbnail,
-          });  
-        }
-      }
-    }
+    this._onSelectedRecordUpdate(await this.AppStateModel.getSelectedRecord());
+    this._resize(true);
 
     let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     if( screenWidth < 800 ) {
@@ -120,7 +103,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     if (e.mediaViewerNavLeftMostThumbnail === this.leftMostThumbnail) return;
 
     this.leftMostThumbnail = e.mediaViewerNavLeftMostThumbnail;
-    this._resize();    
   }
 
   _onBookreaderStateUpdate(e) {
@@ -189,8 +171,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    * @description update thumbnail preview on resize
    *
    */
-  _resize() {
-    // let w = this.offsetWidth;
+  _resize(updateThumbnailWindow=false) {
     let w = window.innerWidth;
 
     // grrrr
@@ -213,16 +194,27 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     let spaceBuffer = window.innerWidth < 1000 ? 0.35 : 0.42;
     let availableThumbSpace = Math.min(w - iconsWidth, w * spaceBuffer);
+
     this.thumbnailsPerFrame = Math.max(
       Math.floor(availableThumbSpace / this.totalThumbnailWidth),
       1
     );
+    
+    this.thumbnailContainerWidth = this.thumbnailsPerFrame * this.totalThumbnailWidth;
+
+    if( updateThumbnailWindow ) {
+      let selectedThumbnail = this.thumbnails.findIndex(t => t.selected);
+      if( selectedThumbnail ) {
+        this.leftMostThumbnail = Math.floor(selectedThumbnail / Math.max(this.thumbnailsPerFrame, 1)) * this.thumbnailsPerFrame;
+        if( this.leftMostThumbnail < 0 ) this.leftMostThumbnail = 0;
+      }  
+    }
+
     if (this.isLightbox) this.thumbnailsPerFrame *= 2;
     let thumbnailContainer = this.shadowRoot.querySelector("#thumbnails");
     if (!thumbnailContainer) return;
-
-    thumbnailContainer.style.width =
-      this.thumbnailsPerFrame * this.totalThumbnailWidth + "px";
+    
+    thumbnailContainer.style.width = this.thumbnailContainerWidth + 'px';
 
     this.showNavLeft = this.leftMostThumbnail !== 0;
     this.showNavRight = !this._showingLastThumbFrame();
@@ -359,8 +351,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       // TODO: Filtering out the text based files for now until we get the PDF/text viewer set up correctly
       // .filter((element) => element.icon !== "blank-round");
 
-
-    this._resize();   
+    this._resize(true);
   }
 
   _renderThumbnail(node, clientMediaPage, selectedMediaPage) {
@@ -382,10 +373,10 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     // }
 
     let thumbnail = {
-      id: node["@id"]+(!clientMediaPage.page || clientMediaPage.page === undefined ? '' : ':'+(clientMediaPage.page-1)),
+      id: node["@id"]+(!clientMediaPage.page || clientMediaPage.page === undefined ? '' : ':'+clientMediaPage.page),
       icon: iconType,
       position: clientMediaPage.page,
-      selected: (clientMediaPage.page-1) === selectedMediaPage,
+      selected: clientMediaPage.page === selectedMediaPage,
       disabled: false,
       src: thumbnailUrl,
       // thumbnail: url

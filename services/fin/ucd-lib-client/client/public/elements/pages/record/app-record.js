@@ -33,6 +33,7 @@ class AppRecord extends Mixin(LitElement)
       date: { type: String },
       publisher: { type: String },
       subjects: { type: Array },
+      creator: { type: String },
       callNumber: { type: String },
       material: { type: String },
       size: { type: String },
@@ -49,6 +50,7 @@ class AppRecord extends Mixin(LitElement)
       itemDisplay: { type: String },
       displayData: { type: Object },
       savedCollectionData: { type: Object },
+      disableDownload: { type: Boolean },
     };
   }
 
@@ -65,6 +67,7 @@ class AppRecord extends Mixin(LitElement)
     this.date = "";
     this.publisher = "";
     this.subjects = [];
+    this.creator = '';
     this.callNumber = "";
     this.material = "";
     this.collectionImg = "";
@@ -89,6 +92,7 @@ class AppRecord extends Mixin(LitElement)
     this.editMode = false;
     this.displayData = {};
     this.savedCollectionData = {};
+    this.disableDownload = (APP_CONFIG.disableFileDownloads && !APP_CONFIG.downloadMirrorUrl);
 
     this._injectModel(
       "AppStateModel",
@@ -139,6 +143,7 @@ class AppRecord extends Mixin(LitElement)
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
     this.material = this.record.material;
+    this.creator = this.record.creator;
 
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
@@ -310,6 +315,10 @@ class AppRecord extends Mixin(LitElement)
       '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
     ];
 
+  }
+
+  _onSubjectClick(e) {
+    this.AppStateModel.set({ resetScroll: true })
   }
 
   /**

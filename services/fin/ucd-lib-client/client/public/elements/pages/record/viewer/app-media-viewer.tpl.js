@@ -189,6 +189,10 @@ export default function render() {
         padding-bottom: 3.5rem;
       }
 
+      ucdlib-bookreader[fullscreen] {
+        padding-top: .5rem;
+      }
+
       /* .br-fullscreen-active {
           html, body {
             margin: 0;

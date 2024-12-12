@@ -33,14 +33,17 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     this.maxValue = Number.MAX_VALUE;
     this.showUnknown = false;
 
-    this._injectModel("AppStateModel", "RecordModel", "CollectionModel");
+    this._injectModel("AppStateModel", "RecordModel", "CollectionModel", "FiltersModel");
   }
 
-  // connectedCallback() {
-  //   super.connectedCallback();
-  // }
+  async firstUpdated() {
+    if( this.AppStateModel.location.page !== 'search' ) return;
 
-  firstUpdated() {
+    let searchDoc = this.RecordModel.getCurrentSearchDocument();
+    if( searchDoc ) {
+      this._onRecordSearchUpdate(await this.RecordModel.search(searchDoc));
+    }
+
     this.resize();
   }
 
@@ -132,13 +135,19 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
   }
 
   /**
-   * @method _onSelectedCollectionUpdate
-   * @description from CollectionInterface, called whenever selected collection updates
-   *
+   * @method _onFilterBucketsUpdate
+   * @description from FilterService
+   * 
    * @param {Object} e
    */
-  _onSelectedCollectionUpdate(e) {
-    this.selectedCollection = e ? e["@id"] : "";
+  _onFilterBucketsUpdate(e) {
+    if( e.filter !== '@graph.isPartOf.@id' ) return;
+
+    if( e.buckets.length === 1 ) {
+      this.selectedCollection = e.buckets[0].key;
+    } else {
+      this.selectedCollection = '';
+    }
     this._renderFilters();
   }
 
@@ -165,12 +174,16 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     if (!this.currentFilters) return;
 
     // grab default aggregations for collection
-    let cid = this.selectedCollection;
-    let result = await this.RecordModel.defaultSearch(this.selectedCollection);
-    if (cid !== this.selectedCollection) return; // make sure we haven't updated
+    let result;
+    if( this.selectedCollection ) {
+      let facets = this.FiltersModel.getFacets();
+      result = await this.RecordModel.defaultSearch(this.selectedCollection, null, null, facets);        
+    } else {
+      result = await this.RecordModel.defaultSearch('');
+    }
     this.default = result;
 
-    let rangeFilter = this.default.payload.aggregations.ranges[this.filter];
+    let rangeFilter = this.default?.payload?.aggregations?.ranges?.[this.filter];
     if (rangeFilter) {
       this.absMinValue = rangeFilter.min;
       this.absMaxValue = rangeFilter.max;

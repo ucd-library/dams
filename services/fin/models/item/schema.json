@@ -64,8 +64,17 @@
       "type" : "keyword"
     },
 
-    "@graph.creator.name" : {
+    "@graph.creator.@id" : {
       "type" : "keyword"
+    },
+
+    "@graph.creator.name" : {
+      "type" : "keyword",
+      "fields": {
+        "text": { 
+          "type":  "text"
+        }
+      }
     },
 
     "@graph.created" : {
