@@ -148,14 +148,14 @@ Sitemap: ${config.server.url}/sitemap.xml`);
       }
     };
 
-    let chunkSize = 250;
+    let chunkSize = 1000;
     let time = '30s';
 
     // find records and start scroll
     let result = await items.esSearch({
       _source : ['name'],
       query : query,
-      size: 250
+      size: chunkSize
     }, {scroll: time});
 
     let sent = result.hits.hits.length;
@@ -182,7 +182,7 @@ Sitemap: ${config.server.url}/sitemap.xml`);
     // create our es query
     let query = {};
     let time = '30s';
-    let chunkSize = 250;
+    let chunkSize = 1000;
 
     // find records and start scroll
     let result = await items.esSearch({
@@ -192,8 +192,7 @@ Sitemap: ${config.server.url}/sitemap.xml`);
 
     let sent = result.hits.hits.length;
     result.hits.hits.forEach(result => resp.write(`${config.server.url}${result._id}\n`));
-    
-    while( chunkSize === sent ) {
+    while( sent > 0 ) {
       result = await items.esScroll({
         scroll_id: result._scroll_id,
         scroll: time
@@ -202,6 +201,8 @@ Sitemap: ${config.server.url}/sitemap.xml`);
       result.hits.hits.forEach(result => resp.write(`${config.server.url}${result._id}\n`));
       sent = result.hits.hits.length;
     }
+
+    // todo clear scroll
 
     // finish our response
     resp.end();

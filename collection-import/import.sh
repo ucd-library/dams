@@ -4,6 +4,7 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
+export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 ROOT_DIR="/data"
 ROOT_GIT_HOST="https://github.com/ucd-library"
 GOOGLE_APPLICATION_CREDENTIALS="/etc/fin/service-account.json" 

@@ -1,6 +1,5 @@
 const RecordGraph = require('../ucd-lib-client/client/public/lib/utils/RecordGraph');
 const fetch = require('node-fetch');
-const {config} = require('@ucd-lib/fin-service-utils');
 
 
 class Validate {
@@ -12,7 +11,7 @@ class Validate {
    * @param {Object} jsonld 
    * @returns {Object}
    */
-  async validateItem(jsonld) {
+  async validateItem(jsonld, serverHost) {
     if( !jsonld ) {
       throw new Error('Elastic search response is empty');
     }
@@ -64,6 +63,29 @@ class Validate {
           message : e.message,
           stack : e.stack
         });
+      }
+    }
+
+    let isPartOf = graph.root.isPartOf;
+    if( !isPartOf ) {
+      result.errors.push('Collection isPartOf not found');
+    } else {
+      if( !Array.isArray(isPartOf) ) {
+        isPartOf = [isPartOf];
+      }
+
+      let found = false;
+      for( let part of isPartOf ) {
+        if( !part['@id'] ) {
+          continue;
+        } else if( part['@id'].match(/^\/collection\//) ) {
+          found = true;
+          break;
+        }
+      }
+
+      if( !found ) {
+        result.errors.push('Collection isPartOf not found');
       }
     }
 
@@ -175,8 +197,8 @@ class Validate {
         });
       }
       if( pdf && pdf.manifest ) {
-        let url = config.server.url+pdf.manifest;
-        let hResp = await fetch(config.gateway.host+pdf.manifest, {method: 'HEAD'});
+        let url = serverHost+pdf.manifest;
+        let hResp = await fetch(serverHost+pdf.manifest, {method: 'HEAD'});
         if( hResp.status !== 200 ) {
           result.errors.push({
             label : 'Pdf client media manifest is not available',

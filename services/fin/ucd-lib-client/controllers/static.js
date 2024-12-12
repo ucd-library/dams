@@ -56,6 +56,8 @@ module.exports = async (app) => {
         // recordCount: (await records.rootCount()).count,
         featuredImages : config.client.featuredImages,
         env : config.client.env,
+        disableFileDownloads : config.gateway.proxy.disableFileDownloads,
+        downloadMirrorUrl : config.fcrepo.dataMirror.url,
         buildInfo : loadCorkBuildInfo(),
         fcAppConfig : appConfig.config,
         title : config.client.title,
