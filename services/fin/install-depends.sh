@@ -9,7 +9,8 @@ apt install -y \
   gcc \
   python3-dev \
   python3-setuptools \
-  python3-pip
+  python3-pip \
+  rsync
 
 pip3 uninstall crcmod
 pip3 install --no-cache-dir -U crcmod
