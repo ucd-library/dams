@@ -21,7 +21,7 @@ class ItemValidator {
     await this.validateAll();
   }
 
-  async validate(json) {
+  async validate(json, host) {
     try {
       let resp = await validate.validateItem(json, host);
       console.log(json['@id'], resp);
