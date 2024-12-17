@@ -377,9 +377,14 @@ export default function render() {
         </div>
       </div>
 
-      <div ?hidden="${!this.creator}" class="metadata-row" id="creator">
+      <div ?hidden="${!this.creator || !this.creator.length}" class="metadata-row" id="creator">
         <div class="attr">Creator</div>
-        <div class="value" id="creatorValue">${this.creator}</div>
+        <div class="value" id="creatorValue">
+          ${this.creator.map(
+            (c, index) =>
+              html`${index > 0 ? ", " : ""}<a href="${utils.getCreatorUrl(this.RecordModel, c)}" @click="${this._onCreatorClick}">${c}</a>`
+          )}
+        </div>
       </div>
 
       <div ?hidden="${!this.callNumber}" class="metadata-row" id="callNumber">
