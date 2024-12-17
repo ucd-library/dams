@@ -92,7 +92,7 @@ class AppRecord extends Mixin(LitElement)
     this.editMode = false;
     this.displayData = {};
     this.savedCollectionData = {};
-    this.disableDownload = (APP_CONFIG.disableFileDownloads && !APP_CONFIG.downloadMirrorUrl);
+    this.disableDownload = APP_CONFIG.disableFileDownloads;
 
     this._injectModel(
       "AppStateModel",
