@@ -560,6 +560,11 @@ class ImageUtils {
       let fileInfo = path.parse(localFile);
       sizeFile = path.join(fileInfo.dir, outputBaseName+'.'+sizeConfig.outputFormat);
 
+      // hack for tif files
+      if( fileInfo.ext === '.tif' || fileInfo.ext === '.tiff' ) {
+        localFile += '[0]';
+      }
+
       let files = {
         input : localFile,
         output : sizeConfig.output ? sizeConfig.output+sizeFile : sizeFile
