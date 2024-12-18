@@ -73,8 +73,43 @@ return html`
     margin: 0 auto;
   }
 
-  @media(max-width: 768px) {
+  .tooltip {
+    cursor: pointer;
+    position: relative;
+  }
 
+  .tooltip:hover:before {
+    content: attr(data-tooltip-text);
+    position: absolute;
+    bottom: 60px;
+    right: 50%;
+    transform: translateX(50%);
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: var(--color-aggie-blue);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    white-space: nowrap;
+    opacity: 0;
+    transition: .2s opacity ease-out;
+    z-index: 10;
+  }
+
+  .tooltip:hover:after {
+    content: "";
+    position: absolute;
+    bottom: 50px;
+    right: 20px;
+    border: 5px solid var(--color-aggie-blue);
+    border-color: var(--color-aggie-blue) transparent transparent transparent;
+    opacity: 0;
+    transition: .2s opacity ease-out;
+  }
+
+  .tooltip:hover:before,
+  .tooltip:hover:after {
+    opacity: 1;
   }
 
   ${plyrCss}
@@ -88,7 +123,9 @@ return html`
     <audio id="audio_player" controls>
       <source>
     </audio>
-    <div class="button"><app-share-btn></app-share-btn></div>
+    <div class="button tooltip" data-tooltip-text="Share">
+      <app-share-btn></app-share-btn>
+    </div>
   </div>
 
 </div>

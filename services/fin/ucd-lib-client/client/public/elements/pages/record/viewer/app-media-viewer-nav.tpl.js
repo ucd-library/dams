@@ -274,6 +274,54 @@ export default function render() {
           width: 80% !important;
         }
       }
+
+      .tooltip {
+        cursor: pointer;
+        position: relative;
+      }
+
+      .tooltip:hover:before {
+        content: attr(data-tooltip-text);
+        position: absolute;
+        bottom: 60px;
+        right: 50%;
+        transform: translateX(50%);
+        padding: 5px 10px;
+        border-radius: 5px;
+        background: var(--color-aggie-blue);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: bold;
+        white-space: nowrap;
+        opacity: 0;
+        transition: .2s opacity ease-out;
+        z-index: 10;
+      }
+
+      .tooltip.right-align:hover:before {
+        transform: translateX(80%);
+      }
+
+      .tooltip.left-align:hover:before {
+        transform: translateX(20%);
+      }
+
+      .tooltip:hover:after {
+        content: "";
+        position: absolute;
+        bottom: 50px;
+        right: 20px;
+        border: 5px solid var(--color-aggie-blue);
+        border-color: var(--color-aggie-blue) transparent transparent transparent;
+        opacity: 0;
+        transition: .2s opacity ease-out;
+      }
+
+      .tooltip:hover:before,
+      .tooltip:hover:after {
+        opacity: 1;
+      }
+
     </style>
 
     <div
@@ -296,8 +344,9 @@ export default function render() {
             style="min-width: 300px;"
             ?hidden="${this.brFullscreen || !this.isBookReader}">
             <div
-              class="zoom ${this.searching ? "searching" : ""}"
-              @click="${this._onSearchToggled}">
+              class="zoom ${this.searching ? "searching" : ""} tooltip"
+              @click="${this._onSearchToggled}"
+              data-tooltip-text="Search Inside">
               <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
             </div>
             <div
@@ -368,7 +417,10 @@ export default function render() {
         style="white-space: nowrap"
         ?hidden="${this.isLightbox}"
       >
-        <div @click="${this._onToggleBookView}" class="page-toggle" ?hidden="${!this.isBookReader}">
+        <div @click="${this._onToggleBookView}" 
+          class="page-toggle tooltip ${this.brSinglePage ? 'two-page' : 'single-page'}" 
+          ?hidden="${!this.isBookReader}"
+          data-tooltip-text="${this.brSinglePage ? 'Two-Page View' : 'Single-Page View'}">
           <ucdlib-icon
             icon="ucdlib-dams:fa-book-open"
             ?hidden="${!this.brSinglePage}"
@@ -381,23 +433,25 @@ export default function render() {
         </div>
 
         <div
-          class="zoom-controls"
+          class="zoom-controls tooltip"
           @click="${this._onBRZoomOutClicked}"
           ?hidden="${!this.brFullscreen}"
-        >
+          data-tooltip-text="Zoom Out">
           <ucdlib-icon icon="ucdlib-dams:fa-minus"></ucdlib-icon>
         </div>
         <div
-          class="zoom-controls"
+          class="zoom-controls tooltip"
           @click="${this._onBRZoomInClicked}"
           ?hidden="${!this.brFullscreen}"
-        >
+          data-tooltip-text="Zoom In" >
           <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
         </div>
 
         <div
           @click="${this._onExpandBookView}"
           ?hidden="${!this.isBookReader || this.brFullscreen}"
+          class="tooltip"
+          data-tooltip-text="Fullscreen"
         >
           <ucdlib-icon
             icon="ucdlib-dams:fa-up-right-and-down-left-from-center"
@@ -406,7 +460,7 @@ export default function render() {
         <div
           @click="${this._onCollapseBookView}"
           ?hidden="${!this.isBookReader || !this.brFullscreen}"
-        >
+          class="tooltip" data-tooltip-text="Exit Fullscreen">
           <ucdlib-icon
             icon="ucdlib-dams:fa-down-left-and-up-right-to-center"
           ></ucdlib-icon>
@@ -415,12 +469,14 @@ export default function render() {
         <div
           @click="${this._onZoomInClicked}"
           ?hidden="${this.isBookReader || this.hideZoom}"
+          class="tooltip"
+          data-tooltip-text="Fullscreen"
         >
           <ucdlib-icon
             icon="ucdlib-dams:fa-up-right-and-down-left-from-center"
           ></ucdlib-icon>
         </div>
-        <div ?hidden="${this.brFullscreen}">
+        <div ?hidden="${this.brFullscreen}" class="tooltip" data-tooltip-text="Share">
           <app-share-btn></app-share-btn>
         </div>
 
@@ -477,14 +533,14 @@ export default function render() {
           <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
         </div>
 
-        <div @click="${this._onZoomOutClicked}">
+        <div @click="${this._onZoomOutClicked}" class="tooltip" data-tooltip-text="Zoom Out">
           <ucdlib-icon icon="ucdlib-dams:fa-minus"></ucdlib-icon>
         </div>
-        <div @click="${this._onZoomInClicked}">
+        <div @click="${this._onZoomInClicked}" class="tooltip" data-tooltip-text="Zoom In">
           <ucdlib-icon icon="ucdlib-dams:fa-plus"></ucdlib-icon>
         </div>
 
-        <div @click="${this._onCloseClicked}">
+        <div @click="${this._onCloseClicked}" class="tooltip left-align" data-tooltip-text="Exit Fullscreen">
           <ucdlib-icon icon="ucdlib-dams:fa-down-left-and-up-right-to-center"></ucdlib-icon>
         </div>
 
