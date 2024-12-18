@@ -58,7 +58,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     if (this.data.id) {
       this.title = this.data.title;
       this.itemUrl = this.data.id;
-      this.thumbnailUrl = this.data.thumbnailUrl;
+      this.thumbnailUrl = this.data.thumbnailUrl || '/images/tree-bike-illustration.png';
       this.size = this.data.size;
 
       if (this.thumbnailUrl) this._renderImage();

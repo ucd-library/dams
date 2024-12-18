@@ -53,7 +53,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
   willUpdate(props) {
     if (this.data.id) {
       this.itemUrl = this.data.id;
-      this.thumbnailUrl = this.data.thumbnailUrl;
+      this.thumbnailUrl = this.data.thumbnailUrl || '/images/tree-bike-illustration.png';
       this.mediaType = this.data.mediaType;
       if (this.data.mediaType === "Image") {
         this.mediaType = "image";

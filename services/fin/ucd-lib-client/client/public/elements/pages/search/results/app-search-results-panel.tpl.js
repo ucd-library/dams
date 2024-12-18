@@ -255,7 +255,7 @@ export default function render() {
         .masonry .item {
           width: 85vw !important;
           position: initial;
-          margin: auto;
+          /* margin: auto; */
           padding-bottom: .5rem;
         }
       }

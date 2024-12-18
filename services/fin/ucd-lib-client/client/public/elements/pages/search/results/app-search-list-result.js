@@ -61,7 +61,7 @@ export class AppSearchListResult extends Mixin(LitElement).with(LitCorkUtils) {
     if (this.data.id) {
       let collectionName = APP_CONFIG.collectionLabels[this.data.collectionId?.['@id']] || '';
       this.itemUrl = this.data.id;
-      this.thumbnailUrl = this.data.thumbnailUrl;
+      this.thumbnailUrl = this.data.thumbnailUrl || '/images/tree-bike-illustration.png';
       this.title = this.data.title;
       this.date = this.data.date;
       this.collection = collectionName;

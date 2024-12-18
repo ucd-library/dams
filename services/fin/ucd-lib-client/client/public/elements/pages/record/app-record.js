@@ -33,7 +33,7 @@ class AppRecord extends Mixin(LitElement)
       date: { type: String },
       publisher: { type: String },
       subjects: { type: Array },
-      creator: { type: String },
+      creator: { type: Array },
       callNumber: { type: String },
       material: { type: String },
       size: { type: String },
@@ -67,7 +67,7 @@ class AppRecord extends Mixin(LitElement)
     this.date = "";
     this.publisher = "";
     this.subjects = [];
-    this.creator = '';
+    this.creator = [];
     this.callNumber = "";
     this.material = "";
     this.collectionImg = "";
@@ -92,7 +92,7 @@ class AppRecord extends Mixin(LitElement)
     this.editMode = false;
     this.displayData = {};
     this.savedCollectionData = {};
-    this.disableDownload = (APP_CONFIG.disableFileDownloads && !APP_CONFIG.downloadMirrorUrl);
+    this.disableDownload = APP_CONFIG.disableFileDownloads;
 
     this._injectModel(
       "AppStateModel",
@@ -143,7 +143,8 @@ class AppRecord extends Mixin(LitElement)
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
     this.material = this.record.material;
-    this.creator = this.record.creator;
+    this.creator = this.record.creator || [];
+    if( !Array.isArray(this.creator) ) this.creator = [this.creator];
 
     this.citationRoot = this.record.root;
     this.collectionId = this.record.collectionId;
@@ -318,6 +319,10 @@ class AppRecord extends Mixin(LitElement)
   }
 
   _onSubjectClick(e) {
+    this.AppStateModel.set({ resetScroll: true })
+  }
+
+  _onCreatorClick(e) {
     this.AppStateModel.set({ resetScroll: true })
   }
 

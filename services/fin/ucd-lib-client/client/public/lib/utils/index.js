@@ -285,6 +285,21 @@ class Utils {
     recordModel.appendKeywordFilter(searchDocument, subjectFacet, subject);
     return '/search/'+recordModel.searchDocumentToUrl(searchDocument);
   }
+
+  /**
+   * @method getCreatorUrl
+   * @description given a creator string, build search url 
+   * 
+   * @param {Object} recordModel
+   * @param {String} creator
+   * @returns {String} search url for creator
+   */
+  getCreatorUrl(recordModel, creator) {
+    let searchDocument = recordModel.emptySearchDocument();
+    let creatorFacet = '@graph.creator.name';
+    recordModel.appendKeywordFilter(searchDocument, creatorFacet, creator);
+    return '/search/'+recordModel.searchDocumentToUrl(searchDocument);
+  }
 }
 
 module.exports = new Utils();
