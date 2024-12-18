@@ -31,6 +31,9 @@
           "MEDIA_UTILS_IMAGE=${ucdlib-media-utils.media-utils}"
         ]
       }
+    },
+    "dams-binary-mirror" : {
+      "contextPath" : "services/binary-mirror"
     }
   }
 }

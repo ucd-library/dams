@@ -37,14 +37,12 @@ GIT_URL="$ROOT_GIT_HOST/$METADATA_REPO.git"
 echo "Importing collection $COLLECTION_NAME from $GCS_BINARY_BACKUP_BUCKET"
 
 if [[ -d $METADATA_DIR ]]; then
-  echo "Pulling $METADATA_REPO"
-  cd $METADATA_DIR
-  git pull
-else
-  echo "Cloning $GIT_URL"
-  cd $ROOT_DIR
-  git clone $GIT_URL
+  rm -rf $METADATA_DIR
 fi
+
+echo "Cloning $GIT_URL"
+cd $ROOT_DIR
+git clone $GIT_URL
 
 cd $METADATA_DIR
 
