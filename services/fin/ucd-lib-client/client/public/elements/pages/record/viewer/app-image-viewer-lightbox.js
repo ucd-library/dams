@@ -184,7 +184,38 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     if (this.renderedMedia.tiled) {
       let tiledUrl = this.renderedMedia.tiled.iiif + "/info.json";
       this.currentLayer = L.tileLayer.iiif(tiledUrl);
+      this.currentLayer.getTileUrl = function(coords) {
+        var _this = this,
+          x = coords.x,
+          y = (coords.y),
+          zoom = _this._getZoomForUrl(),
+          scale = Math.pow(2, _this.maxNativeZoom - zoom),
+          tileBaseSize = _this.options.tileSize * scale,
+          minx = (x * tileBaseSize),
+          miny = (y * tileBaseSize),
+          maxx = Math.min(minx + tileBaseSize, _this.x),
+          maxy = Math.min(miny + tileBaseSize, _this.y);
+        
+        var xDiff = (maxx - minx);
+        var yDiff = (maxy - miny);
 
+        // Canonical URI Syntax for v2
+        // var size = Math.ceil(xDiff / scale) + ',';
+        // if (_this.type === 'ImageService3') {
+        //   // Cannonical URI Syntax for v3
+        //   size = size + Math.ceil(yDiff / scale);
+        // }
+        let size = Math.ceil(xDiff / scale) + ',' + (Math.ceil(yDiff / scale)+1);
+    
+        return L.Util.template(this._baseUrl, L.extend({
+          format: _this.options.tileFormat,
+          quality: _this.quality,
+          region: [minx, miny, xDiff, yDiff].join(','),
+          rotation: 0,
+          size: size
+        }, this.options));
+      }
+      
     } else {
       let image = this.renderedMedia.original ||
                   this.renderedMedia.large ||
