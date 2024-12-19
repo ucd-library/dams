@@ -422,7 +422,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     }
 
     let maxHeight = Math.max.apply(Math, colHeights);
-    if( numCols === 1 ) {
+    if( numCols === 1 && eles.length > 5 ) {
       maxHeight += 1500;
     }
     this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
