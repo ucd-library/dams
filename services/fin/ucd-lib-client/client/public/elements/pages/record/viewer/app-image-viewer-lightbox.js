@@ -205,7 +205,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
         //   // Cannonical URI Syntax for v3
         //   size = size + Math.ceil(yDiff / scale);
         // }
-        let size = Math.ceil(xDiff / scale) + ',' + (Math.ceil(yDiff / scale)+1);
+        let size = Math.ceil(xDiff / scale) + ',' + Math.ceil(yDiff / scale);
     
         return L.Util.template(this._baseUrl, L.extend({
           format: _this.options.tileFormat,
