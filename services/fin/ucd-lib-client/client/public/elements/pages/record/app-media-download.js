@@ -77,7 +77,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.isTwoPageView = false;
     this.downloadAllMedia = false;
     this.isBookreader = false;
-    this.disableDownload = (APP_CONFIG.disableFileDownloads && !APP_CONFIG.downloadMirrorUrl);
+    this.disableDownload = APP_CONFIG.disableFileDownloads;
   }
 
   _onAppStateUpdate(e) {

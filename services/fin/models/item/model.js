@@ -100,7 +100,7 @@ class ItemsModel extends FinEsDataModel {
   }
 
   async validate(jsonld) {
-    return validate.validateItem(jsonld, config.server.url);
+    return validate.validateItem(jsonld, config.gateway.host);
   }
 
 }
