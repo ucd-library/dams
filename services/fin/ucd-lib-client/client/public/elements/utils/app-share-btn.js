@@ -29,7 +29,18 @@ export default class AppShareBtn extends Mixin(LitElement)
     this.active = true;
 
     this.visible = false;
+    this.removeAttribute('popup');
     this._injectModel('AppStateModel', 'MediaModel', 'RecordModel');
+  }
+
+  willUpdate(changedProperties) {
+    if( changedProperties.has('visible') ) {
+      if( this.visible ) {
+        this.setAttribute('popup', '');
+      } else {
+        this.removeAttribute('popup');
+      }
+    }
   }
 
   /**

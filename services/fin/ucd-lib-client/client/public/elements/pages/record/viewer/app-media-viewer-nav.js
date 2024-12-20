@@ -108,6 +108,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
   _onBookreaderStateUpdate(e) {
     this.brFullscreen = e.fullscreen;
     this.selectedResult = e.selectedSearchResult + 1;
+    this.searching = e.searchActive;
 
     this.searchResults = [];
     if( e.searchResults?.state === 'loaded' ) {

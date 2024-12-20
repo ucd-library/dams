@@ -17,7 +17,8 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       singlePageView : { type: Boolean },
       selectedResult : { type: Number },
       searchResults : { type: Array },
-      searchResultsCount : { type: Number }
+      searchResultsCount : { type: Number },
+      searching : { type: Boolean }
     }
   }
 
@@ -39,6 +40,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     this.numPages = e.bookViewData?.pages?.length || 0;
     this.singlePageView = e.selectedView === 'double' ? false : true;
     this.selectedResult = (e.selectedSearchResult || 0) + 1;
+    this.searching = e.searchActive;
 
     this.searchResults = [];
     if( e.searchResults?.state === 'loaded' ) {
@@ -65,6 +67,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     this.selectedResult = 0;
     this.searchResults = [];
     this.searchResultsCount = 0;
+    this.searching = false;
   }
 
   _prevPage(e) {
@@ -111,6 +114,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   _onSearchClicked(e) {
     let searching = this.BookReaderModel.store?.data?.state?.searchActive || false;
     this.BookReaderModel.setSearchActive(!searching);
+    this.searching = !this.searching;
   }
   
 
