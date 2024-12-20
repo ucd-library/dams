@@ -82,9 +82,9 @@ export default function render() {
       .masonry {
         margin: 10px;
         position: relative;
-        display: flex;
+        /* display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
+        flex-wrap: wrap; */
         width: 95%;
       }
 
@@ -253,10 +253,10 @@ export default function render() {
         }
         
         .masonry .item {
-          width: 85vw !important;
-          position: initial;
+          width: 80vw !important;
+          /* position: initial; */
           /* margin: auto; */
-          padding-bottom: .5rem;
+          /* padding-bottom: .5rem; */
         }
       }
 
@@ -322,8 +322,8 @@ export default function render() {
       }
 
       .masonry {
-        display: flex;
-        flex-wrap: wrap;
+        /* display: flex;
+        flex-wrap: wrap; */
         gap: 16px;
       }
 
