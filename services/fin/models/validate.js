@@ -66,26 +66,29 @@ class Validate {
       }
     }
 
-    let isPartOf = graph.root.isPartOf;
-    if( !isPartOf ) {
-      result.errors.push('Collection isPartOf not found');
-    } else {
-      if( !Array.isArray(isPartOf) ) {
-        isPartOf = [isPartOf];
-      }
-
-      let found = false;
-      for( let part of isPartOf ) {
-        if( !part['@id'] ) {
-          continue;
-        } else if( part['@id'].match(/^\/collection\//) ) {
-          found = true;
-          break;
-        }
-      }
-
-      if( !found ) {
+    // ensure items are associated with a collection
+    if( !graph.root['@shortType'].includes('Collection') ) {
+      let isPartOf = graph.root.isPartOf;
+      if( !isPartOf ) {
         result.errors.push('Collection isPartOf not found');
+      } else {
+        if( !Array.isArray(isPartOf) ) {
+          isPartOf = [isPartOf];
+        }
+
+        let found = false;
+        for( let part of isPartOf ) {
+          if( !part['@id'] ) {
+            continue;
+          } else if( part['@id'].match(/^\/collection\//) ) {
+            found = true;
+            break;
+          }
+        }
+
+        if( !found ) {
+          result.errors.push('Collection isPartOf not found');
+        }
       }
     }
 

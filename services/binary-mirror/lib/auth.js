@@ -1,3 +1,5 @@
+import config from './config.js';
+import fetch from 'node-fetch';
 
 class ServiceAccountAuth {
 
@@ -14,7 +16,7 @@ class ServiceAccountAuth {
       return this.cachedToken;
     }
 
-    let resp = await this.loginServiceAccount(config.serviceAccount.username, config.serviceAccount.secret);
+    let resp = await this.loginServiceAccount(config.serviceAccount.name, config.serviceAccount.secret);
     if( resp.status === 200 ) {
       this.cachedToken = resp.body.access_token;
       setTimeout(() => this.cachedToken = null, 1000*60*60*12);
@@ -29,8 +31,6 @@ class ServiceAccountAuth {
   }
 
   async loginServiceAccount(username, secret) {
-    this.initTls();
-
     let apiResp = await fetch(config.oidc.baseUrl+'/protocol/openid-connect/token', {
       method: 'POST',
       headers:{
@@ -54,3 +54,6 @@ class ServiceAccountAuth {
     }
   }
 }
+
+const inst = new ServiceAccountAuth();
+export default inst;

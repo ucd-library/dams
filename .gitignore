@@ -4,3 +4,5 @@ services/fin/ucd-lib-client/client/public/js
 .DS_Store
 .cache
 run.js
+corkbuild.Dockerfile
+*.cork-build.json
