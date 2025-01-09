@@ -146,10 +146,12 @@ export default function render() {
       text-align: center;
     }
 
+    .card-2,
     .card-2-4 {
       width: 75%;
       margin: 0 auto;
     }
+    .card-single,
     .card-2,
     .card-2-4,
     .card-trio,
@@ -158,6 +160,7 @@ export default function render() {
       grid-template-columns: auto;
       grid-gap: var(--spacing-sm);
     }
+    .card-single dams-collection-card,
     .card-2 dams-collection-card,
     .card-2-4 dams-collection-card,
     .card-trio dams-collection-card,
@@ -177,9 +180,14 @@ export default function render() {
       .card-2-4 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+      .card-single,
       .card-trio,
       .card-5-plus {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .card-single .collection-item,
+      .card-single dams-item-card {
+        grid-column: 2;
       }
       
       .card-trio {
@@ -557,6 +565,12 @@ export default function render() {
     .toggle-switch input {
       display: none;
     }
+
+    .highlight-display-select {
+      display: inline-block;
+      margin-left: 1rem;
+      min-width: 3.5rem;
+    }
   </style>
   
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
@@ -679,42 +693,50 @@ export default function render() {
       <fieldset class="radio" style="border: none; margin: 0; padding: 0;">      
         <div>
           <span class="form-label">Highlight Display:</span>
-          <ul class="list--reset" style="display: inline;">
-            <li>
-              <input id="six" 
-                name="radio-items-per-page" 
-                type="radio" 
-                class="radio" 
-                value="6" 
-                ?checked="${this.itemCount === 6}" 
-                @change="${this._onItemDisplayChange}">
-              <label for="six">6 (recommended)</label>
-            </li>
-            <li>
-              <input id="three" 
-                name="radio-items-per-page" 
-                type="radio" 
-                class="radio" 
-                value="3" 
-                ?checked="${this.itemCount === 3}" 
-                @change="${this._onItemDisplayChange}">
-              <label for="three">3</label>
-            </li>
-            <li>
-              <input id="zero" 
-                name="radio-items-per-page" 
-                type="radio" 
-                class="radio" 
-                value="0" 
-                ?checked="${this.itemCount === 0}" 
-                @change="${this._onItemDisplayChange}">
-              <label for="zero">0</label>
-            </li>
-          </ul>
+          <ucd-theme-slim-select
+            class="highlight-display-select"
+            @change="${this._onItemDisplayChange}"
+            @focusin="${this._ssSelectFocus}"
+            @click="${this._ssSelectFocus}"
+            @blur="${this._ssSelectBlur}">
+            <select>
+                <option value="6" ?selected="${this.itemCount === 6}">6</option>
+                <option value="3" ?selected="${this.itemCount === 3}">3</option>
+                <option value="2" ?selected="${this.itemCount === 2}">2</option>
+                <option value="1" ?selected="${this.itemCount === 1}">1</option>
+                <option value="0" ?selected="${this.itemCount === 0}">0</option>
+            </select>
+          </ucd-theme-slim-select>
         </div>
       </fieldset>
 
-        <div class="card-trio" ?hidden="${this.itemCount === 0}">      
+        <div class="card-single" ?hidden="${this.itemCount !== 1}">      
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-1 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[0] ? this.savedItems[0]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
+          </div>
+        </div>
+        <div class="card-2" ?hidden="${this.itemCount !== 2}">      
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-1 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[0] ? this.savedItems[0]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
+          </div>
+          <div class="collection-item">
+            <span>Item ARK ID</span>
+            <input class="item-2 item-ark-input" 
+              type="text" 
+              .value="${this.savedItems[1] ? this.savedItems[1]['@id'].split('/item')[1] : ''}" 
+              placeholder="/ark:/..." />
+          </div>
+        </div>
+
+        <div class="card-trio" ?hidden="${this.itemCount < 3}">      
           <div class="collection-item">
             <span>Item ARK ID</span>
             <input class="item-1 item-ark-input" 
@@ -850,6 +872,16 @@ export default function render() {
       
       </div>
       <div ?hidden="${this.editMode}" style="padding: 0 2rem;">
+        <div class="card-single" ?hidden="${this.itemCount !== 1}">
+          ${this.highlightedItems.map((item, index) => html`
+            ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
+          `)}
+        </div>
+        <div class="card-2" ?hidden="${this.itemCount !== 2}">
+          ${this.highlightedItems.map((item, index) => html`
+            ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
+          `)}
+        </div>
         <div class="card-trio" ?hidden="${this.itemCount < 3}">
           ${this.highlightedItems.map((item, index) => html`
             ${index < 3 ? html`<dams-item-card data-itemid="${'/item'+item['@id'].split('/item')[1]}"></dams-item-card>` : ''}
