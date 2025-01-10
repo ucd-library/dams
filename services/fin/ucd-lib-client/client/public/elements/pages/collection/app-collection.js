@@ -218,10 +218,15 @@ class AppCollection extends Mixin(LitElement)
   _onItemDisplayChange(e) {
     this.itemCount = parseInt(e.detail.value);
 
-    let itemInputs = document.querySelectorAll('.item-ark-input');
+    let itemInputs = this._getHighlightedItemInputs();
     itemInputs.forEach((input, index) => {
       if( index+1 > this.itemCount ) {
         input.value = '';
+      } else {
+        let item = this.savedItems[index];
+        if( item ) {
+          input.value = item['@id'].replace(/^\/item\//, '');
+        }
       }
     });
 
@@ -230,6 +235,20 @@ class AppCollection extends Mixin(LitElement)
       this._updateSlimStyles();
       this._updateDisplayData();  
     });
+  }
+
+  _getHighlightedItemInputs() {
+    // parse to inputs for the selcted item count: 0, 1, 2, 3, 6
+    let itemInputs;
+    if( this.itemCount === 1 ) {
+      itemInputs = document.querySelectorAll('.card-single .item-ark-input');
+    } else if( this.itemCount === 2 ) {
+      itemInputs = document.querySelectorAll('.card-2 .item-ark-input');
+    } else {
+      itemInputs = document.querySelectorAll('.card-trio .item-ark-input');
+    }
+
+    return itemInputs;
   }
 
   /**
@@ -260,7 +279,8 @@ class AppCollection extends Mixin(LitElement)
     let newSavedItems = [];
     let itemArkRegex = /^\/?(item\/)?(ark:\/)?/;
 
-    let itemInputs = document.querySelectorAll('.item-ark-input');
+    let itemInputs = this._getHighlightedItemInputs();
+
     itemInputs.forEach((input, index) => {
       if( input.value ) {
         let val = input.value.trim();
@@ -300,9 +320,18 @@ class AppCollection extends Mixin(LitElement)
       await this.FcAppConfigModel.updateItemDisplayExceptions(itemExceptions, this.itemDefaultDisplay);
     }
 
-    this.requestUpdate();
     this.AppStateModel.setLocation(this.collectionId);
     // this._parseDisplayData();
+    
+    // refresh this.highlightedItems
+    this.highlightedItems = [];
+    if( this.savedItems.length ) {
+      this.highlightedItems = this.savedItems;
+    } else {
+      this.getLatestItems();
+    }
+ 
+    this.requestUpdate();
   }
 
   /**
