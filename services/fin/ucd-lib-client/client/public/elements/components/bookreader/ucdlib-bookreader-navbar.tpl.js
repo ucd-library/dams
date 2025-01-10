@@ -207,7 +207,7 @@ return html`
         <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
       </div>
 
-      <span class="br-currentpage-override">${this.selectedPage+1} of ${this.numPages}</span>
+      <span class="br-currentpage-override">${this.selectedPageLabel} of ${this.numPages}</span>
 
       <div id="next" style="width: 25px;" @click="${this._nextPage}">
         <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>

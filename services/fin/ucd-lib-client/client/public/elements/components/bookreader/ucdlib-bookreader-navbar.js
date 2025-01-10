@@ -18,7 +18,8 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       selectedResult : { type: Number },
       searchResults : { type: Array },
       searchResultsCount : { type: Number },
-      searching : { type: Boolean }
+      searching : { type: Boolean },
+      selectedPageLabel : { type: String }
     }
   }
 
@@ -57,6 +58,8 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       let slider = this.shadowRoot.querySelector('ucdlib-bookreader-slider');
       if( slider ) slider._onResize();
     });
+
+    this._updateSelectedPageLabel();
   }
 
   _reset() {
@@ -68,6 +71,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     this.searchResults = [];
     this.searchResultsCount = 0;
     this.searching = false;
+    this.selectedPageLabel = '';
   }
 
   _prevPage(e) {
@@ -78,6 +82,8 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     if( this.selectedPage > 0 ) {
       this.BookReaderModel.setPage(this.selectedPage - pageIncrement);
     }
+
+    this._updateSelectedPageLabel();
   }
 
   _nextPage(e) {
@@ -87,6 +93,25 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
 
     if( (this.selectedPage+pageIncrement) < this.numPages ) {
       this.BookReaderModel.setPage(this.selectedPage + pageIncrement);
+    } else if( !this.singlePageView && this.selectedPage+2 === this.numPages ) {
+      // update to last page if in double page view and on last page
+      this.BookReaderModel.setPage(this.selectedPage + 1);
+    }
+
+    this._updateSelectedPageLabel();
+  }
+
+  _updateSelectedPageLabel() {
+    // update selected page label, the page number if single page, otherwise include the page range if double page
+    // if first/last page, since we don't want to show a range if we're on the first
+    if( this.singlePageView || this.selectedPage === 0 ) {
+      this.selectedPageLabel = this.selectedPage+1;
+    } else if( this.selectedPage === (this.numPages-1) && this.numPages % 2 === 1 ) { 
+      // very last page (for odd number pages)
+      this.selectedPageLabel = this.selectedPage + '-' + (this.selectedPage+1)
+
+    } else {
+      this.selectedPageLabel = this.selectedPage+1 + '-' + (this.selectedPage+2);
     }
   }
 
