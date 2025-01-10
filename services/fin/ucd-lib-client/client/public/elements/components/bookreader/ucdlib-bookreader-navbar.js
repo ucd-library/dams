@@ -108,8 +108,10 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       this.selectedPageLabel = this.selectedPage+1;
     } else if( this.selectedPage === (this.numPages-1) && this.numPages % 2 === 1 ) { 
       // very last page (for odd number pages)
-      this.selectedPageLabel = this.selectedPage + '-' + (this.selectedPage+1)
-
+      this.selectedPageLabel = this.selectedPage + '-' + (this.selectedPage+1);    
+    } else if( this.selectedPage === (this.numPages-1) && this.numPages % 2 !== 1 ) { 
+      // very last page (for even number pages)
+      this.selectedPageLabel = this.selectedPage+1;
     } else {
       this.selectedPageLabel = this.selectedPage+1 + '-' + (this.selectedPage+2);
     }
