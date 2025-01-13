@@ -112,6 +112,16 @@ return html`
     opacity: 1;
   }
 
+  .tooltip:has(> app-share-btn[popup]):hover:before,
+  .tooltip:has(> app-share-btn[popup]):hover:after {
+    display: none;
+  }
+
+  .button:hover,
+  .button:has(> app-share-btn[popup]) {
+    background-color: var(--color-aggie-blue);
+  }
+
   ${plyrCss}
 </style>
 <div class="container">

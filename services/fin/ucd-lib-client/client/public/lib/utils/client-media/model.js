@@ -225,6 +225,10 @@ class ClientMedia {
       return 0;
     });
 
+    node.clientMedia.pages.forEach((page, index) => {
+      page.uiPosition = index+1;     
+    });
+
     node.clientMedia.download = node.clientMedia.pages.map(page => {
       return page.download;      
     });
@@ -251,10 +255,18 @@ class ClientMedia {
     }
 
     if( node.clientMedia.pages ) {
+      node.clientMedia.pages.sort((a, b) => {
+        if( a.page < b.page ) return -1;
+        if( a.page > b.page ) return 1;
+        return 0;
+      });
+
       node.clientMedia.pages.forEach((page, index) => {
         if( !page['@id'] ) {
           page['@id'] = node['@id']+':'+index;
         }
+
+        page.uiPosition = index+1;     
       });
     }
 

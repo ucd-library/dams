@@ -5,6 +5,7 @@ import {MainDomElement} from '@ucd-lib/theme-elements/utils/mixins';
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import "@ucd-lib/theme-elements/ucdlib/ucdlib-icon/ucdlib-icon";
+import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js";
 
 import "../../components/cards/dams-item-card";
 import '../../components/citation';
@@ -63,6 +64,8 @@ class AppCollection extends Mixin(LitElement)
   async firstUpdated() {
     this._onAppStateUpdate(await this.AppStateModel.get());
     // this._onCollectionUpdate(await this.CollectionModel.get(this.AppStateModel.location.pathname));
+
+    this._updateSlimStyles();
   }
 
   /**
@@ -80,6 +83,7 @@ class AppCollection extends Mixin(LitElement)
     if( this.collectionId === e.location.fullpath ) return;
     this.reset();
 
+    this._updateSlimStyles();
     this.collectionId = e.location.fullpath;
 
     try {
@@ -212,16 +216,39 @@ class AppCollection extends Mixin(LitElement)
   }
 
   _onItemDisplayChange(e) {
-    this.itemCount = parseInt(e.target.value);
+    this.itemCount = parseInt(e.detail.value);
 
-    let itemInputs = document.querySelectorAll('.item-ark-input');
+    let itemInputs = this._getHighlightedItemInputs();
     itemInputs.forEach((input, index) => {
       if( index+1 > this.itemCount ) {
         input.value = '';
+      } else {
+        let item = this.savedItems[index];
+        if( item ) {
+          input.value = item['@id'].replace(/^\/item\//, '');
+        }
       }
     });
 
-    this._updateDisplayData();
+    requestAnimationFrame(() => {
+      this._ssSelectBlur();
+      this._updateSlimStyles();
+      this._updateDisplayData();  
+    });
+  }
+
+  _getHighlightedItemInputs() {
+    // parse to inputs for the selcted item count: 0, 1, 2, 3, 6
+    let itemInputs;
+    if( this.itemCount === 1 ) {
+      itemInputs = document.querySelectorAll('.card-single .item-ark-input');
+    } else if( this.itemCount === 2 ) {
+      itemInputs = document.querySelectorAll('.card-2 .item-ark-input');
+    } else {
+      itemInputs = document.querySelectorAll('.card-trio .item-ark-input');
+    }
+
+    return itemInputs;
   }
 
   /**
@@ -232,6 +259,7 @@ class AppCollection extends Mixin(LitElement)
    */
   _onEditClicked(e) {
     if( !this.isUiAdmin ) return;
+    this._updateSlimStyles();
     this.editMode = true;
   }
 
@@ -251,7 +279,8 @@ class AppCollection extends Mixin(LitElement)
     let newSavedItems = [];
     let itemArkRegex = /^\/?(item\/)?(ark:\/)?/;
 
-    let itemInputs = document.querySelectorAll('.item-ark-input');
+    let itemInputs = this._getHighlightedItemInputs();
+
     itemInputs.forEach((input, index) => {
       if( input.value ) {
         let val = input.value.trim();
@@ -291,9 +320,18 @@ class AppCollection extends Mixin(LitElement)
       await this.FcAppConfigModel.updateItemDisplayExceptions(itemExceptions, this.itemDefaultDisplay);
     }
 
-    this.requestUpdate();
     this.AppStateModel.setLocation(this.collectionId);
     // this._parseDisplayData();
+    
+    // refresh this.highlightedItems
+    this.highlightedItems = [];
+    if( this.savedItems.length ) {
+      this.highlightedItems = this.savedItems;
+    } else {
+      this.getLatestItems();
+    }
+ 
+    this.requestUpdate();
   }
 
   /**
@@ -398,9 +436,6 @@ class AppCollection extends Mixin(LitElement)
     ).filter(item => item.defaultDisplay && item.defaultDisplay !== this.itemDefaultDisplay);
 
     // hack for radios occasionally not being selected, styles coming from brand css
-    if( this.itemCount === 0 ) this.querySelector('#zero').checked = true;
-    if( this.itemCount === 3 ) this.querySelector('#three').checked = true;
-    if( this.itemCount === 6 ) this.querySelector('#six').checked = true;
     if( this.itemDefaultDisplay === utils.itemDisplayType.brTwoPage ) this.querySelector('#two').checked = true;
     if( this.itemDefaultDisplay === utils.itemDisplayType.brOnePage ) this.querySelector('#one').checked = true;
     if( this.itemDefaultDisplay === utils.itemDisplayType.imageList ) this.querySelector('#list').checked = true;
@@ -422,6 +457,70 @@ class AppCollection extends Mixin(LitElement)
       showDisclaimer : this.showDisclaimer
     };
     this.displayData = this.FcAppConfigModel.getCollectionDisplayData(this.collectionId, opts);
+  }
+
+  _updateSlimStyles() {
+    let select = this.querySelector('ucd-theme-slim-select');
+    if( !select ) return;
+
+    let ssMain = select.shadowRoot.querySelector(".ss-main");
+    if (ssMain) {
+      ssMain.style.border = 'none';
+      ssMain.style.backgroundColor = 'transparent';
+    }
+
+    let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");
+    if (ssSingle) {
+      ssSingle.style.border = "none";
+      ssSingle.style.height = "49px";
+      ssSingle.style.paddingLeft = "1rem";
+      ssSingle.style.backgroundColor = "var(--color-aggie-blue-50)";
+      ssSingle.style.borderRadius = '0';
+      ssSingle.style.fontWeight = "bold";
+      ssSingle.style.color = "var(--color-aggie-blue)";
+    }
+
+    let search = select.shadowRoot.querySelector('.ss-search');
+    if( search ) {
+      search.style.display = "none";
+    }
+  }
+
+  /**
+   * @method _ssSelectFocus
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectFocus(e) {
+    let ssMain = e.currentTarget.shadowRoot.querySelector('.ss-main');
+    let ssSingleSelected = e.currentTarget.shadowRoot.querySelector('.ss-single-selected');
+
+    if( ssSingleSelected?.classList.value === 'ss-single-selected ss-open-below' ) {
+      ssSingleSelected.style.backgroundColor = '#FFF4D2'; // gold-30
+      ssMain.style.borderColor = '#FFBF00'; // gold
+    } else {
+      ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+      ssMain.style.borderColor = '#B0D0ED'; // blue-50
+    }
+
+    let search = this.querySelector('ucd-theme-slim-select')?.shadowRoot.querySelector('.ss-search');
+    if( search ) {
+      search.style.display = "none";
+    }
+  }
+
+  /**
+   * @method _ssSelectBlur
+   * @description slim select focus change, color should be gold if active, blue if not
+   * @param {Object} e
+   */
+  _ssSelectBlur(e) {
+    let slimSelect = this.querySelector('.highlight-display-select');
+    let ssMain = slimSelect?.shadowRoot?.querySelector('.ss-main');
+    let ssSingleSelected = slimSelect?.shadowRoot.querySelector('.ss-single-selected');
+
+    ssSingleSelected.style.backgroundColor = '#B0D0ED'; // blue-50
+    ssMain.style.borderColor = '#B0D0ED'; // blue-50
   }
 
   async _onFileChange(e) {
