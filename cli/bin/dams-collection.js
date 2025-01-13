@@ -158,10 +158,9 @@ function getValues(node, prop) {
 }
 
 async function getMetadata(finPath) {
-  let resp = await api.get({
+  let resp = await api.metadata({
     path: finPath,
-    jwt : CliConfig.jwt,
-    fcBasePath : '/fin/rest'
+    jwt : CliConfig.jwt
   });
 
   if( resp.last.statusCode !== 200 ) {
@@ -171,7 +170,9 @@ async function getMetadata(finPath) {
   let data = JSON.parse(resp.last.body);
   let isArchivalGroup = false;
 
-  for( let node of data['@graph'] ) {
+  data = data['@graph'] || data;
+
+  for( let node of data ) {
     let types = node['@type'] || [];
     if( !Array.isArray(types) ) types = [types];
     if( types.includes(ARCHIVAL_GROUP) || types.includes(FIN_ARCHIVAL_GROUP) ) {

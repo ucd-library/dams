@@ -68,10 +68,9 @@ async function streamFile(fcrepoPath, etag, res) {
   let etagPath = path.join(ETAG_PATH, fcrepoPath);
 
   if( fs.existsSync(filePath) && fs.existsSync(etagPath) ) {
-    console.log('Cache hit: '+fcrepoPath+' with ETag:', etag);
-
     let fileEtag = fs.readFileSync(etagPath, 'utf8');
     if (etag === fileEtag) {
+      console.log('Cache hit: '+fcrepoPath+' with ETag:', etag);
       res.sendFile(filePath);
 
       // Update the etag file modification time
