@@ -30,10 +30,13 @@ class RecordVcModel {
           root.isPartOf = [root.isPartOf];
         }
 
-        for( let part of root.isPartOf ) {
-          if( part['@id'].startsWith('/collection/') ) {
-            collectionId = part['@id'];
-            break;
+        collectionId = root.isPartOf.filter(p => p['@id']?.includes('/collection/ark'))[0]?.['@id'];
+        if( !collectionId ) {
+          for( let part of root.isPartOf ) {
+            if( part['@id'].startsWith('/collection/') ) {
+              collectionId = part['@id'];
+              break;
+            }
           }
         }
       }
