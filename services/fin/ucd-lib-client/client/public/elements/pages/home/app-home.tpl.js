@@ -440,6 +440,35 @@ export default function render() {
     padding: 1rem 0;
   }
 
+  .featured-collections-public .two-four,
+  .featured-collections-public .three-five {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: auto;
+    grid-gap: var(--spacing-sm);
+  }
+
+  .featured-collections-public .three-five {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .featured-collections-public .two-four {    
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 75%;
+  }
+
+  @media (max-width: 992px) {
+    .featured-collections-public .three-five {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .featured-collections-public .two-four {    
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      width: 100%;
+    }
+  }
+
   @media (max-width: 767px) {
     /* mobile */
     .featured-group .card-trio {
@@ -463,6 +492,14 @@ export default function render() {
       width: 100%;
       margin: initial;
       text-align: left
+    }
+
+    .featured-collections-public .three-five {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .featured-collections-public .two-four {    
+      grid-template-columns: repeat(1, minmax(0, 1fr));
     }
   }
   .about-content {
@@ -838,10 +875,7 @@ export default function render() {
         ${data.type === "cards"
           ? html`
               <div
-                class="card-trio ${data.collectionIds.length === 3
-                  ? "three-total"
-                  : ""}"
-              >
+                class="card-trio ${data.collectionIds.length === 3 ? "three-total" : ""} ${[3, 5].includes(data.collectionIds.length) ? "three-five" : ""} ${[2, 4].includes(data.collectionIds.length) ? "two-four" : ""}">
                 ${data.collectionIds.map(
                   (collection) => html`
                     <dams-collection-card

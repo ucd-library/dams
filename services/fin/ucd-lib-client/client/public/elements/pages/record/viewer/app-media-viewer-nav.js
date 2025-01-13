@@ -108,6 +108,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
   _onBookreaderStateUpdate(e) {
     this.brFullscreen = e.fullscreen;
     this.selectedResult = e.selectedSearchResult + 1;
+    this.searching = e.searchActive;
 
     this.searchResults = [];
     if( e.searchResults?.state === 'loaded' ) {
@@ -327,14 +328,34 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     }
 
     let thumbnails = [];
-    for( let node of clientMedia.mediaGroups ) {
-      if( !node.clientMedia.pages && !this.overrideImageList ) {
-        thumbnails.push(this._renderThumbnail(selectedMedia, node.clientMedia.images, selectedMediaPage));
-        continue;
-      }
-      if( !node.clientMedia.pages ) continue;
-      for( let page of node.clientMedia.pages ) {
+
+    // prioritize imagelist, then pdf. else combine pages
+    let imageList = (clientMedia.mediaGroups || []).filter(m => m['@shortType'].includes('ImageList'))?.[0];
+    if( imageList?.clientMedia?.pages ) {
+      for( let page of imageList.clientMedia.pages ) {
         thumbnails.push(this._renderThumbnail(selectedMedia, page, selectedMediaPage));
+      }
+    }
+
+    if( !thumbnails.length ) {
+      let pdf = (clientMedia.mediaGroups || []).filter(m => m.clientMedia.pdf)?.[0];
+      if( pdf?.clientMedia?.pages ) {
+        for( let page of pdf.clientMedia.pages ) {
+          thumbnails.push(this._renderThumbnail(selectedMedia, page, selectedMediaPage));
+        }
+      }
+    }
+
+    if( !thumbnails.length ) {
+      for( let node of clientMedia.mediaGroups ) {
+        if( !node.clientMedia.pages && !this.overrideImageList ) {
+          thumbnails.push(this._renderThumbnail(selectedMedia, node.clientMedia.images, selectedMediaPage));
+          continue;
+        }
+        if( !node.clientMedia.pages ) continue;
+        for( let page of node.clientMedia.pages ) {
+          thumbnails.push(this._renderThumbnail(selectedMedia, page, selectedMediaPage));
+        }
       }
     }
 
@@ -348,8 +369,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
         ids.push(element.id);
         return true;
       })
-      // TODO: Filtering out the text based files for now until we get the PDF/text viewer set up correctly
-      // .filter((element) => element.icon !== "blank-round");
 
     this._resize(true);
   }
@@ -372,11 +391,13 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     //   thumbnailUrl += '/svc:iiif/full/,50/0/default.jpg';
     // }
 
+    let uiPosition = clientMediaPage.uiPosition || clientMediaPage.page;
+
     let thumbnail = {
-      id: node["@id"]+(!clientMediaPage.page || clientMediaPage.page === undefined ? '' : ':'+clientMediaPage.page),
+      id: node["@id"]+(!uiPosition || uiPosition === undefined ? '' : ':'+uiPosition),
       icon: iconType,
-      position: clientMediaPage.page,
-      selected: clientMediaPage.page === selectedMediaPage,
+      position: uiPosition,
+      selected: uiPosition === selectedMediaPage,
       disabled: false,
       src: thumbnailUrl,
       // thumbnail: url

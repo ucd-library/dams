@@ -166,7 +166,8 @@ export default function render() {
         margin-left: 0.4rem;
       }
 
-      #buttonWrapper div:hover {
+      #buttonWrapper div:hover,
+      #buttonWrapper div:has(> app-share-btn[popup]) {
         background-color: var(--color-aggie-blue);
       }
 
@@ -230,6 +231,10 @@ export default function render() {
 
       .br-search-non-fs div.zoom {
         cursor: pointer;
+      }
+
+      .br-search-non-fs div.zoom:hover {
+        background-color: var(--color-aggie-blue);
       }
 
       .br-search-non-fs ucdlib-icon {
@@ -322,6 +327,11 @@ export default function render() {
         opacity: 1;
       }
 
+      .tooltip:has(> app-share-btn[popup]):hover:before,
+      .tooltip:has(> app-share-btn[popup]):hover:after {
+        display: none;
+      }
+
     </style>
 
     <div
@@ -346,7 +356,7 @@ export default function render() {
             <div
               class="zoom ${this.searching ? "searching" : ""} tooltip"
               @click="${this._onSearchToggled}"
-              data-tooltip-text="Search Inside">
+              data-tooltip-text="${this.searching ? "Hide Search Box" : "Search Inside"}">
               <ucdlib-icon icon="ucdlib-dams:fa-magnifying-glass"></ucdlib-icon>
             </div>
             <div

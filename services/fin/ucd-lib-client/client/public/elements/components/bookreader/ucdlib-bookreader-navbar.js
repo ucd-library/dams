@@ -17,7 +17,9 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       singlePageView : { type: Boolean },
       selectedResult : { type: Number },
       searchResults : { type: Array },
-      searchResultsCount : { type: Number }
+      searchResultsCount : { type: Number },
+      searching : { type: Boolean },
+      selectedPageLabel : { type: String }
     }
   }
 
@@ -39,6 +41,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     this.numPages = e.bookViewData?.pages?.length || 0;
     this.singlePageView = e.selectedView === 'double' ? false : true;
     this.selectedResult = (e.selectedSearchResult || 0) + 1;
+    this.searching = e.searchActive;
 
     this.searchResults = [];
     if( e.searchResults?.state === 'loaded' ) {
@@ -55,6 +58,8 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       let slider = this.shadowRoot.querySelector('ucdlib-bookreader-slider');
       if( slider ) slider._onResize();
     });
+
+    this._updateSelectedPageLabel();
   }
 
   _reset() {
@@ -65,6 +70,8 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     this.selectedResult = 0;
     this.searchResults = [];
     this.searchResultsCount = 0;
+    this.searching = false;
+    this.selectedPageLabel = '';
   }
 
   _prevPage(e) {
@@ -75,6 +82,8 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     if( this.selectedPage > 0 ) {
       this.BookReaderModel.setPage(this.selectedPage - pageIncrement);
     }
+
+    this._updateSelectedPageLabel();
   }
 
   _nextPage(e) {
@@ -84,6 +93,27 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
 
     if( (this.selectedPage+pageIncrement) < this.numPages ) {
       this.BookReaderModel.setPage(this.selectedPage + pageIncrement);
+    } else if( !this.singlePageView && this.selectedPage+2 === this.numPages ) {
+      // update to last page if in double page view and on last page
+      this.BookReaderModel.setPage(this.selectedPage + 1);
+    }
+
+    this._updateSelectedPageLabel();
+  }
+
+  _updateSelectedPageLabel() {
+    // update selected page label, the page number if single page, otherwise include the page range if double page
+    // if first/last page, since we don't want to show a range if we're on the first
+    if( this.singlePageView || this.selectedPage === 0 ) {
+      this.selectedPageLabel = this.selectedPage+1;
+    } else if( this.selectedPage === (this.numPages-1) && this.numPages % 2 === 1 ) { 
+      // very last page (for odd number pages)
+      this.selectedPageLabel = this.selectedPage + '-' + (this.selectedPage+1);    
+    } else if( this.selectedPage === (this.numPages-1) && this.numPages % 2 !== 1 ) { 
+      // very last page (for even number pages)
+      this.selectedPageLabel = this.selectedPage+1;
+    } else {
+      this.selectedPageLabel = this.selectedPage+1 + '-' + (this.selectedPage+2);
     }
   }
 
@@ -111,6 +141,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
   _onSearchClicked(e) {
     let searching = this.BookReaderModel.store?.data?.state?.searchActive || false;
     this.BookReaderModel.setSearchActive(!searching);
+    this.searching = !this.searching;
   }
   
 

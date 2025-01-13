@@ -390,6 +390,9 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     let eles = this.shadowRoot
       .querySelector("#layout")
       .querySelectorAll("app-search-grid-result");
+  
+    let styledPadding = 0;
+    if( numCols === 1 ) styledPadding = 80; // margin+padding
 
     for (let i = 0; i < eles.length; i++) { 
       let padding = (this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 22 : 40) + 25;
@@ -418,13 +421,10 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       let cheight = colHeights[col];
       eles[i].style.left = leftOffset + col * w + "px";
       eles[i].style.top = cheight + "px";
-      colHeights[col] += Math.ceil(scaledHeight + padding);
+      colHeights[col] += Math.ceil(scaledHeight + padding + styledPadding);
     }
 
     let maxHeight = Math.max.apply(Math, colHeights);
-    if( numCols === 1 && eles.length > 5 ) {
-      maxHeight += 1500;
-    }
     this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
 
     this.requestUpdate();
