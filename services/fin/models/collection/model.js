@@ -85,6 +85,21 @@ class CollectionsModel extends FinEsDataModel {
     return result;
   }
 
+  async getByArk(ark) {
+    let searchDocument = {
+      "filters":{
+        "@graph.identifier.raw":{
+            type:"keyword",
+            op:"or",
+            value:[ark]
+        }
+      },
+      limit: 1
+    }
+    let resp = await super.search(searchDocument);
+    return resp;
+  }
+
   async _appendClientEdits(collection) {
     if( !collection ) return collection;
     let resp = await clientEditsModel.get(collection['@id']);

@@ -69,6 +69,21 @@ class ItemsModel extends FinEsDataModel {
     return result;
   }
 
+  async getByArk(ark) {
+    let searchDocument = {
+      "filters":{
+        "@graph.identifier.raw":{
+            type:"keyword",
+            op:"and",
+            value:[ark]
+        }
+      },
+      limit: 1
+    }
+    let resp = await this.search(searchDocument);
+    return resp;
+  }
+
   async getFiles(id, files=[]) {
     let searchDocument = {
       "filters":{
