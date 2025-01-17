@@ -25,6 +25,9 @@ router.post('/:collection', async (req, res) => {
     if( req.query.ignoreBinarySync ) {
       req.query.ignoreBinarySync = req.query.ignoreBinarySync === 'true';
     }
+    if( req.query.agent && req.query.agent !== 'protected' ) {
+      delete req.query.agent;
+    }
     res.json(await model.import(req.params.collection, req.query)); 
   } catch(e) {
     errorResponse(res, e, 'Error importing collection: '+req.params.collection);

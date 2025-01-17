@@ -28,6 +28,16 @@ program
     exportCollection(finPath, options.limit)
   });
 
+program
+  .command('set-access <path> <access>')
+  .description('Set access control on a collection and all items.  Access can be either public or private')
+  .action((finPath, access, options) => {
+    if( access !== 'public' && access !== 'private' ) {
+      throw new Error('Access must be either public or private');
+    }
+    crawlAndSetAccess(finPath, access)
+  });
+
 
 async function remove(finPath) {
   let t = Date.now();
@@ -97,7 +107,37 @@ async function exportCollection(finPath, limit) {
 
 }
 
+async function crawlAndSetAccess(finPath, access, crawled={}) {
+  if( crawled[finPath] ) return;
+  console.log('Crawling ', finPath);
+  crawled[finPath] = true;
 
+  let t = Date.now();
+  let resp;
+  try {
+    resp = await getMetadata(finPath);
+  } catch(e) {
+    console.log(' -> Failed to get metadata: ', e.message);
+    return;
+  }
+  console.log('  -> '+(Date.now()-t)+'ms');
+
+  if( resp.isArchivalGroup ) {
+    if( access === 'public' ) {
+      await api.removeFinAc(finPath);
+    } else {
+      await api.setFinAcAgent(finPath, 'protected');
+    }
+    if( !finPath.startsWith('/collection') ) {
+      return;
+    }
+  }
+
+  let finPaths = getCrawlProperties(resp.data);
+  for( let finPath of finPaths ) {
+    await crawlAndSetAccess(finPath, access, crawled);
+  };
+}
 
 async function crawlAndRemove(finPath, crawled={}) {
   if( crawled[finPath] ) return;

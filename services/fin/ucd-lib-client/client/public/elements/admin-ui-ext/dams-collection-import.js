@@ -157,17 +157,22 @@ export default class DamsCollectionImport extends Mixin(LitElement)
   async _onCollectionImportClicked(id) {
     let job = this.getJob(id);
     let ignoreBinarySync = false;
+    let privateImport = false;
 
     if( job.state == 'finished' || job.volume ) {
       ignoreBinarySync = this.querySelector(`input#ibs-input-${id}`).checked;
     }
 
-    if( !confirm(`Are you sure you want to run the import for ${id} with IGNORE_BINARY_SYNC=${ignoreBinarySync}?`) ) {
+    privateImport = this.querySelector(`input#private-input-${id}`).checked;
+
+    if( !confirm(`Are you sure you want to run the import for ${id} with IGNORE_BINARY_SYNC=${ignoreBinarySync} and PRIVATE=${privateImport}?`) ) {
       return;
     }
 
-    this.logger.info('Running collection import', id, {ignoreBinarySync});
-    let resp = await this.CollectionImportModel.start(id, {ignoreBinarySync});
+    let agent = privateImport ? 'protected' : null;
+
+    this.logger.info('Running collection import', id, {ignoreBinarySync, agent});
+    let resp = await this.CollectionImportModel.start(id, {ignoreBinarySync, agent});
     this.logger.info('Collection import started', resp);
     this.loadCollectionList();
   }
@@ -185,11 +190,14 @@ export default class DamsCollectionImport extends Mixin(LitElement)
 
   async _onRerunImportClicked(collection) {
     let ignoreBinarySync = this.querySelector(`input#ibs-input-${collection.id}`).checked;
+    let privateImport = this.querySelector(`input#private-input-${collection.id}`).checked;
     let id = collection.id;
     
-    if( !confirm(`Are you sure you want to run the re-import for ${id} with IGNORE_BINARY_SYNC=${ignoreBinarySync}?`) ) {
+    if( !confirm(`Are you sure you want to run the re-import for ${id} with IGNORE_BINARY_SYNC=${ignoreBinarySync} and PRIVATE=${privateImport}?`) ) {
       return;
     }
+
+    let agent = privateImport ? 'protected' : null;
 
     collection.state = 'removing';
     this.requestUpdate();
@@ -198,7 +206,7 @@ export default class DamsCollectionImport extends Mixin(LitElement)
     let resp = await this.CollectionImportModel.delete(id);
     this.logger.info('Collection import stopped', resp);
 
-    resp = await this.CollectionImportModel.start(id, {ignoreBinarySync});
+    resp = await this.CollectionImportModel.start(id, {ignoreBinarySync, agent});
     this.logger.info('Collection import started', resp);
     this.updateCollection(id);
   }

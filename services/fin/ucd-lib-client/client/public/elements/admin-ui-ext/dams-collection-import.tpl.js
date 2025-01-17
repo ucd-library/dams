@@ -61,6 +61,9 @@ return html`
           <div ?hidden="${item.state !== 'finished' && !item.volume}">
             <input type="checkbox" id="ibs-input-${item.id}" checked> Ignore Binary Sync
           </div>
+          <div>
+            <input type="checkbox" id="private-input-${item.id}" checked> Set Private
+          </div>
         </td>
       </tr>
       <tr>

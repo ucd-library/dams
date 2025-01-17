@@ -199,6 +199,9 @@ module.exports = async function(path, graph, headers, utils) {
     item._.graphId = '/collection/'+ag[1];
   }
 
+  let fetchOpts = {headers: {}}
+  utils.getAuthHeader(fetchOpts.headers);
+
   if( headers.link ) {
     // if( headers.link['archival-group'] ) {
     //   item._['archival-group'] = headers.link['archival-group'].map(item => item.url);
@@ -216,11 +219,11 @@ module.exports = async function(path, graph, headers, utils) {
       let pdfImageProducts = headers.link.workflow.find(item => PDF_IMAGE_PRODUCTS === item.type);
       let imageProducts = headers.link.workflow.find(item => IMAGE_PRODUCTS === item.type);
       if( pdfImageProducts ) {
-        let workflowInfo = await fetch(getGatewayUrl(pdfImageProducts.url));
+        let workflowInfo = await fetch(getGatewayUrl(pdfImageProducts.url), fetchOpts);
         workflowInfo = await workflowInfo.json()
 
         // fetch the first image product
-        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/0/manifest.json');
+        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/0/manifest.json', fetchOpts);
         item.clientMedia.images = await manifest.json();
 
         // set the full manifest url, this could be big, we will not fetch
@@ -228,15 +231,15 @@ module.exports = async function(path, graph, headers, utils) {
           manifest : config.fcrepo.root+item['@id'] + '/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json'
         }
       } else if( imageProducts ) {
-        let workflowInfo = await fetch(getGatewayUrl(imageProducts.url));
+        let workflowInfo = await fetch(getGatewayUrl(imageProducts.url), fetchOpts);
         workflowInfo = await workflowInfo.json()
-        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json');
+        let manifest = await fetch(config.gateway.host+config.fcrepo.root+item['@id']+'/svc:gcs/'+workflowInfo.data.gcsBucket+'/'+workflowInfo.data.gcsSubpath+'/manifest.json', fetchOpts);
         item.clientMedia.images = await manifest.json();
       }
 
       let streamVideoSupport = headers.link.workflow.find(item => STREAMING_VIDEO_WORKFLOW === item.type);
       if( streamVideoSupport ) {
-        let workflowInfo = await fetch(getGatewayUrl(streamVideoSupport.url));
+        let workflowInfo = await fetch(getGatewayUrl(streamVideoSupport.url), fetchOpts);
         workflowInfo = await workflowInfo.json()
 
         item.clientMedia.streamingVideo = {

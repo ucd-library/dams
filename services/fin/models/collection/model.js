@@ -1,4 +1,4 @@
-const {dataModels, models, logger, pg} = require('@ucd-lib/fin-service-utils');
+const {dataModels, models, logger, pg, config} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
 const {FinEsDataModel} = dataModels;
 const workflowUtils = require('../workflows.js');
@@ -133,7 +133,7 @@ class CollectionsModel extends FinEsDataModel {
 
       let imageGraph = await model.get(
         root.image['@id'], 
-        {compact: true, singleNode: true}
+        {compact: true, singleNode: true, roles: [config.finac.agents.admin]}
       );
       
       if( !imageGraph ) return collection;

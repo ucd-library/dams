@@ -83,6 +83,12 @@ class CollectionImportModel {
         value : 'true'
       });
     }
+    if( opts.agent ) {
+      importer.env.push({
+        name : 'FIN_AC_AGENT',
+        value : opts.agent
+      });
+    }
 
     let promises = [];
 

@@ -35,6 +35,10 @@ METADATA_DIR="$ROOT_DIR/$METADATA_REPO"
 GIT_URL="$ROOT_GIT_HOST/$METADATA_REPO.git"
 
 echo "Importing collection $COLLECTION_NAME from $GCS_BINARY_BACKUP_BUCKET"
+if [[ ! -z $FIN_AC_AGENT ]]; then
+  echo "Using fin ac agent: $FIN_AC_AGENT"
+  FIN_AC_AGENT="--agent $FIN_AC_AGENT"
+fi
 
 if [[ -d $METADATA_DIR ]]; then
   rm -rf $METADATA_DIR
@@ -61,7 +65,7 @@ echo "Setting service account token"
 node $SCRIPT_DIR/setToken.js
 
 if [[ $DRY_RUN = 'true' ]]; then
-  fin io import --debug-sha-changes --dry-run --ag-import-strategy version-all .
+  fin io import $FIN_AC_AGENT --debug-sha-changes --dry-run --ag-import-strategy version-all .
 else
-  fin io import --ag-import-strategy version-all .
+  fin io import $FIN_AC_AGENT --ag-import-strategy version-all .
 fi
