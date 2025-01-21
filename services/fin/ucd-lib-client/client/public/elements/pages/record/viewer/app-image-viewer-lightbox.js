@@ -163,7 +163,26 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       return;
     }
 
-    this.renderedMedia = selectedMedia.clientMedia?.pages?.filter(media => media.page === selectedMediaPage)[0];
+    let pages = [];
+
+    // prioritize imagelist, then pdf
+    let imageList = (clientMedia.mediaGroups || []).filter(m => m['@shortType'].includes('ImageList'))?.[0];
+    if( imageList?.clientMedia?.pages ) {
+      pages = imageList.clientMedia.pages;
+    }
+
+    if( !pages.length ) {
+      let pdf = (clientMedia.mediaGroups || []).filter(m => m.clientMedia.pdf)?.[0];
+      if( pdf?.clientMedia?.pages ) {
+        pages = pdf.clientMedia.pages;
+      }
+    }
+
+    if( !pages.length && selectedMedia.clientMedia?.pages ) {
+      pages = selectedMedia.clientMedia.pages;
+    }
+
+    this.renderedMedia = pages?.filter(media => media.page === selectedMediaPage)[0];
     // on first page load, selectedMediaPage is -1, so just show first page from clientMedia.images
     if( !this.renderedMedia ) {
       this.renderedMedia = selectedMedia.clientMedia.images;

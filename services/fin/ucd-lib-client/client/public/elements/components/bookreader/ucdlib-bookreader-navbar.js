@@ -59,7 +59,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       if( slider ) slider._onResize();
     });
 
-    this._updateSelectedPageLabel();
+    this._updatePageLabels();
   }
 
   _reset() {
@@ -83,7 +83,7 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       this.BookReaderModel.setPage(this.selectedPage - pageIncrement);
     }
 
-    this._updateSelectedPageLabel();
+    this._updatePageLabels();
   }
 
   _nextPage(e) {
@@ -98,23 +98,27 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
       this.BookReaderModel.setPage(this.selectedPage + 1);
     }
 
-    this._updateSelectedPageLabel();
+    this._updatePageLabels();
   }
 
-  _updateSelectedPageLabel() {
+  _updatePageLabels() {    
     // update selected page label, the page number if single page, otherwise include the page range if double page
     // if first/last page, since we don't want to show a range if we're on the first
     if( this.singlePageView || this.selectedPage === 0 ) {
       this.selectedPageLabel = this.selectedPage+1;
     } else if( this.selectedPage === (this.numPages-1) && this.numPages % 2 === 1 ) { 
       // very last page (for odd number pages)
-      this.selectedPageLabel = this.selectedPage + '-' + (this.selectedPage+1);    
+      this.selectedPageLabel = this.selectedPage + '-' + (this.selectedPage+1);
     } else if( this.selectedPage === (this.numPages-1) && this.numPages % 2 !== 1 ) { 
       // very last page (for even number pages)
       this.selectedPageLabel = this.selectedPage+1;
     } else {
       this.selectedPageLabel = this.selectedPage+1 + '-' + (this.selectedPage+2);
     }
+
+    // also set custom property to help with styling so nav doesn't jump around
+    let pageLabelDiv = this.shadowRoot.querySelector('.br-currentpage-override');
+    if( pageLabelDiv ) pageLabelDiv.style.setProperty('--num-pages-length', this.numPages.toString().length);
   }
 
   _prevSearchResult(e) {

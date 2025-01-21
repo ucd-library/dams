@@ -22,9 +22,9 @@ export function styles() {
 
     ucdlib-icon {
       height: 35px;
-      width: 35px;
+      width: 30px;
       max-height: 35px;
-      max-width: 35px;
+      max-width: 30px;
       cursor: pointer;
     }
 
@@ -39,8 +39,8 @@ export function styles() {
       color: #022851;
       font-size: 0.9rem;
       font-weight: bold;
-      min-width: 80px;
       text-align: center;
+      min-width: calc(var(--num-pages-length, 0) * 3ch + 3ch);
     }
 
     #buttonWrapper div {
