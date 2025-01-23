@@ -50,10 +50,6 @@ else
   git pull 
 fi
 
-echo "Cloning $GIT_URL"
-cd $ROOT_DIR
-git clone $GIT_URL
-
 cd $METADATA_DIR
 
 echo "Authenticating with Google Cloud"
