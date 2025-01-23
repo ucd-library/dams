@@ -40,7 +40,7 @@ if [[ ! -z $FIN_AC_AGENT ]]; then
   FIN_AC_AGENT="--agent $FIN_AC_AGENT"
 fi
 
-if [[ -d $METADATA_DIR ]]; then
+if [[ ! -d $METADATA_DIR ]]; then
   echo "Cloning $GIT_URL"
   cd $ROOT_DIR
   git clone $GIT_URL
