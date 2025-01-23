@@ -41,7 +41,13 @@ if [[ ! -z $FIN_AC_AGENT ]]; then
 fi
 
 if [[ -d $METADATA_DIR ]]; then
-  rm -rf $METADATA_DIR
+  echo "Cloning $GIT_URL"
+  cd $ROOT_DIR
+  git clone $GIT_URL
+else
+  echo "Updating $METADATA_DIR"
+  cd $METADATA_DIR
+  git pull 
 fi
 
 echo "Cloning $GIT_URL"
