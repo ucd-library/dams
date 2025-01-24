@@ -38,6 +38,8 @@ echo "Importing collection $COLLECTION_NAME from $GCS_BINARY_BACKUP_BUCKET"
 if [[ ! -z $FIN_AC_AGENT ]]; then
   echo "Using fin ac agent: $FIN_AC_AGENT"
   FIN_AC_AGENT="--agent $FIN_AC_AGENT"
+else
+  echo "Not using fin ac agent"
 fi
 
 if [[ ! -d $METADATA_DIR ]]; then
@@ -57,7 +59,9 @@ gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
 if [[ $IGNORE_BINARY_SYNC != 'true' ]]; then
   echo "Syncing binary backups from gs://$GCS_BINARY_BACKUP_BUCKET"
-  gsutil -m -q rsync -c -J -r -u -d -y ".*\.jsonld\.json$" gs://$GCS_BINARY_BACKUP_BUCKET/$COLLECTION_NAME .
+  gsutil -m -q rsync -c -J -r -u -y "(^\.git|.*\.jsonld\.json$)" gs://$GCS_BINARY_BACKUP_BUCKET/$COLLECTION_NAME .
+else
+  echo "Ignoring binary sync"
 fi
 
 echo "Importing collection $COLLECTION_NAME"
