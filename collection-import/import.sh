@@ -59,7 +59,7 @@ gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
 if [[ $IGNORE_BINARY_SYNC != 'true' ]]; then
   echo "Syncing binary backups from gs://$GCS_BINARY_BACKUP_BUCKET"
-  gsutil -m -q rsync -c -J -r -u -y "(^\.git|.*\.jsonld\.json$)" gs://$GCS_BINARY_BACKUP_BUCKET/$COLLECTION_NAME .
+  gsutil -m -q rsync -d -c -J -r -u -y "(^\.git|.*\.jsonld\.json$)" gs://$GCS_BINARY_BACKUP_BUCKET/$COLLECTION_NAME .
 else
   echo "Ignoring binary sync"
 fi
