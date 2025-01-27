@@ -152,7 +152,7 @@ return html`
     <img src="/images/watercolors/citation-watercolor-800px-landscape.png" width="100%" alt="cite this collection image" />
   </div>
   <div class="cite-collection">
-    <h2>Cite This Collection</h2>
+    <h2>Cite This ${this.citationTypeLabel}</h2>
 
     ${ SharedHtml.headerDots() }
 

@@ -17,7 +17,8 @@ export class Citation extends LitElement {
       record: {type : Object},
       recordId: {type : String},
       citations : {type : Array},
-      selectedCitation : {type : Object}
+      selectedCitation : {type : Object},
+      citationTypeLabel : {type : String, attribute : 'citation-type-label'}
     };
   }
 
@@ -30,6 +31,7 @@ export class Citation extends LitElement {
     this.recordId = '';
     this.citations = [];
     this.selectedCitation = {};
+    this.citationTypeLabel = 'Collection';
     
   }
 
