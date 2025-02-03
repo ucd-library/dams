@@ -412,6 +412,6 @@ export default function render() {
       </div>
     </div>
 
-    <app-citation .record="${this.citationRoot}"></app-citation>
+    <app-citation .record="${this.citationRoot}" citation-type-label="Item"></app-citation>
   `;
 }

@@ -222,7 +222,7 @@ class BookReaderModel extends BaseModel {
         originalHeight = parseInt(page?.original?.size?.height || page?.large?.size?.height);
         originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
         scale = width / originalWidth;
-        filename = page['@id'].split('/').pop()
+        filename = page['@id']?.split('/').pop()
         return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth, page: page.page, filename};
     });
 
