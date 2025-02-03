@@ -202,13 +202,6 @@ config.client = {
       collectionLink : "/collection/ark:/13030/c8pc37z3"
     },
     {
-      imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lehmann-d7mm2n.jpg",
-      itemName : "Holiday 1997: Season's Greetings from Sherry-Lehmann",
-      collectionName : "Sherry Lehmann Wine Catalogs",
-      itemLink : "/item/ark:/87287/d7mm2n",
-      collectionLink : "/collection/ark:/13030/c8pc37z3"
-    },
-    {
       imageUrl : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lug-D211_22_43.jpg",
       itemName : "Arden Villa",
       collectionName : "Lug and Can Label Collection",
@@ -288,6 +281,69 @@ config.client = {
       collectionName : "Slater (Colby E. \"Babe\") Collection",
       itemLink : "/item/ark:/87293/d3m09f",
       collectionLink : "/collection/slater"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/regional-postcard-O-001_01_016.jpg",
+      "itemName" : "Hot Air Balloon, Davis, Calif.",
+      "collectionName" : "Regional Postcard Collection",
+      "itemLink" : "/item/ark:/87293/d3h41jt83",
+      "collectionLink" : "/collection/ark:/87293/d3kw57r29"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/pierce-D-022_09_21.jpg",
+      "itemName" : "A-21. Images of almond orchards...",
+      "collectionName" : "Pierce Families Papers",
+      "itemLink" : "/item/ark:/87293/d3sx64f52",
+      "collectionLink" : "/collection/ark:/87293/d3z892n52"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/davis-covid-87293_d3g528.jpg",
+      "itemName" : "Abstract Rainbow Mandala",
+      "collectionName" : "Davis Downtown COVID-19 Community Art Project",
+      "itemLink" : "/item/ark:/87293/d3g528",
+      "collectionLink" : "/collection/ark:/87293/d3sj19z36"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/nature-printing-butterflyfish-87293_d32j6888m.jpg",
+      "itemName" : "Butterflyfishes",
+      "collectionName" : "Nature Printing Society Collection",
+      "itemLink" : "/item/ark:/87293/d32j6888m",
+      "collectionLink" : "/collection/ark:/87293/d3057d056"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/nature-printing-inkodye-87293_d3901zm5p.jpg",
+      "itemName" : "Inkodye-on-Cloth",
+      "collectionName" : "Nature Printing Society Collection",
+      "itemLink" : "/item/ark:/87293/d3901zm5p",
+      "collectionLink" : "/collection/ark:/87293/d3057d056"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/hours-virgin-87293_d38w3870g.jpg",
+      "itemName" : "Hours of the Virgin",
+      "collectionName" : "Hours of the Virgin",
+      "itemLink" : "/item/ark:/87293/d38w3870g",
+      "collectionLink" : "/collection/ark:/87293/d3vd6pc0t"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/picnic_day-87293_d3t727m3g.jpg",
+      "itemName" : "Picnic Day program 1987",
+      "collectionName" : "Picnic Day Collection",
+      "itemLink" : "/item/ark:/87293/d3t727m3g",
+      "collectionLink" : "/collection/ark:/87293/d36q1sq2t"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lehmann-87287_d79018.jpg",
+      "itemName" : "To A Gay and Festive Summer 1950",
+      "collectionName" : "Sherry Lehmann Wine Catalogs",
+      "itemLink" : "/item/ark:/87287/d79018",
+      "collectionLink" : "/collection/ark:/13030/c8pc37z3"
+    },
+    {
+      "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/lehmann-87287_d7tg6n.jpg",
+      "itemName" : "Season's Greetings (Globe Theater) 1965",
+      "collectionName" : "Sherry Lehmann Wine Catalogs",
+      "itemLink" : "/item/ark:/87287/d7tg6n",
+      "collectionLink" : "/collection/ark:/13030/c8pc37z3"
     }
   ]
 };
