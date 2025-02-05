@@ -17,8 +17,11 @@ class SitemapModel {
    */
   middleware(app) {
     let allow = 'Disallow: /';
+    let sitemap = '';
+
     if( config.server.url.match('https://digital.ucdavis.edu') ) {
       allow = 'Allow: /';
+      sitemap = `Sitemap: ${config.server.url}/sitemap.xml`;
     }
 
     app.get(/^\/sitemap.*/, (req, res) => this._onRequest(req, res));
@@ -28,7 +31,7 @@ class SitemapModel {
       res.send(`User-agent: * 
 ${allow}
 
-Sitemap: ${config.server.url}/sitemap.xml`);
+${sitemap}`);
     });
   }
 
