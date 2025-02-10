@@ -162,9 +162,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     // single page images should use normal image viewer
-    if( (renderAsBr && mediaGroup?.clientMedia?.pages?.length === 1) || !mediaGroup?.clientMedia.pages?.length ) {
+    if( renderAsBr && (mediaGroup?.clientMedia?.pages?.length === 1 || !mediaGroup?.clientMedia.pages?.length) ) {
       renderAsBr = false;
-      mediaType = 'image';
+      if( mediaType === 'bookreader' ) mediaType = 'image';
     }
 
     if( renderAsBr ) {
