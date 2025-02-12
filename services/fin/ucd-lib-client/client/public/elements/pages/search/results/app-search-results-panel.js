@@ -412,8 +412,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       }
 
       let containerWidth = eles[i].offsetWidth || (w * .92); // hack to get around offsetWidth intermittently being 0, not rendered yet?
-      let naturalWidth = img.naturalWidth;
-      let naturalHeight = img.naturalHeight;
+      let naturalWidth = img.naturalWidth || 1;
+      let naturalHeight = img.naturalHeight || 1;
       let aspectRatio = naturalHeight / naturalWidth;
       let scaledHeight = containerWidth * aspectRatio;
       
