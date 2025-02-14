@@ -43,7 +43,7 @@ class CollectionImportModel {
     }
 
     let templates = null;
-    if( config.k8s.platform === 'docker-desktop' ) {
+    if( config.k8s.platform === 'docker-desktop' || config.k8s.platform === 'microk8s' ) {
       let yamlStr = await kubectl.corkKubeApply(
         path.join(kubectl.k8sTemplatePath, config.k8s.collectionImport.templateName), {
         'local-dev' : '',
@@ -55,11 +55,7 @@ class CollectionImportModel {
 
       // update storage class and host path for local dev
       let pvc = templates.find(t => t.kind === 'PersistentVolumeClaim');
-      pvc.spec.storageClassName = 'hostpath';
-
-      // let pv = templates.find(t => t.kind === 'PersistentVolume');
-      // pv.spec.storageClassName = 'hostpath';
-      // pv.spec.hostPath.path = path.join(config.k8s.collectionImport.localDevHostPath, collection);
+      pvc.spec.storageClassName = config.k8s.platform === 'microk8s' ? 'microk8s-hostpath' : 'hostpath';
     } else {
       templates = await kubectl.renderKustomizeTemplate(
         config.k8s.collectionImport.templateName, 

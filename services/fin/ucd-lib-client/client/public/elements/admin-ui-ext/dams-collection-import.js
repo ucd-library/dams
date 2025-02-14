@@ -247,8 +247,10 @@ export default class DamsCollectionImport extends Mixin(LitElement)
   getJobLink(id) {
     if( !this.config ) return '';
     let k8s = this.config.k8s || {};
-    
-    if( k8s.platform === 'docker-desktop' ) {
+
+    if( k8s.dashboardUrl ) {
+      return `${k8s.dashboardUrl}/job/${k8s.namespace}/import-${id}?namespace=${k8s.namespace}`;
+    } else if( k8s.platform === 'docker-desktop' ) {
       return `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/job/${k8s.namespace}/import-${id}?namespace=${k8s.namespace}`
     } else if( k8s.platform === 'gke' ) {
       return `https://console.cloud.google.com/kubernetes/job/${k8s.region}/${k8s.cluster}/${k8s.namespace}/import-${id}/details?project=${this.config.google.project}`;

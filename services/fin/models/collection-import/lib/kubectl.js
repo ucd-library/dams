@@ -25,9 +25,8 @@ class KubectlWrapper {
       return;
     }
 
-
-    if( config.k8s.platform === 'docker-desktop' ) {
-      logger.info('kubectl initialized for local environment. /root/.kube should already be mounted');
+    if( fs.existsSync('/root/.kube') ) {
+      logger.info(`kubectl initialized for platform ${config.k8s.platform}.  /root/.kube already exists`);
       this.initalized = true;
       return;
     }
