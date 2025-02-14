@@ -34,7 +34,7 @@ METADATA_REPO="dams-${COLLECTION_NAME}-metadata"
 METADATA_DIR="$ROOT_DIR/$METADATA_REPO"
 GIT_URL="$ROOT_GIT_HOST/$METADATA_REPO.git"
 
-echo "Importing collection $COLLECTION_NAME from $GCS_BINARY_BACKUP_BUCKET"
+echo "Importing collection $COLLECTION_NAME from $GCS_BINARY_BACKUP_BUCKET to $FIN_URL"
 if [[ ! -z $FIN_AC_AGENT ]]; then
   echo "Using fin ac agent: $FIN_AC_AGENT"
   FIN_AC_AGENT="--agent $FIN_AC_AGENT"
@@ -43,7 +43,7 @@ else
 fi
 
 if [[ ! -d $METADATA_DIR ]]; then
-  echo "Cloning $GIT_URL"
+  echo "Cloning $GIT_URL to $METADATA_DIR"
   cd $ROOT_DIR
   git clone $GIT_URL
 else
@@ -54,7 +54,7 @@ fi
 
 cd $METADATA_DIR
 
-echo "Authenticating with Google Cloud"
+echo "Authenticating with Google Cloud: $GOOGLE_APPLICATION_CREDENTIALS"
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
 if [[ $IGNORE_BINARY_SYNC != 'true' ]]; then
