@@ -161,8 +161,6 @@ export class FinApp extends Mixin(LitElement)
 
       this.buildInfo.push(info);
     }
-
-    console.log(this.buildInfo);
   }
 
   /**

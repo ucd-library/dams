@@ -98,63 +98,47 @@ export default function render() {
       </div>
       
       <p>
-        The UC Davis Digital Collections is a locally developed digital repository that 
-        was designed to store and manage the digital assets of UC Davis. These Digital 
-        Collections are intended to increase access to previously undiscoverable digital 
-        assets held by the University Library.
+        UC Davis Digital Collections provide online access to digitized or born-digital materials from the UC Davis Library, 
+        with a particular focus on the rare and unique materials in its Archives and Special Collections. 
+        These documents, images, audio and video files offer a rich resource for exploration by scholars and the public alike.
       </p>
       
+      <h4>How We Determine What to Share Online</h4>
+      
+      <p>      
+        We consider materials based on criteria including the library's collecting strengths and priorities, rarity, 
+        research value, demonstrated demand, support of areas of excellence for UC Davis, and the desire to elevate the 
+        narratives, perspectives, and expertise of communities historically underrepresented in the scholarly record. 
+      </p>
+
       <p>
-        Initially launched in 2018, the repository currently stores <span>${this.count}</span> digital assets. 
-        Assests will be added continually as they are ready.
+        We acknowledge that some materials presented in our collections may reflect views that are considered outdated, 
+        biased or offensive today. Although some of these materials may be difficult to encounter, we believe it is 
+        important to document history without censorship, so that students and scholars can reflect on and learn from the past. 
+        The library's stewardship and preservation of the breadth of the historical record does not imply support for any views expressed therein.
       </p>
-      
-      <h4>Platform</h4>
-      
-      <p>
-        The Digital Asset Management System is built on the Fedora Linked Data Platform. 
-        Custom microservices are implemented using a Fedora (API-X) extension method as a general 
-        methodology. The User Interface was built with web-components anticipating a need for 
-        UI flexibility as the digital collection grows. For a more detailed explanation of 
-        the development, see our code repositories:
-        <a href="https://github.com/ucd-library/fin/blob/main/docs/README.md">Fin Server</a> or
-        <a href="https://github.com/ucd-library/dams">DAMS Fin Implementation.</a>
-      </p>
-      
+
       <h4>Contact</h4>
-      <div>
-        <ul class="list--arrow">
-          <li><a href="https://www.library.ucdavis.edu/person/eric-nebeker">Eric A Nebeker</a> (Digital Assets Specialist)</li>
-        </ul>
-      </div>
-      
-      <h4>Implementation Team</h4>
-      <div>
-        <ul class="list--arrow">
-          <li><a href="https://www.library.ucdavis.edu/person/quinn-hart">Quinn Hart</a> (Team Lead)</li>
-          <li><a href="https://www.library.ucdavis.edu/person/justin-merz">Justin Merz</a> (Lead Developer)</li>
-          <li><a href="https://www.library.ucdavis.edu/person/dusty-cartwright">Dusty Cartwright</a> (Developer)</li>
-          <li><a href="https://www.library.ucdavis.edu/person/kimmy-hescock">Kimmy Hescock</a> (User Experience Designer)</li>
-        </ul>
-      </div>
-      
-      <h4>DAMS Steering Committee Members</h4>
-      <div>
-        <ul class="list--arrow">
-          <li><a href="https://www.library.ucdavis.edu/person/peter-brantley">Peter Brantley</a></li>
-          <li><a href="https://www.library.ucdavis.edu/person/vessela-ensberg">Vessela Ensberg</a></li>
-          <li><a href="https://www.library.ucdavis.edu/person/xiaoli-li">Xiaoli Li</a></li>
-          <li><a href="https://www.library.ucdavis.edu/person/kevin-miller">Kevin Miller</a></li>
-          <li><a href="https://www.library.ucdavis.edu/person/eric-nebeker">Eric Nebeker</a></li>
-          <li><a href="https://www.library.ucdavis.edu/person/dale-snapp">Dale Snapp</a></li>
-          <li><a href="https://www.library.ucdavis.edu/person/carl-stahmer">Carl Stahmer</a></li>
-          <li><a href="https://www.library.ucdavis.edu/person/neil-weingarten">Neil Weingarten</a></li>
-        </ul>
-      </div>
-      
       <p>
-        The UC Davis Digital Collections was a project of the UC Davis Library's 
-        <a href="https://www.library.ucdavis.edu/online-strategy/">Online Strategy team.</a>
+        Please contact us with questions or to report potential errors. Regarding requests to remove materials published 
+        in our digital collections, it is generally the policy of the UC Davis Library to provide access as broadly as possible 
+        to the materials we hold, consistent with our legal and ethical obligations, and to remove materials only for 
+        compelling legal or ethical reasons. Given our commitment to the integrity of the historical record, we are unable 
+        to alter errors or inaccuracies in original materials. The ultimate authority to make decisions regarding takedown 
+        requests lies with the University Librarian or their designee. All questions, corrections, or requests should be directed to:
+      </p>      
+      <div>
+        <ul class="list--arrow" style="margin-top: 0;">
+          <li><a href="mailto:digitalcollections@ucdavis.edu">digitalcollections@ucdavis.edu</a></li>
+        </ul>
+      </div>
+
+      <h4>Platform</h4>
+      <p>
+        The UC Davis Digital Collections platform is actively developed by the UC Davis Library.  
+        The platform runs using multiple web standards, including primarily the Fedora Linked Data Platform 
+        server and Web Components for user interface design.
       </p>
+      
     </div>
 `;}
