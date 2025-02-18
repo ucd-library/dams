@@ -461,7 +461,7 @@ export default function render() {
           )}
         </div>
 
-        <div class="masonry" ?hidden="${!this.loading || !this.isMosaicLayout}">
+        <div class="masonry" ?hidden="${!this.loading || !this.isMosaicLayout}" style="display: flex;">
           <div class="col-1">
             <div class="teaser">
               <div class="teaser__image" style="height: 350px;"></div>

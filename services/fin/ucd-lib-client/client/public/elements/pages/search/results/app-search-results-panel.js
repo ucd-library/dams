@@ -391,6 +391,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       .querySelector("#layout")
       .querySelectorAll("app-search-grid-result");
   
+    this._estimateViewHeight(eles, w, numCols);
+
     let styledPadding = 0;
     if( numCols === 1 ) styledPadding = 80; // margin+padding
 
@@ -428,6 +430,31 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
 
     this.requestUpdate();
+  }
+
+  /**
+   * @method _estimateViewHeight
+   * @description estimate height of view, some items don't have sizes defined
+   * 
+   * @param {Array} eles array of elements
+   * @param {Number} w width of each element
+   * @param {Number} numCols number of columns
+   */
+  _estimateViewHeight(eles=[], w=300, numCols=3) {
+    if( !numCols || !w ) return;
+
+    let colHeights = [];
+    for( let i = 0; i < numCols; i++ ) colHeights.push(0);
+
+    for( let i = 0; i < eles.length; i++ ) { 
+      let col = this._findMinCol(colHeights);
+      let cheight = colHeights[col];
+      eles[i].style.left = col * w + "px";
+      eles[i].style.top = cheight + "px";
+      colHeights[col] += w;
+    }
+
+    this.shadowRoot.querySelector("#layout").style.height = (eles.length / numCols * w + 100) + "px";
   }
 
   /**
