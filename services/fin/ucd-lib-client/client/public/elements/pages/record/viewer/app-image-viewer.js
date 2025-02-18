@@ -15,6 +15,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       media: { type: Object },
       loading: { type: Boolean },
       height: { type: String },
+      spinnerTop: { type: Number },
       hasMultipleImages: { type: Boolean },
     };
   }
@@ -29,6 +30,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     this.media = {};
     this.loading = false;
     this.height = '600px';
+    this.spinnerTop = 300;
     this.hasMultipleImages = false;
   }
 
@@ -101,8 +103,10 @@ export default class AppImageViewer extends Mixin(LitElement).with(
         let maxHeight = 600;
         let optimalImageHeight = (size.height / size.width * window.innerWidth);
         this.height = optimalImageHeight > maxHeight ? maxHeight + 'px' : optimalImageHeight + 'px';
+        this.spinnerTop = optimalImageHeight / 2;
       } else {
         this.height = '600px';
+        this.spinnerTop = 300;
       }
 
       let sizes = "600px";
@@ -111,7 +115,6 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.shadowRoot.querySelector("#img").srcset = srcset;
       this.shadowRoot.querySelector("#img").sizes = sizes;
       this.shadowRoot.querySelector("#img").src = src;
-      this.shadowRoot.querySelector("#img").style.height = "600px";
 
       this.shadowRoot.querySelector('#img').addEventListener('load', () => {
         this.loading = false;

@@ -25,7 +25,6 @@ export default function render() {
 
       .spinner {
         position: relative;
-        top: 300px;
         left: 0;
         width: 100vw;
         /* height: 100vh; */
@@ -56,7 +55,7 @@ export default function render() {
       }
     </style>
 
-    <div class="spinner" ?hidden="${!this.loading}"></div>
+    <div class="spinner" ?hidden="${!this.loading}" style="top: ${this.spinnerTop}px"></div>
 
     <div class="layout" style="line-height: 0; height: ${this.height}">
       <img ?hidden="${this.loading}" id="img" style="height: ${this.height}" />

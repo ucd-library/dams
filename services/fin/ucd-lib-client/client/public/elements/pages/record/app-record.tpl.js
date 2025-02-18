@@ -177,7 +177,7 @@ export default function render() {
         }
 
         .part-of .collection-info {
-          margin: auto;
+          margin: 1rem 1rem 1rem 0;
         }
 
         .part-of {
