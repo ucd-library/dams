@@ -29,6 +29,8 @@ class KubectlWrapper {
       logger.info(`kubectl initialized for platform ${config.k8s.platform}.  /root/.kube already exists`);
       this.initalized = true;
       return;
+    } else if( config.k8s.platform !== 'gke' ) {
+      throw new Error(`Error for ${config.k8s.platform} No kubernetes config found at /root/.kube and platform is not gke`);
     }
 
     if( this.initializing ) return this.initializing;
