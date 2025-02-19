@@ -13,7 +13,6 @@ class KubectlWrapper {
   constructor() {
     this.initalized = false;
     this.k8sTemplatePath = k8sTemplatePath;
-    this.init();
   }
 
   async init() {
