@@ -161,8 +161,6 @@ export class FinApp extends Mixin(LitElement)
 
       this.buildInfo.push(info);
     }
-
-    console.log(this.buildInfo);
   }
 
   /**
@@ -216,6 +214,7 @@ export class FinApp extends Mixin(LitElement)
       }
     }));
 
+    let isBrowseLandingPage = false;
     if( page === 'browse' ) {
       let browseByType = this.AppStateModel.location.path[1];
       if( browseByType ) {
@@ -224,6 +223,7 @@ export class FinApp extends Mixin(LitElement)
         // browse landing page
         let browseSection = selectedPage.querySelector('.browse-selection-section');
         if( browseSection ) browseSection.removeAttribute('hidden');
+        isBrowseLandingPage = true;
       }
       if( selectedPage ) {
         selectedPage.removeAttribute('hidden');
@@ -234,6 +234,8 @@ export class FinApp extends Mixin(LitElement)
     if( page === 'browse' && selectedPage?.offsetHeight ) {
       let height = selectedPage.offsetHeight;
       mainContent.style.minHeight = height+'px';
+    } else if( isBrowseLandingPage ) {
+      mainContent.style.minHeight = '100px';    
     } else {
       mainContent.style.minHeight = '100vh';
     }
