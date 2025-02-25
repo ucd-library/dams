@@ -306,13 +306,14 @@ class CollectionsModel extends FinEsDataModel {
    * 
    * @returns {Promise} resolves to map of id to label
    */
-  async allLabels() {
+  async allLabels(roles) {
     let result = await this.esSearch(
       {
         from : 0,
         size : 10000
       },
       {
+        roles,
         _source_excludes : false,
         _source_includes : ['@id', 'name']
       }   

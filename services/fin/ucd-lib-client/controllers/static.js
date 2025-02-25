@@ -50,7 +50,7 @@ module.exports = async (app) => {
       }
 
       next({
-        collectionLabels : await collectionModel.allLabels(),
+        collectionLabels : await collectionModel.allLabels(user.roles),
         user : user,
         appRoutes : config.client.appRoutes,
         // recordCount: (await records.rootCount()).count,
