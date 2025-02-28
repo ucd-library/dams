@@ -111,7 +111,7 @@ class CollectionModel extends BaseModel {
       let searchDocument = {
         limit,
         sort: [{
-          '@graph.datePublished': {order : "desc", "unmapped_type": "date"} 
+          '@graph.yearPublished': {order : "desc" } 
         }]
       };
       // searchDocument = {limit: 3};
