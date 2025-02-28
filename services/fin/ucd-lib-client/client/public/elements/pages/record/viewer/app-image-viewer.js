@@ -109,6 +109,8 @@ export default class AppImageViewer extends Mixin(LitElement).with(
         this.spinnerTop = 300;
       }
 
+      if( this.spinnerTop > 500 ) this.spinnerTop = 300;
+
       let sizes = "600px";
 
       // add to img
