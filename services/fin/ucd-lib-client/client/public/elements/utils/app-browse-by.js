@@ -276,14 +276,14 @@ export default class AppBrowseBy extends Mixin(LitElement)
         if( a[sortBy.type] < b[sortBy.type] ) return (sortBy.dir === 'asc') ? -1 : 1;
         return 0;
       });
-    } else {
+    } else if ( sortBy.label === 'A-Z' ) {
       // sort by title
       this.allResults.sort((a, b) => {
         if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sortBy.dir === 'asc') ? 1 : -1;
         if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sortBy.dir === 'asc') ? -1 : 1;
         return 0;   
       });
-    }
+    } // else recent, just sort by date, but already sorted
     
     this.collectionResults = this.allResults.slice(
       this.currentIndex, 
