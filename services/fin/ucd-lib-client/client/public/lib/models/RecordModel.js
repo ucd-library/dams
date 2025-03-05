@@ -195,7 +195,7 @@ class RecordModel extends ElasticSearchModel {
     if( !searchDocument.text ) {
       searchDocument.sort = [
         {
-          "@graph.name.punctuation_insensitive": {
+          "name.raw": {
             "order": "asc"
           }
         },
@@ -209,7 +209,7 @@ class RecordModel extends ElasticSearchModel {
       searchDocument.sort = [
         "_score",
         {
-          "@graph.name.punctuation_insensitive": {
+          "name.raw": {
             "order": "asc"
           }
         },
@@ -322,12 +322,12 @@ class RecordModel extends ElasticSearchModel {
     if( searchDocument.text && !searchDocument.sort ) {      
       searchDocument.sort = [
         '_score', 
-        { "@graph.name.punctuation_insensitive": { "order": "asc" } },
+        { "name.raw": { "order": "asc" } },
         { "@graph.@id": { "order": "asc" } }    
       ];
     } else if( !searchDocument.sort ) {
       searchDocument.sort = [
-        { "@graph.name.punctuation_insensitive": { "order": "asc" } },
+        { "name.raw": { "order": "asc" } },
         { "@graph.@id": { "order": "asc" } }    
       ];
     }

@@ -104,11 +104,12 @@
       "type" : "integer"
     },
 
-   "@graph.name" : {
+    "name" : {
       "type": "text",
       "fields": {
         "raw": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
         },
         "punctuation_insensitive": {
           "type": "text",

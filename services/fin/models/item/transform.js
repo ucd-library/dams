@@ -369,6 +369,10 @@ module.exports = async function(path, graph, headers, utils) {
   };
   delete item._.graphId;
 
+  if( graph['@id'] === item['@id'] ) {
+    graph.name = item.name;
+  }
+
   return graph;
 }
 

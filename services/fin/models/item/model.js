@@ -22,6 +22,16 @@ class ItemsModel extends FinEsDataModel {
     return false;
   }
 
+  search(searchDocument, options, index) {
+    if( !searchDocument.sort ) {
+      searchDocument.sort = [
+        '_score',
+        { 'name.raw' : 'asc' }
+      ]
+    }
+    return super.search(searchDocument, options, index);
+  }
+
   /**
    * @method update
    * @description adding additional logic to update to send a message reindex messages to any collection
@@ -117,6 +127,21 @@ class ItemsModel extends FinEsDataModel {
   async validate(jsonld) {
     return validate.validateItem(jsonld, config.gateway.host);
   }
+
+
+  getDefaultIndexConfig(schema) {
+    let config = super.getDefaultIndexConfig(schema);
+    config.body.settings.analysis.normalizer = {
+        "lowercase_normalizer": {
+          "type": "custom",
+          "char_filter": [],
+          "filter": ["lowercase"]
+        }
+    };
+
+    return config;
+  }
+
 
 }
 

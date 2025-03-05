@@ -6,3 +6,4 @@ services/fin/ucd-lib-client/client/public/js
 run.js
 corkbuild.Dockerfile
 *.cork-build.json
+collection-import/download-checker-data
