@@ -47,8 +47,8 @@ config.elasticSearch = {
   },
 
   textFields : {
-    record : ['@graph.name', '@graph.description', '@graph.identifier', '@graph.about', '@graph.keywords', '@graph.alternativeHeadline', '@graph.indexableContent'],
-    collection : ['@graph.name', '@graph.description', '@graph.about', '@graph.keywords']
+    record : ['name.punctuation_insensitive', '@graph.description', '@graph.identifier', '@graph.about', '@graph.keywords', '@graph.alternativeHeadline', '@graph.indexableContent'],
+    collection : ['name', '@graph.description', '@graph.about', '@graph.keywords']
   },
   
   // max number of facets filter options

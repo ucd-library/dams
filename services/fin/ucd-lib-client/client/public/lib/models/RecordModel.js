@@ -331,7 +331,7 @@ class RecordModel extends ElasticSearchModel {
         { "@graph.@id": { "order": "asc" } }    
       ];
     }
-    if( searchDocument.text && !searchDocument.sort.find(s => s['_score']) ) {
+    if( searchDocument.text && !searchDocument.sort.includes('_score')) {
       searchDocument.sort.unshift('_score');
     }
 
