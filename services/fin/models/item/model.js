@@ -131,12 +131,26 @@ class ItemsModel extends FinEsDataModel {
 
   getDefaultIndexConfig(schema) {
     let config = super.getDefaultIndexConfig(schema);
+    config.body.settings.analysis.char_filter = {
+      "remove_special_chars": {
+        "type": "pattern_replace",
+        "pattern": "[^\\w\\s]",
+        "replacement": ""
+      }
+    };
     config.body.settings.analysis.normalizer = {
-        "lowercase_normalizer": {
-          "type": "custom",
-          "char_filter": [],
-          "filter": ["lowercase"]
-        }
+      "lowercase_normalizer": {
+        "type": "custom",
+        "char_filter": [],
+        "filter": ["lowercase"]
+      }
+    };
+    config.body.settings.analysis.normalizer = {
+      "lowercase_remove_punctuation_normalizer": {
+        "type": "custom",
+        "char_filter": ["remove_special_chars"],
+        "filter": ["lowercase"]
+      }
     };
 
     return config;
