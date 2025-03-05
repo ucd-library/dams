@@ -109,7 +109,7 @@
       "fields": {
         "raw": {
           "type": "keyword",
-          "normalizer": "lowercase_normalizer"
+          "normalizer": "lowercase_remove_punctuation_normalizer"
         },
         "punctuation_insensitive": {
           "type": "text",
