@@ -9,5 +9,6 @@ program
   .version(pkg.version)
   .command('hdt-to-label', 'Convert HDT file to labels.jsonld.json')
   .command('collection', 'DAMS collection utils')
+  .command('reindex-items', 'Reindex all items')
 
 program.parse(process.argv);
