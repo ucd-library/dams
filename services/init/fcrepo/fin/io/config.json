@@ -5,7 +5,7 @@
     "basePath" : "/collection",
     "virtualArchiveGroup" : {
       "predicate" : "http://schema.org/identifier",
-      "regex" : "^([A-Z]+-\\d+|ark:/[a-z0-9]+/[a-z0-9]+([A-Z]+-\\d+)?)$"
+      "regex" : "^ark:/[a-z0-9]+/[a-z0-9]+$"
     },
     "virtualIndirectContainers" : {
       "links" : {
