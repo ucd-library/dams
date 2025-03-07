@@ -59,10 +59,10 @@ return html`
             <button class="btn btn--primary btn--round" @click="${() => this._onRerunImportClicked(item)}">Rerun Import</button>
           </div>
           <div ?hidden="${item.state !== 'finished' && !item.volume}">
-            <input type="checkbox" id="ibs-input-${item.id}" checked> Ignore Binary Sync
+            <input type="checkbox" id="ibs-input-${item.id}"> Ignore Binary Sync
           </div>
           <div>
-            <input type="checkbox" id="private-input-${item.id}" checked> Set Private
+            <input type="checkbox" id="private-input-${item.id}"> Set Private
           </div>
         </td>
       </tr>
