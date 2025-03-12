@@ -185,8 +185,29 @@ class ClientMedia {
         this.handleImage(node);
       } else if( fileType === 'pdf' ) {
         this.handlePdf(node); 
+      } else if( mediaType === 'VideoObject' ) {
+        this.handleVideo(node);
       }
     }
+  }
+
+  /**
+   * @method handleVideo
+   * @description ensure image is properly linked to video
+   * 
+   * @param {Object} node
+   */
+  handleVideo(node) {
+    if( !node.clientMedia ) {
+      node.clientMedia = {};
+    }
+
+    if( !node.image ) return;
+
+    let image = this.getNode(node.image);
+    if( !image ) return;
+
+    node.clientMedia.images = image.clientMedia?.images;
   }
 
   /**
