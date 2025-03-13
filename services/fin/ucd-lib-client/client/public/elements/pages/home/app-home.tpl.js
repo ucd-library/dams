@@ -799,7 +799,7 @@ export default function render() {
 <section class="recent site-frame" ?hidden="${
     this.recentCollections.length === 0
   }">
-  <h1>Recently Digitized<br><span class="fw-light">Collections</span></h1>
+  <h1>Recently Added<br><span class="fw-light">Collections</span></h1>
   ${SharedHtml.headerDots()}
   <div class="card-trio ${
     this.recentCollections.length === 3 ? "three-total" : ""
@@ -902,9 +902,10 @@ export default function render() {
       <h1>About<br><span class="fw-light">Digital Collections</span></h1>
       ${SharedHtml.headerDots()}
       <p style="padding-bottom: 1rem;">
-        The UC Davis Digital Collections is a locally developed repository designed
-        to store and manage the digital assets of UC Davis Library, increasing access
-        to previously undiscoverable digital assets.
+        UC Davis Digital Collections provide online access to digitized or born-digital materials 
+        from the UC Davis Library, with a particular focus on the rare and unique materials in 
+        its Archives and Special Collections. These documents, images, audio and video files 
+        offer a rich resource for exploration by scholars and the public alike.
       </p>
       <a href="/about" class="btn--more-about btn--alt btn--round">More about this project</a>
     </div>

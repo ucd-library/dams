@@ -185,7 +185,6 @@ export function render() {
             University of California, Davis <br />
             Davis, CA 95616 <br /><br />
             <a href="tel:+1-530-752-8792" class="underline">530-752-8792</a><br /><br />
-            <a href="mailto:library@ucdavis.edu" class="underline">library@ucdavis.edu</a>
           </address>
         </div>
       </div>

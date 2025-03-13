@@ -12,7 +12,7 @@ if( process.env.APP_VERSION ) {
 config.client = {
   // TODO: move this to fcrepo
   title : 'UC Davis Library Digital Collections',
-  description : 'The UC Davis Digital Collections is a locally developed digital repository that was designed to store and manage the digital assets of UC Davis. These Digital Collections are intended to increase access to previously undiscoverable digital assets held by the University Library.',
+  description : 'UC Davis Digital Collections provide online access to digitized or born-digital materials from the UC Davis Library, with a particular focus on the rare and unique materials in its Archives and Special Collections. These documents, images, audio and video files offer a rich resource for exploration by scholars and the public alike.',
 
   appName : process.env.FIN_APP_NAME || 'ucd-lib-client',
   assets : (env === 'prod') ? 'dist' : 'public',
