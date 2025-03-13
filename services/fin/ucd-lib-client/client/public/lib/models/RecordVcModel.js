@@ -48,8 +48,15 @@ class RecordVcModel {
       if( e.payload?.clientMedia?.mediaGroups ) {
         let groups = e.payload.clientMedia.mediaGroups;
         let group = groups.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
+
+        let graph = e.payload.clientMedia.graph || [];
+        if( !Array.isArray(graph) ) graph = [graph];
+        let graphImage = graph.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
+
         if( group ) {
           images = group.clientMedia?.images;
+        } else if( graphImage && graphImage.clientMedia?.images ) {
+          images = graphImage.clientMedia?.images;
         } else if( groups[0]?.clientMedia?.images ) {
           images = groups[0].clientMedia.images;
         }

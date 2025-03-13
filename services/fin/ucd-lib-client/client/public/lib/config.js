@@ -41,7 +41,7 @@ config.elasticSearch = {
       }
     },
     '@graph.yearPublished' : {
-      label : 'Date Published',
+      label : 'Date',
       type : 'range'
     }
   },
