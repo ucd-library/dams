@@ -73,6 +73,8 @@ class BookReaderService extends BaseService {
         if( resp.payload ) {
           let byPage = {};
 
+          let pages = this.store.data.state.bookViewData.pages || [];
+
           // update matches to be matches[0] for entire array
           (resp.payload.matches || []).forEach(match => {
             let text = match.text;
@@ -85,6 +87,9 @@ class BookReaderService extends BaseService {
               .map(str => new RegExp(str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'));
 
             if( match.par.boxes ) delete match.par.boxes;
+
+            let page = pages.find(p => p.page === match.par.page)?.displayIndex;
+            if( page ) match.par.page = page + 1;
 
             if( !byPage[match.par.page-1] ) {
               byPage[match.par.page-1] = [];
