@@ -619,7 +619,7 @@ export default function render() {
         
         <h1>${this.title}</h1>
         <h3 ?hidden="${!this.callNumber}">Collection ${this.callNumber}</h3>
-        <a href="${this.collectionSearchHref}" class="btn--alt btn--round">View ${this.items} items</a>
+        <a href="${this.collectionSearchHref}" class="btn--alt btn--round">View ${this.items} item${this.items == 1 ? '' : 's'}</a>
       </div>
     </div>
 
