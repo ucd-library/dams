@@ -88,8 +88,8 @@ class BookReaderService extends BaseService {
 
             if( match.par.boxes ) delete match.par.boxes;
 
-            let page = pages.find(p => p.page === match.par.page)?.displayIndex;
-            if( page ) match.par.page = page + 1;
+            let page = pages.find(p => p.page === match.par.page);
+            if( page ) match.par.page = (page.displayIndex||0) + 1;          
 
             if( !byPage[match.par.page-1] ) {
               byPage[match.par.page-1] = [];
