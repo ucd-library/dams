@@ -9,6 +9,7 @@ import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-selec
 
 import "../../components/cards/dams-item-card";
 import '../../components/citation';
+import '../../components/modal-overlay.js';
 
 import user from '../../../lib/utils/user.js';
 import utils from '../../../lib/utils/index.js';
@@ -46,7 +47,10 @@ class AppCollection extends Mixin(LitElement)
       citationRoot : { type: Object },
       itemDefaultDisplay : { type: String },
       itemEdits : { type: Array },
-      showDisclaimer : { type: Boolean }
+      showDisclaimer : { type: Boolean },
+      showModal : { type: Boolean },
+      modalTitle : { type: String },
+      modalContent : { type: String },
     };
   }
 
@@ -80,11 +84,11 @@ class AppCollection extends Mixin(LitElement)
       this.reset();
       return;
     }
-    if( this.collectionId === e.location.fullpath ) return;
+    if( this.collectionId === e.location.pathname ) return;
     this.reset();
 
     this._updateSlimStyles();
-    this.collectionId = e.location.fullpath;
+    this.collectionId = e.location.pathname;
 
     try {
       let recordData = await this.CollectionModel.get(this.collectionId);
@@ -94,6 +98,17 @@ class AppCollection extends Mixin(LitElement)
         new CustomEvent("show-404", {})
       );
     }
+
+    this.showModal = false;
+    // if page path has '?from=v1', show modal with warning of url changes in new site
+    if( this.AppStateModel.location.fullpath.includes('?from=v1') ) {
+      this.showModal = true;
+    }    
+  }
+
+  _onModalClose(e) {
+    this.AppStateModel.setLocation(this.collectionId);
+    this.showModal = false
   }
 
   /**
@@ -103,9 +118,19 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e
    */
    async onCollectionUpdate(e) {
-    if( e.state !== 'loaded' ) return;
     if( this.AppStateModel.location.page !== 'collection' ) return;
 
+    // TODO: make proper 404
+    if( e.state === 'error' && e.error.details.message === 'null body response from service' ) {
+      // this.dispatchEvent(
+      //   new CustomEvent("show-404", {})
+      // );
+      window.location.href = '/';
+      return;
+    }
+
+    if( e.state !== 'loaded' ) return;
+    
     await this._parseDisplayData();
     let searchObj = this.RecordModel.emptySearchDocument();
     this.RecordModel.appendKeywordFilter(searchObj, '@graph.isPartOf.@id', e.vcData.id);
@@ -209,6 +234,9 @@ class AppCollection extends Mixin(LitElement)
     this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage; // one, list.. for admin pref on BR display type for items in this collection
     this.itemEdits = [];
     this.showDisclaimer = false;
+    this.showModal = false;
+    this.modalTitle = 'Welcome to the new Digital Collections!';
+    this.modalContent = `<p>We've recently updated this website, so some webpage addresses (URLs) may have changed. Please search within this collection for the item you're looking for.</p> <p>We apologize for the inconvenience.</p>`;
 
     let featuredImageElement = document.querySelector('.featured-image');
     if( featuredImageElement ) featuredImageElement.style.backgroundImage = '';
