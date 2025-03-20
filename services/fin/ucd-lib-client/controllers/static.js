@@ -88,11 +88,15 @@ module.exports = async (app) => {
         });
       }
 
+      
+      let ark = req.originalUrl.replace(/\?.*/, '').split('/').splice(0,5).join('/');
+
       try {
         if( isCollection ) {
-          let collection = await collectionModel.get(isCollection);
-          if( !collection ) throw new Error('No collection found for id: '+isCollection);
-          jsonld = JSON.stringify(collection, '  ', '  ');
+          let collection = await collectionModel.get(ark);
+          if( !collection ) throw new Error('No collection found for id: '+ark);
+          collection = collection['@graph'].filter(r => r['@id'] === ark)[0];
+          jsonld = JSON.stringify(addContext(collection), '  ', '  ');
 
           return next({
             jsonld,
@@ -102,11 +106,10 @@ module.exports = async (app) => {
           })
 
         } else {
-          let id = req.originalUrl;
-          let record = await recordModel.get(id);
-          if( !record ) throw new Error('No record found for id: '+id);
-          record = record['@graph'].filter(r => r['@id'] === id)[0];
-          jsonld = JSON.stringify(record, '  ', '  ');
+          let record = await recordModel.get(ark);
+          if( !record ) throw new Error('No record found for id: '+ark);
+          record = record['@graph'].filter(r => r['@id'] === ark)[0];
+          jsonld = JSON.stringify(addContext(record), '  ', '  ');
 
           return next({
             jsonld,
@@ -134,6 +137,17 @@ module.exports = async (app) => {
     immutable: true,
     maxAge: '1y'
   }));
+}
+
+function addContext(jsonld) {
+  jsonld['@context'] = {};
+  for( let key in jsonld ) {
+    if( key.startsWith('@') ) {
+      continue;
+    }
+    jsonld['@context'][key] = 'http://schema.org/' + key;
+  }
+  return jsonld;
 }
 
 function loadCorkBuildInfo() {

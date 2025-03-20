@@ -1,6 +1,7 @@
 const config = require('../config');
 const {logger, models} = require('@ucd-lib/fin-service-utils');
 const cors = require('cors');
+const v1CollectionLookup = require('./v1-collections.json');
 let item, collection;
 
 let idRegExp = /(ark|doi):\/?[a-zA-Z0-9\.]+\/[a-zA-Z0-9\.]+/;
@@ -23,25 +24,8 @@ async function checkForCollectionRedirect(req, resp, next) {
 
   let fullId = req.originalUrl.replace(/\/collection\//, '');
   let id = fullId.split('/')[0];
-  let name = id.replace(/[-_]/g, '');
-
-  logger.info('checking for collection redirect: ', req.originalUrl, name, {fullId, id, name});
-
-  let c = await collection.getByArk(id);
-  if( c.results.length ) {
-    logger.info('found collection by id: ', name, c['@id']);
-    resp.redirect(c.results[0]['@id']);
-    return;
-  }
-
-  let r = await collection.search({
-    text: name,
-    limit: 100,
-    textFields: ['name.text', '@graph.description'],
-  }, {debug: true, roles: ['public']});
-  if( r.results.length ) {
-    logger.info('found collection by name search: ', name, r.results[0]['@id']);
-    resp.redirect(r.results[0]['@id']);
+  if( v1CollectionLookup[id] ) {
+    resp.redirect(301, '/collection/'+v1CollectionLookup[id]+'?from=v1');
     return;
   }
 
