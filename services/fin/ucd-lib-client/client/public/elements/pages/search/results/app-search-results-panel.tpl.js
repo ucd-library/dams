@@ -389,7 +389,7 @@ export default function render() {
             ></ucdlib-icon>
           </div>
           
-          <span style="font-weight: bold">${utils.formatNumberWithCommas(this.total)}${this.total === 10000 ? '+' : ''} item<span class="truncated-text"> result</span>s</span><span ?hidden="${this.totalCollections === 0}">
+          <span style="font-weight: bold">${utils.formatNumberWithCommas(this.total)}${this.total === 10000 ? '+' : ''} item<span class="truncated-text"> result</span>${this.total === 1 ? '' : 's'}</span><span ?hidden="${this.totalCollections === 0}">
             from
             <a href="" @click="${this._scrollToCollections}">${this.totalCollections} collection${this.totalCollections > 1 ? 's' : ''}</a></span>
         </div>
