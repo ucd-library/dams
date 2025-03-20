@@ -22,12 +22,19 @@ module.exports = async (app) => {
  * @param {Object} resp express response
  */
 async function handleRequest(req, resp) {
+  let info = {};
+
   // split apart id, type and suffix from url
-  let info = req.url.split(idRegExp);
-  info = {
-    id : req.url.match(idRegExp)[0],
-    type : info[1],
-    suffix : info[2]
+  try {
+    info = req.url.split(idRegExp);
+    info = {
+      id : req.url.match(idRegExp)[0],
+      type : info[1],
+      suffix : info[2]
+    }
+  } catch(e) { 
+    logger.warn('error parsing ark/doi request: ', req.originalUrl, e);
+    return resp.status(400).send('Bad request');
   }
 
   // request record from identifier field in elasticsearch

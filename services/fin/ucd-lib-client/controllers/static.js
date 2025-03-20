@@ -91,8 +91,9 @@ module.exports = async (app) => {
       try {
         if( isCollection ) {
           let collection = await collectionModel.get(isCollection);
+          if( !collection ) throw new Error('No collection found for id: '+isCollection);
           jsonld = JSON.stringify(collection, '  ', '  ');
-    
+
           return next({
             jsonld,
             title : collection.name + ' - '+ config.client.title,
@@ -103,6 +104,7 @@ module.exports = async (app) => {
         } else {
           let id = req.originalUrl;
           let record = await recordModel.get(id);
+          if( !record ) throw new Error('No record found for id: '+id);
           record = record['@graph'].filter(r => r['@id'] === id)[0];
           jsonld = JSON.stringify(record, '  ', '  ');
 
