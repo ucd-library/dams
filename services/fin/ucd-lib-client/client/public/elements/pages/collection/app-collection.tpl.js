@@ -572,7 +572,12 @@ export default function render() {
       min-width: 3.5rem;
     }
   </style>
-  
+    <app-modal-overlay
+      ?hidden="${!this.showModal}"
+      .title="${this.modalTitle}"
+      .content="${this.modalContent}"
+      @ok=${this._onModalClose}>
+    </app-modal-overlay>
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
     </div>
     <div class="admin-edit" ?hidden="${!this.isUiAdmin}">
