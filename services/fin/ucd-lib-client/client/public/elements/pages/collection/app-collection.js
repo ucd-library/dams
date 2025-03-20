@@ -103,9 +103,19 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e
    */
    async onCollectionUpdate(e) {
-    if( e.state !== 'loaded' ) return;
     if( this.AppStateModel.location.page !== 'collection' ) return;
 
+    // TODO: make proper 404
+    if( e.state === 'error' && e.error.details.message === 'null body response from service' ) {
+      // this.dispatchEvent(
+      //   new CustomEvent("show-404", {})
+      // );
+      window.location.href = '/';
+      return;
+    }
+
+    if( e.state !== 'loaded' ) return;
+    
     await this._parseDisplayData();
     let searchObj = this.RecordModel.emptySearchDocument();
     this.RecordModel.appendKeywordFilter(searchObj, '@graph.isPartOf.@id', e.vcData.id);

@@ -10,9 +10,43 @@ module.exports = async (app) => {
    * listen for /ark: or /doi:
    */
   app.get(/^\/(ark|doi):*/, cors(), handleRequest);
+  app.get(/^\/collection\//, checkForCollectionRedirect);
   item = (await models.get('item')).model;
   collection = (await models.get('collection')).model;
 };
+
+async function checkForCollectionRedirect(req, resp, next) {
+  // if an ark, doi or skip
+  if( req.originalUrl.match(idRegExp) ) {
+    return next();
+  }
+
+  let fullId = req.originalUrl.replace(/\/collection\//, '');
+  let id = fullId.split('/')[0];
+  let name = id.replace(/[-_]/g, '');
+
+  logger.info('checking for collection redirect: ', req.originalUrl, name, {fullId, id, name});
+
+  let c = await collection.getByArk(id);
+  if( c.results.length ) {
+    logger.info('found collection by id: ', name, c['@id']);
+    resp.redirect(c.results[0]['@id']);
+    return;
+  }
+
+  let r = await collection.search({
+    text: name,
+    limit: 100,
+    textFields: ['name.text', '@graph.description'],
+  }, {debug: true, roles: ['public']});
+  if( r.results.length ) {
+    logger.info('found collection by name search: ', name, r.results[0]['@id']);
+    resp.redirect(r.results[0]['@id']);
+    return;
+  }
+
+  next();
+}
 
 /**
  * @function handleRequest
