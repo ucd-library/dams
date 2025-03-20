@@ -106,6 +106,11 @@ class AppCollection extends Mixin(LitElement)
     }    
   }
 
+  _onModalClose(e) {
+    this.AppStateModel.setLocation(this.collectionId);
+    this.showModal = false
+  }
+
   /**
    * @method onCollectionUpdate
    * @description fired when collection updates

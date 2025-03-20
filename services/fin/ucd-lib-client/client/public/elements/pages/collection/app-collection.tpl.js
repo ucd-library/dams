@@ -576,7 +576,7 @@ export default function render() {
       ?hidden="${!this.showModal}"
       .title="${this.modalTitle}"
       .content="${this.modalContent}"
-      @ok=${(e) => this.showModal = false}>
+      @ok=${this._onModalClose}>
     </app-modal-overlay>
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
     </div>
