@@ -30,6 +30,7 @@ class SitemapModel {
       res.set('Content-Type', 'text/plain');
       res.send(`User-agent: * 
 ${allow}
+Crawl-delay: 30
 
 ${sitemap}`);
     });
@@ -53,13 +54,14 @@ ${sitemap}`);
     try {
       // no collection name provided, set the root sitemapindex for all collections
       if( !collection ) {
-        return res.send(await this.getRoot());
+        // return res.send(await this.getRoot());
+        return  res.send(await this.getCollections());
       }
 
       collection = collection.replace(/^-/,'');
-      if( collection === COLLECTIONS_SITEMAP ) {
-        return await this.getCollections(res);
-      }
+      // if( collection === COLLECTIONS_SITEMAP ) {
+      //   return await this.getCollections(res);
+      // }
 
       // send express response, we are going to stream out the xml result
       this.getCollection(collection.replace(/^-/,''), res);
@@ -79,51 +81,45 @@ ${sitemap}`);
    * 
    * @returns {Promise} resolves to xml string
    */
-  async getRoot() {
-    let sitemaps = await collections.esSearch({
-      _source : ['name']
-    });
+//   async getRoot() {
+//     let sitemaps = await collections.esSearch({
+//       _source : ['name']
+//     });
 
-    let hits = sitemaps.hits.hits || [];
-    sitemaps = hits.map(result => `<sitemap>
-    <loc>${config.server.url}/sitemap-${result._id.replace('/collection/','')}.xml</loc>
-</sitemap>`);
+//     let hits = sitemaps.hits.hits || [];
+//     sitemaps = hits.map(result => `<sitemap>
+//     <loc>${config.server.url}/sitemap-${result._id.replace('/collection/','')}.xml</loc>
+// </sitemap>`);
 
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap>
-    <loc>${config.server.url}/sitemap-${COLLECTIONS_SITEMAP}.xml</loc>
-  </sitemap>
-  ${sitemaps.join('\n')}
-</sitemapindex>`;
-  }
+//     return `<?xml version="1.0" encoding="UTF-8"?>
+// <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+//   <sitemap>
+//     <loc>${config.server.url}/sitemap-${COLLECTIONS_SITEMAP}.xml</loc>
+//   </sitemap>
+//   ${sitemaps.join('\n')}
+// </sitemapindex>`;
+//   }
 
   /**
    * @method getCollections
    * 
    */
-  async getCollections(resp) {
-    resp.write(`<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`);
-
+  async getCollections() {
     let sitemaps = await collections.esSearch({
+      from : 0,
+      size : 10000,
       _source : ['name']
     });
 
-    (sitemaps.hits.hits || [])
-      .map(result => {
-        return `${config.server.url}${result._id}`
-      })
-      .forEach(url => {
-        resp.write(`<url>
-          <loc>${url}</loc>
-          <changefreq>weekly</changefreq>
-          <priority>.5</priority>
-        </url>\n`);
-      });
+    let hits = sitemaps.hits.hits || [];
+    sitemaps = hits.map(result => `<sitemap>
+        <loc>${config.server.url}/sitemap-${result._id.replace('/collection/','')}.xml</loc>
+    </sitemap>`);
 
-    resp.write('</urlset>');
-    resp.end();
+        return `<?xml version="1.0" encoding="UTF-8"?>
+    <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      ${sitemaps.join('\n')}
+    </sitemapindex>`;
   }
 
   /**

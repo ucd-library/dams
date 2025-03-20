@@ -80,11 +80,11 @@ class AppCollection extends Mixin(LitElement)
       this.reset();
       return;
     }
-    if( this.collectionId === e.location.fullpath ) return;
+    if( this.collectionId === e.location.pathname ) return;
     this.reset();
 
     this._updateSlimStyles();
-    this.collectionId = e.location.fullpath;
+    this.collectionId = e.location.pathname;
 
     try {
       let recordData = await this.CollectionModel.get(this.collectionId);
