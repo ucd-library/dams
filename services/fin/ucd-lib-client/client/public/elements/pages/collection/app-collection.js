@@ -9,6 +9,7 @@ import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-selec
 
 import "../../components/cards/dams-item-card";
 import '../../components/citation';
+import '../../components/modal-overlay.js';
 
 import user from '../../../lib/utils/user.js';
 import utils from '../../../lib/utils/index.js';
@@ -46,7 +47,10 @@ class AppCollection extends Mixin(LitElement)
       citationRoot : { type: Object },
       itemDefaultDisplay : { type: String },
       itemEdits : { type: Array },
-      showDisclaimer : { type: Boolean }
+      showDisclaimer : { type: Boolean },
+      showModal : { type: Boolean },
+      modalTitle : { type: String },
+      modalContent : { type: String },
     };
   }
 
@@ -94,6 +98,12 @@ class AppCollection extends Mixin(LitElement)
         new CustomEvent("show-404", {})
       );
     }
+
+    this.showModal = false;
+    // if page path has '?from=v1', show modal with warning of url changes in new site
+    if( this.AppStateModel.location.fullpath.includes('?from=v1') ) {
+      this.showModal = true;
+    }    
   }
 
   /**
@@ -219,6 +229,9 @@ class AppCollection extends Mixin(LitElement)
     this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage; // one, list.. for admin pref on BR display type for items in this collection
     this.itemEdits = [];
     this.showDisclaimer = false;
+    this.showModal = false;
+    this.modalTitle = 'Welcome to the new Digital Collections!';
+    this.modalContent = `<p>We've recently updated this website, so some webpage addresses (URLs) may have changed. Please search within this collection for the item you're looking for.</p> <p>We apologize for the inconvenience.</p>`;
 
     let featuredImageElement = document.querySelector('.featured-image');
     if( featuredImageElement ) featuredImageElement.style.backgroundImage = '';
