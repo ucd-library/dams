@@ -117,7 +117,7 @@ module.exports = async (app) => {
 
         }
       } catch(e) {
-        console.error(e);
+        console.info(e);
         return next({
           jsonld,
           title : 'Server Error',

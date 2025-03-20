@@ -33,7 +33,7 @@ async function handleRequest(req, resp) {
       suffix : info[2]
     }
   } catch(e) { 
-    logger.warn('error parsing ark/doi request: ', req.originalUrl, e);
+    logger.info('error parsing ark/doi request: ', req.originalUrl, e);
     return resp.status(400).send('Bad request');
   }
 
@@ -47,7 +47,7 @@ async function handleRequest(req, resp) {
       isCollection = true;
     }
   } catch(e) {
-    logger.error('error looking up ark: ', info, e);
+    logger.info('error looking up ark: ', info, e);
     return resp.status(500).json({error: true, message: e.message, stack: e.stack});
   }
 
