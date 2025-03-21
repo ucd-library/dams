@@ -1,10 +1,11 @@
 const config = require('../config');
-const {logger, models} = require('@ucd-lib/fin-service-utils');
+const {logger, models, pg} = require('@ucd-lib/fin-service-utils');
 const cors = require('cors');
 const v1CollectionLookup = require('./v1-collections.json');
 let item, collection;
 
 let idRegExp = /(ark|doi):\/?[a-zA-Z0-9\.]+\/[a-zA-Z0-9\.]+/;
+const V1_REDIRECTS_TABLE = 'v1_port.redirects';
 
 module.exports = async (app) => {
   /**
@@ -22,10 +23,33 @@ async function checkForCollectionRedirect(req, resp, next) {
     return next();
   }
 
-  let fullId = req.originalUrl.replace(/\/collection\//, '');
+  let fullId = req.originalUrl.replace(/\?.*/, '').split('/');
+
+  // v1 redirects are 5, 6 or 7 segments long
+  let idSet = new Set([
+    fullId.slice(0, 5).join('/'),
+    fullId.slice(0, 6).join('/'),
+    fullId.slice(0, 7).join('/')
+  ]);
+
+  let t = Date.now();
+  let result = await pg.query(
+    `select * from ${V1_REDIRECTS_TABLE} where source = any($1::text[])`,
+    [Array.from(idSet)]
+  );
+
+  if( result.rows.length ) {
+    let redirect = result.rows[0];
+    logger.info('found v1 item redirect', req.originalUrl, redirect.status_code+'', redirect.source, redirect.destination);
+    return resp.redirect(redirect.status_code, '/item/'+redirect.destination);
+  }
+
+  fullId = req.originalUrl.replace(/\/collection\//, '');
   let id = fullId.split('/')[0];
   if( v1CollectionLookup[id] ) {
-    resp.redirect(301, '/collection/'+v1CollectionLookup[id]+'?from=v1');
+    logger.info('found v1 collection redirect', req.originalUrl, id, v1CollectionLookup[id]);
+    let code = req.originalUrl.split('/').length === 3 ? 301 : 302;
+    resp.redirect(code, '/collection/'+v1CollectionLookup[id]+'?from=v1');
     return;
   }
 

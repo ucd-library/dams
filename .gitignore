@@ -7,3 +7,5 @@ run.js
 corkbuild.Dockerfile
 *.cork-build.json
 collection-import/download-checker-data
+redirects/map.json
+redirects/package-lock.json
