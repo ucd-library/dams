@@ -49,7 +49,8 @@ async function checkForCollectionRedirect(req, resp, next) {
   if( v1CollectionLookup[id] ) {
     logger.info('found v1 collection redirect', req.originalUrl, id, v1CollectionLookup[id]);
     let code = req.originalUrl.split('/').length === 3 ? 301 : 302;
-    resp.redirect(code, '/collection/'+v1CollectionLookup[id]+'?from=v1');
+    let flag = req.originalUrl.split('/').length === 3 ? '' : '?from=v1';
+    resp.redirect(code, '/collection/'+v1CollectionLookup[id]+flag);
     return;
   }
 
