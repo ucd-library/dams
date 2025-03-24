@@ -154,7 +154,7 @@ return html`
   </div>
   <div class="marketing-highlight__body ${this.darkBg ? 'dark' : ''}">
     <h4 class="marketing-highlight__title">${this.cardTitle}</h4>
-    <p class="marketing-highlight__items"><span ?hidden="${!this.itemCt}">${this.itemCt || 0} items</span></p>
+    <p class="marketing-highlight__items"><span ?hidden="${!this.itemCt}">${this.itemCt || 0} item${this.itemCt == 1 ? '' : 's'}</span></p>
   </div>
 </a>
 
