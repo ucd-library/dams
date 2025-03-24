@@ -19,12 +19,12 @@ class SitemapModel {
     let allow = 'Disallow: /';
     let sitemap = '';
 
-    // if( config.server.url.match('https://digital.ucdavis.edu') ) {
+    if( config.server.url.match('https://digital.ucdavis.edu') ) {
       allow = `Disallow: /api/search
 Disallow: /auth
 Disallow: /api`;
       sitemap = `Sitemap: ${config.server.url}/sitemap.xml`;
-    // }
+    }
 
     app.get(/^\/sitemap.*/, (req, res) => this._onRequest(req, res));
     app.get('/all-items.txt', (req, res) => this.allItems(res));
