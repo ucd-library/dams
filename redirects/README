@@ -1,0 +1,2 @@
+This folder contains the requirements for adding old v1 to ark mappings to PG so that proper
+redirects can be set by the ucd-lib-client when old paths are requested.

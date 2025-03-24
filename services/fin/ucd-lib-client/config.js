@@ -14,6 +14,9 @@ config.client = {
   title : 'UC Davis Library Digital Collections',
   description : 'UC Davis Digital Collections provide online access to digitized or born-digital materials from the UC Davis Library, with a particular focus on the rare and unique materials in its Archives and Special Collections. These documents, images, audio and video files offer a rich resource for exploration by scholars and the public alike.',
 
+  enableGA4Stats : process.env.GA4_ENABLE_STATS === 'true',
+  gaId : process.env.GA4_MEASUREMENT_ID || '',
+
   appName : process.env.FIN_APP_NAME || 'ucd-lib-client',
   assets : (env === 'prod') ? 'dist' : 'public',
   appRoutes : ['about', 'item', 'search', 'browse', 'collections', 'collection', 'components'],
