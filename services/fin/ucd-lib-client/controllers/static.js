@@ -61,7 +61,9 @@ module.exports = async (app) => {
         buildInfo : loadCorkBuildInfo(),
         fcAppConfig : appConfig.config,
         title : config.client.title,
-        logger : config.client.logger
+        logger : config.client.logger,
+        enableGA4Stats : config.client.enableGA4Stats,
+        gaId : config.client.gaId,
       });
     },
     template : async (req, res, next) => {
@@ -84,7 +86,8 @@ module.exports = async (app) => {
           jsonld,
           title : config.client.title,
           description : '',
-          jsBundleHash
+          jsBundleHash,
+          gaId: config.client.gaId
         });
       }
 
@@ -102,7 +105,8 @@ module.exports = async (app) => {
             jsonld,
             title : collection.name + ' - '+ config.client.title,
             description : collection.description || '',
-            jsBundleHash
+            jsBundleHash,
+            gaId: config.client.gaId
           })
 
         } else {
@@ -115,7 +119,8 @@ module.exports = async (app) => {
             jsonld,
             title : (record.name || record.title) + ' - '+ config.client.title,
             description : record.description || '',
-            jsBundleHash
+            jsBundleHash,
+            gaId: config.client.gaId
           })
 
         }
@@ -124,7 +129,8 @@ module.exports = async (app) => {
         return next({
           jsonld,
           title : 'Server Error',
-          description : 'Invalid URL: '+req.originalUrl
+          description : 'Invalid URL: '+req.originalUrl,
+          gaId: config.client.gaId
         })
       }
     }
