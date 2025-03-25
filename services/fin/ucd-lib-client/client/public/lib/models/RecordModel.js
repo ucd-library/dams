@@ -293,6 +293,11 @@ class RecordModel extends ElasticSearchModel {
     return this.store.getRecord(id);
   }
 
+  async getGitInfo(id) {
+    await this.service.getGitInfo(id);
+    return this.store.data.gitInfo[id];
+  }
+
   setSearchLocation(searchDocument) {
     AppStateModel.setLocation('/search/'+this.searchDocumentToUrl(searchDocument));
   }

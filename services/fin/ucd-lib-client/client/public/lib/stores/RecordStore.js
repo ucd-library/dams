@@ -11,13 +11,15 @@ class RecordStore extends BaseStore {
       byId : {},
       // by collection id
       defaultSearch : {},
-      search : {}
+      search : {},
+      gitInfo : {}
     }
 
     this.events = {
       RECORD_UPDATE : 'record-update',
       RECORD_SEARCH_UPDATE : 'record-search-update',
-      DEFAULT_RECORD_SEARCH_UPDATE : 'default-record-search-update'
+      DEFAULT_RECORD_SEARCH_UPDATE : 'default-record-search-update',
+      RECORD_GIT_INFO_UPDATE : 'record-git-info-update'
     }
 
   }
@@ -65,6 +67,32 @@ class RecordStore extends BaseStore {
       vcModel.renderRecord(state);
     }
     this.emit(this.events.RECORD_UPDATE, state);
+  }
+
+  /**
+   * Git Info
+   * 
+   * @param {*} id 
+   * @param {*} payload 
+   */
+  setGitInfoLoaded(id, payload) {
+    this._setGitInfoState({
+      state: this.STATE.LOADED,
+      id,
+      payload
+    });
+  }
+
+  setGitInfoError(id, error) {
+    this._setGitInfoState({
+      state: this.STATE.ERROR,   
+      error, id
+    });
+  }
+
+  _setGitInfoState(state) {
+    this.data.gitInfo[state.id] = state;
+    this.emit(this.events.RECORD_GIT_INFO_UPDATE, state);
   }
 
   /**

@@ -51,6 +51,8 @@ class AppRecord extends Mixin(LitElement)
       displayData: { type: Object },
       savedCollectionData: { type: Object },
       disableDownload: { type: Boolean },
+      showReportButton: { type: Boolean },
+      githubIssueUrl: { type: String }
     };
   }
 
@@ -93,6 +95,9 @@ class AppRecord extends Mixin(LitElement)
     this.displayData = {};
     this.savedCollectionData = {};
     this.disableDownload = APP_CONFIG.disableFileDownloads;
+
+    this.showReportButton = false;
+    this.githubIssueUrl = '';
 
     this._injectModel(
       "AppStateModel",
@@ -150,6 +155,19 @@ class AppRecord extends Mixin(LitElement)
     this.collectionId = this.record.collectionId;
 
     this._updateLinks(this.AppStateModel.location, record);
+
+    if( APP_CONFIG.user?.loggedIn ) {
+      let t = await this.RecordModel.getGitInfo(this.currentRecordId);
+      this.showReportButton = t.state === 'loaded' && t.payload;
+      if( this.showReportButton ) {
+        let rootUrl = t.payload.repo.replace(/\.git$/, '');
+        let githubFileUrl = rootUrl + '/tree/main' + t.payload.file;
+        let body = '**File:** [' + t.payload.file + ']('+githubFileUrl+')\n\n**Description:**\n\n';
+        this.githubIssueUrl = t.payload.repo.replace(/\.git$/, '') + '/issues/new?title=' + encodeURIComponent('Request change to ' + this.currentRecordId) + '&body=' + encodeURIComponent(body);
+      }
+    } else {
+      this.showReportButton = false;
+    }
   }
 
   async _onCollectionUpdate(e) {

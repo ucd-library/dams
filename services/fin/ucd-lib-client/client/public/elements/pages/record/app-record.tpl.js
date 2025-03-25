@@ -410,6 +410,13 @@ export default function render() {
           ${this.fedoraLinks.map((link) => html`<a href="${link}">${link.replace('/fcr:metadata', '')}</a>`)}
         </div>
       </div>
+
+      <div class="metadata-row" ?hidden="${!this.showReportButton}">
+        <div class="attr">Modify</div>
+        <div class="value">
+          <a class="btn btn--primary btn--round" target="_blank" href="${this.githubIssueUrl}">Create Metadata Issue on GitHub</a>
+        </div>
+      </div>
     </div>
 
     <app-citation .record="${this.citationRoot}" citation-type-label="Item"></app-citation>

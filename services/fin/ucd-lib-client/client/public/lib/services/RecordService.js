@@ -27,6 +27,34 @@ class RecordService extends BaseService {
     });
   }
 
+  getGitInfo(id) {
+    return this.request({
+      url : `/fcrepo/rest${id}`,
+      fetchOptions : {
+        method : 'HEAD',
+      },
+      checkCached : () => this.store.data.gitInfo[id],
+      onLoad : result => {
+        let gitInfo = null;
+        result.response.headers.get('Digest')
+          .split(',')
+          .map(digest => digest.trim().split('='))
+          .forEach(digest => {
+            if( digest[0] === 'finio-git-source' ) {
+              gitInfo = digest[1];
+            }
+          });
+
+        if( gitInfo ) {
+          gitInfo = JSON.parse(atob(gitInfo));
+        }
+
+        this.store.setGitInfoLoaded(id, gitInfo)
+      },
+      onError : e => this.store.setGitInfoError(id, e)
+    });
+  }
+
   // getIaBookManifest(url) {
   //   return this.request({
   //     url,
