@@ -33,11 +33,11 @@ return html`
     }
 
     .citation .btn-copy {
-      padding: .3rem;
       background-color: var(--color-aggie-gold);
       cursor: pointer;
       border: none;
-      font-size: 1.2rem;
+      min-height: 2rem;
+      height: 2rem;
     }
 
     .citation .btn-copy:hover {
@@ -49,7 +49,6 @@ return html`
       background-color: var(--color-aggie-blue-50);
       margin-right: .5rem;
       min-width: 8ch;
-      /* height: 3.18rem; */
       font-size: 1.2rem;
 
       /* arrow styles */
