@@ -265,6 +265,28 @@ export default function render() {
       z-index: 400;
     }
 
+    a.create-issue {
+      color: var(--default-primary-color);
+      background-color: var(--default-secondary-color);
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 13px 13px;
+      font-size: 0.9rem;
+      text-transform: none;
+      height: 1.5rem;
+    }
+
+    a.create-issue:focus {
+      color: var(--default-primary-color);
+    }
+
+    a.create-issue:hover {
+      background-color: var(--color-aggie-blue);
+      color: var(--color-aggie-gold);
+    }
+
     ucdlib-md p {
       margin-top: 0;
     }
@@ -414,7 +436,7 @@ export default function render() {
       <div class="metadata-row" ?hidden="${!this.showReportButton}">
         <div class="attr">Modify</div>
         <div class="value">
-          <a class="btn btn--primary btn--round" target="_blank" href="${this.githubIssueUrl}">Create Metadata Issue on GitHub</a>
+          <a class="create-issue" target="_blank" href="${this.githubIssueUrl}">Request Metadata Change (via GitHub)</a>
         </div>
       </div>
     </div>

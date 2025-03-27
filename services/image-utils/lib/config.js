@@ -4,6 +4,11 @@ const OCR_TO_IA_BOOK_SCALE = 2;
 const IA_BOOK_SIZE = 1024;
 const env = process.env;
 
+let params = {};
+if( env.GOOGLE_CLOUD_WORKFLOW_PARAMS ) {
+  params = JSON.parse(env.GOOGLE_CLOUD_WORKFLOW_PARAMS);
+}
+
 config.ocr = {
   outputFormat : 'jpg',
   imageMagick : {
@@ -20,6 +25,11 @@ config.ocr = {
     quality : 100,
     resize : (IA_BOOK_SIZE*OCR_TO_IA_BOOK_SCALE)+'x',
   }
+}
+
+if( params.imagemagick?.deskew === false ) {
+  console.log('Ignoring ImageMagick deskew step');
+  delete config.ocr.imageMagick.deskew;
 }
 
 // config.iaReader = {
@@ -89,7 +99,8 @@ config.workflow = {
   gcsBuckets : {
     products : env.GOOGLE_CLOUD_WORKFLOW_BUCKET || 'dams-client-products',
     tmp : env.GOOGLE_CLOUD_WORKFLOW_TMP_BUCKET || 'dams-prod-workflow-tmp-space'
-  }
+  },
+  params
 }
 
 module.exports = config;

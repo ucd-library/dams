@@ -218,7 +218,7 @@ class ImageUtils {
   }
 
   async getWorkflowInfo(workflowId) {
-    let workflowInfo = await gcs.readFileToMemory('gc://'+path.join(config.workflow.gcsBuckets.tmp, workflowId, 'workflow.json'));
+    let workflowInfo = await gcs.readFileToMemory('gs://'+path.join(config.workflow.gcsBuckets.tmp, workflowId, 'workflow.json'));
     return JSON.parse(workflowInfo);
   }
 
@@ -301,6 +301,7 @@ class ImageUtils {
       if( !tiledManifest ) tiledManifest = {};
 
       manifest = Object.assign(manifest, sizesManifest, ocrManifest, tiledManifest);
+      manifest.workflowParams = config.workflow.params;
 
       // TODO: setting metadata here doesn't seem to work.  Need to test.
       // Possibly need to use the setMetadata() method, however below is in documentation :(
