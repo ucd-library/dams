@@ -6,7 +6,14 @@ const env = process.env;
 
 let params = {};
 if( env.GOOGLE_CLOUD_WORKFLOW_PARAMS ) {
-  params = JSON.parse(env.GOOGLE_CLOUD_WORKFLOW_PARAMS);
+  try {
+    params = JSON.parse(env.GOOGLE_CLOUD_WORKFLOW_PARAMS);
+    console.log('Parsed GOOGLE_CLOUD_WORKFLOW_PARAMS', params);
+  } catch(e) {
+    console.warn('Failed to parse GOOGLE_CLOUD_WORKFLOW_PARAMS', env.GOOGLE_CLOUD_WORKFLOW_PARAMS);
+  }
+} else {
+  console.log('GOOGLE_CLOUD_WORKFLOW_PARAMS not set');
 }
 
 config.ocr = {
@@ -90,6 +97,10 @@ config.imageSizes = {
       }
     }
   }
+}
+
+if( params.imagemagick?.deskew === false ) {
+  delete config.imageSizes.sizes.large.imageMagick.deskew;
 }
 
 config.port = env.PORT || 3000;
