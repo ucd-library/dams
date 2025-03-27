@@ -310,6 +310,17 @@ export default function render() {
               </option>
           </select>
         </ucd-theme-slim-select>
+
+        <div style="display: flex; align-items: baseline; margin-top: 1rem;">
+          <input id="checkbox-deskew" 
+            style="margin-right: 0.5rem;"
+            name="checkbox-deskew" 
+            type="checkbox" 
+            @change="${this._onDeskewCheckboxChange}">
+          <label for="checkbox-deskew" style="margin-right: 1rem;">De-skew images</label>
+
+          <button class="btn btn--primary" @click="${this._onRunWorkflow}">Run Workflow</button>
+        </div>
       </div>
 
       <div class="right-panel">
