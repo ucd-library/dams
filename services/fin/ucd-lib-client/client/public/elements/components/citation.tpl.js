@@ -36,8 +36,8 @@ return html`
       background-color: var(--color-aggie-gold);
       cursor: pointer;
       border: none;
-      min-height: 2rem;
-      height: 2rem;
+      min-height: 1.4rem;
+      height: 1.4rem;
     }
 
     .citation .btn-copy:hover {
@@ -49,7 +49,7 @@ return html`
       background-color: var(--color-aggie-blue-50);
       margin-right: .5rem;
       min-width: 8ch;
-      font-size: 1.2rem;
+      font-size: 1rem;
 
       /* arrow styles */
       display: inline-block;

@@ -173,6 +173,8 @@ export default function render() {
       padding-top: .3rem;
       padding-bottom: .3rem;
       margin: 3rem 0 3rem;
+      height: 2.4rem;
+      min-height: 2.4rem;
     }
 
     @media (min-width: 767px) {

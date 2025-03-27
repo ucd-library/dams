@@ -266,17 +266,8 @@ export default function render() {
     }
 
     a.create-issue {
-      height: 2rem;
-      min-height: 2rem;
-    }
-
-    a.create-issue:focus {
-      color: var(--default-primary-color);
-    }
-
-    a.create-issue:hover {
-      background-color: var(--color-aggie-blue);
-      color: var(--color-aggie-gold);
+      height: 1.4rem;
+      min-height: 1.4rem;
     }
 
     ucdlib-md p {

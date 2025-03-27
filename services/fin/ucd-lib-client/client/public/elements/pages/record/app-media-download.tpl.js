@@ -48,6 +48,9 @@ export default function render() {
         color: var(--default-primary-color);
       }
 
+      .radio label {
+        color: black;  
+      }
       .radio label:before {
         top: 5px;
         left: -1px;
@@ -113,8 +116,8 @@ export default function render() {
       }
 
       .downloadBtn {
-        min-height: 2rem;
-        height: 2rem;
+        min-height: 1.4rem;
+        height: 1.4rem;
         text-transform: none;
         background-color: var(--color-aggie-gold);
         border: none;
@@ -126,9 +129,9 @@ export default function render() {
       }
 
       #format {
-        height: 50px;
+        height: 2.65rem;
         background-color: var(--color-aggie-blue-50);
-        font-size: 0.9rem;
+        font-size: 1rem;
         font-weight: bold;
         padding: 0 1.5rem 0 1rem;
         min-width: 35%;
@@ -139,17 +142,18 @@ export default function render() {
       #media-all-format-label,
       #multimedia-format-label,
       #multimedia-all-format-label {
-        font-size: 0.9rem;
+        font-size: 1rem;
         margin-right: 0.75rem;
-        font-weight: bold;
-        height: 3.3rem;
-        line-height: 3.3rem;
+        height: 2.7rem;
+        line-height: 2.7rem;
         text-align: center;
         border: solid 2px var(--color-aggie-blue-50);
         white-space: nowrap;
         display: inline-block;
         box-sizing: border-box;
         padding: 0 1rem;
+        color: var(--color-aggie-blue);
+        font-weight: bold;
       }
 
       #single,
@@ -207,8 +211,7 @@ export default function render() {
           @click="${this._onDownloadFullSetClicked}"
           target="_blank"
           rel="noopener"
-          download
-          style="white-space: nowrap; text-align: center;">
+          download>
           <span> Download </span>
         </a>
       </div>
@@ -239,8 +242,7 @@ export default function render() {
         @click="${this._onDownloadFullSetClicked}"
         target="_blank"
         rel="noopener"
-        download
-        style="white-space: nowrap; text-align: center; display: inline-block;">
+        download>
         <span> Download </span>
       </a>
     </div>
