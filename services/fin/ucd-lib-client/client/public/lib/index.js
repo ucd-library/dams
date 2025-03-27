@@ -13,6 +13,7 @@ const models =  {
   FcAppConfigModel : require('./models/FcAppConfigModel'),
   BrowseByModel : require('./models/BrowseByModel'),
   BookReaderModel : require('./models/BookReaderModel'),
+  WorkflowModel: require('./models/WorkflowModel')
 };
 
 if( typeof window !== 'undefined' ) {

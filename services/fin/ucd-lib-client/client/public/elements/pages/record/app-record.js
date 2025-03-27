@@ -91,7 +91,7 @@ class AppRecord extends Mixin(LitElement)
     this.itemDisplay = '';
 
     this.isUiAdmin = user.canEditUi();
-    this.editMode = false;
+    this.editMode = true;
     this.displayData = {};
     this.savedCollectionData = {};
     this.disableDownload = APP_CONFIG.disableFileDownloads;
@@ -122,6 +122,7 @@ class AppRecord extends Mixin(LitElement)
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
 
     this._updateSlimStyles();
+    this._onEditClicked(); // TEMP remove
   }
 
   /**
@@ -424,7 +425,7 @@ class AppRecord extends Mixin(LitElement)
     if( !pages ) return;
     if( display ) {
       pages.style.opacity = 0;
-      pages.style.height = '150px';
+      pages.style.height = '200px';
       pages.style.display = 'block';
     } else {
       pages.style.opacity = 100;
