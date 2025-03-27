@@ -113,11 +113,11 @@ export default function render() {
       }
 
       .downloadBtn {
-        padding: 13px 0;
-        font-size: 0.9rem;
-        width: 6rem;
+        min-height: 2rem;
+        height: 2rem;
         text-transform: none;
-        height: 1.5rem;
+        background-color: var(--color-aggie-gold);
+        border: none;
       }
 
       .downloadBtn:hover {
@@ -142,19 +142,14 @@ export default function render() {
         font-size: 0.9rem;
         margin-right: 0.75rem;
         font-weight: bold;
-        padding: 11px 1rem;
+        height: 3.3rem;
+        line-height: 3.3rem;
+        text-align: center;
         border: solid 2px var(--color-aggie-blue-50);
-        height: 1.5rem;
         white-space: nowrap;
-      }
-
-      @media (max-width: 600px) {
-        .downloadBtn {
-          min-width: auto;
-          text-overflow: clip;
-          overflow: hidden;
-          white-space: nowrap;
-        }
+        display: inline-block;
+        box-sizing: border-box;
+        padding: 0 1rem;
       }
 
       #single,
@@ -196,7 +191,7 @@ export default function render() {
         <span id="media-format-label"
           ?hidden="${!this.showDownloadLabel || this.isMultimedia}">
         </span>
-        <a class="downloadBtn"
+        <a class="downloadBtn btn"
           ?hidden="${(this.isTwoPageView || this.downloadAllMedia) && this.sources.length > 1}"
           href="${this.href}"
           @click="${this._onDownloadClicked}"
@@ -206,7 +201,7 @@ export default function render() {
           style="white-space: nowrap; text-align: center;">
           <span> Download </span>
         </a>
-        <a class="downloadBtn archive"
+        <a class="downloadBtn archive btn"
           ?hidden="${(!this.isTwoPageView && !this.downloadAllMedia) || this.sources.length === 1}"
           href="${this.archiveHref}"
           @click="${this._onDownloadFullSetClicked}"
@@ -238,7 +233,7 @@ export default function render() {
         @change="${this._onFormatSelected}"
         ?hidden="${!this.fullSetSelected || !this.showImageFormats || this.sources.length < 2}">
       </select>
-      <a class="downloadBtn archive"
+      <a class="downloadBtn archive btn"
         ?hidden="${!this.fullSetSelected}"
         href="${this.archiveHref}"
         @click="${this._onDownloadFullSetClicked}"

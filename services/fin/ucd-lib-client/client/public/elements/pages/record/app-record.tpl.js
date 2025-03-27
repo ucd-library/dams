@@ -266,16 +266,8 @@ export default function render() {
     }
 
     a.create-issue {
-      color: var(--default-primary-color);
-      background-color: var(--default-secondary-color);
-      text-transform: uppercase;
-      font-weight: var(--fw-bold);
-      text-decoration: none;
-      white-space: nowrap;
-      padding: 13px 13px;
-      font-size: 0.9rem;
-      text-transform: none;
-      height: 1.5rem;
+      height: 2rem;
+      min-height: 2rem;
     }
 
     a.create-issue:focus {
@@ -436,7 +428,7 @@ export default function render() {
       <div class="metadata-row" ?hidden="${!this.showReportButton}">
         <div class="attr">Modify</div>
         <div class="value">
-          <a class="create-issue" target="_blank" href="${this.githubIssueUrl}">Request Metadata Change (via GitHub)</a>
+          <a class="create-issue btn btn--primary" target="_blank" href="${this.githubIssueUrl}">Request Metadata Change (via GitHub)</a>
         </div>
       </div>
     </div>
