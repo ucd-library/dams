@@ -295,7 +295,7 @@ config.client = {
     {
       "imageUrl" : "/fcrepo/rest/application/ucd-lib-client/default-images/featured/pierce-D-022_09_21.jpg",
       "itemName" : "A-21. Images of almond orchards...",
-      "collectionName" : "Pierce Families Papers",
+      "collectionName" : "Pierce Family Papers",
       "itemLink" : "/item/ark:/87293/d3sx64f52",
       "collectionLink" : "/collection/ark:/87293/d3z892n52"
     },
