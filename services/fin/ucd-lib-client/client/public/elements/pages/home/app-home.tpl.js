@@ -702,6 +702,11 @@ export default function render() {
     text-decoration: none;
   }
 
+  a.browse-collections {
+    height: 3rem;
+    min-height: 3rem;
+  }
+
 </style>
 
 <dams-hero .srcOptions="${this.heroImgOptions}" selected-src-url="${this.heroUrl}" @src-change="${
@@ -890,7 +895,7 @@ export default function render() {
     )}
 
     <div class="featured-more">
-      <a href="/browse/collections" class="btn btn--primary btn--lg">Browse all collections</a>
+      <a href="/browse/collections" class="btn btn--primary btn--lg browse-collections">Browse all collections</a>
     </div>
   </section>
 
