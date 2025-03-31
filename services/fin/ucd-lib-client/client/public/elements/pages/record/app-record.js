@@ -52,7 +52,8 @@ class AppRecord extends Mixin(LitElement)
       savedCollectionData: { type: Object },
       disableDownload: { type: Boolean },
       showReportButton: { type: Boolean },
-      githubIssueUrl: { type: String }
+      githubIssueUrl: { type: String },
+      deskewImages: { type: Boolean },
     };
   }
 
@@ -98,13 +99,15 @@ class AppRecord extends Mixin(LitElement)
 
     this.showReportButton = false;
     this.githubIssueUrl = '';
+    this.deskewImages = true;
 
     this._injectModel(
       "AppStateModel",
       "RecordModel",
       "CollectionModel",
       "SeoModel",
-      "FcAppConfigModel"
+      "FcAppConfigModel",
+      "WorkflowModel"
     );
 
     window.addEventListener('click', () => this._onPageClick());
@@ -221,6 +224,34 @@ class AppRecord extends Mixin(LitElement)
     this._updateLinks(e.location);
     
     await this._parseDisplayData();
+  }
+
+  _onDeskewCheckboxChange(e) {
+    this.deskewImages = e.currentTarget.checked;
+  }
+
+  async _onGetWorkflow(e) {
+    let imageUrl = this.record.images?.original?.url || '';
+    if( !imageUrl ) return;
+
+    let res = await this.WorkflowModel.get(imageUrl)
+    console.log('get workflow', res);
+  }
+
+  async _onStartWorkflow(e) {
+    let imageUrl = this.record.images?.original?.url || '';
+    if( !imageUrl ) return;
+
+    let res = await this.WorkflowModel.start(imageUrl)
+    console.log('run workflow', res);
+  }
+
+  async _onGetWorkflowParams(e) {
+    console.log('TODO get workflow params', e);
+  }
+
+  async _onSetWorkflowParams(e) {
+    console.log('TODO set workflow params', e);
   }
 
   _arkDoiClick(e) {

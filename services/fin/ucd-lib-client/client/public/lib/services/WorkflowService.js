@@ -1,44 +1,41 @@
-import {
-  BaseService, 
-  // PayloadUtils
-} from '@ucd-lib/cork-app-utils';
-// import WorkflowStore from '../stores/WorkflowStore.js';
-
-// let payloadUtils = new PayloadUtils({
-//   idParts : ['path', 'text', 'itemId', 'bookId']
-// });
-
+import { BaseService } from '@ucd-lib/cork-app-utils';
+import WorkflowStore from '../stores/WorkflowStore.js';
 class WorkflowService extends BaseService {
 
   constructor() {
     super();
-    // this.store = WorkflowStore;
+    this.store = WorkflowStore;
 
-    this.FIN_SERVICE = 'svc:workflow';
+    this.FIN_SERVICE = '/svc:workflow';
   }
 
-  async get(itemId) {
-    // TODO
-    // let ido = {path: id};
-
-    // await this.request({
-    //   url : pdf.clientMedia.pdf.manifest,
-    //   checkCached : () => this.store.data.bookManifest.get(id),
-    //   onUpdate : resp => {
-    //     let payload = payloadUtils.generate(ido, resp);
-    //     payload.src = pdf;
-    //     payload.id = id;
-    //     if( payload.payload ) {
-    //       payload.payload = payload.payload.pages;
-    //     }
-    //     this.store.set(payload, this.store.data.bookManifest);
-    //   }
-    // })
+  async get(imageUrl) {
+    return await this.request({
+      url : imageUrl + this.FIN_SERVICE,
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    })
   }
 
-  async start(itemId) {
-    // TODO
+  async start(imageUrl) {
+    return await this.request({
+      url : imageUrl + this.FIN_SERVICE + '/image-products',
+      fetchOptions : {
+        method : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({ 'force': true })
+      },
+      checkCached : () => null,
+      onLoading : null,
+      onLoad : null,
+      onError : null
+    })
   }
+
 
   async getParams(itemId) {
     // TODO

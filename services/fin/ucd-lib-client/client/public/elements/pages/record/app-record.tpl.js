@@ -316,10 +316,20 @@ export default function render() {
             style="margin-right: 0.5rem;"
             name="checkbox-deskew" 
             type="checkbox" 
+            .checked="${this.deskewImages}"
             @change="${this._onDeskewCheckboxChange}">
           <label for="checkbox-deskew" style="margin-right: 1rem;">De-skew images</label>
 
-          <button class="btn btn--primary" @click="${this._onRunWorkflow}">Run Workflow</button>
+
+          <div>
+            <button class="btn btn--secondary" @click="${this._onGetWorkflow}" style="display: block; margin: .25rem;">Get Workflow</button>
+            <button class="btn btn--primary" @click="${this._onStartWorkflow}" style="display: block; margin: .25rem;">Start Workflow</button>
+          </div>
+          <div>
+            <button class="btn btn--secondary" @click="${this._onGetWorkflowParams}" style="display: block; margin: .25rem;">Get Workflow Params</button>
+            <button class="btn btn--primary" @click="${this._onSetWorkflowParams}" style="display: block; margin: .25rem;">Set Workflow Params</button>
+          </div>
+          
         </div>
       </div>
 
@@ -339,7 +349,7 @@ export default function render() {
 
     <app-media-viewer></app-media-viewer>
 
-    <div class="container" style="padding-bottom: 50px">
+    <div class="container" style="padding-bottom: 50px; margin-top: 150px;">
       <h3>${this.name}</h3>
       <div class="copyright">
         <span>&copy;</span>
