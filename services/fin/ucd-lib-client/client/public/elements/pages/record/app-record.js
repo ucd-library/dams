@@ -247,11 +247,27 @@ class AppRecord extends Mixin(LitElement)
   }
 
   async _onGetWorkflowParams(e) {
-    console.log('TODO get workflow params', e);
+    let imageUrl = this.record.images?.original?.url || '';
+    if( !imageUrl ) return;
+
+    let res = await this.WorkflowModel.getParams(imageUrl);
+    console.log('TODO get workflow params', res);
   }
 
-  async _onSetWorkflowParams(e) {
-    console.log('TODO set workflow params', e);
+  async _setImSkewParam() {
+    let params = {
+      imagemagick : {
+        deskew : false
+      }
+    }
+    await this._setWorkflowParams(params);
+  }
+
+  async _setWorkflowParams(params) {
+    let imageUrl = this.record.images?.original?.url || '';
+    if( !imageUrl ) return;
+    let res = await this.WorkflowModel.setParams(imageUrl, params);
+    console.log('TODO set workflow params', res);
   }
 
   _arkDoiClick(e) {

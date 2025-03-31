@@ -327,7 +327,7 @@ export default function render() {
           </div>
           <div>
             <button class="btn btn--secondary" @click="${this._onGetWorkflowParams}" style="display: block; margin: .25rem;">Get Workflow Params</button>
-            <button class="btn btn--primary" @click="${this._onSetWorkflowParams}" style="display: block; margin: .25rem;">Set Workflow Params</button>
+            <button class="btn btn--primary" @click="${this._setImSkewParam}" style="display: block; margin: .25rem;">Set Workflow Params</button>
           </div>
           
         </div>
