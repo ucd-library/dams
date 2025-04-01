@@ -14,20 +14,28 @@ class WorkflowModel extends BaseModel {
     this.register('WorkflowModel');
   }
 
-  async get(imageUrl) {
-    return this.service.get(imageUrl);
+  // async get(imageUrl) {
+  //   return this.service.get(imageUrl);
+  // }
+
+  // async start(imageUrl) {
+  //   return this.service.start(imageUrl);
+  // }
+
+  // async getParams(imageUrl) {
+  //   return this.service.getParams(imageUrl);
+  // }
+
+  // async setParams(imageUrl, params) {
+  //   return this.service.setParams(imageUrl, params);
+  // }
+
+  async batchStatus(name, imageIds) {
+    return this.service.batchStatus(name, imageIds);
   }
 
-  async start(imageUrl) {
-    return this.service.start(imageUrl);
-  }
-
-  async getParams(imageUrl) {
-    return this.service.getParams(imageUrl);
-  }
-
-  async setParams(imageUrl, params) {
-    return this.service.setParams(imageUrl, params);
+  async batchStart(name, params, imageIds) {
+    return this.service.batchStart(name, params, imageIds);
   }
 
 }

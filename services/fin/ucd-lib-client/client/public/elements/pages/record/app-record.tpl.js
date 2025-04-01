@@ -274,14 +274,71 @@ export default function render() {
       margin-top: 0;
     }
 
+    .admin-edit h3 {
+      color: var(--color-aggie-blue);
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+
+    .admin-edit .dropdown-label {
+      font-weight: bold;
+      margin-bottom: .5rem;
+    }
+
+    .admin-edit .dropdown-label.image-skew {
+      margin-top: 1.5rem;
+    }
+
+    .admin-edit .deskew-status ucdlib-icon { 
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      min-height: 24px;
+    }
+
+    .admin-edit .deskew-status .deskew-running {
+      fill: var(--color-aggie-gold);
+    }
+
+    .admin-edit .deskew-status .deskew-finished {
+      fill: var(--color-quad);
+    }
+
+    .admin-edit .deskew-wrapper,
+    .admin-edit .deskew-action-wrapper {
+      display: flex;
+      gap: .5rem;
+    }
+
+    .admin-edit .deskew-wrapper ucd-theme-slim-select {
+      flex: 1;
+    }
+
+    .admin-edit .deskew-action-wrapper {
+      flex: 0;
+      white-space: nowrap;
+    }
+
+    .admin-edit .image-skew-description {
+      color: var(--color-black-70);
+      font-size: .9rem;
+      margin: .25rem 0 .5rem 0;
+    }
+
+    .admin-edit .apply-button {
+      font-size: 1rem;
+    }
+
     </style>
 
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
     </div>
     <div class="admin-edit" ?hidden="${!this.isUiAdmin}">
       <div class="left-panel" ?hidden="${!this.editMode || !this.isUiAdmin}">
-        <span class="form-label" style="font-weight: bold;">Item Display:</span>
+        <h3 class="form-label">Item Display</h3>
+        <p class="form-label dropdown-label">Viewer</p>
         <ucd-theme-slim-select
+          class="item-display-select"
           @change="${this._ssSelectBlur}"
           @focusin="${this._ssSelectFocus}"
           @click="${this._ssSelectFocus}"
@@ -302,37 +359,33 @@ export default function render() {
           </select>
         </ucd-theme-slim-select>
 
-
-
-        <div style="padding-top: 2rem;">
-          <h5 ?hidden="${!this.workflowRunning}">Worklow running...</h5>
-          <div style="font-size: .9rem; font-style: italic;">
-            ${this.latestWorkflowStatus}
+        <p class="form-label dropdown-label image-skew">Image Skew</p>
+        <p class="image-skew-description">Only change this setting if the image is crooked. This is a realtime process, there may be some delay.</p>
+        <div class="deskew-wrapper">
+          <ucd-theme-slim-select
+            class="deskew-select"
+            @change="${this._onDeskewChange}"
+            @focusin="${this._ssSelectFocus}"
+            @click="${this._ssSelectFocus}"
+            @blur="${this._ssSelectBlur}"
+            class="deskew-select">
+            <select>
+                <option value="original" ?selected=${!this.deskewImages}>
+                  Original version (as digitized)
+                </option>
+                <option value="deskew" ?selected=${this.deskewImages}>
+                  Deskew (ImageMagick)
+                </option>
+            </select>
+          </ucd-theme-slim-select>
+          <div class="deskew-action-wrapper">
+            <button class="btn btn--primary apply-button" ?disabled="${!this.deskewMismatch && (this.workflowRunning || this.imagesCurrentlyDeskewed === this.deskewImages)}" @click="${this._runWorkflow}">Apply to Item</button>
+            <div class="deskew-status">
+              <ucdlib-icon ?hidden="${this.deskewMismatch || this.imagesCurrentlyDeskewed !== this.deskewImages}" class="deskew-finished" icon="ucdlib-dams:fa-check"></ucdlib-icon>
+              <ucdlib-icon ?hidden="${!this.workflowRunning}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
+            </div>
           </div>
         </div>
-
-        <div style="display: flex; align-items: baseline; margin-top: 1rem;">
-          <input id="checkbox-deskew" 
-            style="margin-right: 0.5rem;"
-            name="checkbox-deskew" 
-            type="checkbox" 
-            .checked="${this.deskewImages}"
-            @change="${this._onDeskewCheckboxChange}"
-            ?disabled="${this.workflowLoading || this.workflowRunning}">
-          <label for="checkbox-deskew" style="margin-right: 1rem;">De-skew images</label>
-
-
-          <div>
-            <button ?hidden="${!this.showGetWorkflow}" class="btn btn--secondary" @click="${this._onGetWorkflow}" style="display: block; margin: .25rem;">Get Workflow</button>
-            <button ?hidden="${!this.showStartWorkflow}" ?disabled="${this.disableStartWorkflow}" class="btn btn--primary" @click="${this._onStartWorkflow}" style="display: block; margin: .25rem;">Start Workflow</button>
-          </div>
-          <div>
-            <button ?hidden="${!this.showGetWorkflowParams}" class="btn btn--secondary" @click="${this._onGetWorkflowParams}" style="display: block; margin: .25rem;">Get Workflow Params</button>
-            <button ?hidden="${!this.showSetWorkflowParams}" class="btn btn--primary" @click="${this._setImSkewParam}" style="display: block; margin: .25rem;">Set Workflow Params</button>
-          </div>
-
-        </div>
-        
       </div>
 
       <div class="right-panel">

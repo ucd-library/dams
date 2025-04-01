@@ -54,6 +54,8 @@ class AppRecord extends Mixin(LitElement)
       showReportButton: { type: Boolean },
       githubIssueUrl: { type: String },
       deskewImages: { type: Boolean },
+      imagesCurrentlyDeskewed: { type: Boolean },
+      deskewMismatch: { type: Boolean },
       showGetWorkflow: { type: Boolean },
       showStartWorkflow: { type: Boolean },
       disableStartWorkflow: { type: Boolean },
@@ -107,7 +109,9 @@ class AppRecord extends Mixin(LitElement)
 
     this.showReportButton = false;
     this.githubIssueUrl = '';
-    this.deskewImages = true;
+    this.deskewImages = false;
+    this.imagesCurrentlyDeskewed = false;
+    this.deskewMismatch = true;
     this.showGetWorkflow = false;
     this.showStartWorkflow = false;
     this.disableStartWorkflow = false;
@@ -155,6 +159,9 @@ class AppRecord extends Mixin(LitElement)
 
     let record = e.vcData;
     if( !record || this.renderedRecordId === record['@id'] ) return;
+
+    this.graph = e.payload.data['@graph'] || [];
+    this.parseWorkflowImages();
 
     this.renderedRecordId = record["@id"];
     this.record = record;
@@ -214,7 +221,10 @@ class AppRecord extends Mixin(LitElement)
    * @method _onAppStateUpdate
    */
   async _onAppStateUpdate(e) {
-    if( e.location.page !== 'item' ) return;
+    if( e.location.page !== 'item' ) {
+      this.stopWorkflowLoop = true;
+      return;
+    }
 
     this._updateSlimStyles();
 
@@ -247,104 +257,95 @@ class AppRecord extends Mixin(LitElement)
     this._validateCanStartWorkflow();
   }
 
-  async _onGetWorkflow(e) {
-    let imageUrl = this.record.images?.original?.url || '';
-    if( !imageUrl ) return;
+  async _getWorkflowStatus() {
+    // get status of active workflows
+    let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
 
-    this.workflowLoading = true;
+    this.workflowRunning = (status.body || []).find(s => s.state !== 'completed') ? true : false;
+    if( this.workflowRunning ) this._loopUntilWorkflowFinishes(status);
 
-    let res = await this.WorkflowModel.get(imageUrl);
+    status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
 
-    // sort most recent first
-    res = this._getLatestImageWorkflow(res);
+    console.log({ status });
 
-    // check workflow completion state
-    this._loopUntilWorkflowFinishes(res);
+    // TODO logic below / in template for allowing all workflow types 
+    // to be ran if params diverge isn't working yet, investigate
+    // status[0].params = { imagemagick: { deskew : true }};
+
+    // TODO also, the params doesn't seem to either get set when running, or retrieve after running.
+
+
+    // to enable 'apply to item' if any image workflows diverge in deskew setting
+    this.deskewMismatch = !status.filter(s => s.state === 'completed')
+                                     .map(s => s.params)?.every(p => !p.imagemagick || p.imagemagick.deskew);
     
-    this.workflowLoading = false;
+    // disable 'apply to item' button if selected skew setting is what the workflow status shows
+    // else hide the green check and enable the button
+    this.imagesCurrentlyDeskewed = status[0]?.params?.imagemagick?.deskew ? true : false;
+    console.log(this.deskewMismatch, this.workflowRunning, this.imagesCurrentlyDeskewed, this.deskewImages);
   }
 
-  _getLatestImageWorkflow(res) {
-    return (res.body || []).filter(r => r.name === 'image-products').sort((a,b) => new Date(b.created) - new Date(a.created))?.[0] || {};
-  }
-
-  _validateCanStartWorkflow() {
-    // -if config different than saved config (like de-skew button is different than last ran config), show start workflow button
-    let deskewConfig = this.workflowParams?.imagemagick?.deskew;
-    if( this.workflowRunning ) {
-      this.showStartWorkflow = true;
-      this.disableStartWorkflow = true;
-    } else if(( this.deskewImages && !deskewConfig ) || ( deskewConfig && this.deskewImages !== deskewConfig )) {
-      this.showStartWorkflow = true;
-      this.disableStartWorkflow = false;
-    } else {
-      this.showStartWorkflow = false;
-      this.disableStartWorkflow = true;
-    }
-  }
-
-  _loopUntilWorkflowFinishes(res) {
-    // -on get workflow, update ui with latest workflow info
-    this.latestWorkflowStatus = '';
-    if( res?.created ) {
-      this.latestWorkflowStatus = `WorkflowId: ${res.workflow_id} | Created: ${new Date(res.created)} | State: ${res.state} | Deskewed: ${this.workflowParams?.imagemagick?.deskew || false}`;
-    }
-
-    let state = res.data?.gcExecution?.state;
-    if( this.stopWorkflowLoop || state === 'SUCCEEDED' ) {
-      this.workflowRunning = false;
-
-      this._validateCanStartWorkflow();
-      return;
-    }
+  async _runWorkflow() {    
+    console.log('runWorkflow', this.deskewImages);
     this.workflowRunning = true;
+    await this.WorkflowModel.batchStart('image-products', { imagemagick : { deskew : this.deskewImages } }, this.workflowImageUrls);
 
-    setTimeout(async () => {
-      let res = await this.WorkflowModel.get(this.record.images.original.url);
-      res = this._getLatestImageWorkflow(res);
-
-      console.log('in _loopUntilWorkflowFinishes.setTimeout, looping until workflow succeeded', res);
-      this._loopUntilWorkflowFinishes(res);
-    }, 10000);
+    // get workflow status and loop
+    let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
+    this._loopUntilWorkflowFinishes(status);
   }
 
-  async _onStartWorkflow(e) {
-    let imageUrl = this.record.images?.original?.url || '';
-    if( !imageUrl ) return;
+  parseWorkflowImages() {
+    let workflowImageUrls = [];
 
-    this.disableStartWorkflow = true;
-
-    // save workflow params
-    await this._setImSkewParam();
-
-    // then start workflow
-    let res = await this.WorkflowModel.start(imageUrl)
-
-    this._loopUntilWorkflowFinishes(res);
-  }
-
-  async _onGetWorkflowParams(e) {
-    let imageUrl = this.record.images?.original?.url || '';
-    if( !imageUrl ) return;
-
-    let res = await this.WorkflowModel.getParams(imageUrl);
-    return res.body || {};
-  }
-
-  async _setImSkewParam() {
-    this.workflowParams = {
-      imagemagick : {
-        deskew : this.deskewImages
+    this.IMAGE_WORKFLOWS = {
+      // 'pdf-image-products' : {
+      //   mimeTypes : ['application/pdf'],
+      //   property : 'images',
+      //   pageSearch : {
+      //     multiPage : true
+      //   }
+      // },
+      'image-products' : {
+        mimeTypes : ['image/jpeg', 'image/png', 'image/tiff'],
+        property: 'images',
+        pageSearch : {
+          multiPage : false
+        }
       }
     }
-    await this._setWorkflowParams(this.workflowParams);
+
+    this.graph.forEach(node => {
+      for( let workflow in this.IMAGE_WORKFLOWS ) {
+        let def = this.IMAGE_WORKFLOWS[workflow];
+
+        if( !node.fileFormat ) continue;
+        if( !def.mimeTypes.includes(node.fileFormat) ) continue;
+
+        workflowImageUrls.push(node['@id']);
+      }
+    });
+
+    this.workflowImageUrls = workflowImageUrls;
   }
 
-  async _setWorkflowParams(params) {
-    let imageUrl = this.record.images?.original?.url || '';
-    if( !imageUrl ) return;
+  _loopUntilWorkflowFinishes(status) {
+    status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
+    this.workflowRunning = true;
 
-    await this.WorkflowModel.setParams(imageUrl, params);
+    this.workflowRunning = status.find(s => s.state !== 'completed') ? true : false;
+    if( this.stopWorkflowLoop || !this.workflowRunning ) {
+      console.log('workflow loop ended');
+
+      return;
+    }
+
+    setTimeout(async () => {
+      let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
+     
+      console.log('in workflow loop until workflow completes', status);
+      this._loopUntilWorkflowFinishes(status);
+    }, 10000);
   }
 
   _arkDoiClick(e) {
@@ -354,30 +355,43 @@ class AppRecord extends Mixin(LitElement)
     window.scrollTo(0, 0);
   }
 
+  _onDeskewChange(e) {
+    this._ssSelectBlur(e);
+
+    this.deskewImages = (this.querySelector('.deskew-select')?.slimSelect?.data?.data || []).find(opt => opt.selected).value === 'deskew';
+    
+    // hack for styles
+    requestAnimationFrame(() => {
+      this._updateSlimStyles();
+    });
+  }
+
   _updateSlimStyles() {
-    let select = this.querySelector('ucd-theme-slim-select');
-    if( !select ) return;
+    let selects = this.querySelectorAll('ucd-theme-slim-select');
+    if( !selects ) return;
 
-    let ssMain = select.shadowRoot.querySelector(".ss-main");
-    if (ssMain) {
-      ssMain.style.border = 'none';
-      ssMain.style.backgroundColor = 'transparent';
-    }
+    for( let select of selects ) {
+      let ssMain = select.shadowRoot.querySelector(".ss-main");
+      if (ssMain) {
+        ssMain.style.border = 'none';
+        ssMain.style.backgroundColor = 'transparent';
+      }
 
-    let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");
-    if (ssSingle) {
-      ssSingle.style.border = "none";
-      ssSingle.style.height = "49px";
-      ssSingle.style.paddingLeft = "1rem";
-      ssSingle.style.backgroundColor = "var(--color-aggie-blue-50)";
-      ssSingle.style.borderRadius = '0';
-      ssSingle.style.fontWeight = "bold";
-      ssSingle.style.color = "var(--color-aggie-blue)";
-    }
+      let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");
+      if (ssSingle) {
+        ssSingle.style.border = "none";
+        ssSingle.style.height = "49px";
+        ssSingle.style.paddingLeft = "1rem";
+        ssSingle.style.backgroundColor = "var(--color-aggie-blue-50)";
+        ssSingle.style.borderRadius = '0';
+        ssSingle.style.fontWeight = "bold";
+        ssSingle.style.color = "var(--color-aggie-blue)";
+      }
 
-    let search = select.shadowRoot.querySelector('.ss-search');
-    if( search ) {
-      search.style.display = "none";
+      let search = select.shadowRoot.querySelector('.ss-search');
+      if( search ) {
+        search.style.display = "none";
+      }
     }
   }
   
@@ -482,14 +496,7 @@ class AppRecord extends Mixin(LitElement)
     
     this._changeMediaViewerDisplay('none');
 
-    // - get workflow params to populate de-skew setting of current config
-    // - show button for get workflow
-    this.workflowLoading = true;
-    this.workflowParams = await this._onGetWorkflowParams();
-    this.deskewImages = this.workflowParams?.imagemagick?.deskew || false;
-    this.stopWorkflowLoop = false;
-    await this._onGetWorkflow();
-    // this.showGetWorkflow = true;    
+    await this._getWorkflowStatus();    
   }
 
   /**
@@ -501,7 +508,7 @@ class AppRecord extends Mixin(LitElement)
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
     
-    this.itemDisplay = document.querySelector('ucd-theme-slim-select')?.slimSelect?.selected();
+    this.itemDisplay = document.querySelector('ucd-theme-slim-select.item-display-select')?.slimSelect?.selected();
     this._updateDisplayData();
     await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
 
@@ -560,7 +567,7 @@ class AppRecord extends Mixin(LitElement)
     if( !pages ) return;
     if( display ) {
       pages.style.opacity = 0;
-      pages.style.height = '200px';
+      pages.style.height = '450px';
       pages.style.display = 'block';
     } else {
       pages.style.opacity = 100;
