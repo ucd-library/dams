@@ -22,12 +22,12 @@ class WorkflowModel extends BaseModel {
     return this.service.start(imageUrl);
   }
 
-  async getParams(itemId) {
-    return this.service.getParams(itemId);
+  async getParams(imageUrl) {
+    return this.service.getParams(imageUrl);
   }
 
-  async setParams(itemId, params) {
-    return this.service.setParams(itemId, params);
+  async setParams(imageUrl, params) {
+    return this.service.setParams(imageUrl, params);
   }
 
 }

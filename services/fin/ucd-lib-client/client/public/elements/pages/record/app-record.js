@@ -54,6 +54,14 @@ class AppRecord extends Mixin(LitElement)
       showReportButton: { type: Boolean },
       githubIssueUrl: { type: String },
       deskewImages: { type: Boolean },
+      showGetWorkflow: { type: Boolean },
+      showStartWorkflow: { type: Boolean },
+      disableStartWorkflow: { type: Boolean },
+      showGetWorkflowParams: { type: Boolean },
+      showSetWorkflowParams: { type: Boolean },
+      workflowLoading: { type: Boolean },
+      workflowRunning: { type: Boolean },
+      latestWorkflowStatus: { type: String },
     };
   }
 
@@ -92,7 +100,7 @@ class AppRecord extends Mixin(LitElement)
     this.itemDisplay = '';
 
     this.isUiAdmin = user.canEditUi();
-    this.editMode = true;
+    this.editMode = false;
     this.displayData = {};
     this.savedCollectionData = {};
     this.disableDownload = APP_CONFIG.disableFileDownloads;
@@ -100,6 +108,15 @@ class AppRecord extends Mixin(LitElement)
     this.showReportButton = false;
     this.githubIssueUrl = '';
     this.deskewImages = true;
+    this.showGetWorkflow = false;
+    this.showStartWorkflow = false;
+    this.disableStartWorkflow = false;
+    this.showGetWorkflowParams = false;
+    this.showSetWorkflowParams = false;
+    this.workflowLoading = false;
+    this.workflowRunning = false; 
+    this.latestWorkflowStatus = '';
+
 
     this._injectModel(
       "AppStateModel",
@@ -125,7 +142,6 @@ class AppRecord extends Mixin(LitElement)
     if( this.collectionId ) this._onCollectionUpdate(await this.CollectionModel.get(this.collectionId));
 
     this._updateSlimStyles();
-    this._onEditClicked(); // TEMP remove
   }
 
   /**
@@ -228,22 +244,83 @@ class AppRecord extends Mixin(LitElement)
 
   _onDeskewCheckboxChange(e) {
     this.deskewImages = e.currentTarget.checked;
+    this._validateCanStartWorkflow();
   }
 
   async _onGetWorkflow(e) {
     let imageUrl = this.record.images?.original?.url || '';
     if( !imageUrl ) return;
 
-    let res = await this.WorkflowModel.get(imageUrl)
-    console.log('get workflow', res);
+    this.workflowLoading = true;
+
+    let res = await this.WorkflowModel.get(imageUrl);
+
+    // sort most recent first
+    res = this._getLatestImageWorkflow(res);
+
+    // check workflow completion state
+    this._loopUntilWorkflowFinishes(res);
+    
+    this.workflowLoading = false;
+  }
+
+  _getLatestImageWorkflow(res) {
+    return (res.body || []).filter(r => r.name === 'image-products').sort((a,b) => new Date(b.created) - new Date(a.created))?.[0] || {};
+  }
+
+  _validateCanStartWorkflow() {
+    // -if config different than saved config (like de-skew button is different than last ran config), show start workflow button
+    let deskewConfig = this.workflowParams?.imagemagick?.deskew;
+    if( this.workflowRunning ) {
+      this.showStartWorkflow = true;
+      this.disableStartWorkflow = true;
+    } else if(( this.deskewImages && !deskewConfig ) || ( deskewConfig && this.deskewImages !== deskewConfig )) {
+      this.showStartWorkflow = true;
+      this.disableStartWorkflow = false;
+    } else {
+      this.showStartWorkflow = false;
+      this.disableStartWorkflow = true;
+    }
+  }
+
+  _loopUntilWorkflowFinishes(res) {
+    // -on get workflow, update ui with latest workflow info
+    this.latestWorkflowStatus = '';
+    if( res?.created ) {
+      this.latestWorkflowStatus = `WorkflowId: ${res.workflow_id} | Created: ${new Date(res.created)} | State: ${res.state} | Deskewed: ${this.workflowParams?.imagemagick?.deskew || false}`;
+    }
+
+    let state = res.data?.gcExecution?.state;
+    if( this.stopWorkflowLoop || state === 'SUCCEEDED' ) {
+      this.workflowRunning = false;
+
+      this._validateCanStartWorkflow();
+      return;
+    }
+    this.workflowRunning = true;
+
+    setTimeout(async () => {
+      let res = await this.WorkflowModel.get(this.record.images.original.url);
+      res = this._getLatestImageWorkflow(res);
+
+      console.log('in _loopUntilWorkflowFinishes.setTimeout, looping until workflow succeeded', res);
+      this._loopUntilWorkflowFinishes(res);
+    }, 10000);
   }
 
   async _onStartWorkflow(e) {
     let imageUrl = this.record.images?.original?.url || '';
     if( !imageUrl ) return;
 
+    this.disableStartWorkflow = true;
+
+    // save workflow params
+    await this._setImSkewParam();
+
+    // then start workflow
     let res = await this.WorkflowModel.start(imageUrl)
-    console.log('run workflow', res);
+
+    this._loopUntilWorkflowFinishes(res);
   }
 
   async _onGetWorkflowParams(e) {
@@ -251,23 +328,23 @@ class AppRecord extends Mixin(LitElement)
     if( !imageUrl ) return;
 
     let res = await this.WorkflowModel.getParams(imageUrl);
-    console.log('TODO get workflow params', res);
+    return res.body || {};
   }
 
   async _setImSkewParam() {
-    let params = {
+    this.workflowParams = {
       imagemagick : {
-        deskew : false
+        deskew : this.deskewImages
       }
     }
-    await this._setWorkflowParams(params);
+    await this._setWorkflowParams(this.workflowParams);
   }
 
   async _setWorkflowParams(params) {
     let imageUrl = this.record.images?.original?.url || '';
     if( !imageUrl ) return;
-    let res = await this.WorkflowModel.setParams(imageUrl, params);
-    console.log('TODO set workflow params', res);
+
+    await this.WorkflowModel.setParams(imageUrl, params);
   }
 
   _arkDoiClick(e) {
@@ -398,12 +475,21 @@ class AppRecord extends Mixin(LitElement)
    * 
    * @param {Object} e 
    */
-  _onEditClicked(e) {
+  async _onEditClicked(e) {
     if( !this.isUiAdmin ) return;
     this._updateSlimStyles();
     this.editMode = true;
     
     this._changeMediaViewerDisplay('none');
+
+    // - get workflow params to populate de-skew setting of current config
+    // - show button for get workflow
+    this.workflowLoading = true;
+    this.workflowParams = await this._onGetWorkflowParams();
+    this.deskewImages = this.workflowParams?.imagemagick?.deskew || false;
+    this.stopWorkflowLoop = false;
+    await this._onGetWorkflow();
+    // this.showGetWorkflow = true;    
   }
 
   /**
@@ -420,6 +506,7 @@ class AppRecord extends Mixin(LitElement)
     await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
 
     this.editMode = false;
+    this.stopWorkflowLoop = true;
 
     this._changeMediaViewerDisplay('', true);
   }
@@ -433,6 +520,7 @@ class AppRecord extends Mixin(LitElement)
   _onCancelEditClicked(e) {
     if( !this.isUiAdmin ) return;
     this.editMode = false;
+    this.stopWorkflowLoop = true;
 
     this._changeMediaViewerDisplay('');
   }

@@ -63,7 +63,6 @@ class WorkflowService extends BaseService {
       onError : null
     })
   }
-
 }
 
 const service = new WorkflowService();

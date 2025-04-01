@@ -311,26 +311,37 @@ export default function render() {
           </select>
         </ucd-theme-slim-select>
 
+
+
+        <div style="padding-top: 2rem;">
+          <h5 ?hidden="${!this.workflowRunning}">Worklow running...</h5>
+          <div style="font-size: .9rem; font-style: italic;">
+            ${this.latestWorkflowStatus}
+          </div>
+        </div>
+
         <div style="display: flex; align-items: baseline; margin-top: 1rem;">
           <input id="checkbox-deskew" 
             style="margin-right: 0.5rem;"
             name="checkbox-deskew" 
             type="checkbox" 
             .checked="${this.deskewImages}"
-            @change="${this._onDeskewCheckboxChange}">
+            @change="${this._onDeskewCheckboxChange}"
+            ?disabled="${this.workflowLoading || this.workflowRunning}">
           <label for="checkbox-deskew" style="margin-right: 1rem;">De-skew images</label>
 
 
           <div>
-            <button class="btn btn--secondary" @click="${this._onGetWorkflow}" style="display: block; margin: .25rem;">Get Workflow</button>
-            <button class="btn btn--primary" @click="${this._onStartWorkflow}" style="display: block; margin: .25rem;">Start Workflow</button>
+            <button ?hidden="${!this.showGetWorkflow}" class="btn btn--secondary" @click="${this._onGetWorkflow}" style="display: block; margin: .25rem;">Get Workflow</button>
+            <button ?hidden="${!this.showStartWorkflow}" ?disabled="${this.disableStartWorkflow}" class="btn btn--primary" @click="${this._onStartWorkflow}" style="display: block; margin: .25rem;">Start Workflow</button>
           </div>
           <div>
-            <button class="btn btn--secondary" @click="${this._onGetWorkflowParams}" style="display: block; margin: .25rem;">Get Workflow Params</button>
-            <button class="btn btn--primary" @click="${this._setImSkewParam}" style="display: block; margin: .25rem;">Set Workflow Params</button>
+            <button ?hidden="${!this.showGetWorkflowParams}" class="btn btn--secondary" @click="${this._onGetWorkflowParams}" style="display: block; margin: .25rem;">Get Workflow Params</button>
+            <button ?hidden="${!this.showSetWorkflowParams}" class="btn btn--primary" @click="${this._setImSkewParam}" style="display: block; margin: .25rem;">Set Workflow Params</button>
           </div>
-          
+
         </div>
+        
       </div>
 
       <div class="right-panel">
@@ -349,7 +360,7 @@ export default function render() {
 
     <app-media-viewer></app-media-viewer>
 
-    <div class="container" style="padding-bottom: 50px; margin-top: 150px;">
+    <div class="container" style="padding-bottom: 50px;">
       <h3>${this.name}</h3>
       <div class="copyright">
         <span>&copy;</span>
