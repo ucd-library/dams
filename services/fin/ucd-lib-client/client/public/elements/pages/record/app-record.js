@@ -58,12 +58,11 @@ class AppRecord extends Mixin(LitElement)
       deskewMismatch: { type: Boolean },
       showGetWorkflow: { type: Boolean },
       showStartWorkflow: { type: Boolean },
-      disableStartWorkflow: { type: Boolean },
-      showGetWorkflowParams: { type: Boolean },
-      showSetWorkflowParams: { type: Boolean },
-      workflowLoading: { type: Boolean },
+      workflowStatusLoading: { type: Boolean },
+      workflowAlreadyExecuted: { type: Boolean },
       workflowRunning: { type: Boolean },
-      latestWorkflowStatus: { type: String },
+      workflowStatus: { type: String },
+      workflowError: { type: Boolean }
     };
   }
 
@@ -111,16 +110,14 @@ class AppRecord extends Mixin(LitElement)
     this.githubIssueUrl = '';
     this.deskewImages = false;
     this.imagesCurrentlyDeskewed = false;
-    this.deskewMismatch = true;
+    this.deskewMismatch = false;
     this.showGetWorkflow = false;
     this.showStartWorkflow = false;
-    this.disableStartWorkflow = false;
-    this.showGetWorkflowParams = false;
-    this.showSetWorkflowParams = false;
-    this.workflowLoading = false;
+    this.workflowStatusLoading = false;
+    this.workflowAlreadyExecuted = false;
     this.workflowRunning = false; 
-    this.latestWorkflowStatus = '';
-
+    this.workflowStatus = '';
+    this.workflowError = false;
 
     this._injectModel(
       "AppStateModel",
@@ -258,41 +255,88 @@ class AppRecord extends Mixin(LitElement)
   }
 
   async _getWorkflowStatus() {
-    // get status of active workflows
+    this.workflowStatusLoading = true;
+
     let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
-
-    this.workflowRunning = (status.body || []).find(s => s.state !== 'completed') ? true : false;
-    if( this.workflowRunning ) this._loopUntilWorkflowFinishes(status);
-
     status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
 
-    console.log({ status });
-
-    // TODO logic below / in template for allowing all workflow types 
-    // to be ran if params diverge isn't working yet, investigate
-    // status[0].params = { imagemagick: { deskew : true }};
-
-    // TODO also, the params doesn't seem to either get set when running, or retrieve after running.
-
-
-    // to enable 'apply to item' if any image workflows diverge in deskew setting
-    this.deskewMismatch = !status.filter(s => s.state === 'completed')
-                                     .map(s => s.params)?.every(p => !p.imagemagick || p.imagemagick.deskew);
+    this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
+    this.workflowRunning = this.latestWorkflowStatus.find(s => s.state !== 'completed') ? true : false;
     
-    // disable 'apply to item' button if selected skew setting is what the workflow status shows
-    // else hide the green check and enable the button
-    this.imagesCurrentlyDeskewed = status[0]?.params?.imagemagick?.deskew ? true : false;
-    console.log(this.deskewMismatch, this.workflowRunning, this.imagesCurrentlyDeskewed, this.deskewImages);
+    if( this.workflowRunning ) this._loopUntilWorkflowFinishes(status);
+    this.workflowStatusLoading = false;
+
+    // make sure deskew setting matches in last workflow run
+    let deskew = this.latestWorkflowStatus[0].params?.imagemagick?.deskew;
+    let allMatch = true;
+    this.latestWorkflowStatus.forEach(status => {
+      if( status.params?.imagemagick?.deskew != deskew ) allMatch = false;
+    });
+
+    if( !allMatch ) {
+      this.workflowError = true;
+      this.imagesCurrentlyDeskewed = false;
+      this.deskewMismatch = true;
+      this.latestWorkflowType = 'mismatch';
+    } else {
+      this.workflowError = false;
+      this.imagesCurrentlyDeskewed = deskew;
+      this.latestWorkflowType = deskew ? 'deskew' : 'original';
+    }
+
+    this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
+  }
+
+  _getLatestStatusFromBatch(status=[]) {
+    // group to items ids map
+    // then filter by created desc to get latest
+    status = status.reduce((acc, status) => {
+      const { finPath } = status;
+      if (!acc[finPath]) {
+        acc[finPath] = [];
+      }
+      acc[finPath].push(status);
+      return acc;
+    }, {});
+
+    let latest = [];
+    Object.values(status).forEach(workflow => {
+      latest.push(workflow.sort((a,b) => new Date(b.created) - new Date(a.created))[0]);
+    })
+    return latest;
+  }
+
+  updateWorkflowStatusMessage(status) {
+    this.workflowStatus = '';
+    if( this.workflowRunning ) {
+      let pendingWorkflows = status.filter(s => s.state !== 'running' && s.state !== 'completed').length;
+      let runningWorkflows = status.filter(s => s.state === 'running').length;
+      let completedWorkflows = status.filter(s => s.state === 'completed').length;
+
+      this.workflowStatus = `Status: ${pendingWorkflows} pending, ${runningWorkflows} processing, ${completedWorkflows} complete (of ${status.length})`;
+    }
+
+    if( this.deskewImages ) {
+      this.workflowAlreadyExecuted = this.latestWorkflowType === 'deskew';
+    } else {
+      this.workflowAlreadyExecuted = this.latestWorkflowType === 'original';
+    }
+
+    if( this.workflowRunning ) this.workflowAlreadyExecuted = false;
   }
 
   async _runWorkflow() {    
-    console.log('runWorkflow', this.deskewImages);
     this.workflowRunning = true;
+    this.workflowStatus = 'Status: Starting...';
     await this.WorkflowModel.batchStart('image-products', { imagemagick : { deskew : this.deskewImages } }, this.workflowImageUrls);
 
     // get workflow status and loop
     let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
-    this._loopUntilWorkflowFinishes(status);
+    status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
+    this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
+
+    
+    this._loopUntilWorkflowFinishes();
   }
 
   parseWorkflowImages() {
@@ -329,22 +373,27 @@ class AppRecord extends Mixin(LitElement)
     this.workflowImageUrls = workflowImageUrls;
   }
 
-  _loopUntilWorkflowFinishes(status) {
-    status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
+  _loopUntilWorkflowFinishes() {
     this.workflowRunning = true;
+    this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
 
-    this.workflowRunning = status.find(s => s.state !== 'completed') ? true : false;
+    this.workflowRunning = this.latestWorkflowStatus.find(s => s.state !== 'completed') ? true : false;
     if( this.stopWorkflowLoop || !this.workflowRunning ) {
-      console.log('workflow loop ended');
 
+      this.workflowStatus = '';
+      this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
+      // console.log('workflow loop ended');
+      this._getWorkflowStatus();
       return;
     }
 
     setTimeout(async () => {
       let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
-     
-      console.log('in workflow loop until workflow completes', status);
-      this._loopUntilWorkflowFinishes(status);
+      status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
+      this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
+
+      // console.log('in workflow loop until workflow completes', status);
+      this._loopUntilWorkflowFinishes();
     }, 10000);
   }
 
@@ -359,6 +408,7 @@ class AppRecord extends Mixin(LitElement)
     this._ssSelectBlur(e);
 
     this.deskewImages = (this.querySelector('.deskew-select')?.slimSelect?.data?.data || []).find(opt => opt.selected).value === 'deskew';
+    this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
     
     // hack for styles
     requestAnimationFrame(() => {
@@ -567,7 +617,7 @@ class AppRecord extends Mixin(LitElement)
     if( !pages ) return;
     if( display ) {
       pages.style.opacity = 0;
-      pages.style.height = '450px';
+      pages.style.height = '500px';
       pages.style.display = 'block';
     } else {
       pages.style.opacity = 100;

@@ -304,6 +304,10 @@ export default function render() {
       fill: var(--color-quad);
     }
 
+    .admin-edit .deskew-status .deskew-error {
+      fill: var(--color-double-decker);
+    }
+
     .admin-edit .deskew-wrapper,
     .admin-edit .deskew-action-wrapper {
       display: flex;
@@ -319,10 +323,21 @@ export default function render() {
       white-space: nowrap;
     }
 
-    .admin-edit .image-skew-description {
+    .admin-edit .image-skew-description,
+    .admin-edit .image-skew-status,
+    .admin-edit .image-skew-error {
       color: var(--color-black-70);
       font-size: .9rem;
       margin: .25rem 0 .5rem 0;
+    }
+
+    .admin-edit .image-skew-status {
+      font-style: italic;
+      margin-top: .5rem;
+    }
+
+    .admin-edit .image-skew-error {
+      color: var(--color-double-decker);
     }
 
     .admin-edit .apply-button {
@@ -361,6 +376,8 @@ export default function render() {
 
         <p class="form-label dropdown-label image-skew">Image Skew</p>
         <p class="image-skew-description">Only change this setting if the image is crooked. This is a realtime process, there may be some delay.</p>
+        <p class="image-skew-error" ?hidden="${!this.workflowError}">Warning: This item includes original and deskewed images. Modifying this setting will affect all images associated with this item.</p>
+        
         <div class="deskew-wrapper">
           <ucd-theme-slim-select
             class="deskew-select"
@@ -379,13 +396,15 @@ export default function render() {
             </select>
           </ucd-theme-slim-select>
           <div class="deskew-action-wrapper">
-            <button class="btn btn--primary apply-button" ?disabled="${!this.deskewMismatch && (this.workflowRunning || this.imagesCurrentlyDeskewed === this.deskewImages)}" @click="${this._runWorkflow}">Apply to Item</button>
+            <button class="btn btn--primary apply-button" ?disabled="${this.workflowStatusLoading || this.workflowRunning || this.workflowAlreadyExecuted}" @click="${this._runWorkflow}">Apply to Item</button>
             <div class="deskew-status">
-              <ucdlib-icon ?hidden="${this.deskewMismatch || this.imagesCurrentlyDeskewed !== this.deskewImages}" class="deskew-finished" icon="ucdlib-dams:fa-check"></ucdlib-icon>
-              <ucdlib-icon ?hidden="${!this.workflowRunning}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
+              <ucdlib-icon ?hidden="${this.workflowError || this.deskewMismatch || !this.workflowAlreadyExecuted}" class="deskew-finished" icon="ucdlib-dams:fa-check"></ucdlib-icon>
+              <ucdlib-icon ?hidden="${this.workflowError || !this.workflowRunning}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
+              <ucdlib-icon ?hidden="${!this.workflowError}" class="deskew-error" icon="ucdlib-dams:fa-triangle-exclamation"></ucdlib-icon>
             </div>
           </div>
         </div>
+        <p class="image-skew-status">${this.workflowStatus}</p>
       </div>
 
       <div class="right-panel">
