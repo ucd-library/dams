@@ -88,7 +88,7 @@ class AppHome extends Mixin(LitElement)
     this.isUiAdmin = false;
     this.showWelcomeModal = !utils.getCookie('welcome_modal_dismissed');;
     this.welcomeModalTitle = 'Welcome to the new Digital Collections!';
-    this.welcomeModalContent = `We've recently updated this site. If something doesn't look quite right, please let us know at <a href="mailto:digitalcollections@ucdavis.edu">digitalcollections@ucdavis.edu</a>.`;
+    this.welcomeModalContent = `We've recently updated this site. Pardon our dust as we put on the finishing touches.`;
     this._injectModel('AppStateModel', 'FcAppConfigModel', 'CollectionModel', 'RecordModel');
   }
 

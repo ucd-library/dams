@@ -375,7 +375,7 @@ export default function render() {
         </ucd-theme-slim-select>
 
         <p class="form-label dropdown-label image-skew">Image Skew</p>
-        <p class="image-skew-description">Only change this setting if the image is crooked. This is a realtime process, there may be some delay.</p>
+        <p class="image-skew-description">Only change this setting to fix tilted images. This is a realtime process, there may be some delay.</p>
         <p class="image-skew-error" ?hidden="${!this.workflowError}">Warning: This item includes original and deskewed images. Modifying this setting will affect all images associated with this item.</p>
         
         <div class="deskew-wrapper">

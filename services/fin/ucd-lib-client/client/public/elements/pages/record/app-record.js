@@ -282,6 +282,9 @@ class AppRecord extends Mixin(LitElement)
       this.workflowError = false;
       this.imagesCurrentlyDeskewed = deskew;
       this.latestWorkflowType = deskew ? 'deskew' : 'original';
+
+      // update selected deskew setting based on last run
+      this._onDeskewChange(null, deskew);
     }
 
     this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
@@ -404,10 +407,14 @@ class AppRecord extends Mixin(LitElement)
     window.scrollTo(0, 0);
   }
 
-  _onDeskewChange(e) {
-    this._ssSelectBlur(e);
-
-    this.deskewImages = (this.querySelector('.deskew-select')?.slimSelect?.data?.data || []).find(opt => opt.selected).value === 'deskew';
+  _onDeskewChange(e, deskew=false) {
+    if( e ) {
+      this._ssSelectBlur(e);
+      this.deskewImages = (this.querySelector('.deskew-select')?.slimSelect?.data?.data || []).find(opt => opt.selected).value === 'deskew';
+    } else {
+      this.deskewImages = deskew;
+      this.querySelector('.deskew-select')?.slimSelect.selected('deskew');
+    }
     this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
     
     // hack for styles
