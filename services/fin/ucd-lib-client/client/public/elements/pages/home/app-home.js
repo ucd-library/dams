@@ -15,6 +15,7 @@ import "../../components/nav-bar";
 import "../../components/filterButton";
 import "../../components/graphics/dams-watercolor";
 import "../../components/graphics/dams-watercolor-overlay";
+import "../../components/welcome-modal.js";
 
 import "../../components/cards/dams-collection-card";
 import "../../components/cards/dams-item-card";
@@ -25,6 +26,8 @@ import "../../components/admin/admin-featured-collections";
 import user from "../../../lib/utils/user";
 
 import render from './app-home.tpl.js';
+
+import utils from '../../../lib/utils/index.js';
 
 /**
  * @class AppHome
@@ -57,7 +60,10 @@ class AppHome extends Mixin(LitElement)
       heroCollectionUrl: {type: String},
       editMode: {type: Boolean},
       displayData: {type: Array},
-      isUiAdmin: {type: Boolean}
+      isUiAdmin: {type: Boolean},
+      showWelcomeModal: {type: Boolean},
+      welcomeModalTitle: {type: String},
+      welcomeModalContent: {type: String}
     };
   }
 
@@ -80,7 +86,10 @@ class AppHome extends Mixin(LitElement)
     this.displayData = [];
     this.editMode = false;
     this.isUiAdmin = false;
-    this._injectModel('FcAppConfigModel', 'CollectionModel', 'RecordModel');
+    this.showWelcomeModal = !utils.getCookie('welcome_modal_dismissed');;
+    this.welcomeModalTitle = 'Welcome to the new Digital Collections!';
+    this.welcomeModalContent = `We've recently updated this site. If something doesn't look quite right, please let us know at <a href="mailto:digitalcollections@ucdavis.edu">digitalcollections@ucdavis.edu</a>.`;
+    this._injectModel('AppStateModel', 'FcAppConfigModel', 'CollectionModel', 'RecordModel');
   }
 
   /**
@@ -127,6 +136,20 @@ class AppHome extends Mixin(LitElement)
     this.requestUpdate();
   }
 
+  /**
+   * @method _onAppStateUpdate
+   * @description on the App update, the state is determined and by checking
+   * the location
+   *
+   * @param {Object} e
+   */
+    async _onAppStateUpdate(e) {
+      if( this.AppStateModel.location.page !== 'home' && this.visitedHome ) {
+        this._onWelcomeModalClose(); // nav away from home is enough to close modal
+      }
+      this.visitedHome = true;
+    }
+
   _setFeaturedImage() {
     this.heroImgOptions = (APP_CONFIG.featuredImages || []);
 
@@ -157,6 +180,16 @@ class AppHome extends Mixin(LitElement)
     let imageUrl = e.target._selectedSrc;
     if ( !imageUrl ) return;
     this.heroImgCurrent = this.heroImgOptions.filter(i => i.imageUrl === imageUrl)[0];
+  }  
+
+  /**
+   * @method _onHeroChange
+   * @description Listener attached to <dams-hero> image change
+   * @param {CustomEvent} e 
+   */
+  _onWelcomeModalClose(e) {
+    utils.setCookie('welcome_modal_dismissed', 'true', 365)
+    this.showWelcomeModal = false;
   }
 
   /**

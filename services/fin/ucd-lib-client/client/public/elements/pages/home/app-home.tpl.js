@@ -754,6 +754,13 @@ export default function render() {
 
 </dams-hero>
 
+<app-welcome-modal
+  ?hidden="${!this.showWelcomeModal}"
+  .title="${this.welcomeModalTitle}"
+  .content="${this.welcomeModalContent}"
+  @ok=${this._onWelcomeModalClose}>
+</app-welcome-modal>
+
 <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}"></div>
 <section class="browse-buttons site-frame">
   <div class="priority-links">
