@@ -289,7 +289,12 @@ export default function render() {
       margin-top: 1.5rem;
     }
 
+    .admin-edit .deskew-status {
+      margin-top: 0.6rem;
+    }
+
     .admin-edit .deskew-status ucdlib-icon { 
+      padding: 0;
       width: 24px;
       height: 24px;
       min-width: 24px;
@@ -344,6 +349,19 @@ export default function render() {
       font-size: 1rem;
     }
 
+    [icon="ucdlib-dams:fa-rotate"] {
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
     </style>
 
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
@@ -375,7 +393,9 @@ export default function render() {
         </ucd-theme-slim-select>
 
         <p class="form-label dropdown-label image-skew">Image Skew</p>
-        <p class="image-skew-description">Only change this setting to fix tilted images. This is a realtime process, there may be some delay.</p>
+        <p class="image-skew-description">Only change this setting to fix tilted images. This is a realtime process, there may be some delay.
+          After the process completes, you will need to refresh the page to see the changes.
+        </p>
         <p class="image-skew-error" ?hidden="${!this.workflowError}">Warning: This item includes original and deskewed images. Modifying this setting will affect all images associated with this item.</p>
         
         <div class="deskew-wrapper">

@@ -281,6 +281,7 @@ class AppRecord extends Mixin(LitElement)
     } else {
       this.workflowError = false;
       this.imagesCurrentlyDeskewed = deskew;
+      if( deskew === undefined ) deskew = true;
       this.latestWorkflowType = deskew ? 'deskew' : 'original';
 
       // update selected deskew setting based on last run
