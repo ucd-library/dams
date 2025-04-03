@@ -2,15 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const {parseString} = require('xml2js');
 const xmlbuilder = require('xmlbuilder');
-const config = require('./config.js');
 
-function rootDjvu(imageDim) {
+function rootDjvu(imageDim, DENSITY=300) {
   const xml = xmlbuilder.create('OBJECT');
   xml.att('height', imageDim.height);
   xml.att('width', imageDim.width);
   xml.att('type', 'image/x.djvu');
 
-  xml.ele('PARAM', {name: 'DPI', value: config.ocr.imageMagick.density})
+  xml.ele('PARAM', {name: 'DPI', value: DENSITY})
   const mainColumn = xml.ele('HIDDENTEXT').ele('PAGECOLUMN');
   return {xml, mainColumn};
 }

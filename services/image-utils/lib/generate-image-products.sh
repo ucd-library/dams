@@ -2,9 +2,13 @@
 
 OCR_TO_BOOK_SCALE=2
 LARGE_SIZE=1024
-MEDIUM_SIZE=$((LARGE_SIZE / 2))
+MEDIUM_SIZE=$(($LARGE_SIZE / 2))
 SMALL_SIZE=$(($LARGE_SIZE / 4))
-OCR_SIZE=$((LARGE_SIZE * 2))
+OCR_SIZE=$(($LARGE_SIZE * 2))
+
+DESKEW_THRESHOLD=40%
+
+OCR_OPTS="--dpi 300 -l eng --psm 1 --oem 3 hocr"
 
 # OCR Base options
 IM_OCR_BASE_OPTS=$(cat <<EOF
@@ -27,18 +31,14 @@ EOF
 )
 
 TILED_TIF_OPTS=$(cat <<EOF
--resize 3072x \
 -define tiff:tile-geometry=256x256 \
 -compress JPEG \
 -alpha remove \
+-resize 3072x \
 -quality 90 \
 -layers flatten
 EOF
 )
-
-DESKEW_THRESHOLD=40%
-
-OCR_OPTS="--dpi 300 -l eng --psm 1 --oem 3 hocr"
 
 INPUT_FILE=$1
 if [[ -z "$INPUT_FILE" ]]; then
@@ -71,28 +71,28 @@ TILED_IMAGE="${DIR}/tiled.tif"
 DESKEW_ANGLE_FILE="${DIR}/deskew-angle.txt"
 
 # Generate small image
-magick $INPUT_FILE -resize ${SMALL_SIZE}x $BASE_IMAGE_OPTS $SMALL_IMAGE
+convert $INPUT_FILE -resize ${SMALL_SIZE}x $BASE_IMAGE_OPTS $SMALL_IMAGE
 
 # Generate medium image
-magick $INPUT_FILE -resize ${MEDIUM_SIZE}x $BASE_IMAGE_OPTS $MEDIUM_IMAGE
+convert $INPUT_FILE -resize ${MEDIUM_SIZE}x $BASE_IMAGE_OPTS $MEDIUM_IMAGE
 
 # Generate large image
-magick $INPUT_FILE -resize ${LARGE_SIZE}x $BASE_IMAGE_OPTS $LARGE_IMAGE
+convert $INPUT_FILE -resize ${LARGE_SIZE}x $BASE_IMAGE_OPTS $LARGE_IMAGE
 
 # Generate large deskew image
-magick $INPUT_FILE -resize ${OCR_SIZE}x -deskew $DESKEW_THRESHOLD $BASE_IMAGE_OPTS -resize ${LARGE_SIZE} $LARGE_DESKEW_IMAGE
+convert $INPUT_FILE -resize ${OCR_SIZE}x -deskew $DESKEW_THRESHOLD $BASE_IMAGE_OPTS -resize ${LARGE_SIZE} $LARGE_DESKEW_IMAGE
 
 # Generate OCR image
-magick $INPUT_FILE -resize ${OCR_SIZE}x $IM_OCR_BASE_OPTS $OCR_IMAGE
+convert $INPUT_FILE -resize ${OCR_SIZE}x $IM_OCR_BASE_OPTS $OCR_IMAGE
 
 # Generate OCR deskew image
-magick $INPUT_FILE -resize ${OCR_SIZE}x -deskew $DESKEW_THRESHOLD $IM_OCR_BASE_OPTS $OCR_DESKEW_IMAGE
+convert $INPUT_FILE -resize ${OCR_SIZE}x -deskew $DESKEW_THRESHOLD $IM_OCR_BASE_OPTS $OCR_DESKEW_IMAGE
 
 # Generate tiled tif image
-magick $INPUT_FILE $TILED_TIF_OPTS ptif:$TILED_IMAGE
+convert $INPUT_FILE $TILED_TIF_OPTS ptif:$TILED_IMAGE
 
 # get deskew angle
-DESKEW_ANGLE=$(magick $INPUT_FILE -resize ${OCR_SIZE}x -deskew $DESKEW_THRESHOLD -format "%[deskew:angle]" info:)
+DESKEW_ANGLE=$(convert $INPUT_FILE -resize ${OCR_SIZE}x -deskew $DESKEW_THRESHOLD -format "%[deskew:angle]" info:)
 echo "Deskew angle: $DESKEW_ANGLE"
 echo $DESKEW_ANGLE > $DESKEW_ANGLE_FILE
 
