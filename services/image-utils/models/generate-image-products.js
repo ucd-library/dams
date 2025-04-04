@@ -1,12 +1,15 @@
 const path = require('path');
 const fs = require('fs-extra');
-const exec = require('./exec');
-const hocrToDjvu = require('./hocr-to-djvu');
+const exec = require('../lib/exec');
+const config = require('../lib/config');
+const hocrToDjvu = require('../lib/hocr-to-djvu');
+const getImageDimensions = require('../lib/get-image-dimensions');
+const extractPdfPage = require('../lib/extract-pdf-page');
 
 const DESKEW_ANGLE_THRESHOLD = 1.1;
 const WORD_COUNT_THRESHOLD = 100;
 const OCR_TO_LARGE_SCALE = 2;
-const GEN_IMAGE_PRODUCTS = path.join(__dirname, 'generate-image-products.sh');
+const GEN_IMAGE_PRODUCTS = path.resolve(__dirname, '..', 'lib', 'generate-image-products.sh');
 const GEN_IMAGE_FILENAMES = {
   smallImg : 'small.jpg',
   mediumImg : 'medium.jpg',
@@ -56,31 +59,46 @@ function analyzeWords(djvuFile) {
   };
 }
 
-async function getImageDimensions(file, page) {
-  if( page !== undefined ) {
-    file = file+'['+page+']';
-  }
-
-  let {stdout, stderr} = await exec(`identify -format "%wx%h " ${file}`);
-  let sizes = stdout.trim().split(' ').map(size => {
-    let [width, height] = size.split('x');
-    return {width, height};
-  })
-  if( sizes.length === 1 ) {
-    return sizes[0];
-  }
-  return sizes;
-}
-
 async function getDeskewAngle(filePath, page=0) {
   var {stdout} = await exec(`convert ${filePath} -resize 2048x -deskew 40% -verbose info:`);
   var angle = parseFloat(stdout.match(/deskew:angle: (-?\d+(\.\d+)?)/)[1]);
   return angle;
 }
 
-async function run(inputImage, outputDir='') {
+/**
+ * @method run
+ * @description This function will generate the image products for a given input image.
+ * it will output the results to the output directory if provided, otherwise it will
+ * output to the same directory as the input image. It will also generate a manifest
+ * which is returned from the function.  The manifest will describe the image products
+ * generated and their sizes as well as if the deskewed image was an improvement over
+ * the original image.  However all images are saved to disk.
+ * 
+ * This function will generate the following image products:
+ * - small.jpg
+ * - medium.jpg
+ * - large.jpg
+ * - large-deskew.jpg
+ * - ocr.djvu
+ * - ocr-deskew.djvu
+ * - tiled.tif
+ * 
+ * @param {*} inputImage 
+ * @param {*} opts 
+ * @returns 
+ */
+async function run(inputImage, opts={}) {
+  let outputDir = opts.outputDir;
   if( !outputDir ) {
     outputDir = path.dirname(inputImage);
+  }
+
+  let orgInputImage = inputImage;
+
+  // check if this is a pdf file, if so, extract the page to a temp tif file for processing
+  if( path.parse(inputImage).ext === '.pdf' ) {
+    console.log('Received pdf '+inputImage+'. Extracting page '+opts.page+' from pdf');
+    inputImage = await extractPdfPage(inputImage, opts.page);
   }
 
   let files = {};
@@ -89,12 +107,23 @@ async function run(inputImage, outputDir='') {
   }
 
   let {stdout} = await exec(GEN_IMAGE_PRODUCTS+' '+inputImage+' '+outputDir);
+  console.log(stdout);
 
   let ocrImgDim = await getImageDimensions(files.ocrImg);
   let ocrDeskewImgDim = await getImageDimensions(files.ocrDeskewImg);
 
+  if( opts.keepOcrImg !== true ) {
+    fs.removeSync(files.ocrImg);
+    fs.removeSync(files.ocrDeskewImg);
+  }
+
   let djvuFile = await hocrToDjvu(files.ocr, OCR_TO_LARGE_SCALE, ocrImgDim);
   let djvuDeskewFile = await hocrToDjvu(files.ocrDeskew, OCR_TO_LARGE_SCALE, ocrDeskewImgDim);
+
+  if( opts.keepHocr !== true ) {
+    fs.removeSync(files.ocr);
+    fs.removeSync(files.ocrDeskew);
+  }
   
   let ocrImgStats = analyzeWords(djvuFile);
   let ocrDeskewImgStats = analyzeWords(djvuDeskewFile);
@@ -110,9 +139,10 @@ async function run(inputImage, outputDir='') {
   }
 
   let manifest = {
+    outputDir,
     original : {
-      file : inputImage,
-      size : await getImageDimensions(inputImage),
+      file : orgInputImage,
+      size : await getImageDimensions(orgInputImage, opts.page),
     },
     small : {
       file : files.smallImg,
@@ -129,10 +159,12 @@ async function run(inputImage, outputDir='') {
     ocrStats,
   }
 
-  if( ocrDeskewImgStats.count > ocrImgStats.count && 
-      ocrDeskewImgStats.median >= ocrImgStats.median && 
-      ((DESKEW_ANGLE_THRESHOLD >= deskewAngle && deskewAngle >= DESKEW_ANGLE_THRESHOLD*-1) || 
-        ocrDeskewImgStats.count > WORD_COUNT_THRESHOLD ) ) {
+  if( opts.page !== undefined && opts.page !== null ) {
+    manifest.original.page = parseInt(opts.page);
+  }
+
+
+  if( pickDeskewedImage(manifest) ) {
     manifest.large = {
       file : files.largeDeskewImg,
       size : await getImageDimensions(files.largeDeskewImg)
@@ -157,6 +189,30 @@ async function run(inputImage, outputDir='') {
   }
 
   return manifest;
+}
+
+function pickDeskewedImage(manifest) {
+  let deskewed = manifest.ocrStats.deskewed;
+  let original = manifest.ocrStats.original;
+
+  if( config.imagemagick?.deskew === false ) {
+    return false;
+  }
+
+  let improvedWordCount = deskewed.count > original.count;
+  let improvedMedian = deskewed.median >= original.median;
+  let deskewAngle = manifest.ocrStats.deskewAngle;
+
+  let aboveWordCountThreshold = deskewed.count > WORD_COUNT_THRESHOLD;
+  let withinAngleThreshold = (DESKEW_ANGLE_THRESHOLD >= deskewAngle && 
+                              deskewAngle >= DESKEW_ANGLE_THRESHOLD*-1);
+
+  if( improvedWordCount && improvedMedian &&
+      (withinAngleThreshold || aboveWordCountThreshold) ) {
+    return true;
+  }
+
+  return false;
 }
 
 module.exports = run;
