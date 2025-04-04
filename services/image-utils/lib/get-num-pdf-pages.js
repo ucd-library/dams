@@ -1,3 +1,5 @@
+const exec = require('./exec');
+
 /**
  * @method getNumPdfPages
  * @description wrapper around pdfinfo to get number of pages in a pdf

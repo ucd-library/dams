@@ -54,6 +54,8 @@ fi
 echo "Input file: $INPUT_FILE"
 echo "Output directory: $DIR"
 
+mkdir -p "$DIR"
+
 # Check if the input file is a TIFF image
 if [[ "$INPUT_FILE" == *.tif || "$INPUT_FILE" == *.tiff ]]; then
   INPUT_FILE="${INPUT_FILE}[0]"

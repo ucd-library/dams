@@ -94,11 +94,13 @@ async function run(inputImage, opts={}) {
   }
 
   let orgInputImage = inputImage;
+  let isPdf = false;
 
   // check if this is a pdf file, if so, extract the page to a temp tif file for processing
   if( path.parse(inputImage).ext === '.pdf' ) {
     console.log('Received pdf '+inputImage+'. Extracting page '+opts.page+' from pdf');
     inputImage = await extractPdfPage(inputImage, opts.page);
+    isPdf = true;
   }
 
   let files = {};
@@ -163,7 +165,6 @@ async function run(inputImage, opts={}) {
     manifest.original.page = parseInt(opts.page);
   }
 
-
   if( pickDeskewedImage(manifest) ) {
     manifest.large = {
       file : files.largeDeskewImg,
@@ -187,6 +188,11 @@ async function run(inputImage, opts={}) {
 
     ocrStats.selected = 'original';
   }
+
+  // remove the tmp tif file we created from the pdf
+  // if( isPdf ) {
+  //   fs.removeSync(inputImage);
+  // }
 
   return manifest;
 }
