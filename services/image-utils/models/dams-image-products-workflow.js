@@ -51,6 +51,10 @@ const COPY_KEYS = {
 async function run(opts={}) {
   let {inputImage, workflowInfo, page} = opts;
 
+  if( !workflowInfo && !inputImage ) {
+    throw new Error('No workflow info or input image provided');
+  }
+
   if( typeof workflowInfo === 'string' ) {
     workflowInfo = await gcs.readFileToMemory(
       'gs://'+path.join(config.workflow.gcsBuckets.tmp, workflowId, 'workflow.json'));

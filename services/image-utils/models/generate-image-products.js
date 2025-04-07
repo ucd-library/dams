@@ -108,8 +108,7 @@ async function run(inputImage, opts={}) {
     files[key] = path.join(outputDir, GEN_IMAGE_FILENAMES[key]);
   }
 
-  let {stdout} = await exec(GEN_IMAGE_PRODUCTS+' '+inputImage+' '+outputDir);
-  console.log(stdout);
+  await exec(GEN_IMAGE_PRODUCTS+' '+inputImage+' '+outputDir, null, true);
 
   let ocrImgDim = await getImageDimensions(files.ocrImg);
   let ocrDeskewImgDim = await getImageDimensions(files.ocrDeskewImg);
