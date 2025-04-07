@@ -119,6 +119,8 @@ class AppRecord extends Mixin(LitElement)
     this.workflowStatus = '';
     this.workflowError = false;
 
+    this.workflowIntervalId = null;
+
     this._injectModel(
       "AppStateModel",
       "RecordModel",
@@ -262,8 +264,8 @@ class AppRecord extends Mixin(LitElement)
 
     this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
     this.workflowRunning = this.latestWorkflowStatus.find(s => s.state !== 'completed') ? true : false;
-    
-    if( this.workflowRunning ) this._loopUntilWorkflowFinishes(status);
+
+    if( this.workflowRunning ) this._startWorkflowStatusLoop();
     this.workflowStatusLoading = false;
 
     // make sure deskew setting matches in last workflow run
@@ -335,12 +337,10 @@ class AppRecord extends Mixin(LitElement)
     await this.WorkflowModel.batchStart('image-products', { imagemagick : { deskew : this.deskewImages } }, this.workflowImageUrls);
 
     // get workflow status and loop
-    let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
-    status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
-    this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
-
-    
-    this._loopUntilWorkflowFinishes();
+    // let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
+    // status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
+    // this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
+    this._startWorkflowStatusLoop();
   }
 
   parseWorkflowImages() {
@@ -377,28 +377,61 @@ class AppRecord extends Mixin(LitElement)
     this.workflowImageUrls = workflowImageUrls;
   }
 
-  _loopUntilWorkflowFinishes() {
-    this.workflowRunning = true;
-    this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
+  _startWorkflowStatusLoop() {
+    console.log(this.workflowIntervalId);
+    this.workflowStatus = 'Loading workflow status...';
+    this.workflowStatusLoading = true;
 
+    if (this.workflowIntervalId !== null) {
+      console.log('Loop is already running.');
+      return;
+    }
+  
+    console.log('Starting loop...');
+    this.workflowIntervalId = setInterval(async () => {
+      await this._runWorkflowStatusLoop();
+    }, 10000);
+  }
+  
+  async _runWorkflowStatusLoop() {
+    console.log('Running workflow status loop...', { workflowStatusLoading: this.workflowStatusLoading });
+    if( !this.workflowStatusLoading && this.workflowRunning ) return;
+    
+    this.workflowRunning = true;
+    this.workflowStatusLoading = false;
+    console.log('In run workflow loop');
+    
+    let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
+    status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
+    
+
+    this.latestWorkflowStatus = this._getLatestStatusFromBatch(status); 
     this.workflowRunning = this.latestWorkflowStatus.find(s => s.state !== 'completed') ? true : false;
+
+    console.log('Checking condition...');
     if( this.stopWorkflowLoop || !this.workflowRunning ) {
+      console.log('Condition met! Stopping loop.');
+      this._stopWorkflowStatusLoop();
 
       this.workflowStatus = '';
       this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
+      this.workflowStatusLoading = false;
+
       // console.log('workflow loop ended');
-      this._getWorkflowStatus();
-      return;
+      // this._getWorkflowStatus();      
+    } else {
+      this.workflowIntervalId = setTimeout(this._runWorkflowStatusLoop, 10000);
     }
-
-    setTimeout(async () => {
-      let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
-      status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
-      this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
-
-      // console.log('in workflow loop until workflow completes', status);
-      this._loopUntilWorkflowFinishes();
-    }, 10000);
+  
+    this.workflowRunning = false;
+  }
+  
+  _stopWorkflowStatusLoop() {
+    if( this.workflowIntervalId !== null ) {
+      clearTimeout(this.workflowIntervalId);
+      this.workflowIntervalId = null;
+      console.log('Loop stopped.');
+    }
   }
 
   _arkDoiClick(e) {
@@ -438,7 +471,7 @@ class AppRecord extends Mixin(LitElement)
       let ssSingle = select.shadowRoot.querySelector(".ss-single-selected");
       if (ssSingle) {
         ssSingle.style.border = "none";
-        ssSingle.style.height = "49px";
+        ssSingle.style.height = "2.5em";
         ssSingle.style.paddingLeft = "1rem";
         ssSingle.style.backgroundColor = "var(--color-aggie-blue-50)";
         ssSingle.style.borderRadius = '0';
@@ -554,7 +587,7 @@ class AppRecord extends Mixin(LitElement)
     
     this._changeMediaViewerDisplay('none');
 
-    await this._getWorkflowStatus();    
+    this._startWorkflowStatusLoop();
   }
 
   /**
@@ -625,7 +658,7 @@ class AppRecord extends Mixin(LitElement)
     if( !pages ) return;
     if( display ) {
       pages.style.opacity = 0;
-      pages.style.height = '500px';
+      pages.style.height = '30rem';
       pages.style.display = 'block';
     } else {
       pages.style.opacity = 100;

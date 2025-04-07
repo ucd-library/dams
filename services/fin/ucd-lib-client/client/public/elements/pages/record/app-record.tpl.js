@@ -316,11 +316,12 @@ export default function render() {
     .admin-edit .deskew-wrapper,
     .admin-edit .deskew-action-wrapper {
       display: flex;
-      gap: .5rem;
+      gap: 1rem;
     }
 
     .admin-edit .deskew-wrapper ucd-theme-slim-select {
       flex: 1;
+      min-height: 2.5em;
     }
 
     .admin-edit .deskew-action-wrapper {
@@ -359,6 +360,24 @@ export default function render() {
       }
       100% {
         transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 768px) {
+      app-record .admin-edit .left-panel {
+        left: 5%;
+        width: 90%;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .admin-edit .deskew-wrapper {
+        display: block;
+      }
+
+      .admin-edit .deskew-action-wrapper {
+        padding-top: 1rem;
+        display: flex;
       }
     }
 
