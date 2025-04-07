@@ -274,14 +274,104 @@ export default function render() {
       margin-top: 0;
     }
 
+    .admin-edit h3 {
+      color: var(--color-aggie-blue);
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+
+    .admin-edit .dropdown-label {
+      font-weight: bold;
+      margin-bottom: .5rem;
+    }
+
+    .admin-edit .dropdown-label.image-skew {
+      margin-top: 1.5rem;
+    }
+
+    .admin-edit .deskew-status {
+      margin-top: 0.6rem;
+    }
+
+    .admin-edit .deskew-status ucdlib-icon { 
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      min-height: 24px;
+    }
+
+    .admin-edit .deskew-status .deskew-running {
+      fill: var(--color-aggie-gold);
+    }
+
+    .admin-edit .deskew-status .deskew-finished {
+      fill: var(--color-quad);
+    }
+
+    .admin-edit .deskew-status .deskew-error {
+      fill: var(--color-double-decker);
+    }
+
+    .admin-edit .deskew-wrapper,
+    .admin-edit .deskew-action-wrapper {
+      display: flex;
+      gap: .5rem;
+    }
+
+    .admin-edit .deskew-wrapper ucd-theme-slim-select {
+      flex: 1;
+    }
+
+    .admin-edit .deskew-action-wrapper {
+      flex: 0;
+      white-space: nowrap;
+    }
+
+    .admin-edit .image-skew-description,
+    .admin-edit .image-skew-status,
+    .admin-edit .image-skew-error {
+      color: var(--color-black-70);
+      font-size: .9rem;
+      margin: .25rem 0 .5rem 0;
+    }
+
+    .admin-edit .image-skew-status {
+      font-style: italic;
+      margin-top: .5rem;
+    }
+
+    .admin-edit .image-skew-error {
+      color: var(--color-double-decker);
+    }
+
+    .admin-edit .apply-button {
+      font-size: 1rem;
+    }
+
+    [icon="ucdlib-dams:fa-rotate"] {
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
     </style>
 
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
     </div>
     <div class="admin-edit" ?hidden="${!this.isUiAdmin}">
       <div class="left-panel" ?hidden="${!this.editMode || !this.isUiAdmin}">
-        <span class="form-label" style="font-weight: bold;">Item Display:</span>
+        <h3 class="form-label">Item Display</h3>
+        <p class="form-label dropdown-label">Viewer</p>
         <ucd-theme-slim-select
+          class="item-display-select"
           @change="${this._ssSelectBlur}"
           @focusin="${this._ssSelectFocus}"
           @click="${this._ssSelectFocus}"
@@ -301,6 +391,40 @@ export default function render() {
               </option>
           </select>
         </ucd-theme-slim-select>
+
+        <p class="form-label dropdown-label image-skew">Image Skew</p>
+        <p class="image-skew-description">Only change this setting to fix tilted images. This is a realtime process, there may be some delay.
+          After the process completes, you will need to refresh the page to see the changes.
+        </p>
+        <p class="image-skew-error" ?hidden="${!this.workflowError}">Warning: This item includes original and deskewed images. Modifying this setting will affect all images associated with this item.</p>
+        
+        <div class="deskew-wrapper">
+          <ucd-theme-slim-select
+            class="deskew-select"
+            @change="${this._onDeskewChange}"
+            @focusin="${this._ssSelectFocus}"
+            @click="${this._ssSelectFocus}"
+            @blur="${this._ssSelectBlur}"
+            class="deskew-select">
+            <select>
+                <option value="original" ?selected=${!this.deskewImages}>
+                  Original version (as digitized)
+                </option>
+                <option value="deskew" ?selected=${this.deskewImages}>
+                  Deskew (ImageMagick)
+                </option>
+            </select>
+          </ucd-theme-slim-select>
+          <div class="deskew-action-wrapper">
+            <button class="btn btn--primary apply-button" ?disabled="${this.workflowStatusLoading || this.workflowRunning || this.workflowAlreadyExecuted}" @click="${this._runWorkflow}">Apply to Item</button>
+            <div class="deskew-status">
+              <ucdlib-icon ?hidden="${this.workflowError || this.deskewMismatch || !this.workflowAlreadyExecuted}" class="deskew-finished" icon="ucdlib-dams:fa-check"></ucdlib-icon>
+              <ucdlib-icon ?hidden="${this.workflowError || !this.workflowRunning}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
+              <ucdlib-icon ?hidden="${!this.workflowError}" class="deskew-error" icon="ucdlib-dams:fa-triangle-exclamation"></ucdlib-icon>
+            </div>
+          </div>
+        </div>
+        <p class="image-skew-status">${this.workflowStatus}</p>
       </div>
 
       <div class="right-panel">
@@ -319,7 +443,7 @@ export default function render() {
 
     <app-media-viewer></app-media-viewer>
 
-    <div class="container" style="padding-bottom: 50px">
+    <div class="container" style="padding-bottom: 50px;">
       <h3>${this.name}</h3>
       <div class="copyright">
         <span>&copy;</span>
