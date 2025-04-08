@@ -26,7 +26,7 @@ function rootDjvu(imageDim, DENSITY=300) {
  * 
  * @returns 
  */
-function run(hocrFile, scaleFactor=1, imageDim={}) {
+function run(hocrFile, scaleFactor=1, imageDim={}, wordConfidenceThreshold) {
   let fileInfo = path.parse(hocrFile);
   let djvuFile = path.join(fileInfo.dir, fileInfo.name + '.djvu');
 
@@ -72,11 +72,14 @@ function run(hocrFile, scaleFactor=1, imageDim={}) {
                 let xconf = word.$.title.split(';')
                   .map(item => item.trim())
                   .find(item => item.startsWith('x_wconf'));
-                if( !xconf ) xconf = '';
+                if( !xconf ) xconf = 0;
+
+                let wordConfidence = parseFloat(xconf.replace('x_wconf ', '').trim());
+                if( wordConfidence < wordConfidenceThreshold ) return;
 
                 xmlLine.ele('WORD', {
                   coords : meta[0],
-                  'x-confidence' : xconf.replace('x_wconf ', '').trim()
+                  'x-confidence' : wordConfidence+''
                 }, word._ || '');
               }); // line
             }) // paragraph

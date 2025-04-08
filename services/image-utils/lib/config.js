@@ -26,6 +26,12 @@ const config = Object.assign({
     pdfExtractDensity : env.PDF_DENSITY || 900,
   },
 
+  image : {
+    deskewAngleThreshold : parseFloat(env.DESKEW_ANGLE_THRESHOLD || 1.1),
+    wordCountThreshold : parseInt(env.WORD_COUNT_THRESHOLD || 100),
+    wordConfidenceThreshold : parseFloat(env.WORD_CONFIDENCE_THRESHOLD || 50),
+  },
+
   video : {
     allowedResolutions : [
       '360p', '480p', '720p', '1080p'

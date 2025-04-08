@@ -6,8 +6,10 @@ const hocrToDjvu = require('../lib/hocr-to-djvu');
 const getImageDimensions = require('../lib/get-image-dimensions');
 const extractPdfPage = require('../lib/extract-pdf-page');
 
-const DESKEW_ANGLE_THRESHOLD = 1.1;
-const WORD_COUNT_THRESHOLD = 100;
+const DESKEW_ANGLE_THRESHOLD = config.image.deskewAngleThreshold;
+const WORD_COUNT_THRESHOLD = config.image.wordCountThreshold;
+const WORD_CONFIDENCE_THRESHOLD = config.image.wordConfidenceThreshold;
+
 const OCR_TO_LARGE_SCALE = 2;
 const GEN_IMAGE_PRODUCTS = path.resolve(__dirname, '..', 'lib', 'generate-image-products.sh');
 const GEN_IMAGE_FILENAMES = {
@@ -118,8 +120,8 @@ async function run(inputImage, opts={}) {
     fs.removeSync(files.ocrDeskewImg);
   }
 
-  let djvuFile = await hocrToDjvu(files.ocr, OCR_TO_LARGE_SCALE, ocrImgDim);
-  let djvuDeskewFile = await hocrToDjvu(files.ocrDeskew, OCR_TO_LARGE_SCALE, ocrDeskewImgDim);
+  let djvuFile = await hocrToDjvu(files.ocr, OCR_TO_LARGE_SCALE, ocrImgDim, WORD_CONFIDENCE_THRESHOLD);
+  let djvuDeskewFile = await hocrToDjvu(files.ocrDeskew, OCR_TO_LARGE_SCALE, ocrDeskewImgDim, WORD_CONFIDENCE_THRESHOLD);
 
   if( opts.keepHocr !== true ) {
     fs.removeSync(files.ocr);
@@ -135,6 +137,7 @@ async function run(inputImage, opts={}) {
     deskewAngle,
     angleThreshold: DESKEW_ANGLE_THRESHOLD,
     wordCountThreshold: WORD_COUNT_THRESHOLD,
+    wordConfidenceThreshold: WORD_CONFIDENCE_THRESHOLD,
     original : ocrImgStats,
     deskewed : ocrDeskewImgStats
   }
