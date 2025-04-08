@@ -14,7 +14,7 @@ async function run(pdfFile, page) {
   // first make a tiff
   let filenameParts = path.parse(pdfFile);
   let outputFile = path.join(filenameParts.dir, filenameParts.base+'-'+page+'-tmp.tif');
-  await exec(`convert -density ${config.workflow.pdfExtractDensity} ${pdfFile}[${page}] ${outputFile}`);
+  await exec(`convert -density ${config.pdf.extractDensity} ${pdfFile}[${page}] -resize ${config.pdf.tifResizeWidth}x  ${outputFile}`);
   
   return outputFile;
 }

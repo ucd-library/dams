@@ -23,7 +23,12 @@ const config = Object.assign({
       products : env.GOOGLE_CLOUD_WORKFLOW_BUCKET || 'dams-client-products',
       tmp : env.GOOGLE_CLOUD_WORKFLOW_TMP_BUCKET || 'dams-prod-workflow-tmp-space'
     },
-    pdfExtractDensity : env.PDF_DENSITY || 900,
+    pdfExtractDensity : env.PDF_DENSITY || 600,
+  },
+
+  pdf : {
+    extractDensity : parseInt(env.PDF_DENSITY || 600),
+    tifResizeWidth : parseInt(env.TIF_RESIZE_WIDTH || 3072),
   },
 
   image : {
