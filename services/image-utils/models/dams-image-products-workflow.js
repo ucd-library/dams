@@ -77,7 +77,7 @@ async function run(opts={}) {
       })
   }
 
-  console.log('Processing image: '+inputImage+' page '+page);
+  console.log('Processing image: '+inputImage+(page ? ' page '+page : ''));
 
   // base gcs path we will use to upload the image products
   let baseGcsPath;

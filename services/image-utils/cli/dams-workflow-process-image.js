@@ -29,6 +29,11 @@ program
       opts.workflowInfo = path.resolve(opts.workflowDataFile);
     }
 
+    if( opts.workflowId ) {
+      opts.workflowInfo = opts.workflowId;
+      delete opts.workflowId;
+    }
+
     if( opts.inputFile ) {
       if( !path.isAbsolute(opts.inputFile) ) {
         opts.inputFile = path.join(process.cwd(), opts.inputFile);
