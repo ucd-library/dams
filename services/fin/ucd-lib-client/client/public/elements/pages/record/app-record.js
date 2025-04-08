@@ -62,7 +62,8 @@ class AppRecord extends Mixin(LitElement)
       workflowAlreadyExecuted: { type: Boolean },
       workflowRunning: { type: Boolean },
       workflowStatus: { type: String },
-      workflowError: { type: Boolean }
+      workflowError: { type: Boolean },
+      firstStatusLoaded: { type: Boolean },
     };
   }
 
@@ -118,6 +119,7 @@ class AppRecord extends Mixin(LitElement)
     this.workflowRunning = false; 
     this.workflowStatus = '';
     this.workflowError = false;
+    this.firstStatusLoaded = false;
 
     this.workflowIntervalId = null;
 
@@ -256,43 +258,6 @@ class AppRecord extends Mixin(LitElement)
     this._validateCanStartWorkflow();
   }
 
-  async _getWorkflowStatus() {
-    this.workflowStatusLoading = true;
-
-    let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
-    status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
-
-    this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
-    this.workflowRunning = this.latestWorkflowStatus.find(s => s.state !== 'completed') ? true : false;
-
-    if( this.workflowRunning ) this._startWorkflowStatusLoop();
-    this.workflowStatusLoading = false;
-
-    // make sure deskew setting matches in last workflow run
-    let deskew = this.latestWorkflowStatus[0].params?.imagemagick?.deskew;
-    let allMatch = true;
-    this.latestWorkflowStatus.forEach(status => {
-      if( status.params?.imagemagick?.deskew != deskew ) allMatch = false;
-    });
-
-    if( !allMatch ) {
-      this.workflowError = true;
-      this.imagesCurrentlyDeskewed = false;
-      this.deskewMismatch = true;
-      this.latestWorkflowType = 'mismatch';
-    } else {
-      this.workflowError = false;
-      this.imagesCurrentlyDeskewed = deskew;
-      if( deskew === undefined ) deskew = true;
-      this.latestWorkflowType = deskew ? 'deskew' : 'original';
-
-      // update selected deskew setting based on last run
-      this._onDeskewChange(null, deskew);
-    }
-
-    this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
-  }
-
   _getLatestStatusFromBatch(status=[]) {
     // group to items ids map
     // then filter by created desc to get latest
@@ -378,59 +343,69 @@ class AppRecord extends Mixin(LitElement)
   }
 
   _startWorkflowStatusLoop() {
-    console.log(this.workflowIntervalId);
     this.workflowStatus = 'Loading workflow status...';
     this.workflowStatusLoading = true;
 
     if (this.workflowIntervalId !== null) {
-      console.log('Loop is already running.');
       return;
     }
   
-    console.log('Starting loop...');
     this.workflowIntervalId = setInterval(async () => {
       await this._runWorkflowStatusLoop();
     }, 10000);
   }
   
   async _runWorkflowStatusLoop() {
-    console.log('Running workflow status loop...', { workflowStatusLoading: this.workflowStatusLoading });
-    if( !this.workflowStatusLoading && this.workflowRunning ) return;
+    if( !this.workflowStatusLoading && !this.workflowRunning ) return;
     
     this.workflowRunning = true;
     this.workflowStatusLoading = false;
-    console.log('In run workflow loop');
     
     let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
     status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
-    
+    this.firstStatusLoaded = true;    
+
 
     this.latestWorkflowStatus = this._getLatestStatusFromBatch(status); 
     this.workflowRunning = this.latestWorkflowStatus.find(s => s.state !== 'completed') ? true : false;
 
-    console.log('Checking condition...');
     if( this.stopWorkflowLoop || !this.workflowRunning ) {
-      console.log('Condition met! Stopping loop.');
       this._stopWorkflowStatusLoop();
 
-      this.workflowStatus = '';
-      this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
-      this.workflowStatusLoading = false;
+      // make sure deskew setting matches in last workflow run
+      let deskew = this.latestWorkflowStatus[0].params?.imagemagick?.deskew;
+      let allMatch = true;
+      this.latestWorkflowStatus.forEach(status => {
+        if( status.params?.imagemagick?.deskew != deskew ) allMatch = false;
+      });
 
-      // console.log('workflow loop ended');
-      // this._getWorkflowStatus();      
-    } else {
-      this.workflowIntervalId = setTimeout(this._runWorkflowStatusLoop, 10000);
-    }
+      if( !allMatch ) {
+        this.workflowError = true;
+        this.imagesCurrentlyDeskewed = false;
+        this.deskewMismatch = true;
+        this.latestWorkflowType = 'mismatch';
+      } else {
+        this.workflowError = false;
+        this.imagesCurrentlyDeskewed = deskew;
+        if( deskew === undefined ) deskew = true;
+        this.latestWorkflowType = deskew ? 'deskew' : 'original';
+
+        // update selected deskew setting based on last run
+        this._onDeskewChange(null, deskew);
+      }
+
+      this.workflowStatus = '';
+      this.workflowStatusLoading = false;
+      this.workflowRunning = false;
+    } 
   
-    this.workflowRunning = false;
+    this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
   }
   
   _stopWorkflowStatusLoop() {
     if( this.workflowIntervalId !== null ) {
       clearTimeout(this.workflowIntervalId);
       this.workflowIntervalId = null;
-      console.log('Loop stopped.');
     }
   }
 
@@ -587,7 +562,7 @@ class AppRecord extends Mixin(LitElement)
     
     this._changeMediaViewerDisplay('none');
 
-    this._startWorkflowStatusLoop();
+    if( !this.firstStatusLoaded || this.workflowRunning ) this._startWorkflowStatusLoop();
   }
 
   /**
@@ -618,7 +593,7 @@ class AppRecord extends Mixin(LitElement)
   _onCancelEditClicked(e) {
     if( !this.isUiAdmin ) return;
     this.editMode = false;
-    this.stopWorkflowLoop = true;
+    // this.stopWorkflowLoop = true;
 
     this._changeMediaViewerDisplay('');
   }

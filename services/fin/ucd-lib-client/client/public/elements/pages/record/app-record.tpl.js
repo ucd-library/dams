@@ -438,7 +438,7 @@ export default function render() {
             <button class="btn btn--primary apply-button" ?disabled="${this.workflowStatusLoading || this.workflowRunning || this.workflowAlreadyExecuted}" @click="${this._runWorkflow}">Apply to Item</button>
             <div class="deskew-status">
               <ucdlib-icon ?hidden="${this.workflowError || this.deskewMismatch || !this.workflowAlreadyExecuted}" class="deskew-finished" icon="ucdlib-dams:fa-check"></ucdlib-icon>
-              <ucdlib-icon ?hidden="${this.workflowError || !this.workflowRunning}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
+              <ucdlib-icon ?hidden="${this.workflowError || !this.workflowRunning || !this.firstStatusLoaded}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
               <ucdlib-icon ?hidden="${!this.workflowError}" class="deskew-error" icon="ucdlib-dams:fa-triangle-exclamation"></ucdlib-icon>
             </div>
           </div>
