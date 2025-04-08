@@ -42,8 +42,8 @@ main:
                                                 limits:
                                                     memory: "8Gi"
                                                     cpu: "2000m"
-                                            command: "node"
-                                            args: ${["dams-workflow", "process-image", args.finWorkflowId]}
+                                            command: "dams-workflow"
+                                            args: ${["process-image", "--workflow-id", args.finWorkflowId ]}
                                             env:
                                               - name: GOOGLE_CLOUD_WORKFLOW_BUCKET
                                                 value: ${args.gcsBucket}
