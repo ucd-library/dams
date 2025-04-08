@@ -57,7 +57,7 @@ async function run(opts={}) {
 
   if( typeof workflowInfo === 'string' ) {
     workflowInfo = await gcs.readFileToMemory(
-      'gs://'+path.join(config.workflow.gcsBuckets.tmp, workflowId, 'workflow.json'));
+      'gs://'+path.join(config.workflow.gcsBuckets.tmp, workflowInfo, 'workflow.json'));
        
 
     if( !fs.existsSync(workflowInfo) ) {
