@@ -58,12 +58,6 @@ async function run(opts={}) {
   if( typeof workflowInfo === 'string' ) {
     workflowInfo = await gcs.readFileToMemory(
       'gs://'+path.join(config.workflow.gcsBuckets.tmp, workflowInfo, 'workflow.json'));
-       
-
-    if( !fs.existsSync(workflowInfo) ) {
-      throw new Error('Workflow info file does not exist: '+workflowInfo);
-    }
-    workflowInfo = JSON.parse(fs.readFileSync(workflowInfo, 'utf8'));
   }
 
   // if an input image is not provided, use the tmpGcsPath to download it
