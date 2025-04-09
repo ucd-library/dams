@@ -25,7 +25,7 @@ program
       if( !fs.existsSync(opts.workflowDataFile) ) {
         throw new Error('Workflow data file does not exist: '+opts.workflowDataFile);
       }
-      opts.workflowInfo = path.resolve(opts.workflowDataFile);
+      opts.workflowInfo = JSON.parse(fs.readFileSync(opts.workflowDataFile, 'utf8'));
     }
 
     if( opts.inputFile ) {
@@ -42,10 +42,7 @@ program
       delete opts.upload;
     }
 
-    let result = await run(opts);
-    if( opts.logOutput ) {
-      console.log(JSON.stringify(result, null, 2));
-    }
+    await run(opts);
 
     console.log('done');
     process.exit(0);

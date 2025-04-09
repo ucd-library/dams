@@ -61,8 +61,13 @@ function analyzeWords(djvuFile) {
   };
 }
 
-async function getDeskewAngle(filePath, page=0) {
-  var {stdout} = await exec(`convert ${filePath} -resize 2048x -deskew 40% -verbose info:`);
+async function getDeskewAngle(filePath) {
+  let page = '';
+  if( filePath.endsWith('.tif') || filePath.endsWith('.tiff') ) {
+    page = '[0]';
+  }
+
+  var {stdout} = await exec(`convert ${filePath}${page} -resize 2048x -deskew ${config.ocr.deskew} -verbose info:`);
   var angle = parseFloat(stdout.match(/deskew:angle: (-?\d+(\.\d+)?)/)[1]);
   return angle;
 }
@@ -100,7 +105,7 @@ async function run(inputImage, opts={}) {
 
   // check if this is a pdf file, if so, extract the page to a temp tif file for processing
   if( path.parse(inputImage).ext === '.pdf' ) {
-    console.log('Received pdf '+inputImage+'. Extracting page '+opts.page+' from pdf');
+    console.log('Received pdf '+inputImage+'. Extracting page '+opts.page+' from pdf using density: '+config.pdf.extractDensity);
     inputImage = await extractPdfPage(inputImage, opts.page);
     isPdf = true;
   }
@@ -110,7 +115,9 @@ async function run(inputImage, opts={}) {
     files[key] = path.join(outputDir, GEN_IMAGE_FILENAMES[key]);
   }
 
-  await exec(GEN_IMAGE_PRODUCTS+' '+inputImage+' '+outputDir, null, true);
+  await exec(GEN_IMAGE_PRODUCTS+' '+inputImage+' '+outputDir, {
+    env : {DESKEW_THRESHOLD : config.ocr.deskew}
+  }, true);
 
   let ocrImgDim = await getImageDimensions(files.ocrImg);
   let ocrDeskewImgDim = await getImageDimensions(files.ocrDeskewImg);
@@ -131,10 +138,11 @@ async function run(inputImage, opts={}) {
   let ocrImgStats = analyzeWords(djvuFile);
   let ocrDeskewImgStats = analyzeWords(djvuDeskewFile);
   
-  let deskewAngle = await getDeskewAngle(inputImage);
+  let deskewAngle = await getDeskewAngle(inputImage, opts.page);
 
   let ocrStats = {
     deskewAngle,
+    imDeskew: config.ocr.deskew,
     angleThreshold: DESKEW_ANGLE_THRESHOLD,
     wordCountThreshold: WORD_COUNT_THRESHOLD,
     wordConfidenceThreshold: WORD_CONFIDENCE_THRESHOLD,
@@ -164,7 +172,7 @@ async function run(inputImage, opts={}) {
   }
 
   if( opts.page !== undefined && opts.page !== null ) {
-    manifest.original.page = parseInt(opts.page);
+    manifest.page = parseInt(opts.page);
   }
 
   if( pickDeskewedImage(manifest) ) {
@@ -189,6 +197,11 @@ async function run(inputImage, opts={}) {
     }
 
     ocrStats.selected = 'original';
+  }
+
+  if( isPdf ) {
+    manifest.extractDensity = config.pdf.extractDensity;
+    delete manifest.original;
   }
 
   // remove the tmp tif file we created from the pdf

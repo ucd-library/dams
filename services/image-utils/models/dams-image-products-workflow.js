@@ -1,4 +1,5 @@
 const generateImageProducts = require('./generate-image-products');
+const imgManifestToDamsManifest = require('../lib/image-manifest-to-dams-manifest');
 const gcs = require('../lib/gcs');
 const fs = require('fs-extra');
 const path = require('path');
@@ -92,51 +93,31 @@ async function run(opts={}) {
     return {manifest};
   }
 
+  // convert the manifest to a DAMS manifest
+  imgManifestToDamsManifest(manifest, workflowInfo, page);
+
   // remove the outputDir from the manifest, we don't need it
   delete manifest.outputDir;
 
-  // add the original image path to the manifest
-  if( page !== undefined && page !== null ) {
-    manifest.page = parseInt(page);
-    page = '/'+page;
-  } else {
-    page = '';
-  }
-
-  // update the manifest with workflow info
-  manifest.original.url = '/fcrepo/rest'+workflowInfo.data.finPath;
-  delete manifest.original.file; // don't need this reference, already in the DAMS
-
   // add DAMS accessible URLs
-  for( let key in COPY_KEYS ) {
-    // reference url for application
-    manifest[key].url = '/fcrepo/rest'+workflowInfo.data.finPath+
-      '/svc:gcs/{{BUCKET}}/'+workflowInfo.data.gcsSubpath+page+'/'+COPY_KEYS[key].name;
-
-    // gcs path for uploading
-    let gcsPath = baseGcsPath+page+COPY_KEYS[key].name;
-
+  for( let key in config.image.products ) {
     let filePath = manifest[key].file;
-    // cleanup the file path from the manifest, we don't need it after upload
-    // the url will be used to get the file
+    let gcsPath = manifest[key].gcsPath;
     delete manifest[key].file;
+    delete manifest[key].gcsPath;
 
     // check if we want to upload the file or not
     if( opts.noUpload === true ) {
       continue;
     }
 
-    console.log('Uploading to GCS: '+manifest[key].file+' to '+gcsPath);
+    console.log('Uploading to GCS: '+filePath+' to '+gcsPath);
     await gcs.streamUpload(
       gcsPath,
       fs.createReadStream(filePath),
-      {contentType : COPY_KEYS[key].contentType}
+      {contentType : config.image.products[key].contentType}
     );
   }
-
-  // add IIIF service url for tiled.tif
-  manifest.tiled.iiif = '/fcrepo/rest'+workflowInfo.data.finPath+'/svc:iiif/'+
-    workflowInfo.data.gcsSubpath+page+'/tiled.tif';
 
   // split the ocr stats from the manifest
   let ocrStats = manifest.ocrStats;

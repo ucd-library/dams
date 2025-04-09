@@ -31,10 +31,22 @@ const config = Object.assign({
     tifResizeWidth : parseInt(env.TIF_RESIZE_WIDTH || 3072),
   },
 
+  ocr : {
+    deskew : '40%'
+  },
+
   image : {
     deskewAngleThreshold : parseFloat(env.DESKEW_ANGLE_THRESHOLD || 1.1),
     wordCountThreshold : parseInt(env.WORD_COUNT_THRESHOLD || 100),
     wordConfidenceThreshold : parseFloat(env.WORD_CONFIDENCE_THRESHOLD || 50),
+  
+    products : {
+      small : {name: 'small.jpg', contentType: 'image/jpeg'},
+      medium : {name: 'medium.jpg', contentType: 'image/jpeg'},
+      large : {name: 'large.jpg', contentType: 'image/jpeg'},
+      ocr : {name: 'ocr.djvu', contentType: 'text/xml'},
+      tiled : {name: 'tiled.tif', contentType: 'image/tiff'}
+    }
   },
 
   video : {

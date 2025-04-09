@@ -6,7 +6,7 @@ MEDIUM_SIZE=$(($LARGE_SIZE / 2))
 SMALL_SIZE=$(($LARGE_SIZE / 4))
 OCR_SIZE=$(($LARGE_SIZE * 2))
 
-DESKEW_THRESHOLD=40%
+DESKEW_THRESHOLD=${DESKEW_THRESHOLD:-40%}
 
 OCR_OPTS="--dpi 300 -l eng --psm 1 --oem 3 hocr"
 
@@ -53,6 +53,7 @@ fi
 
 echo "Input file: $INPUT_FILE"
 echo "Output directory: $DIR"
+echo "Deskew threshold: $DESKEW_THRESHOLD"
 
 mkdir -p "$DIR"
 

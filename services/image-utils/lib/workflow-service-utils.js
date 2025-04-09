@@ -29,6 +29,14 @@ class WorkflowServiceUtils {
     return workflowInfo.data.tmpGcsPath.replace('gs://', config.tmpDir+'/');
   }
 
+  getGcsBasePath(workflowInfo) {
+    return 'gs://'+path.join(
+      workflowInfo.data.gcsBucket, 
+      workflowInfo.data.finPath, 
+      workflowInfo.data.gcsSubpath
+    );
+  }
+
   /**
    * @method fetchTmpFile
    * @description Fetch the main file to be processed from the tmp GCS bucket.
