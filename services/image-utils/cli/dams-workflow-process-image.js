@@ -17,6 +17,7 @@ program
     if( !opts.page && process.env.CLOUD_RUN_TASK_INDEX ) {
       console.log('Using CLOUD_RUN_TASK_INDEX as page: '+process.env.CLOUD_RUN_TASK_INDEX);
       opts.page = process.env.CLOUD_RUN_TASK_INDEX;
+      opts.pageFromCloudRunTaskIndex = true;
     }
 
     if( opts.workflowDataFile ) {

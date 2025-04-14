@@ -73,6 +73,13 @@ async function run(opts={}) {
       })
   }
 
+  // in cloud run the CLOUD_RUN_TASK_INDEX is always set.  But we
+  // want to ignore it unless we are processing a pdf file.
+  if( !inputImage.endsWith('.pdf') && opts.pageFromCloudRunTaskIndex ) {
+    delete opts.page;
+    page = null;
+  }
+
   console.log('Processing image: '+inputImage+(page ? ' page '+page : ''));
 
   // base gcs path we will use to upload the image products
