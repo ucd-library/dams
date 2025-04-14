@@ -253,11 +253,6 @@ class AppRecord extends Mixin(LitElement)
     await this._parseDisplayData();
   }
 
-  _onDeskewCheckboxChange(e) {
-    this.deskewImages = e.currentTarget.checked;
-    this._validateCanStartWorkflow();
-  }
-
   _getLatestStatusFromBatch(status=[]) {
     // group to items ids map
     // then filter by created desc to get latest
@@ -389,9 +384,6 @@ class AppRecord extends Mixin(LitElement)
         this.imagesCurrentlyDeskewed = deskew;
         if( deskew === undefined ) deskew = true;
         this.latestWorkflowType = deskew ? 'deskew' : 'original';
-
-        // update selected deskew setting based on last run
-        this._onDeskewChange(null, deskew);
       }
 
       this.workflowStatus = '';
@@ -414,22 +406,6 @@ class AppRecord extends Mixin(LitElement)
 
     history.pushState(null, '', e.target.getAttribute('href'));
     window.scrollTo(0, 0);
-  }
-
-  _onDeskewChange(e, deskew=false) {
-    if( e ) {
-      this._ssSelectBlur(e);
-      this.deskewImages = (this.querySelector('.deskew-select')?.slimSelect?.data?.data || []).find(opt => opt.selected).value === 'deskew';
-    } else {
-      this.deskewImages = deskew;
-      this.querySelector('.deskew-select')?.slimSelect.selected('deskew');
-    }
-    this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
-    
-    // hack for styles
-    requestAnimationFrame(() => {
-      this._updateSlimStyles();
-    });
   }
 
   _updateSlimStyles() {
@@ -561,8 +537,6 @@ class AppRecord extends Mixin(LitElement)
     this.editMode = true;
     
     this._changeMediaViewerDisplay('none');
-
-    if( !this.firstStatusLoaded || this.workflowRunning ) this._startWorkflowStatusLoop();
   }
 
   /**
