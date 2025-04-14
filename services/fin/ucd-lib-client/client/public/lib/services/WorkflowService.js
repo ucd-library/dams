@@ -91,7 +91,7 @@ class WorkflowService extends BaseService {
         headers : {
           'Content-Type' : 'application/json'
         },
-        body : JSON.stringify({ name, params, ids: imageIds })
+        body : JSON.stringify({ name, ids: imageIds })
       },
       checkCached : () => null,
       onLoading : null,
