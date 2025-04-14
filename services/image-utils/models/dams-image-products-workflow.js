@@ -75,12 +75,6 @@ async function run(opts={}) {
 
   // in cloud run the CLOUD_RUN_TASK_INDEX is always set.  But we
   // want to ignore it unless we are processing a pdf file.
-  console.log(`debug 
-    inputImage=${inputImage}, 
-    opts.page=${opts.page}, 
-    opts.pageFromCloudRunTaskIndex=${opts.pageFromCloudRunTaskIndex}, 
-    inputImage.endsWith('.pdf')=${inputImage.endsWith('.pdf')}, 
-    eval=${!inputImage.endsWith('.pdf') && opts.pageFromCloudRunTaskIndex}`);
   if( !inputImage.endsWith('.pdf') && opts.pageFromCloudRunTaskIndex ) {
     console.log('Ignoring CLOUD_RUN_TASK_INDEX because input image is not a pdf');
     delete opts.page;
@@ -139,6 +133,12 @@ async function run(opts={}) {
 
   if( opts.noUpload === true ) {
     return {manifest, ocrStats};
+  }
+
+  if( page !== undefined && page !== null ) {
+    page = '/'+page;
+  } else {
+    page = '';
   }
 
   console.log('Uploading manifest to GCS: '+baseGcsPath+page+'/manifest.json');
