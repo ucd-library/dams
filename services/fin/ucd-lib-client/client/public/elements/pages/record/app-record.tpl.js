@@ -316,11 +316,12 @@ export default function render() {
     .admin-edit .deskew-wrapper,
     .admin-edit .deskew-action-wrapper {
       display: flex;
-      gap: .5rem;
+      gap: 1rem;
     }
 
     .admin-edit .deskew-wrapper ucd-theme-slim-select {
       flex: 1;
+      min-height: 2.5em;
     }
 
     .admin-edit .deskew-action-wrapper {
@@ -362,6 +363,24 @@ export default function render() {
       }
     }
 
+    @media (max-width: 768px) {
+      app-record .admin-edit .left-panel {
+        left: 5%;
+        width: 90%;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .admin-edit .deskew-wrapper {
+        display: block;
+      }
+
+      .admin-edit .deskew-action-wrapper {
+        padding-top: 1rem;
+        display: flex;
+      }
+    }
+
     </style>
 
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
@@ -392,35 +411,13 @@ export default function render() {
           </select>
         </ucd-theme-slim-select>
 
-        <p class="form-label dropdown-label image-skew">Image Skew</p>
-        <p class="image-skew-description">Only change this setting to fix tilted images. This is a realtime process, there may be some delay.
-          After the process completes, you will need to refresh the page to see the changes.
-        </p>
-        <p class="image-skew-error" ?hidden="${!this.workflowError}">Warning: This item includes original and deskewed images. Modifying this setting will affect all images associated with this item.</p>
-        
+        <p class="form-label dropdown-label image-skew">Image Tilt Correction</p>
+        <p class="image-skew-description">Run this process to fix tilted images. This is a realtime process, there may be some delay.</p>
         <div class="deskew-wrapper">
-          <ucd-theme-slim-select
-            class="deskew-select"
-            @change="${this._onDeskewChange}"
-            @focusin="${this._ssSelectFocus}"
-            @click="${this._ssSelectFocus}"
-            @blur="${this._ssSelectBlur}"
-            class="deskew-select">
-            <select>
-                <option value="original" ?selected=${!this.deskewImages}>
-                  Original version (as digitized)
-                </option>
-                <option value="deskew" ?selected=${this.deskewImages}>
-                  Deskew (ImageMagick)
-                </option>
-            </select>
-          </ucd-theme-slim-select>
           <div class="deskew-action-wrapper">
-            <button class="btn btn--primary apply-button" ?disabled="${this.workflowStatusLoading || this.workflowRunning || this.workflowAlreadyExecuted}" @click="${this._runWorkflow}">Apply to Item</button>
+            <button class="btn apply-button" ?disabled="${this.workflowRunning}" @click="${this._runWorkflow}">Run process</button>
             <div class="deskew-status">
-              <ucdlib-icon ?hidden="${this.workflowError || this.deskewMismatch || !this.workflowAlreadyExecuted}" class="deskew-finished" icon="ucdlib-dams:fa-check"></ucdlib-icon>
-              <ucdlib-icon ?hidden="${this.workflowError || !this.workflowRunning}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
-              <ucdlib-icon ?hidden="${!this.workflowError}" class="deskew-error" icon="ucdlib-dams:fa-triangle-exclamation"></ucdlib-icon>
+              <ucdlib-icon ?hidden="${this.workflowError || !this.workflowRunning || !this.firstStatusLoaded}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
             </div>
           </div>
         </div>
