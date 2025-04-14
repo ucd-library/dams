@@ -415,7 +415,7 @@ export default function render() {
         <p class="image-skew-description">Run this process to fix tilted images. This is a realtime process, there may be some delay.</p>
         <div class="deskew-wrapper">
           <div class="deskew-action-wrapper">
-            <button class="btn apply-button" ?disabled="${this.workflowRunning}" @click="${this._runWorkflow}">Run process</button>
+            <button class="btn apply-button" ?disabled="${this.workflowRunning || this.workflowStatusLoading}" @click="${this._runWorkflow}">Run process</button>
             <div class="deskew-status">
               <ucdlib-icon ?hidden="${this.workflowError || !this.workflowRunning || !this.firstStatusLoaded}" class="deskew-running" icon="ucdlib-dams:fa-rotate"></ucdlib-icon>
             </div>

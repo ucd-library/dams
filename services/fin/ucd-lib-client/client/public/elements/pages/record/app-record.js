@@ -109,9 +109,9 @@ class AppRecord extends Mixin(LitElement)
 
     this.showReportButton = false;
     this.githubIssueUrl = '';
-    this.deskewImages = false;
-    this.imagesCurrentlyDeskewed = false;
-    this.deskewMismatch = false;
+    // this.deskewImages = false;
+    // this.imagesCurrentlyDeskewed = false;
+    // this.deskewMismatch = false;
     this.showGetWorkflow = false;
     this.showStartWorkflow = false;
     this.workflowStatusLoading = false;
@@ -282,11 +282,11 @@ class AppRecord extends Mixin(LitElement)
       this.workflowStatus = `Status: ${pendingWorkflows} pending, ${runningWorkflows} processing, ${completedWorkflows} complete (of ${status.length})`;
     }
 
-    if( this.deskewImages ) {
-      this.workflowAlreadyExecuted = this.latestWorkflowType === 'deskew';
-    } else {
-      this.workflowAlreadyExecuted = this.latestWorkflowType === 'original';
-    }
+    // if( this.deskewImages ) {
+    //   this.workflowAlreadyExecuted = this.latestWorkflowType === 'deskew';
+    // } else {
+    //   this.workflowAlreadyExecuted = this.latestWorkflowType === 'original';
+    // }
 
     if( this.workflowRunning ) this.workflowAlreadyExecuted = false;
   }
@@ -294,7 +294,7 @@ class AppRecord extends Mixin(LitElement)
   async _runWorkflow() {    
     this.workflowRunning = true;
     this.workflowStatus = 'Status: Starting...';
-    await this.WorkflowModel.batchStart('image-products', { imagemagick : { deskew : this.deskewImages } }, this.workflowImageUrls);
+    await this.WorkflowModel.batchStart('image-products', {}, this.workflowImageUrls);
 
     // get workflow status and loop
     // let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
@@ -368,23 +368,23 @@ class AppRecord extends Mixin(LitElement)
       this._stopWorkflowStatusLoop();
 
       // make sure deskew setting matches in last workflow run
-      let deskew = this.latestWorkflowStatus[0].params?.imagemagick?.deskew;
-      let allMatch = true;
-      this.latestWorkflowStatus.forEach(status => {
-        if( status.params?.imagemagick?.deskew != deskew ) allMatch = false;
-      });
+      // let deskew = this.latestWorkflowStatus[0].params?.imagemagick?.deskew;
+      // let allMatch = true;
+      // this.latestWorkflowStatus.forEach(status => {
+      //   if( status.params?.imagemagick?.deskew != deskew ) allMatch = false;
+      // });
 
-      if( !allMatch ) {
-        this.workflowError = true;
-        this.imagesCurrentlyDeskewed = false;
-        this.deskewMismatch = true;
-        this.latestWorkflowType = 'mismatch';
-      } else {
-        this.workflowError = false;
-        this.imagesCurrentlyDeskewed = deskew;
-        if( deskew === undefined ) deskew = true;
-        this.latestWorkflowType = deskew ? 'deskew' : 'original';
-      }
+      // if( !allMatch ) {
+      //   this.workflowError = true;
+      //   this.imagesCurrentlyDeskewed = false;
+      //   this.deskewMismatch = true;
+      //   this.latestWorkflowType = 'mismatch';
+      // } else {
+      this.workflowError = false;
+      // this.imagesCurrentlyDeskewed = deskew;
+      // if( deskew === undefined ) deskew = true;
+      // this.latestWorkflowType = deskew ? 'deskew' : 'original';
+      // }
 
       this.workflowStatus = '';
       this.workflowStatusLoading = false;
@@ -537,6 +537,8 @@ class AppRecord extends Mixin(LitElement)
     this.editMode = true;
     
     this._changeMediaViewerDisplay('none');
+
+    this._startWorkflowStatusLoop();
   }
 
   /**
