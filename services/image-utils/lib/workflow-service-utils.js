@@ -86,7 +86,7 @@ class WorkflowServiceUtils {
       if( !re.test(file.name) ) continue;
       if( fileParts.base !== 'manifest.json' ) continue;
 
-      logger.info('concating gs://'+file.metadata.bucket+'/'+file.name);
+      console.log('concating gs://'+file.metadata.bucket+'/'+file.name);
 
       let t = (await gcs.readFileToMemory('gs://'+file.metadata.bucket+'/'+file.name)).toString('utf-8');
       let pageData = JSON.parse(t);
@@ -94,7 +94,7 @@ class WorkflowServiceUtils {
     }
 
     if( iaManifest.pages.length === 0 ) {
-      logger.warn('No page files found.  Aborting');
+      console.warn('No page files found.  Aborting');
       return iaManifest;
     }
 
