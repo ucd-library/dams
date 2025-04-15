@@ -396,7 +396,7 @@ class AppRecord extends Mixin(LitElement)
   
   _stopWorkflowStatusLoop() {
     if( this.workflowIntervalId !== null ) {
-      clearTimeout(this.workflowIntervalId);
+      clearInterval(this.workflowIntervalId);
       this.workflowIntervalId = null;
     }
   }
