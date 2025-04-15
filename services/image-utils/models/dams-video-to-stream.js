@@ -43,6 +43,8 @@ async function run(opts={}) {
       })
   }
 
+  let dir = path.parse(videoFile).dir;
+
   if( resolution === undefined && resolutionIndex !== undefined ) {
     resolutionIndex = parseInt(resolutionIndex);
     console.log('Using resolution index: '+resolutionIndex);
