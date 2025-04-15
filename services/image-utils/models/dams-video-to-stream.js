@@ -22,10 +22,12 @@ const videoToStream = require('../lib/video-to-stream');
  */
 async function run(opts={}) {
   let {videoFile, resolution, resolutionIndex, workflowInfo} = opts;
+
+  console.log('Converting video to streaming format', {videoFile, resolution, resolutionIndex, workflowInfo});
   
   if( typeof workflowInfo === 'string' ) {
     workflowInfo = await gcs.readFileToMemory(
-      'gs://'+path.join(config.workflow.gcsBuckets.tmp, workflowId, 'workflow.json'));
+      'gs://'+path.join(config.workflow.gcsBuckets.tmp, workflowInfo, 'workflow.json'));
     workflowInfo = JSON.parse(workflowInfo.toString('utf8'));
   }
 
