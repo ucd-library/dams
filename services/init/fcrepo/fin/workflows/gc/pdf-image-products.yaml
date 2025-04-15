@@ -59,9 +59,16 @@ main:
                                                 limits:
                                                     memory: "8Gi"
                                                     cpu: "2000m"
-                                            command: "node"
-                                            args: ${["cli/process-pdf.js", args.finWorkflowId]}
-                                            # imagePullPolicy: "Always"
+                                            command: "dams-workflow"
+                                            args: ${["process-image", "--workflow-id", args.finWorkflowId ]}
+                                            env:
+                                              - name: GOOGLE_CLOUD_WORKFLOW_BUCKET
+                                                value: ${args.gcsBucket}
+                                              - name: GOOGLE_CLOUD_WORKFLOW_TMP_BUCKET
+                                                value: ${args.tmpGcsBucket}
+                                              - name: GOOGLE_CLOUD_WORKFLOW_PARAMS
+                                                value: ${args.params}
+                                            imagePullPolicy: "Always"
                                       timeoutSeconds: 600
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
@@ -114,8 +121,8 @@ main:
                                                 limits:
                                                     memory: "8Gi"
                                                     cpu: "2000m"
-                                            command: "node"
-                                            args: ${["cli/finalize-pdf.js", args.finWorkflowId]}
+                                            command: "dams-workflow"
+                                            args: ${["finalize-pdf", args.finWorkflowId]}
                                       timeoutSeconds: 600
                                       serviceAccountName: ${client_email + "@" + project_id + ".iam.gserviceaccount.com"}
       - finalize_pdf:

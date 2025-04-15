@@ -22,6 +22,8 @@ COPY index.js .
 COPY controllers controllers
 COPY lib lib
 COPY cli cli
+COPY models models
+RUN npm link
 
 
 CMD node index.js

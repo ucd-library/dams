@@ -15,10 +15,10 @@ basename=$(echo "$INPUT_FILE" | cut -f 1 -d '.' | xargs basename)
 BASE_DIR="$OUTPUT_DIR"
 OUTPUT_DIR="$OUTPUT_DIR/stream"
 
-if [ -d "$OUTPUT_DIR" ]; then
-  echo "Directory $OUTPUT_DIR already exists.  Please delete and retry.";
-  exit -1;
-fi
+# if [ -d "$OUTPUT_DIR" ]; then
+#   echo "Directory $OUTPUT_DIR already exists.  Please delete and retry.";
+#   exit -1;
+# fi
 
 echo $OUTPUT_DIR
 mkdir -p $OUTPUT_DIR

@@ -2,15 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const {parseString} = require('xml2js');
 const xmlbuilder = require('xmlbuilder');
-const config = require('./config.js');
 
-function rootDjvu(imageDim) {
+function rootDjvu(imageDim, DENSITY=300) {
   const xml = xmlbuilder.create('OBJECT');
   xml.att('height', imageDim.height);
   xml.att('width', imageDim.width);
   xml.att('type', 'image/x.djvu');
 
-  xml.ele('PARAM', {name: 'DPI', value: config.ocr.imageMagick.density})
+  xml.ele('PARAM', {name: 'DPI', value: DENSITY})
   const mainColumn = xml.ele('HIDDENTEXT').ele('PAGECOLUMN');
   return {xml, mainColumn};
 }
@@ -27,7 +26,7 @@ function rootDjvu(imageDim) {
  * 
  * @returns 
  */
-function run(hocrFile, scaleFactor=1, imageDim={}) {
+function run(hocrFile, scaleFactor=1, imageDim={}, wordConfidenceThreshold) {
   let fileInfo = path.parse(hocrFile);
   let djvuFile = path.join(fileInfo.dir, fileInfo.name + '.djvu');
 
@@ -73,11 +72,14 @@ function run(hocrFile, scaleFactor=1, imageDim={}) {
                 let xconf = word.$.title.split(';')
                   .map(item => item.trim())
                   .find(item => item.startsWith('x_wconf'));
-                if( !xconf ) xconf = '';
+                if( !xconf ) xconf = 0;
+
+                let wordConfidence = parseFloat(xconf.replace('x_wconf ', '').trim());
+                if( wordConfidence < wordConfidenceThreshold ) return;
 
                 xmlLine.ele('WORD', {
                   coords : meta[0],
-                  'x-confidence' : xconf.replace('x_wconf ', '').trim()
+                  'x-confidence' : wordConfidence+''
                 }, word._ || '');
               }); // line
             }) // paragraph

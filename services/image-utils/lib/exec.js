@@ -1,21 +1,30 @@
 const {exec} = require('child_process');
-const {logger} = require('@ucd-lib/fin-service-utils');
 
-function _exec(cmd, options={}) {
+function _exec(cmd, options={}, stream=false) {
   return new Promise((resolve, reject) => {
-
+    if( !options ) options = {};
     if( !options.shell ) {
       options.shell = '/bin/bash'
     };
 
-    logger.info('Executing shell command: ', cmd, options);
+    if( stream === true) {
+      const child = exec(cmd, options);
+      child.stdout.pipe(process.stdout);
+      child.stderr.pipe(process.stderr);
 
-    exec(cmd, options, (error, stdout, stderr) => {
-      logger.debug('Executing shell command result: ', cmd, options, {error, stdout, stderr});
-
-      if( error ) reject(error);
-      else resolve({stdout, stderr});
-    }); 
+      child.on('close', (code) => {
+        if (code !== 0) {
+          reject(new Error(`Process exited with code ${code}`));
+        } else {
+          resolve();
+        }
+      });
+    } else {
+      exec(cmd, options, (error, stdout, stderr) => {
+        if( error ) reject(error);
+        else resolve({stdout, stderr});
+      }); 
+    }
   });
 }
 

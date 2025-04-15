@@ -1,15 +1,19 @@
 {
-  "name": "@ucd-lib/fin-tesseract",
-  "version": "0.0.1",
+  "name": "@ucd-lib/dams-workflow",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "bin" : {
+    "dams-workflow": "./cli/dams-workflow.js"
+  },
+  "author": "jrmerz@ucdavis.edu",
   "license": "ISC",
   "dependencies": {
     "@google-cloud/storage": "^7.14.0",
+    "commander": "^13.1.0",
     "express": "^4.18.2",
     "fs-extra": "^11.1.0",
     "multer": "^1.4.5-lts.1",
