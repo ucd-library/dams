@@ -20,7 +20,7 @@ program
     if( opts.workflowId ) {
       await workflow({
         resolution : opts.resolution,
-        workflowId : opts.workflowId
+        workflowInfo : opts.workflowId
       })
     } else {
       await run(opts.inputFile, opts.resolution); 
