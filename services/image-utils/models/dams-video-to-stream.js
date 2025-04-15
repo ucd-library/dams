@@ -42,7 +42,7 @@ async function run(opts={}) {
   }
 
   // this function checks if the video file exists and is valid resolution
-  let {stderr, stdout} = await videoToStream(`${convertScript} ${videoFile} ${resolution}`);
+  await videoToStream(videoFile, resolution);
 
   // await fs.unlink(videoFile);
 
