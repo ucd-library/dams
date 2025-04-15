@@ -2,21 +2,21 @@
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
-const model = require('../lib/model.js');
+// const model = require('../lib/model.js');
 const serviceUtils = require('../lib/workflow-service-utils.js');
 const getNumPdfPages = require('../lib/get-num-pdf-pages');
 const damsImageProductsWorkflow = require('../models/dams-image-products-workflow.js');
 
-router.delete('/:workflowId', async (req, res) => {
-  try {
-    res.json(await model.cleanupWorkflow(req.params.workflowId));
-  } catch(e) {
-    res.status(500).json({
-      error : e.message,
-      stack : e.stack
-    });
-  }
-});
+// router.delete('/:workflowId', async (req, res) => {
+//   try {
+//     res.json(await model.cleanupWorkflow(req.params.workflowId));
+//   } catch(e) {
+//     res.status(500).json({
+//       error : e.message,
+//       stack : e.stack
+//     });
+//   }
+// });
 
 // for debugging - dont' remove
 // router.post('/ia-reader/:workflowId/:page', async (req, res) => {
@@ -96,15 +96,15 @@ router.get('/process-image/:workflowId/:page', async (req, res) => {
   }
 });
 
-router.get('/:workflowId', async (req, res) => {
-  try {
-    res.json(await model.getWorkflowInfo(req.params.workflowId));
-  } catch(e) {
-    res.status(500).json({
-      error : e.message,
-      stack : e.stack
-    });
-  }
-});
+// router.get('/:workflowId', async (req, res) => {
+//   try {
+//     res.json(await model.getWorkflowInfo(req.params.workflowId));
+//   } catch(e) {
+//     res.status(500).json({
+//       error : e.message,
+//       stack : e.stack
+//     });
+//   }
+// });
 
 module.exports = router;
