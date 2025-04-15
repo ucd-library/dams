@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const config = require('../lib/config');
 const videoToStream = require('../lib/video-to-stream');
+const gcs = require('../lib/gcs');
+const path = require('path');
 
 /**
  * @function run
@@ -64,7 +66,7 @@ async function run(opts={}) {
       workflowInfo.data.gcsSubpath + '/' +
       file;
 
-    logger.info('Copying file from '+path.join(dir, file)+' to '+gcsPath);
+    console.log('Copying file from '+path.join(dir, file)+' to '+gcsPath);
     await gcs.streamUpload(
       gcsPath,
       fs.createReadStream(path.join(dir, file)),
