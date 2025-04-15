@@ -182,6 +182,7 @@ async function run(inputImage, opts={}) {
     }
     manifest.ocr = {
       file : djvuDeskewFile,
+      size : manifest.large.size,
       imageSize: 'large'
     }
 
@@ -193,6 +194,7 @@ async function run(inputImage, opts={}) {
     }
     manifest.ocr = {
       file : djvuFile,
+      size : manifest.large.size,
       imageSize: 'large'
     }
 

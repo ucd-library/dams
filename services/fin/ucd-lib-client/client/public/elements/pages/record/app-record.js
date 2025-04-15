@@ -186,7 +186,7 @@ class AppRecord extends Mixin(LitElement)
 
     if( APP_CONFIG.user?.loggedIn ) {
       let t = await this.RecordModel.getGitInfo(this.currentRecordId);
-      this.showReportButton = t.state === 'loaded' && t.payload;
+      this.showReportButton = (t.state === 'loaded' && t.payload && t.payload.repo);
       if( this.showReportButton ) {
         let rootUrl = t.payload.repo.replace(/\.git$/, '');
         let githubFileUrl = rootUrl + '/tree/main' + t.payload.file;
