@@ -44,7 +44,7 @@ async function run(opts={}) {
   // this function checks if the video file exists and is valid resolution
   let {stderr, stdout} = await videoToStream(`${convertScript} ${videoFile} ${resolution}`);
 
-  await fs.unlink(videoFile);
+  // await fs.unlink(videoFile);
 
   dir = path.join(dir, 'stream');
   let files = await fs.readdir(dir);
@@ -67,7 +67,7 @@ async function run(opts={}) {
     resultFiles.push(gcsPath);
   }
   
-  await fs.remove(dir);
+  // await fs.remove(dir);
 
   return resultFiles;
 }

@@ -39,8 +39,8 @@ main:
                                                 limits:
                                                     memory: "16Gi"
                                                     cpu: "4000m"
-                                            command: "node"
-                                            args: ${["cli/video-to-stream.js", args.finWorkflowId]}
+                                            command: "dams-workflow"
+                                            args: ${["process-video", "-i", args.finWorkflowId]}
                                       timeoutSeconds: 3600
                                       serviceAccountName: ${"dams-production@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
