@@ -34,6 +34,16 @@ async function run(opts={}) {
     workflowInfo = JSON.parse(fs.readFileSync(workflowInfo, 'utf8'));
   }
 
+  if( !videoFile ) {
+    videoFile = workflowInfo.data.tmpGcsPath.replace('gs://', config.tmpDir+'/');
+    console.log('Downloading input image '+workflowInfo.data.tmpGcsPath+' to '+videoFile);
+    await fs.mkdirp(path.parse(videoFile).dir);
+    await gcs.getGcsFileObjectFromPath(workflowInfo.data.tmpGcsPath)
+      .download({
+        destination: videoFile
+      })
+  }
+
   if( resolution === undefined && resolutionIndex !== undefined ) {
     resolution = config.video.allowedResolutions[resolutionIndex];
     if( !resolution ) {
