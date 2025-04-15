@@ -44,6 +44,9 @@ async function run(opts={}) {
   }
 
   if( resolution === undefined && resolutionIndex !== undefined ) {
+    resolutionIndex = parseInt(resolutionIndex);
+    console.log('Using resolution index: '+resolutionIndex);
+
     resolution = config.video.allowedResolutions[resolutionIndex];
     if( !resolution ) {
       throw new Error('Unknown resolution index: '+resolutionIndex);

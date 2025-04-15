@@ -12,14 +12,14 @@ program
   .option('-i, --workflow-id <id>', 'Running from DAMS workflow')
   .action(async (opts={}) => {
     if( !opts.resolution && process.env.CLOUD_RUN_TASK_INDEX ) {
-      opts.resolution = config.video.allowedResolutions[process.env.CLOUD_RUN_TASK_INDEX];
-      console.log('Using CLOUD_RUN_TASK_INDEX='+process.env.CLOUD_RUN_TASK_INDEX+' for resolution: '+opts.resolution);
-      opts.resolution = process.env.CLOUD_RUN_TASK_INDEX;
+      opts.resolutionIndex = process.env.CLOUD_RUN_TASK_INDEX;
+      console.log('Using CLOUD_RUN_TASK_INDEX='+process.env.CLOUD_RUN_TASK_INDEX+' for resolution index');
     }
 
     if( opts.workflowId ) {
       await workflow({
         resolution : opts.resolution,
+        resolutionIndex : opts.resolutionIndex,
         workflowInfo : opts.workflowId
       })
     } else {
