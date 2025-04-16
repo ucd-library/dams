@@ -35,7 +35,7 @@ const damsImageProductsWorkflow = require('../models/dams-image-products-workflo
 router.get('/pdf/getNumPages/:workflowId', async (req, res) => {
   let localFile;
   try {
-    localFile = await serviceUtils.getLocalFile(req.params.workflowId);
+    localFile = await serviceUtils.fetchTmpFile(req.params.workflowId);
     let pageCount = await getNumPdfPages(localFile);
     res.json({success: true, pageCount});
   } catch(e) {
