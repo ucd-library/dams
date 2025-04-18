@@ -27,7 +27,7 @@ program
       if( !fs.existsSync(opts.workflowDataFile) ) {
         throw new Error('Workflow data file does not exist: '+opts.workflowDataFile);
       }
-      opts.workflowInfo = path.resolve(opts.workflowDataFile);
+      opts.workflowInfo = JSON.parse(fs.readFileSync(opts.workflowDataFile), 'utf8');
     }
 
     if( opts.workflowId ) {
