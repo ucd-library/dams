@@ -18,8 +18,8 @@ async function run(opts={}) {
   for( let i = 0; i < numPages; i++ ) {
     let _opts = Object.assign({
       page: i, 
-      outputDir : opts.outputDir ? path.join(opts.outputDir, i+'') : path.join(dir, i+'')
     }, opts);
+    _opts.outputDir = opts.outputDir ? path.join(opts.outputDir, i+'') : path.join(dir, i+'');
 
     let resp = await generateImageProducts(inputFile, _opts);
     if( opts.logOutput ) {
