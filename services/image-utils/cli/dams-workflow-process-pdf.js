@@ -10,6 +10,7 @@ program
   .option('-f, --input-file <file>', 'input file')
   .option('-i, --workflow-id <id>', 'workflow id')
   .option('-d, --workflow-data-file <file>', 'path to workflow data file')
+  .option('-o, --output-dir <dir>', 'output directory')
   .option('-n, --no-upload', 'do not upload to gcs')
   .option('-l, --log-output', 'log the output manifest and stats')
   .action(async (opts={}) => {
