@@ -236,10 +236,8 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       }
       
     } else {
-      let image = this.renderedMedia.original ||
-                  this.renderedMedia.large ||
-                  this.renderedMedia.medium ||
-                  this.renderedMedia.small;
+      let image = (this.renderedMedia.original && !this.renderedMedia.original.missing) ? this.renderedMedia.original : this.renderedMedia.large;
+      if( !image ) return;
 
       // we might not have size
       let size = await this.getImageSize(image);
