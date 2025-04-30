@@ -89,11 +89,24 @@ class RecordModel extends ElasticSearchModel {
           console.warn('Unable to find selected media', id);
         }
 
-        // if pdf, use first
-        selectedMedia = result.payload.clientMedia.mediaGroups.find(node => node.clientMedia?.pdf && node.clientMedia?.pages);
-        if( !selectedMedia ) selectedMedia = result.payload.clientMedia.mediaGroups[0];
+        // prioritize imagelist, then pdf
+        let imageList = (result.payload.clientMedia.mediaGroups || []).filter(m => m['@shortType'].includes('ImageList'))?.[0];
+        if( imageList?.clientMedia?.pages ) {
+          selectedMedia = imageList;
+        }
 
-        if( selectedMedia.clientMedia.pages ) {
+        if( !selectedMedia ) {
+          let pdf = (result.payload.clientMedia.mediaGroups || []).filter(m => m.clientMedia.pdf)?.[0];
+          if( pdf?.clientMedia?.pages ) {
+            selectedMedia = pdf;
+          }
+        }
+
+        if( !selectedMedia ) {
+          selectedMedia = result.payload.clientMedia.mediaGroups[0];
+        }
+
+        if( selectedMedia?.clientMedia?.pages ) {
           mediaPage = 0;
         } else {
           mediaPage = -1;
