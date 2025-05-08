@@ -15,7 +15,7 @@ import "../../components/nav-bar";
 import "../../components/filterButton";
 import "../../components/graphics/dams-watercolor";
 import "../../components/graphics/dams-watercolor-overlay";
-import "../../components/welcome-modal.js";
+// import "../../components/welcome-modal.js";
 
 import "../../components/cards/dams-collection-card";
 import "../../components/cards/dams-item-card";
@@ -61,9 +61,9 @@ class AppHome extends Mixin(LitElement)
       editMode: {type: Boolean},
       displayData: {type: Array},
       isUiAdmin: {type: Boolean},
-      showWelcomeModal: {type: Boolean},
-      welcomeModalTitle: {type: String},
-      welcomeModalContent: {type: String}
+      // showWelcomeModal: {type: Boolean},
+      // welcomeModalTitle: {type: String},
+      // welcomeModalContent: {type: String}
     };
   }
 
@@ -86,9 +86,9 @@ class AppHome extends Mixin(LitElement)
     this.displayData = [];
     this.editMode = false;
     this.isUiAdmin = false;
-    this.showWelcomeModal = !utils.getCookie('welcome_modal_dismissed');;
-    this.welcomeModalTitle = 'Welcome to the new Digital Collections!';
-    this.welcomeModalContent = `We've recently updated this site. Pardon our dust as we put on the finishing touches.`;
+    // this.showWelcomeModal = false;
+    // this.welcomeModalTitle = 'Welcome to the new Digital Collections!';
+    // this.welcomeModalContent = `We've recently updated this site. Pardon our dust as we put on the finishing touches.`;
     this._injectModel('AppStateModel', 'FcAppConfigModel', 'CollectionModel', 'RecordModel');
   }
 
@@ -145,7 +145,7 @@ class AppHome extends Mixin(LitElement)
    */
     async _onAppStateUpdate(e) {
       if( this.AppStateModel.location.page !== 'home' && this.visitedHome ) {
-        this._onWelcomeModalClose(); // nav away from home is enough to close modal
+        // this._onWelcomeModalClose(); // nav away from home is enough to close modal
       }
       this.visitedHome = true;
     }
@@ -187,10 +187,10 @@ class AppHome extends Mixin(LitElement)
    * @description Listener attached to <dams-hero> image change
    * @param {CustomEvent} e 
    */
-  _onWelcomeModalClose(e) {
-    utils.setCookie('welcome_modal_dismissed', 'true', 365)
-    this.showWelcomeModal = false;
-  }
+  // _onWelcomeModalClose(e) {
+  //   utils.setCookie('welcome_modal_dismissed', 'true', 365)
+  //   this.showWelcomeModal = false;
+  // }
 
   /**
    * @method _onEditClicked
