@@ -79,6 +79,11 @@ RUN npm run build
 # production client build
 RUN npm run dist
 
+# Copy Service Definitions
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/service-defs/iiif.jsonld.json /etc/fin/services/iiif.jsonld.json 
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/service-defs/kibana.jsonld.json /etc/fin/services/kibana.jsonld.json
+COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/service-defs/ucd-lib-client.jsonld.json /etc/fin/services/ucd-lib-client.jsonld.json
+
 WORKDIR ${FIN_SERVICE_ROOT}
 
 # Update fin cache settings
@@ -87,27 +92,6 @@ ENV FIN_CACHE_PREDICATES '/^http://digital.ucdavis.edu/schema#/ http://www.loc.g
 
 # Set fin project name for nice label 
 ENV PROJECT_NAME 'dams'
-
-ARG APP_VERSION=-1
-ENV APP_VERSION ${APP_VERSION}
-ARG BUILD_NUM=-1
-ENV BUILD_NUM ${BUILD_NUM}
-ARG BUILD_DATETIME
-ENV BUILD_DATETIME ${BUILD_DATETIME}
-ARG UCD_DAMS_REPO_BRANCH=unknown
-ENV UCD_DAMS_REPO_BRANCH ${UCD_DAMS_REPO_BRANCH}
-ARG UCD_DAMS_REPO_TAG=unknown
-ENV UCD_DAMS_REPO_TAG ${UCD_DAMS_REPO_TAG}
-ARG UCD_DAMS_REPO_SHA=unknown
-ENV UCD_DAMS_REPO_SHA ${UCD_DAMS_REPO_SHA}
-ARG UCD_DAMS_DEPLOYMENT_SHA=unknown
-ENV UCD_DAMS_DEPLOYMENT_SHA ${UCD_DAMS_DEPLOYMENT_SHA}
-ARG UCD_DAMS_DEPLOYMENT_BRANCH=unknown
-ENV UCD_DAMS_DEPLOYMENT_BRANCH ${UCD_DAMS_DEPLOYMENT_BRANCH}
-ARG UCD_DAMS_DEPLOYMENT_TAG=unknown
-ENV UCD_DAMS_DEPLOYMENT_TAG ${UCD_DAMS_DEPLOYMENT_TAG}
-ARG FIN_SERVER_IMAGE=unknown
-ENV FIN_SERVER_IMAGE ${FIN_SERVER_IMAGE}
 
 ENV GCS_CLIENT_MEDIA_BUCKET=dams-client-media-prod
 ENV GCS_TMP_WORKFLOW_BUCKET=dams-prod-workflow-tmp-space
