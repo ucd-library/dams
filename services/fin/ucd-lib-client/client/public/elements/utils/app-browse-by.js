@@ -247,7 +247,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
     } else if( sortBy.label === 'Recent' ) {
       sort = [
           {'@graph.yearPublished': {order : "desc" }},
-          {'@graph.lastModified': {order : "desc" }}
+          // {'@graph.lastModified': {order : "desc" }}
         ];
     } else {
       sort = {"@graph.itemCount" : "desc"};
