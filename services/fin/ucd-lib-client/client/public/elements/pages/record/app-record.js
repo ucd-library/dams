@@ -539,7 +539,7 @@ class AppRecord extends Mixin(LitElement)
     
     this._changeMediaViewerDisplay('none');
 
-    this._startWorkflowStatusLoop();
+    // this._startWorkflowStatusLoop();
   }
 
   /**
