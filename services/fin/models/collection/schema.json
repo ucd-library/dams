@@ -37,6 +37,10 @@
       "type" : "integer"
     },
 
+    "@graph.lastModified" : {
+      "type" : "date"
+    },
+
     "name" : {
       "type" : "keyword",
       "fields": {

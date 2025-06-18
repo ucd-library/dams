@@ -411,7 +411,7 @@ export default function render() {
           </select>
         </ucd-theme-slim-select>
 
-        <p class="form-label dropdown-label image-skew">Image Tilt Correction</p>
+        <!-- <p class="form-label dropdown-label image-skew">Image Tilt Correction</p>
         <p class="image-skew-description">Run this process to fix tilted images. This is a realtime process, there may be some delay.</p>
         <div class="deskew-wrapper">
           <div class="deskew-action-wrapper">
@@ -421,7 +421,7 @@ export default function render() {
             </div>
           </div>
         </div>
-        <p class="image-skew-status">${this.workflowStatus}</p>
+        <p class="image-skew-status">${this.workflowStatus}</p> -->
       </div>
 
       <div class="right-panel">
