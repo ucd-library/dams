@@ -4,6 +4,13 @@
     "foaf" : "http://xmlns.com/foaf/0.1/"
   },
   "@graph" : [{
+    "@id" : "#authz-public",
+    "@type" : ["acl:Authorization"],
+    "acl:accessTo" : [{"@id": "@base:"}],
+    "acl:default" : [{"@id": "@base:"}],
+    "acl:mode" : [{"@id": "acl:Read"}],
+    "acl:agentClass" : [{"@id": "foaf:Agent"}]
+  },{
     "@id" : "#authz-ui-admin",
     "@type" : ["acl:Authorization"],
     "acl:accessTo" : [{"@id": "@base:"}],
