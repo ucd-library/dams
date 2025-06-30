@@ -17,8 +17,20 @@ class CollectionVcModel {
       }
 
       rootNode.identifier.forEach((id) => {
+        // match D-192, MC-342, etc.
         let match = id.match(/[a-zA-Z]{1,2}-\d{3}/g);
-        if (match) callNumber = match[0];
+        if( match ) {
+          callNumber = match[0];
+          return;
+        }
+
+        // match LoC call numbers, ie  'BX2080.A2.1497', 'LD781.D5j 2004 J644', etc..
+        // 1+ letters/numbers followed by a period, followed by 1+ letters/numbers/spaces/periods
+        match = id.match(/^([A-Za-z0-9]+)\.([A-Za-z0-9 .]+)$/);
+        if( match ) {
+          callNumber = match[0];
+          return;
+        }
       });
     }
 
