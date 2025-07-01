@@ -16,12 +16,12 @@ class CollectionVcModel {
         rootNode.identifier = [rootNode.identifier];
       }
 
-      rootNode.identifier.forEach((id) => {
+      for (const id of rootNode.identifier) {
         // match D-192, MC-342, etc.
-        let match = id.match(/[a-zA-Z]{1,2}-\d{3}/g);
+        let match = id.match(/[a-zA-Z]{1,2}-\d{3}/);
         if( match ) {
           callNumber = match[0];
-          return;
+          break;
         }
 
         // match LoC call numbers, ie  'BX2080.A2.1497', 'LD781.D5j 2004 J644', etc..
@@ -29,9 +29,9 @@ class CollectionVcModel {
         match = id.match(/^([A-Za-z0-9]+)\.([A-Za-z0-9 .]+)$/);
         if( match ) {
           callNumber = match[0];
-          return;
+          break;
         }
-      });
+      }
     }
 
     let images;
