@@ -112,7 +112,7 @@ class CollectionModel extends BaseModel {
         limit,
         sort: [
           {'@graph.yearPublished': {order : "desc" }},
-          // {'@graph.lastModified': {order : "desc" }}
+          // {'@graph.lastModified': {order : "desc" }} // this will be used in a subsequent release
         ]
       };
       // searchDocument = {limit: 3};
