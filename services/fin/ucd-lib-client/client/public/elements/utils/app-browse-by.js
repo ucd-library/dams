@@ -245,16 +245,21 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( sortBy.label === 'A-Z' ) {
       sort = {"name" : "asc"};
     } else if( sortBy.label === 'Recent' ) {
-      sort = {"@graph.yearPublished" : "desc"};
+      sort = [
+          {'@graph.yearPublished': {order : "desc" }},
+          // {'@graph.lastModified': {order : "desc" }} // this will be used in a subsequent release
+        ];
     } else {
       sort = {"@graph.itemCount" : "desc"};
+    }
+
+    if (!Array.isArray(sort)) {
+      sort = [sort];
     }
     let searchDocument = {
       text : '',
       filters : {},
-      sort : [
-        sort
-      ],
+      sort : sort,
       limit : 0,
       offset : 0,
       facets : {}

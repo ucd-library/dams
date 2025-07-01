@@ -162,7 +162,7 @@ class AppRecord extends Mixin(LitElement)
     if( !record || this.renderedRecordId === record['@id'] ) return;
 
     this.graph = e.payload.data['@graph'] || [];
-    this.parseWorkflowImages();
+    // this.parseWorkflowImages();
 
     this.renderedRecordId = record["@id"];
     this.record = record;
@@ -205,9 +205,10 @@ class AppRecord extends Mixin(LitElement)
     this.renderedCollectionId = e.id;
     this.collectionId = e.id;
 
-    let overriddenFeatureImage = e.vcData?.clientEdits?.['@id'] || '';
-    if (overriddenFeatureImage) {
-      this.collectionImg = '/fcrepo/rest' + overriddenFeatureImage + '/featuredImage.jpg';;
+    let clientEditsId = e.vcData.clientEdits?.['@id'];
+    let overriddenFeatureImage =  e.vcData.clientEdits?.thumbnailUrl?.['@id'];
+    if( clientEditsId && overriddenFeatureImage ) {
+      this.collectionImg = '/fcrepo/rest' + clientEditsId + '/featuredImage.jpg';
     } else {
       this.collectionImg = e.vcData?.images?.small?.url                   
       || e.vcData?.images?.medium?.url 
@@ -253,153 +254,163 @@ class AppRecord extends Mixin(LitElement)
     await this._parseDisplayData();
   }
 
-  _getLatestStatusFromBatch(status=[]) {
-    // group to items ids map
-    // then filter by created desc to get latest
-    status = status.reduce((acc, status) => {
-      const { finPath } = status;
-      if (!acc[finPath]) {
-        acc[finPath] = [];
-      }
-      acc[finPath].push(status);
-      return acc;
-    }, {});
+  // see issue #359, this was a stop gap that we fixed in the image processing workflow
+  // will likely be removed in the future, for now just disabling the ui controls
+  // _getLatestStatusFromBatch(status=[]) {
+  //   // group to items ids map
+  //   // then filter by created desc to get latest
+  //   status = status.reduce((acc, status) => {
+  //     const { finPath } = status;
+  //     if (!acc[finPath]) {
+  //       acc[finPath] = [];
+  //     }
+  //     acc[finPath].push(status);
+  //     return acc;
+  //   }, {});
 
-    let latest = [];
-    Object.values(status).forEach(workflow => {
-      latest.push(workflow.sort((a,b) => new Date(b.created) - new Date(a.created))[0]);
-    })
-    return latest;
-  }
+  //   let latest = [];
+  //   Object.values(status).forEach(workflow => {
+  //     latest.push(workflow.sort((a,b) => new Date(b.created) - new Date(a.created))[0]);
+  //   })
+  //   return latest;
+  // }
 
-  updateWorkflowStatusMessage(status) {
-    this.workflowStatus = '';
-    if( this.workflowRunning ) {
-      let pendingWorkflows = status.filter(s => s.state !== 'running' && s.state !== 'completed').length;
-      let runningWorkflows = status.filter(s => s.state === 'running').length;
-      let completedWorkflows = status.filter(s => s.state === 'completed').length;
+  // see issue #359, this was a stop gap that we fixed in the image processing workflow
+  // will likely be removed in the future, for now just disabling the ui controls
+  // updateWorkflowStatusMessage(status) {
+  //   this.workflowStatus = '';
+  //   if( this.workflowRunning ) {
+  //     let pendingWorkflows = status.filter(s => s.state !== 'running' && s.state !== 'completed').length;
+  //     let runningWorkflows = status.filter(s => s.state === 'running').length;
+  //     let completedWorkflows = status.filter(s => s.state === 'completed').length;
 
-      this.workflowStatus = `Status: ${pendingWorkflows} pending, ${runningWorkflows} processing, ${completedWorkflows} complete (of ${status.length})`;
-    }
+  //     this.workflowStatus = `Status: ${pendingWorkflows} pending, ${runningWorkflows} processing, ${completedWorkflows} complete (of ${status.length})`;
+  //   }
 
-    // if( this.deskewImages ) {
-    //   this.workflowAlreadyExecuted = this.latestWorkflowType === 'deskew';
-    // } else {
-    //   this.workflowAlreadyExecuted = this.latestWorkflowType === 'original';
-    // }
+  //   // if( this.deskewImages ) {
+  //   //   this.workflowAlreadyExecuted = this.latestWorkflowType === 'deskew';
+  //   // } else {
+  //   //   this.workflowAlreadyExecuted = this.latestWorkflowType === 'original';
+  //   // }
 
-    if( this.workflowRunning ) this.workflowAlreadyExecuted = false;
-  }
+  //   if( this.workflowRunning ) this.workflowAlreadyExecuted = false;
+  // }
 
-  async _runWorkflow() {    
-    this.workflowRunning = true;
-    this.workflowStatus = 'Status: Starting...';
-    await this.WorkflowModel.batchStart('image-products', {}, this.workflowImageUrls);
+  // see issue #359, this was a stop gap that we fixed in the image processing workflow
+  // will likely be removed in the future, for now just disabling the ui controls
+  // async _runWorkflow() {    
+  //   this.workflowRunning = true;
+  //   this.workflowStatus = 'Status: Starting...';
+  //   await this.WorkflowModel.batchStart('image-products', {}, this.workflowImageUrls);
 
-    // get workflow status and loop
-    // let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
-    // status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
-    // this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
-    this._startWorkflowStatusLoop();
-  }
+  //   // get workflow status and loop
+  //   // let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
+  //   // status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
+  //   // this.latestWorkflowStatus = this._getLatestStatusFromBatch(status);
+  //   this._startWorkflowStatusLoop();
+  // }
 
-  parseWorkflowImages() {
-    let workflowImageUrls = [];
+  // see issue #359, this was a stop gap that we fixed in the image processing workflow
+  // will likely be removed in the future, for now just disabling the ui controls
+  // parseWorkflowImages() {
+  //   let workflowImageUrls = [];
 
-    this.IMAGE_WORKFLOWS = {
-      // 'pdf-image-products' : {
-      //   mimeTypes : ['application/pdf'],
-      //   property : 'images',
-      //   pageSearch : {
-      //     multiPage : true
-      //   }
-      // },
-      'image-products' : {
-        mimeTypes : ['image/jpeg', 'image/png', 'image/tiff'],
-        property: 'images',
-        pageSearch : {
-          multiPage : false
-        }
-      }
-    }
+  //   this.IMAGE_WORKFLOWS = {
+  //     // 'pdf-image-products' : {
+  //     //   mimeTypes : ['application/pdf'],
+  //     //   property : 'images',
+  //     //   pageSearch : {
+  //     //     multiPage : true
+  //     //   }
+  //     // },
+  //     'image-products' : {
+  //       mimeTypes : ['image/jpeg', 'image/png', 'image/tiff'],
+  //       property: 'images',
+  //       pageSearch : {
+  //         multiPage : false
+  //       }
+  //     }
+  //   }
 
-    this.graph.forEach(node => {
-      for( let workflow in this.IMAGE_WORKFLOWS ) {
-        let def = this.IMAGE_WORKFLOWS[workflow];
+  //   this.graph.forEach(node => {
+  //     for( let workflow in this.IMAGE_WORKFLOWS ) {
+  //       let def = this.IMAGE_WORKFLOWS[workflow];
 
-        if( !node.fileFormat ) continue;
-        if( !def.mimeTypes.includes(node.fileFormat) ) continue;
+  //       if( !node.fileFormat ) continue;
+  //       if( !def.mimeTypes.includes(node.fileFormat) ) continue;
 
-        workflowImageUrls.push(node['@id']);
-      }
-    });
+  //       workflowImageUrls.push(node['@id']);
+  //     }
+  //   });
 
-    this.workflowImageUrls = workflowImageUrls;
-  }
+  //   this.workflowImageUrls = workflowImageUrls;
+  // }
 
-  _startWorkflowStatusLoop() {
-    this.workflowStatus = 'Loading workflow status...';
-    this.workflowStatusLoading = true;
+  // see issue #359, this was a stop gap that we fixed in the image processing workflow
+  // will likely be removed in the future, for now just disabling the ui controls
+  // _startWorkflowStatusLoop() {
+  //   this.workflowStatus = 'Loading workflow status...';
+  //   this.workflowStatusLoading = true;
 
-    if (this.workflowIntervalId !== null) {
-      return;
-    }
+  //   if (this.workflowIntervalId !== null) {
+  //     return;
+  //   }
   
-    this.workflowIntervalId = setInterval(async () => {
-      await this._runWorkflowStatusLoop();
-    }, 10000);
-  }
+  //   this.workflowIntervalId = setInterval(async () => {
+  //     await this._runWorkflowStatusLoop();
+  //   }, 10000);
+  // }
   
-  async _runWorkflowStatusLoop() {
-    if( !this.workflowStatusLoading && !this.workflowRunning ) return;
+  // async _runWorkflowStatusLoop() {
+  //   if( !this.workflowStatusLoading && !this.workflowRunning ) return;
     
-    this.workflowRunning = true;
-    this.workflowStatusLoading = false;
+  //   this.workflowRunning = true;
+  //   this.workflowStatusLoading = false;
     
-    let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
-    status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
-    this.firstStatusLoaded = true;    
+  //   let status = await this.WorkflowModel.batchStatus('image-products', this.workflowImageUrls);
+  //   status = (status.body || []).sort((a,b) => new Date(b.created) - new Date(a.created));
+  //   this.firstStatusLoaded = true;    
 
 
-    this.latestWorkflowStatus = this._getLatestStatusFromBatch(status); 
-    this.workflowRunning = this.latestWorkflowStatus.find(s => s.state !== 'completed') ? true : false;
+  //   this.latestWorkflowStatus = this._getLatestStatusFromBatch(status); 
+  //   this.workflowRunning = this.latestWorkflowStatus.find(s => s.state !== 'completed') ? true : false;
 
-    if( this.stopWorkflowLoop || !this.workflowRunning ) {
-      this._stopWorkflowStatusLoop();
+  //   if( this.stopWorkflowLoop || !this.workflowRunning ) {
+  //     this._stopWorkflowStatusLoop();
 
-      // make sure deskew setting matches in last workflow run
-      // let deskew = this.latestWorkflowStatus[0].params?.imagemagick?.deskew;
-      // let allMatch = true;
-      // this.latestWorkflowStatus.forEach(status => {
-      //   if( status.params?.imagemagick?.deskew != deskew ) allMatch = false;
-      // });
+  //     // make sure deskew setting matches in last workflow run
+  //     // let deskew = this.latestWorkflowStatus[0].params?.imagemagick?.deskew;
+  //     // let allMatch = true;
+  //     // this.latestWorkflowStatus.forEach(status => {
+  //     //   if( status.params?.imagemagick?.deskew != deskew ) allMatch = false;
+  //     // });
 
-      // if( !allMatch ) {
-      //   this.workflowError = true;
-      //   this.imagesCurrentlyDeskewed = false;
-      //   this.deskewMismatch = true;
-      //   this.latestWorkflowType = 'mismatch';
-      // } else {
-      this.workflowError = false;
-      // this.imagesCurrentlyDeskewed = deskew;
-      // if( deskew === undefined ) deskew = true;
-      // this.latestWorkflowType = deskew ? 'deskew' : 'original';
-      // }
+  //     // if( !allMatch ) {
+  //     //   this.workflowError = true;
+  //     //   this.imagesCurrentlyDeskewed = false;
+  //     //   this.deskewMismatch = true;
+  //     //   this.latestWorkflowType = 'mismatch';
+  //     // } else {
+  //     this.workflowError = false;
+  //     // this.imagesCurrentlyDeskewed = deskew;
+  //     // if( deskew === undefined ) deskew = true;
+  //     // this.latestWorkflowType = deskew ? 'deskew' : 'original';
+  //     // }
 
-      this.workflowStatus = '';
-      this.workflowStatusLoading = false;
-      this.workflowRunning = false;
-    } 
+  //     this.workflowStatus = '';
+  //     this.workflowStatusLoading = false;
+  //     this.workflowRunning = false;
+  //   } 
   
-    this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
-  }
+  //   this.updateWorkflowStatusMessage(this.latestWorkflowStatus);
+  // }
   
-  _stopWorkflowStatusLoop() {
-    if( this.workflowIntervalId !== null ) {
-      clearInterval(this.workflowIntervalId);
-      this.workflowIntervalId = null;
-    }
-  }
+  // _stopWorkflowStatusLoop() {
+  //   if( this.workflowIntervalId !== null ) {
+  //     clearInterval(this.workflowIntervalId);
+  //     this.workflowIntervalId = null;
+  //   }
+  // }
 
   _arkDoiClick(e) {
     e.preventDefault();
@@ -538,7 +549,9 @@ class AppRecord extends Mixin(LitElement)
     
     this._changeMediaViewerDisplay('none');
 
-    this._startWorkflowStatusLoop();
+    // see issue #359, this was a stop gap that we fixed in the image processing workflow
+    // will likely be removed in the future, for now just disabling the ui controls
+    // this._startWorkflowStatusLoop();
   }
 
   /**
