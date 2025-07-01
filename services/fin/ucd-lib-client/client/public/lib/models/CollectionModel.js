@@ -110,9 +110,10 @@ class CollectionModel extends BaseModel {
       // TODO: change to 'uploadDate'
       let searchDocument = {
         limit,
-        sort: [{
-          '@graph.yearPublished': {order : "desc" } 
-        }]
+        sort: [
+          {'@graph.yearPublished': {order : "desc" }},
+          // {'@graph.lastModified': {order : "desc" }} // this will be used in a subsequent release
+        ]
       };
       // searchDocument = {limit: 3};
       return this.search(searchDocument);
