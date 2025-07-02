@@ -16,12 +16,24 @@ class RecordVcModel {
       let callNumber = "";
 
       if (root && root.identifier) {
-        if (!Array.isArray(root.identifier))
-          root.identifier = [root.identifier];
-          root.identifier.forEach((id) => {
-            let match = id.match(/[a-zA-Z]{1,2}-\d{3}/g);
-            if (match) callNumber = id; // match[0];
-        });
+        if (!Array.isArray(root.identifier)) root.identifier = [root.identifier];
+
+        for (const id of root.identifier) {
+          // match D-192, MC-342, etc.
+          let match = id.match(/[a-zA-Z]{1,2}-\d{3}/);
+          if( match ) {
+            callNumber = id;
+            break;
+          }
+
+          // match LoC call numbers, ie  'BX2080.A2.1497', 'LD781.D5j 2004 J644', etc..
+          // 1+ letters/numbers followed by a period, followed by 1+ letters/numbers/spaces/periods
+          match = id.match(/^([A-Za-z0-9]+)\.([A-Za-z0-9 .]+)$/);
+          if( match ) {
+            callNumber = id;
+            break;
+          }
+        }
       }
 
       let collectionId = '';
