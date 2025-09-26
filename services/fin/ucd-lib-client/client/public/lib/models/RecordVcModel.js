@@ -65,12 +65,14 @@ class RecordVcModel {
         if( !Array.isArray(graph) ) graph = [graph];
         let graphImage = graph.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
 
+        let imagesWithoutErrors = groups.filter(g => g.clientMedia?.images && !g.clientMedia.images.error);
+
         if( group ) {
           images = group.clientMedia?.images;
         } else if( graphImage && graphImage.clientMedia?.images ) {
           images = graphImage.clientMedia?.images;
-        } else if( groups[0]?.clientMedia?.images ) {
-          images = groups[0].clientMedia.images;
+        } else if ( imagesWithoutErrors.length ) {
+          images = imagesWithoutErrors[0].clientMedia.images;
         }
       }
 

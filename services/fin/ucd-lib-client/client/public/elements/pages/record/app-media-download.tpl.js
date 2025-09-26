@@ -169,7 +169,7 @@ export default function render() {
             id="single"
             type="radio"
             name="set-size"
-            checked
+            ?checked="${!this.fullSetSelected}"
             @click="${this._toggleMultipleDownload}"
           />
           <label for="single">Selected Page</label>
@@ -179,6 +179,7 @@ export default function render() {
             id="fullset"
             type="radio"
             name="set-size"
+            ?checked="${this.fullSetSelected}"
             @click="${this._toggleMultipleDownload}"
           />
           <label for="fullset">All Files (${this.fullSetCount})</label>
