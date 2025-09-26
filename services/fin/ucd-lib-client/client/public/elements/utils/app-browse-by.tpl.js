@@ -117,18 +117,110 @@ export default function render() {
         width: 100%;
       }
 
-      .left-image {
-        width: 37.5vw;
+      .left-image-container {
         position: absolute;
         left: -12.5vw;
         bottom: 0;
       }
 
-      .right-image {
-        width: 37.5vw;
+      .left-image-container .creator-info-label img {
+        transform: scaleX(-1);
+      }
+
+      .right-image-container {
         position: absolute;
-        right: -14.3vw;
+        right: -12.5vw;
         top: 0;
+      }
+
+      .left-image-container img,
+      .right-image-container img {
+        width: 37.5vw;
+      }
+
+      div.creator-info-label {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+
+        width: auto;
+        z-index: 20;
+        height: auto;
+      }
+
+      .creator-info-label {
+        position: relative;
+        display: inline-block;
+      }
+
+      /* hover transitions */
+      /* bring back after fixing positions/sizing on different screen sizes */
+      /* .left-image-container .creator-info-label {
+        transform: translateX(-150%);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .right-image-container .creator-info-label {
+        transform: translateX(150%);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .left-image-container:hover .creator-info-label,
+      .right-image-container:hover .creator-info-label {
+        transform: translateX(0);
+      } */
+
+      .right-image-container .creator-info-label {
+        left: 0;
+        right: auto;
+      }
+
+      .creator-info-label img {
+        /* width: 16.875rem; */
+        width: 15rem;
+        height: 5.3125rem;
+        /* display: block; */
+        
+        /* position: absolute;
+        right: 0; */
+      }
+
+      .creator-info-label h5,
+      .creator-info-label p {
+        position: absolute;
+        color: var(--white, #FFF);
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 1;
+      }
+
+      .creator-info-label h5 {
+        /* top: 1.8rem; */
+        top: 1rem;
+        /* font-size: 1.2rem; */
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 2rem;
+      }
+
+      .creator-info-label p {
+        top: 2.875rem;
+        font-size: .875rem;
+        line-height: 1.4rem;
+      }
+
+      /* TODO When screen gets too narrow, position label on the left */
+      @media (max-width: 1200px) { /* Adjust this breakpoint as needed */
+        div.creator-info-label {
+          /* position: absolute;
+          bottom: 0;
+          left: 0;
+          width: auto;
+          height: auto; */
+        }
       }
 
       .card-grid {
@@ -281,11 +373,21 @@ export default function render() {
 
     <div class="body">
       <div class="side-image ${this.isCollectionPage ? "no-flex" : ""}">
-        <img
-          class="left-image"
-          ?hidden=${this.results.length < 12 || this.isCollectionPage}
-          src="${this.leftImgUrl}"
-        />
+        <div class="left-image-container">
+          <a href="/item/ark:/87293/d3d02x">
+            <img
+              class="left-image"
+              ?hidden=${this.results.length < 12 || this.isCollectionPage}
+              src="${this.leftImgUrl}"
+            />
+            <div class="creator-info-label">
+              <img src="/images/watercolors/Label-Watercolor-Blue.png" alt="label background"/>
+              <h5>Hari Singh Everest</h5>
+              <p>ark:/99999/fk4/abcd1234</p>
+            </div>
+          </a>
+  
+        </div>
       </div>
 
       <div class="results ${this.isCollectionPage ? 'collection' : ''}">
@@ -321,11 +423,20 @@ export default function render() {
         </div>
       </div>
       <div class="side-image ${this.isCollectionPage ? "no-flex" : ""}">
-        <img
-          class="right-image"
-          ?hidden=${this.results.length < 12 || this.isCollectionPage}
-          src="${this.rightImgUrl}"
-        />
+        <div class="right-image-container">
+          <a href="/item/ark:/87293/d3d02x">
+            <img
+              class="right-image"
+              ?hidden=${this.results.length < 12 || this.isCollectionPage}
+              src="${this.rightImgUrl}"
+            />
+            <div class="creator-info-label">
+              <img src="/images/watercolors/Label-Watercolor-Blue.png" alt="label background"/>
+              <h5 style="top: 1.6rem;">Jancis Robinson</h5>
+              <!-- <p>ark:/87293/d3d80x</p> -->
+            </div>
+          </a>
+        </div>
       </div>
     </div>
 
