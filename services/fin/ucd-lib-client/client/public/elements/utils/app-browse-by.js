@@ -33,6 +33,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
       sideImageIndex : {type: Number},
       leftImgUrl : {type: String},
       rightImgUrl : {type: String},
+      leftItemLink : {type: String},
+      rightItemLink : {type: String},
+      leftLabel : {type: String},
+      rightLabel : {type: String},
       sortByOptions : {type: Array},
       results : {type: Array},
       collectionResults : {type: Array},
@@ -62,6 +66,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
   async firstUpdated() {
     this._onAppStateUpdate(await this.AppStateModel.get());
     this.isCollectionPage = this.label.toLowerCase() === 'collection';
+
     if( this.isCollectionPage ) {
       this.sortByOptions = [
         {label : 'A-Z', type: 'key', dir : 'asc', selected: true},
@@ -102,6 +107,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this.sideImageIndex = 0;
     this.leftImgUrl = '';
     this.rightImgUrl = '';
+    this.leftItemLink = '';
+    this.rightItemLink = '';
+    this.leftLabel = '';
+    this.rightLabel = '';
     this.results = [];
     this.collectionResults = [];
     this.totalResults = 0;
@@ -308,6 +317,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( !this.sideImages || (this.sideImages && !this.sideImages.length) ) {
       this.leftImgUrl = '';
       this.rightImgUrl = '';
+      this.leftItemLink = '';
+      this.rightItemLink = '';
+      this.leftLabel = '';
+      this.rightLabel = '';
       return;
     }
     this.sideImageIndex = this.currentPage - 1;
@@ -319,6 +332,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
 
     this.leftImgUrl = this.sideImages[this.sideImageIndex].leftImgUrl;
     this.rightImgUrl = this.sideImages[this.sideImageIndex].rightImgUrl;
+    this.leftItemLink = this.sideImages[this.sideImageIndex].leftItemLink;
+    this.rightItemLink = this.sideImages[this.sideImageIndex].rightItemLink;
+    this.leftLabel = this.sideImages[this.sideImageIndex].leftLabel;
+    this.rightLabel = this.sideImages[this.sideImageIndex].rightLabel;
   }
 
   /**
