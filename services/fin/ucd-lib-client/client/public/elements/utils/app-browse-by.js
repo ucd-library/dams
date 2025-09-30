@@ -132,9 +132,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
    * @returns {Promise} 
    */
   _onAppStateUpdate(e) {
-    if( e.location.page !== 'browse' ) return;
-    if( e.location.path.length < 2 ) return;
-    if( e.location.path[1] !== this.id ) return; // the page
+    if( e.location.page !== 'browse' || e.location.path.length < 2 || e.location.path[1] !== this.id ) {
+      this.selectedLetter = '';
+      return;
+    }
     
     this.isCollectionPage = this.label.toLowerCase() === 'collection';
     this._loadResults();

@@ -370,7 +370,8 @@ export default function render() {
       <ucdlib-browse-az
         ?hidden="${this.totalPages < 6 && !this.selectedLetter}"
         .results="${(this.allResults?.payload || this.allResults || [])}"
-        @letter-change="${this._onLetterChange}">
+        @letter-change="${this._onLetterChange}"
+        .selected-letter="${this.selectedLetter}">
       </ucdlib-browse-az>
 
       <div class="header-dots ${this.isCollectionPage ? 'collection' : ''}"></div>

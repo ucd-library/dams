@@ -23,7 +23,10 @@ export default class UcdlibBrowseAZ extends Mixin(LitElement)
     super();
     this._injectModel('AppStateModel');
     this.render = render.bind(this);
+    this.reset();
+  }
 
+  reset() {
     this.alpha = [
         {display: '#', value: '1', exists: true},
         {display: 'A', value: 'a', exists: true},
@@ -69,8 +72,8 @@ export default class UcdlibBrowseAZ extends Mixin(LitElement)
   }
 
   async _onAppStateUpdate(e) {
-    if( e.location.page !== 'browse' ) {
-      this.selectedLetter = '';
+    if( e.location.page !== 'browse' || e.location.path.length < 2 ) {
+      this.reset();
       return;
     }
   }
