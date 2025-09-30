@@ -1,6 +1,7 @@
 import { html } from "lit";
 import { sharedStyles } from "../styles/shared-styles";
 import "@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.js";
+import '../components/ucdlib-browse-az.js';
 
 export default function render() {
   return html`
@@ -234,6 +235,12 @@ export default function render() {
         margin: 0 auto;
       }
 
+      ucdlib-browse-az {
+        padding-bottom: 1.5rem;
+        width: 100%; 
+        margin: auto;
+      }
+
       @media (max-width: 1310px) {
         .header,
         .results-footer {
@@ -242,11 +249,19 @@ export default function render() {
         h1 {
           margin: 0.5rem 0;
         }
+
+        ucdlib-browse-az {
+          width: calc(50% / 0.65 - 2rem); 
+        }
       }
       @media (max-width: 767px) {
         .header,
         .results-footer {
           width: auto;
+        }
+
+        ucdlib-browse-az {
+          width: 100%; 
         }
       }
       @media (max-width: 990px) {
@@ -352,6 +367,12 @@ export default function render() {
           )}
         </div>
       </div>
+      <ucdlib-browse-az
+        ?hidden="${this.totalPages < 6 && !this.selectedLetter}"
+        .results="${(this.allResults?.payload || this.allResults || [])}"
+        @letter-change="${this._onLetterChange}">
+      </ucdlib-browse-az>
+
       <div class="header-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
     </div>
 
@@ -425,7 +446,7 @@ export default function render() {
     <div class="results-footer">
       <div class="footer-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
       <ucd-theme-pagination
-        ?hidden="${this.totalPages < 2}"
+        ?hidden="${this.totalPages < 2 && !this.selectedLetter}"
         current-page=${this.currentPage}
         max-pages=${this.totalPages}
         @page-change=${this._onPageClicked}

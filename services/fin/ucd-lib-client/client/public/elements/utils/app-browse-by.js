@@ -45,7 +45,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
       currentIndex : {type: Number},
       totalPages : {type: Number},
       currentPage : {type: Number},
-      isCollectionPage : {type: Boolean}
+      isCollectionPage : {type: Boolean},
+      selectedLetter : {type: String},
     };
   }
 
@@ -120,6 +121,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
     this.currentPage = 1;
     this.label = '';
     this.isCollectionPage = false;
+    this.selectedLetter = '';
   }
 
   /**
@@ -166,11 +168,19 @@ export default class AppBrowseBy extends Mixin(LitElement)
       this.loading = false;
     }
 
-    this.totalPages = this.totalResults / this.resultsPerPage < 1 ? 1 : Math.ceil(this.totalResults / this.resultsPerPage);
+    this.updatePagination();
+    this._renderResults();
+  }
+
+  updatePagination() {
+    if( this.selectedLetter ) {
+      this.totalPages = this.results.length === 0 ? 1 : Math.ceil(this.results.length / this.resultsPerPage);
+    } else {
+      this.totalPages = this.totalResults / this.resultsPerPage < 1 ? 1 : Math.ceil(this.totalResults / this.resultsPerPage);
+    }
+
     let pagination = this.shadowRoot.querySelector('ucd-theme-pagination');
     if( pagination ) pagination.requestUpdate('maxPages', this.totalPages);
-
-    this._renderResults();
   }
 
   /**
@@ -184,10 +194,20 @@ export default class AppBrowseBy extends Mixin(LitElement)
       return;
     }
 
+    let filterResultsTo = this.allResults.payload;
+
+    if( this.selectedLetter ) {
+      // filter by selected letter
+      filterResultsTo = filterResultsTo.filter(item => {
+        return (item.key?.toLowerCase()?.startsWith(this.selectedLetter) || item.title?.toLowerCase()?.startsWith(this.selectedLetter)) 
+          && item.count > 0;
+      });
+    }
+
     let sort = this.sortByOptions.find(item => item.selected);
     
     if( this.sortedAs !== sort.type ) {
-      this.allResults.payload.sort((a, b) => {
+      filterResultsTo.sort((a, b) => {
         if( sort.type === 'count' ) {
           if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
           if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
@@ -201,7 +221,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
       this.sortedAs = sort.type;
     }
     
-    this.results = this.allResults.payload.slice(
+    this.results = filterResultsTo.slice(
       this.currentIndex, 
       this.currentIndex + this.resultsPerPage 
     );
@@ -216,17 +236,27 @@ export default class AppBrowseBy extends Mixin(LitElement)
    */
   _renderCollections() {
     let sort = this.sortByOptions.find(item => item.selected);
-    
+   
+    let filterResultsTo = this.allResults;
+
+    if( this.selectedLetter ) {
+      // filter by selected letter
+      filterResultsTo = filterResultsTo.filter(item => {
+        return (item.key?.toLowerCase()?.startsWith(this.selectedLetter) || item.title?.toLowerCase()?.startsWith(this.selectedLetter)) 
+          && item.count > 0;
+      });
+    }
+
     if( this.sortedAs !== sort.type ) {
       if( sort.type === 'count' ) {
-        this.allResults.sort((a, b) => {
+        filterResultsTo.sort((a, b) => {
           if( a[sort.type] > b[sort.type] ) return (sort.dir === 'asc') ? 1 : -1;
           if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
           return 0;
         });
       } else {
         // sort by title
-        this.allResults.sort((a, b) => {
+        filterResultsTo.sort((a, b) => {
           if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
           if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
           return 0;   
@@ -234,17 +264,28 @@ export default class AppBrowseBy extends Mixin(LitElement)
       }
     }  
 
-    this.collectionResults = this.allResults.slice(
-      this.currentIndex, 
-      this.currentIndex + this.resultsPerPage 
-    );
-    
-    this.results = this.allResults.slice(
+    this.collectionResults = filterResultsTo.slice(
       this.currentIndex, 
       this.currentIndex + this.resultsPerPage 
     );
 
+    this.results = filterResultsTo.slice(
+      this.currentIndex,
+      this.currentIndex + this.resultsPerPage
+    );
+
     this._updateSideImages();
+  }
+
+  _onLetterChange(e) {
+    if( this.selectedLetter === e.detail.letter ) this.selectedLetter = '';
+    else this.selectedLetter = e.detail.letter;
+    
+    this.currentPage = 1;
+    this.currentIndex = (this.currentPage - 1) * this.resultsPerPage;
+
+    this._renderResults();
+    this.updatePagination();
   }
 
   async _searchBrowseByCollections() {
@@ -305,7 +346,6 @@ export default class AppBrowseBy extends Mixin(LitElement)
     );
 
     this.totalResults = this.allResults.length;
-    
     // this.shadowRoot.querySelectorAll('dams-collection-card').forEach(c => c.requestUpdate());
   }
 
