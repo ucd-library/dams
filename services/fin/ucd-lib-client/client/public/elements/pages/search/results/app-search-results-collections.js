@@ -33,13 +33,28 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this.paginationTotal = 1;
     this.resultsPerPage = 6;
 
-    this._injectModel('AppStateModel', 'FiltersModel', 'SearchVcModel');
+    this._injectModel('AppStateModel', 'FiltersModel', 'SearchVcModel', 'CollectionModel', 'RecordModel');
   }
 
-  _onAppStateUpdate(e) {
+  async _onAppStateUpdate(e) {
     if( e.location.page !== 'search' ) return;
+    this.results = [];
+
     this.filterDisplayResults();
     this._updateResultsDisplayed();
+
+    this._onCollectionSearchUpdate(await this.CollectionModel.search({ text: this.RecordModel.lastQuery?.text || '' }));
+  }
+
+  _onCollectionSearchUpdate(e) {
+    if( e.state !== 'loaded' ) return;
+
+    // combine collection search with item search 
+    // (ie match collections regardless of items in search, and show collections where items are matched from them)
+    let collections = (e.payload?.results || []).map(c => ({ '@id': c.root?.['@id'] }));
+    collections.forEach(c => {
+      if( !this.results.find(r => r['@id'] === c['@id']) ) this.results.push(c);      
+    });
   }
 
   /**
@@ -52,11 +67,14 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     // temp remove oac isPartOf records
     e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org') && b.doc_count > 0);
 
-    this.results = e.buckets.map(r => {
+    let results = e.buckets.map(r => {
       return {
         '@id' : r.key,
         // todo other data needed?
       };
+    });
+    results.forEach(r => {
+      if( !this.results.find(res => res['@id'] === r['@id']) ) this.results.push(r);      
     });
 
     let searchText = this.SearchVcModel.getSearch()?.searchDocument?.text;
