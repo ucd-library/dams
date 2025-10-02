@@ -101,6 +101,11 @@ class Utils {
 
     if( !clientMedia.mediaGroups ) return thumbnailUrl;
 
+    // for audio/video, if root node has image, use that
+    // otherwise, use first image in mediaGroups
+    let isAudioVideo = false;
+    let rootImage = '';
+
     for (const mediaGroup of clientMedia.mediaGroups) {
       if (mediaGroup.clientMedia?.images?.medium?.url) {
         thumbnailUrl = mediaGroup.clientMedia.images.medium.url;
@@ -115,14 +120,17 @@ class Utils {
           (g) => parseInt(g.position) === 1 && g.clientMedia
         )[0];
         thumbnailUrl = firstImage?.clientMedia?.images?.medium?.url;
-      } else if (mediaType === "VideoObject") {
+      } else if (mediaType === "VideoObject" || mediaType === 'AudioObject') {
+        isAudioVideo = true;
         // pull image from root node if exists
         let rootNode = graph.filter((g) => g["@id"] === clientMedia["id"])[0];
         if (rootNode) {
-          thumbnailUrl = "/fcrepo/rest" + rootNode.image?.["@id"];
+          rootImage = "/fcrepo/rest" + rootNode.image?.["@id"];
         }
       }
     }
+
+    if( isAudioVideo && rootImage ) thumbnailUrl = rootImage;
 
     return thumbnailUrl;
   }
