@@ -149,8 +149,8 @@ export default function render() {
   .circle.facebook {
     background-color: #3b5998;
   }
-  .circle.twitter {
-    background-color: black;
+  .circle.bluesky {
+    background-color: #1185FE;
   }
   .circle.pinterest {
     background-color: #cb2027;
@@ -180,11 +180,11 @@ export default function render() {
     </div>
 
     <div class="icon">
-        <div class="circle twitter" id="twitter"
+        <div class="circle bluesky" id="bluesky"
           @click="${this._onSocialIconClick}">
-          <ucdlib-icon icon="ucdlib-dams:fa-x-twitter"></ucdlib-icon>
+          <ucdlib-icon icon="ucdlib-dams:fa-bluesky"></ucdlib-icon>
         </div>
-      <span>X (Twitter)</span>
+      <span>Bluesky</span>
     </div>
     <div class="icon">
       <div class="circle pinterest" id="pinterest"
