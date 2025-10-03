@@ -104,7 +104,7 @@ export default class AppShareBtn extends Mixin(LitElement)
 
     let url = BASE_SHARE_LINKS[id];
     let qso = {};
-    let name = (itemName || media.name || media.title || record.name || record.title || record.graph.root.name);
+    let name = (itemName || media.name || media.title || record.name || record.title);
     
     if( id === 'pinterest' ) {  
       let path;
