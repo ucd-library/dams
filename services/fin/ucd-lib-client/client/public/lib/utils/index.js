@@ -101,6 +101,11 @@ class Utils {
 
     if( !clientMedia.mediaGroups ) return thumbnailUrl;
 
+    // for audio/video, if root node has image, use that
+    // otherwise, use first image in mediaGroups
+    let isAudioVideo = false;
+    let rootImage = '';
+
     for (const mediaGroup of clientMedia.mediaGroups) {
       if (mediaGroup.clientMedia?.images?.medium?.url) {
         thumbnailUrl = mediaGroup.clientMedia.images.medium.url;
@@ -115,14 +120,17 @@ class Utils {
           (g) => parseInt(g.position) === 1 && g.clientMedia
         )[0];
         thumbnailUrl = firstImage?.clientMedia?.images?.medium?.url;
-      } else if (mediaType === "VideoObject") {
+      } else if (mediaType === "VideoObject" || mediaType === 'AudioObject') {
+        isAudioVideo = true;
         // pull image from root node if exists
         let rootNode = graph.filter((g) => g["@id"] === clientMedia["id"])[0];
         if (rootNode) {
-          thumbnailUrl = "/fcrepo/rest" + rootNode.image?.["@id"];
+          rootImage = "/fcrepo/rest" + rootNode.image?.["@id"];
         }
       }
     }
+
+    if( isAudioVideo && rootImage ) thumbnailUrl = rootImage;
 
     return thumbnailUrl;
   }
@@ -314,6 +322,84 @@ class Utils {
     let creatorFacet = '@graph.creator.name';
     recordModel.appendKeywordFilter(searchDocument, creatorFacet, creator);
     return '/search/'+recordModel.searchDocumentToUrl(searchDocument);
+  }
+
+  /**
+   * @method fuseScore
+   * @description given an array of results with score (text search) and count (aggregate sums) properties, return
+   * a new array sorted by a fused score of the two metrics.  If either metric is
+   * missing, the other metric will be weighted fully.
+   * 
+   * @param {Array} results array of objects with score and count properties
+   * @param {Object} options
+   *    wScore: weight for score (default 0.6)
+   *    wCount: weight for count (default 0.4)
+   *    scoreScale: scale to normalize scores to (default 20)
+   * 
+   * @returns {Array} new array sorted by fused score descending
+   */
+  fuseScore(results, {
+    wScore = 0.6,
+    wCount = 0.4,
+    scoreScale = 20
+  } = {}) {
+    if (!Array.isArray(results) || results.length === 0) return [];
+
+    const scoreVals = results
+      .map(r => r.score)
+      .filter(v => v !== undefined);
+
+    const countRaw = results.map(r => r.count);
+
+    const countTransformed = countRaw.map(c => (c === undefined ? undefined : c));
+    const countVals = countTransformed.filter(v => v !== undefined);
+
+    const minMax = arr => {
+      if (!arr || arr.length === 0) return null;
+      return { min: Math.min(...arr), max: Math.max(...arr) };
+    };
+
+    const sMM = minMax(scoreVals);
+    const cMM = minMax(countVals);
+
+    const normalize = (x, mm, scale) => {
+      if (x === undefined || mm === null) return undefined;
+      if (mm.max === mm.min) return scale / 2;
+      return scale * (x - mm.min) / (mm.max - mm.min);
+    };
+
+    const out = results.map((r, idx) => {
+      const s = r.score;
+      const cRawVal = countRaw[idx];
+      const cTrans = (cRawVal === undefined) ? undefined : cRawVal;
+
+      const sN = normalize(s, sMM, scoreScale);
+      const cN = normalize(cTrans, cMM, scoreScale);
+
+      // If one side is missing, reweight so the available metric carries full weight
+      let wS = sN === undefined ? 0 : wScore;
+      let wC = cN === undefined ? 0 : wCount;
+      const wSum = (wS + wC) || 1;
+      wS = wS / wSum;
+      wC = wC / wSum;
+
+      const final = (sN ?? 0) * wS + (cN ?? 0) * wC;
+
+      return {
+        ...r,
+        final
+      };
+    });
+
+    // sort descending by final, stable tie-breaker by id if present
+    out.sort((a, b) => {
+      if (b.final !== a.final) return b.final - a.final;
+      const aid = a.id || a._id || a['@id'] || '';
+      const bid = b.id || b._id || b['@id'] || '';
+      return aid < bid ? -1 : aid > bid ? 1 : 0;
+    });
+
+    return out;
   }
 }
 

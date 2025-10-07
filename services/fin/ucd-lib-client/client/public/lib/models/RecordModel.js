@@ -82,28 +82,39 @@ class RecordModel extends ElasticSearchModel {
       this.currentRecordId = result.id;
       this.selectedMediaPage = mediaPage;
 
-      let selectedMedia = result.payload.clientMedia.mediaGroups.find(node => node['@id'] === id);
-      
+      let mediaGroups = result.payload.clientMedia.mediaGroups || [];
+      let selectedMedia = mediaGroups.find(node => node['@id'] === id);
+
       if( !selectedMedia ) {
         if( id !== result.id ) {
           console.warn('Unable to find selected media', id);
         }
 
-        // prioritize imagelist, then pdf
-        let imageList = (result.payload.clientMedia.mediaGroups || []).filter(m => m['@shortType'].includes('ImageList'))?.[0];
-        if( imageList?.clientMedia?.pages ) {
-          selectedMedia = imageList;
+        // check for audio/video object first
+        mediaGroups.forEach(m => {
+          let mediaType = utils.getMediaType(m);
+          if( ['AudioObject', 'VideoObject'].includes(mediaType) ) {
+            selectedMedia = m;
+          }
+        });
+
+        // else prioritize imagelist, then pdf
+        if( !selectedMedia ) {
+          let imageList = (mediaGroups || []).filter(m => m['@shortType'].includes('ImageList'))?.[0];
+          if( imageList?.clientMedia?.pages ) {
+            selectedMedia = imageList;
+          }
         }
 
         if( !selectedMedia ) {
-          let pdf = (result.payload.clientMedia.mediaGroups || []).filter(m => m.clientMedia.pdf)?.[0];
+          let pdf = (mediaGroups || []).filter(m => m.clientMedia.pdf)?.[0];
           if( pdf?.clientMedia?.pages ) {
             selectedMedia = pdf;
           }
         }
 
         if( !selectedMedia ) {
-          selectedMedia = result.payload.clientMedia.mediaGroups[0];
+          selectedMedia = mediaGroups[0];
         }
 
         if( selectedMedia?.clientMedia?.pages ) {

@@ -9,7 +9,7 @@ import './app-toast-popup.js';
 
 const BASE_SHARE_LINKS = {
   facebook : 'https://www.facebook.com/sharer/sharer.php',
-  twitter : 'https://twitter.com/intent/tweet',
+  bluesky : 'https://bsky.app/intent/compose',
   // pinterest can also add ?media and ?description
   pinterest : 'https://pinterest.com/pin/create/button/'
 }
@@ -97,13 +97,14 @@ export default class AppShareBtn extends Mixin(LitElement)
   _onSocialIconClick(e) {
     let record = this.AppStateModel.getSelectedRecord();
     let media = record.selectedMedia;
+    let itemName = record.graph?.root?.name || '';
 
     if( e.type === 'keyup' && e.which !== 13 ) return;
     let id = e.currentTarget['id'];
 
     let url = BASE_SHARE_LINKS[id];
     let qso = {};
-    let name = (media.name || media.title || record.name || record.title || record.graph.root.name);
+    let name = (itemName || media.name || media.title || record.name || record.title);
     
     if( id === 'pinterest' ) {  
       let path;
@@ -123,10 +124,10 @@ export default class AppShareBtn extends Mixin(LitElement)
       qso.url = window.location.href;
     } else if ( id === 'facebook' ) {
       qso.u = window.location.href;
-    } else if( id === 'twitter' ) {
+    } else if( id === 'bluesky' ) {
       let text = name+' - '+window.location.href+' #UCDavisLibrary #DigitalCollections';
-      if( text.length > 280) {
-        let diff = (text.length + 3) - 280;
+      if( text.length > 300) {
+        let diff = (text.length + 3) - 300;
         name = name.substr(0, name.length-diff)+'...';
         text = name+' - '+window.location.href+' #UCDavisLibrary #DigitalCollections';
       }
