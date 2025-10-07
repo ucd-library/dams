@@ -12,6 +12,7 @@ class RecordGraph {
     this.opts = {};
     this.index = {};
     this.root = null;
+    this._score = data._score;
     this.init();
   }
 

@@ -50,25 +50,38 @@
       }
     },
 
-    "@graph.name" : {
+    "@graph.name": {
       "type": "text",
       "fields": {
-        "raw": { 
-          "type":  "keyword"
+        "raw": {
+          "type": "keyword"
+        },
+        "stem": {
+          "type": "text",
+          "analyzer": "english"
         }
       }
     },
 
     "@graph.description" : {
-      "type": "text"
+      "type": "text",
+      "fields": {
+        "stem": { "type": "text", "analyzer": "english" }
+      }
     },
 
     "@graph.about" : {
-      "type": "text"
+      "type": "text",
+      "fields": {
+        "stem": { "type": "text", "analyzer": "english" }
+      }
     },
 
     "@graph.keywords" : {
-      "type": "text"
+      "type": "text",
+      "fields": {
+        "stem": { "type": "text", "analyzer": "english" }
+      }
     },
 
     "@graph.itemCount" : {
