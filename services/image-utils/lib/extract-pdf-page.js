@@ -32,8 +32,8 @@ async function run(pdfFile, page) {
     console.warn('Failed to get valid width for PDF', pdfFile, 'using default density', config.pdf.extractDensity);
     density = config.pdf.extractDensity;
   } else {
-    console.log('Extracting PDF page', page, 'with density', density, 'for width', widthInches, 'inches');
     density = config.pdf.tifResizeWidth/widthInches;
+    console.log('Extracting PDF page', page, 'with density', density, 'for width', widthInches, 'inches');
   }
 
   // first make a tiff
