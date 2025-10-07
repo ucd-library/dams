@@ -200,8 +200,12 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( this.selectedLetter ) {
       // filter by selected letter
       filterResultsTo = filterResultsTo.filter(item => {
-        return (item.key?.toLowerCase()?.startsWith(this.selectedLetter) || item.title?.toLowerCase()?.startsWith(this.selectedLetter)) 
-          && item.count > 0;
+        const firstChar = item.key?.[0]?.toLowerCase() || item.title?.[0]?.toLowerCase();
+        if( this.selectedLetter === '1' ) {
+          return firstChar && !/[a-z]/.test(firstChar) && item.count > 0;
+        }
+
+        return firstChar && firstChar === this.selectedLetter && item.count > 0;
       });
     }
 

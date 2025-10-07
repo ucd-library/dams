@@ -87,10 +87,19 @@ export default class UcdlibBrowseAZ extends Mixin(LitElement)
     }
 
     this.alpha.forEach(letter => {
-      letter.exists = this.results.some(result => {
-        return (result.key?.toLowerCase()?.startsWith(letter.value) || result.title?.toLowerCase()?.startsWith(letter.value)) 
-        && result.count > 0;
-      });
+      if (letter.value === '1') {
+        // match numbers and special characters for the '#' element
+        letter.exists = this.results.some(result => {
+          const firstChar = result.key?.[0]?.toLowerCase() || result.title?.[0]?.toLowerCase();
+          return firstChar && !/[a-z]/.test(firstChar);
+        });
+      } else {
+        // match alphabetic characters for other letters
+        letter.exists = this.results.some(result => {
+          return (result.key?.toLowerCase()?.startsWith(letter.value) || result.title?.toLowerCase()?.startsWith(letter.value)) 
+          && result.count > 0;
+        });
+      }
     });
   }
 
