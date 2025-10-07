@@ -11,7 +11,10 @@ async function getWidthInches(file) {
   let lines = stdout.split('\n')
     .map(line => line.trim())
     .filter(line => line.match(/^Page size:/))
-    .map(line => parseFloat(line.match(/(\d+\.?\d+?)\s+x\s+(\d+\.?\d+?)+\s+pts/)[1]));
+    .map(line => {
+      const match = line.match(/(\d+\.?\d+?)\s+x\s+(\d+\.?\d+?)+\s+pts/);
+      return match ? parseFloat(match[1]) : NaN;
+    });
 
   return lines[0]/PTS_TO_DPI;
 }
