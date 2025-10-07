@@ -26,7 +26,7 @@ async function run(pdfFile, page) {
   }
 
   let widthInches = await getWidthInches(pdfFile);
-  let density
+  let density;
 
   if( typeof widthInches !== 'number' || isNaN(widthInches) || widthInches <= 0 ) {
     console.warn('Failed to get valid width for PDF', pdfFile, 'using default density', config.pdf.extractDensity);
