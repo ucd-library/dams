@@ -161,12 +161,12 @@ export default function render() {
 
       /* hover transitions */
       .left-image-container .creator-info-label {
-        transform: translateX(-150%);
+        transform: translateX(-50vw);
         transition: transform 0.3s ease-in-out;
       }
 
       .right-image-container .creator-info-label {
-        transform: translateX(150%);
+        transform: translateX(50vw);
         transition: transform 0.3s ease-in-out;
       }
 
