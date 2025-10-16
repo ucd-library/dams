@@ -90,13 +90,13 @@ export default class UcdlibBrowseAZ extends Mixin(LitElement)
       if (letter.value === '1') {
         // match numbers and special characters for the '#' element
         letter.exists = this.results.some(result => {
-          const firstChar = result.key?.[0]?.toLowerCase() || result.title?.[0]?.toLowerCase();
+          const firstChar = result.key?.trim()?.[0]?.toLowerCase() || result.title?.trim()?.[0]?.toLowerCase();
           return firstChar && !/[a-z]/.test(firstChar);
         });
       } else {
         // match alphabetic characters for other letters
         letter.exists = this.results.some(result => {
-          return (result.key?.toLowerCase()?.startsWith(letter.value) || result.title?.toLowerCase()?.startsWith(letter.value)) 
+          return (result.key?.toLowerCase()?.trim()?.startsWith(letter.value) || result.title?.toLowerCase()?.trim()?.startsWith(letter.value)) 
           && result.count > 0;
         });
       }
