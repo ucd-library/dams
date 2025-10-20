@@ -47,7 +47,7 @@ config.elasticSearch = {
   },
 
   textFields : {
-    record : ['name.punctuation_insensitive', 'name.stem', '@graph.identifier.stem', '@graph.about.stem', '@graph.keywords', '@graph.indexableContent'],
+    record : ['text_search_description', 'name.punctuation_insensitive', 'name.stem', '@graph.identifier.stem', '@graph.about.stem', '@graph.keywords', '@graph.indexableContent'],
     collection : ['@graph.name.stem', '@graph.description.stem', '@graph.about.stem', '@graph.keywords.stem']
   },
   
