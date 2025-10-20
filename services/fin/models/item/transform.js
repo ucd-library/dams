@@ -86,10 +86,10 @@ module.exports = async function(path, graph, headers, utils) {
     value : ['schema', 'datePublished']
   });
   
-  // await utils.add({
-  //   attr : 'description',
-  //   value : ['schema', 'description']
-  // });
+  await utils.add({
+    attr : 'description',
+    value : ['schema', 'description']
+  });
 
   await utils.add({
     attr : 'encodesCreativeWork',
