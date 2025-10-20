@@ -47,7 +47,7 @@
     },
 
     "@graph.publisher.name" : {
-      "type" : "keyword" 
+      "type" : "keyword"
     },
 
     "@graph.subjects.@id" : {
@@ -130,13 +130,6 @@
       }
     },
 
-    "@graph.description" : {
-      "type": "text",
-      "fields": {
-        "stem": { "type": "text", "analyzer": "english" }
-      }
-    },
-
     "@graph.alternativeHeadline" : {
       "type" : "text"
     },
@@ -163,7 +156,10 @@
 
     "roles" : {
       "type":  "keyword"
-    }
+    },
 
+    "@graph.text_search_description": {
+      "type": "text"
+    }
   }
 }
