@@ -130,6 +130,13 @@
       }
     },
 
+    "@graph.description" : {
+      "type": "text",
+      "fields": {
+        "stem": { "type": "text", "analyzer": "english" }
+      }
+    },
+
     "@graph.alternativeHeadline" : {
       "type" : "text"
     },

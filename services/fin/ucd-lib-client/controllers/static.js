@@ -55,6 +55,8 @@ module.exports = async (app) => {
         appRoutes : config.client.appRoutes,
         // recordCount: (await records.rootCount()).count,
         featuredImages : config.client.featuredImages,
+        itemTextFields : config.client.itemTextFields,
+        collectionTextFields : config.client.collectionTextFields,
         env : config.client.env,
         disableFileDownloads : config.gateway.proxy.disableFileDownloads,
         downloadMirrorUrl : config.fcrepo.dataMirror.url,
