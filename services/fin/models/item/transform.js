@@ -1,4 +1,4 @@
-const {config, pg} = require('@ucd-lib/fin-service-utils');
+const {config, pg, models} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 const fetch = require('node-fetch');
 
@@ -13,6 +13,9 @@ const IMAGE_PRODUCTS = 'image-products';
 
 module.exports = async function(path, graph, headers, utils) {
   let item = {};
+
+  let collectionModel = await models.get('collection');
+  collectionModel = collectionModel?.model;
 
   let container = utils.get(path, graph);
   let gitsource = utils.getByType(ioUtils.TYPES.GIT_SOURCE, graph);
@@ -270,7 +273,7 @@ module.exports = async function(path, graph, headers, utils) {
   // await utils.setImage(item);
   await utils.setIndexableContent(item);
 
-  utils.setYearFromDate(item);
+  utils.setYearFromDate(item);  
 
   item._ = {};
   if( !item.clientMedia ) {
@@ -286,6 +289,42 @@ module.exports = async function(path, graph, headers, utils) {
   let ag = item['@id'].match(ARCHIVAL_GROUP_REGEX);
   if( ag ) {
     item._.graphId = '/item/'+ag[1];
+  }
+
+  // build text_search_description, composite for searching
+  let textSearchDescription = [];  
+  if( item._.graphId === item['@id'] ) {
+    // add collectionName using the isPartOf id
+    if( item.isPartOf ) {
+      try {
+        // fetch collection
+        if( !Array.isArray(item.isPartOf) ) item.isPartOf = [item.isPartOf];
+        let collectionId = item.isPartOf.find(part => part['@id'].includes('/collection/'))?.['@id'];
+        let collection = await collectionModel.get(collectionId);
+        if( collection ) {
+          textSearchDescription.push(collection.name);
+        }
+      } catch(e) {
+        // handled in validate.js
+      }     
+    }
+
+    if( item.name ) textSearchDescription.push(item.name);
+    if( item.creator && Array.isArray(item.creator) ) {
+      for( let creator of item.creator ) {
+        if( creator.name ) textSearchDescription.push(creator.name);
+      }
+    }
+    if( item.subjects && Array.isArray(item.subjects) ) {
+      for( let subject of item.subjects ) {
+        if( subject.name ) textSearchDescription.push(subject.name);
+      }
+    }
+    if( item.description ) textSearchDescription.push(item.description);
+    if( item.alternativeHeadline ) textSearchDescription.push(item.alternativeHeadline);
+    // if( item.publisher && item.publisher.name ) textSearchDescription.push(item.publisher.name);  
+
+    item.text_search_description = textSearchDescription.join('\n\n');
   }
 
   if( headers.link ) {

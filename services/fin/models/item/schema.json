@@ -47,7 +47,7 @@
     },
 
     "@graph.publisher.name" : {
-      "type" : "keyword" 
+      "type" : "keyword"
     },
 
     "@graph.subjects.@id" : {
@@ -163,7 +163,10 @@
 
     "roles" : {
       "type":  "keyword"
-    }
+    },
 
+    "@graph.text_search_description": {
+      "type": "text"
+    }
   }
 }
