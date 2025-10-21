@@ -89,6 +89,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage } = record;    
 
+    this.firstLoad = graph.root?.id !== this.rootRecord?.id ? true : false;
+
     this.rootRecord = graph.root;
     this.selectedMedia = selectedMedia;
     this.clientMedia = clientMedia;
@@ -101,12 +103,11 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this._setDownloadHref(this.sources);
 
     this.hasMultipleDownloadMedia = this.sources.length > 1;
-    if( this.hasMultipleDownloadMedia ) {
+    if( this.firstLoad && this.hasMultipleDownloadMedia ) {
       this.shadowRoot.querySelector("#single").checked = true;
       this.shadowRoot.querySelector("#fullset").checked = false;
+      this.fullSetSelected = false;
     }
-
-    this.fullSetSelected = false;
 
     if( this.sources.length === 0 ) {
       this.selectedMediaHasSources = false;
@@ -123,6 +124,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.selectedRecordMedia = media;
     this.downloadOptions = [this.selectedRecordMedia];
     this.isMultimedia = this.downloadOptions[0]?.fileFormat?.includes('video');
+    let pdf;
 
     if( this.isMultimedia ) {
       let download = this.downloadOptions[0];
@@ -140,7 +142,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       // check if the only main source with pages is pdf,
       // if so then just show archive download options instead of single page
       let imageList = this.clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
-      let pdf = this.clientMedia.mediaGroups.filter(m => m.clientMedia?.pdf && 
+      pdf = this.clientMedia.mediaGroups.filter(m => m.clientMedia?.pdf && 
                                                          m.clientMedia?.pages?.length && 
                                                          m.clientMedia?.download?.[0]?.label === 'pdf')[0];
 
@@ -154,6 +156,10 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     this._renderDownloadAllFormats();
     this._renderDownloadSingleFormat();
+
+    if( pdf && !this.isMultimedia && this.firstLoad ) {
+      this._toggleMultipleDownload(null, true);
+    }
   }
 
   /**
@@ -407,11 +413,22 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
   /**
    * @method _toggleMultipleDownload
    * @description bound to radio buttons click event
+   *
+   * @param {Event} evt the click event
+   * @param {Boolean} preselectPdf if true, then preselect the pdf format if it exists
    */
-  _toggleMultipleDownload() {
+  _toggleMultipleDownload(evt, preselectPdf=false) {
+    if( preselectPdf && this.firstLoad) {
+      let pdfOption = Array.from(this.shadowRoot.querySelector("#format").options).filter(o => o.value === 'pdf')[0];
+      if( pdfOption ) pdfOption.selected = true;
+
+      this.shadowRoot.querySelector("#fullset").checked = true;
+      this.shadowRoot.querySelector("#single").checked = false;
+    }
+
     this.fullSetSelected = this.shadowRoot.querySelector("#fullset").checked
-      ? true
-      : false;
+        ? true
+        : false;
     
     let selectedFormat = this.shadowRoot.querySelector("#format").value;
     let sources = this.sources.filter(s => s.label === selectedFormat || !selectedFormat);

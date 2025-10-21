@@ -100,9 +100,9 @@ class CollectionService extends BaseService {
         }
         let payload = {searchDocument, payload: result.body, id};
         vcModel.renderCollections(payload);
-        this.store.set(payload, this.store.data.search)
+        this.store.set(payload, this.store.data.search);
       },
-      onError : error => this.store.setSearchError({searchDocument, error, id}, this.store.data.search)
+      onError : error => this.store.set({searchDocument, error, id}, this.store.data.search)
     });
 
     return {id, request}

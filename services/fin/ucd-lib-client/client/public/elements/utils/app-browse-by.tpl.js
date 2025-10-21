@@ -1,6 +1,7 @@
 import { html } from "lit";
 import { sharedStyles } from "../styles/shared-styles";
 import "@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.js";
+import '../components/ucdlib-browse-az.js';
 
 export default function render() {
   return html`
@@ -117,18 +118,94 @@ export default function render() {
         width: 100%;
       }
 
-      .left-image {
-        width: 37.5vw;
+      .left-image-container {
         position: absolute;
         left: -12.5vw;
         bottom: 0;
       }
 
-      .right-image {
-        width: 37.5vw;
+      .left-image-container .creator-info-label img {
+        transform: scaleX(-1);
+      }
+
+      .right-image-container {
         position: absolute;
-        right: -14.3vw;
+        right: -12.5vw;
         top: 0;
+      }
+
+      .left-image-container img,
+      .right-image-container img {
+        width: 37.5vw;
+      }
+
+      .left-image-container a,
+      .right-image-container a {
+        cursor: pointer;
+      }
+
+      div.creator-info-label {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+
+        width: auto;
+        z-index: 20;
+        height: auto;
+      }
+
+      .creator-info-label {
+        position: relative;
+        display: inline-block;
+      }
+
+      /* hover transitions */
+      .left-image-container .creator-info-label {
+        transform: translateX(-50vw);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .right-image-container .creator-info-label {
+        transform: translateX(50vw);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .left-image-container:hover .creator-info-label,
+      .right-image-container:hover .creator-info-label {
+        transform: translateX(0);
+      }
+
+      .right-image-container .creator-info-label {
+        left: 0;
+        right: auto;
+      }
+
+      .creator-info-label img {
+        width: 10rem;
+      }
+
+      .creator-info-label h5 {
+        position: absolute;
+        color: var(--white, #FFF);
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 1;
+      }
+
+      .creator-info-label h5 {
+        top: 0;
+        height: 3rem;
+        width: 8rem;
+        font-weight: 800;
+        font-size: 0.875rem;
+        line-height: 1.2;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .card-grid {
@@ -158,6 +235,12 @@ export default function render() {
         margin: 0 auto;
       }
 
+      ucdlib-browse-az {
+        padding-bottom: 1.5rem;
+        width: 100%; 
+        margin: auto;
+      }
+
       @media (max-width: 1310px) {
         .header,
         .results-footer {
@@ -166,11 +249,19 @@ export default function render() {
         h1 {
           margin: 0.5rem 0;
         }
+
+        ucdlib-browse-az {
+          width: calc(50% / 0.65 - 2rem); 
+        }
       }
       @media (max-width: 767px) {
         .header,
         .results-footer {
           width: auto;
+        }
+
+        ucdlib-browse-az {
+          width: 100%; 
         }
       }
       @media (max-width: 990px) {
@@ -276,16 +367,32 @@ export default function render() {
           )}
         </div>
       </div>
+      <ucdlib-browse-az
+        ?hidden="${this.totalPages < 6 && !this.selectedLetter}"
+        .results="${(this.allResults?.payload || this.allResults || [])}"
+        @letter-change="${this._onLetterChange}"
+        .selected-letter="${this.selectedLetter}">
+      </ucdlib-browse-az>
+
       <div class="header-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
     </div>
 
     <div class="body">
       <div class="side-image ${this.isCollectionPage ? "no-flex" : ""}">
-        <img
-          class="left-image"
-          ?hidden=${this.results.length < 12 || this.isCollectionPage}
-          src="${this.leftImgUrl}"
-        />
+        <div class="left-image-container">
+          <a href="${this.leftItemLink}">
+            <img
+              class="left-image"
+              ?hidden=${this.results.length < 12 || this.isCollectionPage}
+              src="${this.leftImgUrl}"
+            />
+            <div class="creator-info-label">
+              <img src="/images/watercolors/Label-Watercolor-Blue_v2.png" alt="label background"/>
+              <h5>${this.leftLabel}</h5>
+            </div>
+          </a>
+  
+        </div>
       </div>
 
       <div class="results ${this.isCollectionPage ? 'collection' : ''}">
@@ -321,18 +428,26 @@ export default function render() {
         </div>
       </div>
       <div class="side-image ${this.isCollectionPage ? "no-flex" : ""}">
-        <img
-          class="right-image"
-          ?hidden=${this.results.length < 12 || this.isCollectionPage}
-          src="${this.rightImgUrl}"
-        />
+        <div class="right-image-container">
+          <a href="${this.rightItemLink}">
+            <img
+              class="right-image"
+              ?hidden=${this.results.length < 12 || this.isCollectionPage}
+              src="${this.rightImgUrl}"
+            />
+            <div class="creator-info-label">
+              <img src="/images/watercolors/Label-Watercolor-Blue_v2.png" alt="label background"/>
+              <h5>${this.rightLabel}</h5>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
 
     <div class="results-footer">
       <div class="footer-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
       <ucd-theme-pagination
-        ?hidden="${this.totalPages < 2}"
+        ?hidden="${this.totalPages < 2 && !this.selectedLetter}"
         current-page=${this.currentPage}
         max-pages=${this.totalPages}
         @page-change=${this._onPageClicked}

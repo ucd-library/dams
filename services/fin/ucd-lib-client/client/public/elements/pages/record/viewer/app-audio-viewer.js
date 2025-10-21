@@ -36,21 +36,21 @@ export default class AppAudioViewer extends Mixin(LitElement)
     this.$ = {};
   }
 
-  _onAppStateUpdate(e) {
+  async _onAppStateUpdate(e) {
     if ( this.fullPath !== e.location.fullpath ) { 
       this._stop();
     }
 
     this.fullPath = e.location.fullpath;
     this._updateStyles();
+
+    let selectedRecord = await this.AppStateModel.getSelectedRecord();
+    if( selectedRecord && selectedRecord.selectedMedia ) this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
   }
 
   async firstUpdated(e) {
     this.$.audio  = this.shadowRoot.getElementById('audio_player');
     this.$.poster = this.shadowRoot.getElementById('audio_poster');
-
-    let selectedRecord = await this.AppStateModel.getSelectedRecord();
-    if( selectedRecord && selectedRecord.selectedMedia ) this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
 
     this.fullPath = (await this.AppStateModel.get()).location.fullpath;
     

@@ -91,7 +91,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
    *
    * @param {Object} e
    */
-  _onAppStateUpdate(e) {
+  async _onAppStateUpdate(e) {
     if (e.location.page !== "search") return;
 
     if( this.AppStateModel.location.fullpath !== this.lastSearch ) {
@@ -102,6 +102,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this._setSelectedDisplay();
     // this._resizeAsync();
     this.filterDisplayResults();
+
+    this._onCollectionSearchUpdate(await this.CollectionModel.search({ text: this.RecordModel.lastQuery?.text || '' }));
   }
 
   _reset() {
@@ -121,6 +123,16 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     this.loading = true;
   }
 
+  _onCollectionSearchUpdate(e) {
+    if( e.state !== 'loaded' ) return;
+    // combine collection search with item search 
+    // (ie match collections regardless of items in search, and show collections where items are matched from them)
+    let collections = (e.payload?.results || []).map(c => ({ '@id': c.root?.['@id'] }));
+    collections.forEach(c => {
+      if( !this.collectionResults.find(r => r['@id'] === c['@id']) ) this.collectionResults.push(c);
+    });
+  }
+
   /**
    * @method _onFilterBucketsUpdate
    * @description called when collection/record search events occur, aggregation query results
@@ -130,11 +142,15 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     if( e.filter !== '@graph.isPartOf.@id' ) return;
     // temp remove oac isPartOf records
     e.buckets = e.buckets.filter(b => !b.key.includes('oac.cdlib.org') && b.doc_count > 0);
-    
-    this.collectionResults = e.buckets.map(r => {
+
+    let collectionResults = e.buckets.map(r => {
       return {
         '@id' : r.key,
       };
+    });
+
+    collectionResults.forEach(r => {
+      if( !this.collectionResults.find(res => res['@id'] === r['@id']) ) this.collectionResults.push(r);
     });
 
     let searchText = this.SearchVcModel.getSearch()?.searchDocument?.text;
@@ -508,14 +524,11 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   _scrollToCollections(e) {
     e.preventDefault();
 
-    let pagination = this.shadowRoot.querySelector("ucd-theme-pagination");
-    if (pagination) {
-      window.scrollTo({
-        top: pagination.offsetTop + 100,
-        left: 0,
-        behavior: "smooth",
-      });
-    }
+    window.scrollTo({
+      top: this.offsetHeight + 100,
+      left: 0,
+      behavior: "smooth",
+    });
   }
 
   /**
