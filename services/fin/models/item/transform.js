@@ -2,6 +2,8 @@ const {config, pg, models} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 const fetch = require('node-fetch');
 
+const ControllerUtils = require('../utils.js');
+
 const BINARY = 'http://fedora.info/definitions/v4/repository#Binary';
 // const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
 const ARCHIVAL_GROUP_REGEX = /^\/item\/(ark:\/[a-z0-9]+\/[a-z0-9]+)/;
@@ -309,38 +311,11 @@ module.exports = async function(path, graph, headers, utils) {
       }     
     }
 
-    if( item.name ) textSearchDescription.push(item.name);
-
-    if( typeof item.creator === 'string' ) {
-      textSearchDescription.push(item.creator);
-    } else {
-      if( !Array.isArray(item.creator) ) item.creator = [item.creator];
-      for( let creator of item.creator ) {
-        if( typeof creator === 'string' ) {
-          textSearchDescription.push(creator);
-        } else if( creator.name ) {
-          textSearchDescription.push(creator.name);
-        }
-      }
-    }
-
-    if( typeof item.subjects === 'string' ) {
-      textSearchDescription.push(item.subjects);
-    } else {
-      if( !Array.isArray(item.subjects) ) item.subjects = [item.subjects];
-      for( let subject of item.subjects ) {
-        if( typeof subject === 'string' ) {
-          textSearchDescription.push(subject);
-        } else if( subject.name ) {
-          textSearchDescription.push(subject.name);
-        }
-      }
-    }
-
-    if( item.description ) textSearchDescription.push(item.description);
-    if( item.alternativeHeadline ) textSearchDescription.push(item.alternativeHeadline);
-    // if( item.publisher && item.publisher.name ) textSearchDescription.push(item.publisher.name);  
-
+    ControllerUtils.appendJsonLdToArray(item.name, textSearchDescription);
+    ControllerUtils.appendJsonLdToArray(item.creator, textSearchDescription);
+    ControllerUtils.appendJsonLdToArray(item.subjects, textSearchDescription);
+    ControllerUtils.appendJsonLdToArray(item.description, textSearchDescription);
+    ControllerUtils.appendJsonLdToArray(item.alternativeHeadline, textSearchDescription);
     item.text_search_description = textSearchDescription.join('\n\n');
   }
 
