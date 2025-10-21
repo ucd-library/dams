@@ -24,12 +24,7 @@
 
     "@graph.about" : {
       "type" : "text",
-      "fields": {
-        "stem": {
-          "type": "text",
-          "analyzer": "english"
-        }
-      }
+      "analyzer": "english"
     },
 
     "@graph.identifier" : {
@@ -37,8 +32,7 @@
       "fields": {
         "raw": { 
           "type":  "keyword"
-        },
-        "stem": { "type": "text", "analyzer": "english" }
+        }      
       }
     },
 
@@ -132,9 +126,7 @@
 
     "@graph.description" : {
       "type": "text",
-      "fields": {
-        "stem": { "type": "text", "analyzer": "english" }
-      }
+      "analyzer": "english"
     },
 
     "@graph.alternativeHeadline" : {
@@ -166,7 +158,8 @@
     },
 
     "@graph.text_search_description": {
-      "type": "text"
+      "type": "text",
+      "analyzer": "english"
     }
   }
 }
