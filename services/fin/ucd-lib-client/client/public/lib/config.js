@@ -46,9 +46,12 @@ config.elasticSearch = {
     }
   },
 
+  // latest text fields used for search are loaded from /services/fin/ucd-lib-client/config.js
+  // when we're releasing new versions requiring schema reindexing, we can update those to the latest,
+  // and update the overlay .env vars with the current working set of fields, until reindexing is done
   textFields : {
-    record : ['name.punctuation_insensitive', 'name.stem', '@graph.description.stem', '@graph.identifier.stem', '@graph.about.stem', '@graph.keywords', '@graph.alternativeHeadline', '@graph.indexableContent'],
-    collection : ['@graph.name.stem', '@graph.description.stem', '@graph.about.stem', '@graph.keywords.stem']
+    record : APP_CONFIG.itemTextFields.split(',').map(f => f.trim()),
+    collection : APP_CONFIG.collectionTextFields.split(',').map(f => f.trim())
   },
   
   // max number of facets filter options
