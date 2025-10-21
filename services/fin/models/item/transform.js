@@ -310,16 +310,33 @@ module.exports = async function(path, graph, headers, utils) {
     }
 
     if( item.name ) textSearchDescription.push(item.name);
-    if( item.creator && Array.isArray(item.creator) ) {
+
+    if( typeof item.creator === 'string' ) {
+      textSearchDescription.push(item.creator);
+    } else {
+      if( !Array.isArray(item.creator) ) item.creator = [item.creator];
       for( let creator of item.creator ) {
-        if( creator.name ) textSearchDescription.push(creator.name);
+        if( typeof creator === 'string' ) {
+          textSearchDescription.push(creator);
+        } else if( creator.name ) {
+          textSearchDescription.push(creator.name);
+        }
       }
     }
-    if( item.subjects && Array.isArray(item.subjects) ) {
+
+    if( typeof item.subjects === 'string' ) {
+      textSearchDescription.push(item.subjects);
+    } else {
+      if( !Array.isArray(item.subjects) ) item.subjects = [item.subjects];
       for( let subject of item.subjects ) {
-        if( subject.name ) textSearchDescription.push(subject.name);
+        if( typeof subject === 'string' ) {
+          textSearchDescription.push(subject);
+        } else if( subject.name ) {
+          textSearchDescription.push(subject.name);
+        }
       }
     }
+
     if( item.description ) textSearchDescription.push(item.description);
     if( item.alternativeHeadline ) textSearchDescription.push(item.alternativeHeadline);
     // if( item.publisher && item.publisher.name ) textSearchDescription.push(item.publisher.name);  
