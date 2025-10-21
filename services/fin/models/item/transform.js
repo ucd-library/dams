@@ -293,21 +293,6 @@ module.exports = async function(path, graph, headers, utils) {
 
   // build text_search_description, composite for searching
   let textSearchDescription = [];  
-  if( item.name ) textSearchDescription.push(item.name);
-  if( item.description ) textSearchDescription.push(item.description);
-  if( item.alternativeHeadline ) textSearchDescription.push(item.alternativeHeadline);
-  if( item.publisher && item.publisher.name ) textSearchDescription.push(item.publisher.name);  
-  if( item.subjects && Array.isArray(item.subjects) ) {
-    for( let subject of item.subjects ) {
-      if( subject.name ) textSearchDescription.push(subject.name);
-    }
-  }
-  if( item.creator && Array.isArray(item.creator) ) {
-    for( let creator of item.creator ) {
-      if( creator.name ) textSearchDescription.push(creator.name);
-    }
-  }
-
   if( item._.graphId === item['@id'] ) {
     // add collectionName using the isPartOf id
     if( item.isPartOf ) {
@@ -323,6 +308,21 @@ module.exports = async function(path, graph, headers, utils) {
         // handled in validate.js
       }     
     }
+
+    if( item.name ) textSearchDescription.push(item.name);
+    if( item.creator && Array.isArray(item.creator) ) {
+      for( let creator of item.creator ) {
+        if( creator.name ) textSearchDescription.push(creator.name);
+      }
+    }
+    if( item.subjects && Array.isArray(item.subjects) ) {
+      for( let subject of item.subjects ) {
+        if( subject.name ) textSearchDescription.push(subject.name);
+      }
+    }
+    if( item.description ) textSearchDescription.push(item.description);
+    if( item.alternativeHeadline ) textSearchDescription.push(item.alternativeHeadline);
+    // if( item.publisher && item.publisher.name ) textSearchDescription.push(item.publisher.name);  
 
     item.text_search_description = textSearchDescription.join('\n\n');
   }
