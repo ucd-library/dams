@@ -28,7 +28,7 @@ config.client = {
   // latest text fields used for search
   // when we're releasing new versions requiring schema reindexing, we can update this to the latest,
   // and update the overlay .env vars with the current working set of fields, until reindexing is done
-  itemTextFields : process.env.ITEM_TEXT_FIELDS || 'text_search_description, name.punctuation_insensitive, name.stem, @graph.identifier.stem, @graph.about.stem, @graph.keywords, @graph.indexableContent',
+  itemTextFields : process.env.ITEM_TEXT_FIELDS || '@graph.text_search_description, name.punctuation_insensitive, name.stem, @graph.identifier, @graph.about, @graph.keywords, @graph.indexableContent',
   collectionTextFields : process.env.COLLECTION_TEXT_FIELDS || '@graph.name.stem, @graph.description.stem, @graph.about.stem, @graph.keywords.stem',
 
   env : {
