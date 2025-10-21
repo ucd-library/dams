@@ -78,6 +78,8 @@ class RecordService extends BaseService {
       searchDocument.textFields = config.elasticSearch.textFields.record;
     }
 
+    searchDocument['simple_query_string'] = true;
+
     let params = {};
     if( opts.debug ) params.debug = true;
     if( opts.compact ) params.compact = true;
