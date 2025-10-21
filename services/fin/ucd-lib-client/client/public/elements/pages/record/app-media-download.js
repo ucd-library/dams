@@ -81,7 +81,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
   }
 
   _onAppStateUpdate(e) {
-    if( e.location.page !== 'item' ) return this._reset();
+    if( e.location.page !== 'item' ) this._reset();
   }
 
   _onSelectedRecordUpdate(record) {
