@@ -200,7 +200,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( this.selectedLetter ) {
       // filter by selected letter
       filterResultsTo = filterResultsTo.filter(item => {
-        const firstChar = item.key?.[0]?.toLowerCase() || item.title?.[0]?.toLowerCase();
+        const firstChar = item.key?.trim()?.[0]?.toLowerCase() || item.title?.trim()?.[0]?.toLowerCase();
         if( this.selectedLetter === '1' ) {
           return firstChar && !/[a-z]/.test(firstChar) && item.count > 0;
         }
@@ -247,7 +247,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( this.selectedLetter ) {
       // filter by selected letter
       filterResultsTo = filterResultsTo.filter(item => {
-        return (item.key?.toLowerCase()?.startsWith(this.selectedLetter) || item.title?.toLowerCase()?.startsWith(this.selectedLetter)) 
+        return (item.key?.toLowerCase()?.trim()?.startsWith(this.selectedLetter) || item.title?.toLowerCase()?.trim()?.startsWith(this.selectedLetter)) 
           && item.count > 0;
       });
     }
@@ -262,8 +262,8 @@ export default class AppBrowseBy extends Mixin(LitElement)
       } else {
         // sort by title
         filterResultsTo.sort((a, b) => {
-          if( a.title.toLowerCase() > b.title.toLowerCase() ) return (sort.dir === 'asc') ? 1 : -1;
-          if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sort.dir === 'asc') ? -1 : 1;
+          if( a.title.toLowerCase().trim() > b.title.toLowerCase().trim() ) return (sort.dir === 'asc') ? 1 : -1;
+          if( a.title.toLowerCase().trim() < b.title.toLowerCase().trim() ) return (sort.dir === 'asc') ? -1 : 1;
           return 0;   
         });
       }
