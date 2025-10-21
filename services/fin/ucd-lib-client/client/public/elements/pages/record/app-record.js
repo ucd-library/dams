@@ -72,6 +72,21 @@ class AppRecord extends Mixin(LitElement)
     this.render = render.bind(this);
     this.active = true;
 
+    this._reset();
+
+    this._injectModel(
+      "AppStateModel",
+      "RecordModel",
+      "CollectionModel",
+      "SeoModel",
+      "FcAppConfigModel",
+      "WorkflowModel"
+    );
+
+    window.addEventListener('click', () => this._onPageClick());
+  }
+
+  _reset() {
     this.record = {};
     this.currentRecordId = "";
     this.name = "";
@@ -122,17 +137,6 @@ class AppRecord extends Mixin(LitElement)
     this.firstStatusLoaded = false;
 
     this.workflowIntervalId = null;
-
-    this._injectModel(
-      "AppStateModel",
-      "RecordModel",
-      "CollectionModel",
-      "SeoModel",
-      "FcAppConfigModel",
-      "WorkflowModel"
-    );
-
-    window.addEventListener('click', () => this._onPageClick());
   }
 
   _onPageClick(e) {
@@ -224,7 +228,8 @@ class AppRecord extends Mixin(LitElement)
    */
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) {
-      this.stopWorkflowLoop = true;
+      // this.stopWorkflowLoop = true;
+      this._reset();
       return;
     }
 
@@ -568,7 +573,7 @@ class AppRecord extends Mixin(LitElement)
     await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
 
     this.editMode = false;
-    this.stopWorkflowLoop = true;
+    // this.stopWorkflowLoop = true;
 
     this._changeMediaViewerDisplay('', true);
   }
