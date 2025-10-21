@@ -69,9 +69,6 @@ class Validate {
     // ensure items are associated with a collection
     if( !graph.root['@shortType'].includes('Collection') ) {
       let isPartOf = graph.root.isPartOf;
-      let found = false;
-      let collectionId;
-
       if( !isPartOf ) {
         result.errors.push('Collection isPartOf not found');
       } else {
@@ -79,11 +76,11 @@ class Validate {
           isPartOf = [isPartOf];
         }
 
+        let found = false;
         for( let part of isPartOf ) {
           if( !part['@id'] ) {
             continue;
           } else if( part['@id'].match(/^\/collection\//) ) {
-            collectionId = part['@id'];
             found = true;
             break;
           }
@@ -91,24 +88,6 @@ class Validate {
 
         if( !found ) {
           result.errors.push('Collection isPartOf not found');
-        }
-      }
-
-      // also make sure we can fetch the collection to get its name
-      if( found && collectionId) {
-        const collectionModel = require('./collection/model');
-        try {
-          let collection = await collectionModel.get(collectionId);
-          if( !collection || !collection.name ) {
-            result.errors.push({
-              label : 'Collection name not found for id: '+collectionId,
-            });
-          }
-        } catch(e) {
-          result.errors.push({
-            label : 'Error fetching collection name for id: '+collectionId,
-            message : e.message
-          });
         }
       }
     }
