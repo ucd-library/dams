@@ -266,7 +266,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
           if( a.title.toLowerCase().trim() < b.title.toLowerCase().trim() ) return (sort.dir === 'asc') ? -1 : 1;
           return 0;   
         });
-      } // else recent, just sort by date, but already sorted
+      } // else recent, just sort by date, but already sorted (in _searchBrowseByCollections(), we sort using the es searchDocument)
     }  
 
     this.collectionResults = filterResultsTo.slice(
@@ -343,7 +343,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
         if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sortBy.dir === 'asc') ? -1 : 1;
         return 0;   
       });
-    } // else recent, just sort by date, but already sorted
+    } // else recent, just sort by date, but already sorted above
     
     this.collectionResults = this.allResults.slice(
       this.currentIndex, 
