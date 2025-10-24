@@ -259,14 +259,14 @@ export default class AppBrowseBy extends Mixin(LitElement)
           if( a[sort.type] < b[sort.type] ) return (sort.dir === 'asc') ? -1 : 1;
           return 0;
         });
-      } else {
+      } else if ( sort.label === 'A-Z' ) {
         // sort by title
         filterResultsTo.sort((a, b) => {
           if( a.title.toLowerCase().trim() > b.title.toLowerCase().trim() ) return (sort.dir === 'asc') ? 1 : -1;
           if( a.title.toLowerCase().trim() < b.title.toLowerCase().trim() ) return (sort.dir === 'asc') ? -1 : 1;
           return 0;   
         });
-      }
+      } // else recent, just sort by date, but already sorted (in _searchBrowseByCollections(), we sort using the es searchDocument)
     }  
 
     this.collectionResults = filterResultsTo.slice(
@@ -343,7 +343,7 @@ export default class AppBrowseBy extends Mixin(LitElement)
         if( a.title.toLowerCase() < b.title.toLowerCase() ) return (sortBy.dir === 'asc') ? -1 : 1;
         return 0;   
       });
-    } // else recent, just sort by date, but already sorted
+    } // else recent, just sort by date, but already sorted above
     
     this.collectionResults = this.allResults.slice(
       this.currentIndex, 
@@ -421,8 +421,16 @@ export default class AppBrowseBy extends Mixin(LitElement)
   _onSortChange(e) {
     let sortIndex = parseInt(e.currentTarget.getAttribute('index'));
     this.sortByOptions.forEach((item, index) => item.selected = (index === sortIndex));
+  
+    // reset to first page
+    if( this.currentPage !== 1 ) {
+      let path = '/browse/'+this.id+'/'+this.resultsPerPage;
+      this.AppStateModel.setLocation(path);
+      this.currentPage = 1;
+    }
+
     this.currentIndex = 0;
-    this.currentPage = 1;
+  
     if( this.isCollectionPage ) {
       this._searchBrowseByCollections();
     }
