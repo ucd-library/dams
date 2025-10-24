@@ -52,8 +52,9 @@ class Utils {
     const YEAR_MONTH_DAY = /^(\d{4})-(\d{2})-(\d{2})$/;
     if (YEAR.test(date)) return date;
 
-    if (YEAR_MONTH.test(date)) {
-      const [, y, m] = YEAR_MONTH.exec(date);
+    const yearMonthMatch = YEAR_MONTH.exec(date);
+    if (yearMonthMatch) {
+      const [, y, m] = yearMonthMatch;
       const dt = new Date(Date.UTC(Number(y), Number(m) - 1, 1));
       return dt.toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long' });
     }
