@@ -45,6 +45,26 @@ class Utils {
     return new Intl.NumberFormat('en-US').format(num);
   }
 
+  formatDateString(date) {
+    if (!date || date === 'Undated') return date;
+    const YEAR = /^\d{4}$/;
+    const YEAR_MONTH = /^(\d{4})-(\d{2})$/;
+    const YEAR_MONTH_DAY = /^(\d{4})-(\d{2})-(\d{2})$/;
+    if (YEAR.test(date)) return date;
+
+    if (YEAR_MONTH.test(date)) {
+      const [, y, m] = YEAR_MONTH.exec(date);
+      const dt = new Date(Date.UTC(Number(y), Number(m) - 1, 1));
+      return dt.toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long' });
+    }
+    // fallback to full date (YYYY-MM-DD or parseable string)
+    const parsed = new Date(date);
+    if (!isNaN(parsed)) {
+      return parsed.toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    return date;
+  }
+
   /**
    * @method findMediaFromId
    * @description given a record object, use the id (@id) to return

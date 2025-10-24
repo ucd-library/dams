@@ -171,7 +171,7 @@ class AppRecord extends Mixin(LitElement)
     this.name = this.record.name;
     this.collectionName = this.record.collectionName;
     this.description = this.record.description;
-    this.date = this.record.date;
+    this.date = utils.formatDateString(this.record.date);
     this.publisher = this.record.publisher;
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
@@ -521,9 +521,10 @@ class AppRecord extends Mixin(LitElement)
       imagePath.replace('/fcrepo/rest', '')
     ];
 
+    if( !imagePath.endsWith('/images') ) imagePath += '/fcr:metadata';
     this.fedoraLinks = [
       '/fcrepo/rest'+ path.replace('/fcrepo/rest', ''),
-      '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
+      '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '')
     ];
 
   }
