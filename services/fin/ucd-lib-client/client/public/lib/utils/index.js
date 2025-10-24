@@ -59,7 +59,7 @@ class Utils {
     }
     // fallback to full date (YYYY-MM-DD or parseable string)
     const parsed = new Date(date);
-    if (!isNaN(parsed)) {
+    if (!isNaN(parsed.getTime())) {
       return parsed.toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' });
     }
     return date;
