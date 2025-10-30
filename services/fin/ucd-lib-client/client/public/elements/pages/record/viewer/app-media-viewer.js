@@ -49,6 +49,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.active = true;
 
     this._injectModel("AppStateModel", "RecordModel", "FcAppConfigModel", "CollectionModel", "BookReaderModel");
+    this._reset();
+  }
+
+  _reset() {
     this.mediaType = "";
     this.bagOfFilesImage = "";
     this.brFullscreen = false;
@@ -65,7 +69,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.queryTerm = "";
     this.regexPattern = /\{\{\{.*?\}\}\}/g;
     this.noMedia = false;
-
     this.$ = {};
   }
 
@@ -249,6 +252,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.noMedia = false;
 
     this._onCollapseBookView();
+    this._reset();
   }
 
   _onSearchResultsChange(resultsByPage={}) {
