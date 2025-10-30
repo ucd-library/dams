@@ -81,8 +81,12 @@ class SearchVcModel extends BaseModel {
 
       if (mediaType) mediaType = mediaType.replace("Object", "");
 
-      let size = result.clientMedia?.mediaGroups?.[0]?.clientMedia?.images?.original?.size || {};
-      if( Array.isArray(size) ) size = size[0];
+      let size = mediaGroups.find(g => g.clientMedia?.images?.original?.size);
+      if( size ) {
+        size = size.clientMedia.images.original.size;
+      } else { 
+        size = {};
+      }
 
       matchedItems.push({
         id: result.root["@id"],
