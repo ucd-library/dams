@@ -19,7 +19,7 @@ config.client = {
 
   appName : process.env.FIN_APP_NAME || 'ucd-lib-client',
   assets : (env === 'prod') ? 'dist' : 'public',
-  appRoutes : ['about', 'item', 'search', 'browse', 'collections', 'collection', 'components'],
+  appRoutes : ['about', 'item', 'search', 'browse', 'collections', 'collection', 'components', 'search-tips'],
   versions : {
     bundle : clientPackageVersion,
     loader : clientPackage.dependencies['@ucd-lib/cork-app-load'].replace(/^\D/, '')

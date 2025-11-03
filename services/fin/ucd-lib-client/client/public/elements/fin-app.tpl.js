@@ -121,6 +121,7 @@ export default function render() {
         <app-search id="search"></app-search>
         <app-record id="item" @show-404="${(e) => this.page = '404'}"></app-record>
         <app-browse id="browse"></app-browse>
+        <app-search-tips id="search-tips"></app-search-tips>
         <app-about id="about"></app-about>
         <app-collection id="collection" @show-404="${(e) => this.page = '404'}"></app-collection>        
       </ucdlib-pages>
@@ -134,6 +135,7 @@ export default function render() {
           <ul>
             <li><a href="/browse/collections">Collections</a></li>
             <li><a href="/search">Items</a></li>
+            <li><a href="/search-tips">Search Tips</a></li>
             <li><a href="/about">About Digital Collections</a></li>
             <!-- <li><a href="">FAQ</a></li> -->
           </ul>

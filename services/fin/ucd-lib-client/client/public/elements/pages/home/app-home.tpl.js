@@ -733,6 +733,8 @@ export default function render() {
       <div class="hero-top-right">
         <a href="/browse">Browse</a>
         <span class="dot"></span>
+        <a href="/search-tips">Search Tips</a>
+        <span class="dot"></span>
         <a href="/about">About</a>
       </div>
     </div>
