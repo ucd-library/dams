@@ -202,7 +202,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       let urls = [];
       if( image1 ) urls.push(image1);
       if( image2 ) urls.push(image2);
-      if( urls.length ) {
+      if( urls.length && !this.fullSetSelected ) {
         this._setZipPaths(urls);
       }
       this._renderDownloadSingleFormat(true);      
@@ -258,11 +258,10 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
 
     if( this.disableDownload ) return;
 
-    let allFiles = this.shadowRoot.querySelector('#fullset').checked;
     let imageList = this.clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
     let firstMediaDownload = this.clientMedia.mediaGroups[0]?.clientMedia?.download?.[0]?.url;
 
-    if( allFiles || this.isTwoPageView ) {
+    if( this.fullSetSelected || this.isTwoPageView ) {
       // build zip download url
       this.zipName = this.rootRecord.name
         .replace(/[^a-zA-Z0-9]/g, "-")
