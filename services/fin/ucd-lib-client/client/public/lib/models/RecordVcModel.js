@@ -102,7 +102,7 @@ class RecordVcModel {
         collectionName: config.collectionLabels[collectionId] || '',
         clientMedia: clientMedia,
         images,
-        date: root.yearPublished || 'Undated',
+        date: root.datePublished || root.yearPublished || 'Undated',
         description: root.description || '',
         publisher: root?.publisher?.name,
         subjects,
