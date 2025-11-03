@@ -48,6 +48,7 @@ export default function render() {
       .sort {
         display: flex;
         align-items: center;
+        justify-content: center;
       }
 
       .body {
@@ -146,7 +147,7 @@ export default function render() {
 
       div.creator-info-label {
         position: absolute;
-        bottom: 0;
+        bottom: 1rem;
         right: 0;
 
         width: auto;
@@ -162,12 +163,12 @@ export default function render() {
       /* hover transitions */
       .left-image-container .creator-info-label {
         transform: translateX(-50vw);
-        transition: transform 0.3s ease-in-out;
+        transition: transform 0.55s ease-in-out;
       }
 
       .right-image-container .creator-info-label {
         transform: translateX(50vw);
-        transition: transform 0.3s ease-in-out;
+        transition: transform 0.55s ease-in-out;
       }
 
       .left-image-container:hover .creator-info-label,
@@ -231,8 +232,9 @@ export default function render() {
       .footer-dots.collection {
         display: block;
         border-bottom: 5px dotted var(--color-dams-secondary); 
-        width: 650px;
+        width: calc(50% + 2rem);
         margin: 0 auto;
+        position: relative;
       }
 
       ucdlib-browse-az {
@@ -263,6 +265,11 @@ export default function render() {
         ucdlib-browse-az {
           width: 100%; 
         }
+        .header-dots.collection,
+        .footer-dots.collection {
+          width: 90%;
+          margin: auto;
+        }
       }
       @media (max-width: 990px) {
         /* tablet */
@@ -272,10 +279,6 @@ export default function render() {
         h1 {
           font-size: 2rem;
           font-weight: 600;
-        }
-        .header-dots.collection,
-        .footer-dots.collection {
-          width: 500px;
         }
       }
 
@@ -300,13 +303,6 @@ export default function render() {
         }
         .results-footer {
           padding: 2rem 1rem 0;
-        }
-        /* .results-footer > * {
-          margin: auto;
-        } */
-        .header-dots.collection,
-        .footer-dots.collection {
-          width: 400px;
         }
 
         .side-image {
@@ -372,10 +368,10 @@ export default function render() {
         .results="${(this.allResults?.payload || this.allResults || [])}"
         @letter-change="${this._onLetterChange}"
         .selected-letter="${this.selectedLetter}">
-      </ucdlib-browse-az>
-
-      <div class="header-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
+      </ucdlib-browse-az>      
     </div>
+
+    <div class="header-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
 
     <div class="body">
       <div class="side-image ${this.isCollectionPage ? "no-flex" : ""}">
@@ -444,8 +440,9 @@ export default function render() {
       </div>
     </div>
 
+    <div class="footer-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
     <div class="results-footer">
-      <div class="footer-dots ${this.isCollectionPage ? 'collection' : ''}"></div>
+      
       <ucd-theme-pagination
         ?hidden="${this.totalPages < 2 && !this.selectedLetter}"
         current-page=${this.currentPage}
