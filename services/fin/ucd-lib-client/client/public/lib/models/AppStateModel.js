@@ -61,8 +61,11 @@ class AppStateModelImpl extends AppStateModel {
     this.lastGaLocation = window.location.pathname;
 
     // temp hack until env variables are used
-    gtag('config', (APP_CONFIG.gaId), {
-      page_path: window.location.pathname
+    gtag('set', 'cookie_domain', 'digital.ucdavis.edu');
+    gtag('config', APP_CONFIG.gaId, {
+      page_path: window.location.pathname,
+      page_location: window.location.href,
+      cookie_domain: 'digital.ucdavis.edu'
     });
   }
 
