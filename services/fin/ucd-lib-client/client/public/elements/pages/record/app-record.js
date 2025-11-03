@@ -72,6 +72,21 @@ class AppRecord extends Mixin(LitElement)
     this.render = render.bind(this);
     this.active = true;
 
+    this._reset();
+
+    this._injectModel(
+      "AppStateModel",
+      "RecordModel",
+      "CollectionModel",
+      "SeoModel",
+      "FcAppConfigModel",
+      "WorkflowModel"
+    );
+
+    window.addEventListener('click', () => this._onPageClick());
+  }
+
+  _reset() {
     this.record = {};
     this.currentRecordId = "";
     this.name = "";
@@ -122,17 +137,6 @@ class AppRecord extends Mixin(LitElement)
     this.firstStatusLoaded = false;
 
     this.workflowIntervalId = null;
-
-    this._injectModel(
-      "AppStateModel",
-      "RecordModel",
-      "CollectionModel",
-      "SeoModel",
-      "FcAppConfigModel",
-      "WorkflowModel"
-    );
-
-    window.addEventListener('click', () => this._onPageClick());
   }
 
   _onPageClick(e) {
@@ -171,7 +175,7 @@ class AppRecord extends Mixin(LitElement)
     this.name = this.record.name;
     this.collectionName = this.record.collectionName;
     this.description = this.record.description;
-    this.date = this.record.date;
+    this.date = utils.formatDateString(this.record.date);
     this.publisher = this.record.publisher;
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
@@ -224,7 +228,8 @@ class AppRecord extends Mixin(LitElement)
    */
   async _onAppStateUpdate(e) {
     if( e.location.page !== 'item' ) {
-      this.stopWorkflowLoop = true;
+      // this.stopWorkflowLoop = true;
+      this._reset();
       return;
     }
 
@@ -521,9 +526,10 @@ class AppRecord extends Mixin(LitElement)
       imagePath.replace('/fcrepo/rest', '')
     ];
 
+    if( !imagePath.endsWith('/images') ) imagePath += '/fcr:metadata';
     this.fedoraLinks = [
       '/fcrepo/rest'+ path.replace('/fcrepo/rest', ''),
-      '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '') +'/fcr:metadata'
+      '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '')
     ];
 
   }
@@ -568,7 +574,7 @@ class AppRecord extends Mixin(LitElement)
     await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
 
     this.editMode = false;
-    this.stopWorkflowLoop = true;
+    // this.stopWorkflowLoop = true;
 
     this._changeMediaViewerDisplay('', true);
   }
