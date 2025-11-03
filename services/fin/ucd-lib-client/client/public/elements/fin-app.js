@@ -15,6 +15,8 @@ import "../lib";
 import "./pages/search/app-search-header";
 import "./pages/search/app-search-breadcrumb";
 import './pages/404/app-404';
+import './pages/search-tips/app-search-tips';
+
 import "./app-footer";
 import "./auth/app-auth-footer";
 import "./components/site/ucdlib-site-footer";
@@ -55,6 +57,7 @@ export class FinApp extends Mixin(LitElement)
       "collection",
       "components",
       "browse",
+      "search-tips"
     ];
     this.BREADCRUMB_PAGES = ["item", "search", "collections"];
 
@@ -272,6 +275,10 @@ export class FinApp extends Mixin(LitElement)
     } else if (page === "collection") {
       return import(
         /* webpackChunkName: "page-collections" */ "./pages/collection/app-collection"
+      );
+    } else if (page === "search-tips") {
+      return import(
+        /* webpackChunkName: "page-search-tips" */ "./pages/search-tips/app-search-tips"
       );
     }
     return page;

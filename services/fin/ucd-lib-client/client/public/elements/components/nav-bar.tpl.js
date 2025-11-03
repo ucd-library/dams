@@ -133,6 +133,7 @@ return html`
       <li><a href="/browse/format/30">Formats</a></li>
       <li><a href="/browse/subject/30">Subjects</a></li>
     </ul>
+    <a href="/search-tips">Search Tips</a>
     <a href="/about">About</a>
   </ucdlib-primary-nav>
   </ucdlib-header>
