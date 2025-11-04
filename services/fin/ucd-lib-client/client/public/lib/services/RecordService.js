@@ -78,13 +78,22 @@ class RecordService extends BaseService {
       searchDocument.textFields = config.elasticSearch.textFields.record;
     }
 
+<<<<<<< Updated upstream
     searchDocument['simple_query_string'] = true;
+=======
+    // searchDocument.explain = true;
+>>>>>>> Stashed changes
 
     let params = {};
     if( opts.debug ) params.debug = true;
     if( opts.compact ) params.compact = true;
     if( opts.singleNode ) params['single-node'] = true;
+
+    params.explain = true;
+    opts.explain = true;
+
     opts.debug = true;
+
     return this.request({
       url : this.baseUrl,
       qs : params,
