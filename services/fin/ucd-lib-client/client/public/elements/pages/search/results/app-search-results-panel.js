@@ -416,10 +416,22 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       let padding = (this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 22 : 40) + 25;
       padding = window.innerWidth < 768 ? 0 : padding; // none needed for mobile
 
-      let size = this.results[i].size || {};
+      await eles[i].updateComplete; 
+      let img = eles[i].shadowRoot?.querySelector('img');
+      if( img ) {
+        await new Promise((resolve) => {
+          if( img.complete ) {
+            resolve();
+          } else { 
+            img.addEventListener('load', resolve);
+            img.addEventListener('error', resolve);
+          }
+        });
+      }
+
       let containerWidth = eles[i].offsetWidth || (w * .92); // hack to get around offsetWidth intermittently being 0, not rendered yet?
-      let naturalWidth = size.width || 1;
-      let naturalHeight = size.height || 1;
+      let naturalWidth = img.naturalWidth || 1;
+      let naturalHeight = img.naturalHeight || 1;
       let aspectRatio = naturalHeight / naturalWidth;
       let scaledHeight = containerWidth * aspectRatio;
       
