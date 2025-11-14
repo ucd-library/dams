@@ -81,6 +81,8 @@ class CollectionService extends BaseService {
 
     searchDocument.textFields = config.elasticSearch.textFields.collection;
     searchDocument.limit = 1000;
+
+    searchDocument['simple_query_string'] = true;
     
     let id = await digest(searchDocument);
 
