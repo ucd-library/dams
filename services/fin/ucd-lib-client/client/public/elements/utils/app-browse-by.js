@@ -300,7 +300,10 @@ export default class AppBrowseBy extends Mixin(LitElement)
     if( sortBy.label === 'A-Z' ) {
       sort = {"name" : "asc"};
     } else if( sortBy.label === 'Recent' ) {
-      sort = config.elasticSearch.textFields.recentCollectionSortBy;
+      sort = [
+          {'@graph.yearPublished': {order : "desc" }},
+          {'@graph.lastModified': {order : "desc" }}
+        ];
     } else {
       sort = {"@graph.itemCount" : "desc"};
     }

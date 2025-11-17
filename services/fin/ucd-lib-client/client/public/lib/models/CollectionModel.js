@@ -5,8 +5,6 @@ const CollectionService = require('../services/CollectionService');
 const RecordStore = require('../stores/RecordStore');
 const AppStateModel = require('./AppStateModel');
 
-const config = require('../config');
-
 const {getLogger} = require('@ucd-lib/cork-app-utils');
 
 class CollectionModel extends BaseModel {
@@ -112,7 +110,10 @@ class CollectionModel extends BaseModel {
       // TODO: change to 'uploadDate'
       let searchDocument = {
         limit,
-        sort: config.elasticSearch.textFields.recentCollectionSortBy
+        sort: [
+          {'@graph.yearPublished': {order : "desc" }},
+          {'@graph.lastModified': {order : "desc" }}
+        ]
       };
       // searchDocument = {limit: 3};
       return this.search(searchDocument);
