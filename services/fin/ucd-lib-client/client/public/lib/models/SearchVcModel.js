@@ -61,25 +61,29 @@ class SearchVcModel extends BaseModel {
 
       // check if imageList
       let mediaGroups = result?.clientMedia?.mediaGroups || [];
-      let mediaType = '';
-      let imageList = mediaGroups.filter(m => utils.getMediaType(m) === 'ImageList')[0];
-      if( imageList && imageList.hasPart && imageList.hasPart.length ) {
-        mediaType = utils.formatNumberWithCommas(imageList.hasPart.length) + ' page' + (imageList.hasPart.length > 1 ? 's' : '')  + ', Image';
-      } else if( imageList && typeof imageList.hasPart === 'object' && Object.keys(imageList.hasPart).length < 2 ) {
-        mediaType = 'Image';
-      } else if( imageList && imageList.hasPart ) { // some items just point to the dl/pdf
-        mediaType = 'Multi-page, Image';
-      }
 
-      if( !mediaType ) {
-        // else find first mediaType
-        for (const mediaGroup of mediaGroups) {
-          mediaType = utils.getMediaType(mediaGroup);
-          if( mediaType ) break;
+      let videoMedia = mediaGroups.find(m => m.fileFormatSimple === 'video');
+      let audioMedia = mediaGroups.find(m => m.fileFormatSimple === 'audio');
+      let imageListMedia = mediaGroups.find(m => m['@shortType'].includes('ImageList'));
+      let pdfMedia = mediaGroups.find(m => m.fileFormatSimple === 'pdf');
+      let imageMedia = mediaGroups.find(m => m.fileFormatSimple === 'image' || m['@shortType'].includes('ImageObject'));
+
+      let pageCount = '';
+      let mediaTypes = [];
+      let multiImage = false;
+
+      if( videoMedia ) mediaTypes.push('Video');
+      if( audioMedia ) mediaTypes.push('Audio');
+      if( imageListMedia || pdfMedia || imageMedia ) {
+        if( imageListMedia && imageListMedia.hasPart && imageListMedia.hasPart.length ) {
+          multiImage = true;
+          pageCount = ' (' + utils.formatNumberWithCommas(imageListMedia.hasPart.length) + ' page' + (imageListMedia.hasPart.length > 1 ? 's' : '') + ')';
+        } else if( imageListMedia && imageListMedia.hasPart || pdfMedia) {
+          multiImage = true;
+          pageCount = ' (Multi-page)';
         }
+        mediaTypes.push('Image' + pageCount);
       }
-
-      if (mediaType) mediaType = mediaType.replace("Object", "");
 
       let size = result.clientMedia?.mediaGroups?.[0]?.clientMedia?.images?.original?.size || {};
       if( Array.isArray(size) ) size = size[0];
@@ -89,12 +93,13 @@ class SearchVcModel extends BaseModel {
         collectionId,
         title: result.root.name,
         thumbnailUrl,
-        mediaType,
+        mediaTypes,
+        multiImage,
         collection: result.root.publisher ? result.root.publisher.name : "", // for detail display
         creator: result.root.creator ? result.root.creator.name : "", // for detail display
         date: result.root.yearPublished || 'Undated', // for detail display
-        format: mediaType ? [mediaType] : null, // for detail display,
-        size 
+        format: mediaTypes.length ? mediaTypes.join(', ') : null, // for detail display,
+        size
       });
     });
 

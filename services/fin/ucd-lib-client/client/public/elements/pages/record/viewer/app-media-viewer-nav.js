@@ -39,6 +39,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       selectedResult: { type: Number },
       searchResults: { type: Array },
       searchResultsCount: { type: Number },
+      isMultimedia: { type: Boolean }
     };
   }
 
@@ -73,6 +74,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.selectedResult = 1;
     this.searchResults = [];
     this.searchResultsCount = 0;
+    this.isMultimedia = false;
 
     window.addEventListener("resize", () => this._resize());
     window.addEventListener("touchend", (e) => this._onTouchEnd(e));
@@ -80,7 +82,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     window.addEventListener("touchmove", (e) => this._onTouchMove(e));
     this.addEventListener("touchstart", (e) => this._onTouchStart(e));
 
-    this._injectModel("AppStateModel", "MediaModel", "BookReaderModel");
+    this._injectModel("AppStateModel", "MediaModel", "BookReaderModel", "CollectionModel");
   }
 
   connectedCallback() {
@@ -103,6 +105,25 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     if (e.mediaViewerNavLeftMostThumbnail === this.leftMostThumbnail) return;
 
     this.leftMostThumbnail = e.mediaViewerNavLeftMostThumbnail;
+  }
+
+  async _getItemDisplayType(itemId, collectionId) {
+    if( !collectionId ) return;
+
+    let edits;
+    try {
+      edits = await this.CollectionModel.getCollectionEdits(collectionId);
+    } catch (error) {
+      this.logger.warn('Error retrieving collection edits', error);
+    }
+
+    if( edits.state !== 'loaded' ) return null;
+    if( !Object.keys(edits.payload).length ) return null;
+
+    let collectionEdits = edits.payload?.collection || {};
+    let itemEdits = edits.payload?.items || {};
+
+    return itemEdits[itemId]?.itemDefaultDisplay || collectionEdits.itemDefaultDisplay;
   }
 
   _onBookreaderStateUpdate(e) {
@@ -316,7 +337,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
    *
    * @param {Object} record selected record
    */
-  _onSelectedRecordUpdate(item) {
+  async _onSelectedRecordUpdate(item) {
     if( !item ) return;
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = item;
@@ -329,24 +350,71 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     let thumbnails = [];
 
+    let mediaGroups = clientMedia.mediaGroups || [];
+    // let videoMedia = mediaGroups.find(m => m.fileFormatSimple === 'video');
+    let audioMedia = mediaGroups.find(m => m.fileFormatSimple === 'audio');
+    // let imageListMedia = mediaGroups.find(m => m['@shortType'].includes('ImageList'));
+    let pdfMedia = mediaGroups.find(m => m.fileFormatSimple === 'pdf');
+    // let imageMedia = mediaGroups.find(m => m.fileFormatSimple === 'image' || m['@shortType'].includes('ImageObject'));
+
+    // if this.isMultimedia, prepend thumbnails for video/audio media first
+    if( this.isMultimedia ) {
+      // check the display type for the item
+      let collectionId = clientMedia.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))?.[0]?.['@id'];
+      let displayType = await this._getItemDisplayType(clientMedia.id, collectionId);
+      if( (!displayType || !displayType.includes('Image List')) ) {
+        this.isBookReader = true;
+      }
+
+      let position = 1;
+      // if( videoMedia ) {
+      //   let thumb = this._renderThumbnail(videoMedia, videoMedia.clientMedia.images || [], selectedMediaPage, 'video');
+      //   if( thumb ) {
+      //     thumb.position = position++;
+      //     thumbnails.push(thumb);
+      //   }
+      // }
+      if( audioMedia ) {
+        let thumb = this._renderThumbnail(audioMedia, audioMedia.clientMedia.images || [], selectedMediaPage, 'audio');
+        if( thumb ) {
+          if( selectedMedia['@id'] === thumb.id ) thumb.selected = true;
+          thumb.position = position++;
+          thumbnails.push(thumb);
+        }
+      }
+
+      if( pdfMedia && this.isBookReader ) {
+        let thumb = this._renderThumbnail(pdfMedia, pdfMedia.clientMedia.images || [], selectedMediaPage, 'pdf');
+        if( thumb ) {
+          if( selectedMedia['@id'] === thumb.id ) thumb.selected = true;
+          thumb.position = position++;
+          thumbnails.push(thumb);
+        }
+      }
+    }
+
+    // debugger;
+    let imagesFound = false;
     // prioritize imagelist, then pdf. else combine pages
     let imageList = (clientMedia.mediaGroups || []).filter(m => m['@shortType'].includes('ImageList'))?.[0];
-    if( imageList?.clientMedia?.pages ) {
+    if( imageList?.clientMedia?.pages && !this.isBookReader ) {
+      imagesFound = true;
       for( let page of imageList.clientMedia.pages ) {
         thumbnails.push(this._renderThumbnail(selectedMedia, page, selectedMediaPage));
       }
     }
 
-    if( !thumbnails.length ) {
+    if( (!thumbnails.length || (!imagesFound && this.isMultimedia)) && !this.isBookReader ) {
       let pdf = (clientMedia.mediaGroups || []).filter(m => m.clientMedia.pdf)?.[0];
       if( pdf?.clientMedia?.pages ) {
+        imagesFound = true;
         for( let page of pdf.clientMedia.pages ) {
           thumbnails.push(this._renderThumbnail(selectedMedia, page, selectedMediaPage));
         }
       }
     }
 
-    if( !thumbnails.length ) {
+    if( (!thumbnails.length || (!imagesFound && this.isMultimedia)) && !this.isBookReader ) {
       for( let node of clientMedia.mediaGroups ) {
         if( !node.clientMedia.pages && !this.overrideImageList ) {
           thumbnails.push(this._renderThumbnail(selectedMedia, node.clientMedia.images, selectedMediaPage));
@@ -373,7 +441,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this._resize(true);
   }
 
-  _renderThumbnail(node, clientMediaPage, selectedMediaPage) {
+  _renderThumbnail(node, clientMediaPage, selectedMediaPage, mediaType) {
     let { fileType, iconType } = this._getFileAndIconType(node);
 
     // if (this.isLightbox && fileType !== "image") {
@@ -393,14 +461,20 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     let uiPosition = clientMediaPage.uiPosition || clientMediaPage.page;
 
+    let idRoot = node['@id'];
+    if( this.isMultimedia ) {
+      idRoot = clientMediaPage['@id']?.replace(/(\.[a-z0-9]+):\d+$/i, '$1') || node['@id'];
+    }
     let thumbnail = {
-      id: node["@id"]+(!uiPosition || uiPosition === undefined ? '' : ':'+uiPosition),
+      // id: node["@id"]+(!uiPosition || uiPosition === undefined ? '' : ':'+uiPosition),
+      id: idRoot+(!uiPosition || uiPosition === undefined ? '' : ':'+uiPosition),
       icon: iconType,
       position: uiPosition,
       selected: uiPosition === selectedMediaPage,
       disabled: false,
       src: thumbnailUrl,
       // thumbnail: url
+      mediaType
     };
 
     return thumbnail;

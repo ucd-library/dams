@@ -26,7 +26,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
       itemUrl: { type: String },
       thumbnailUrl: { type: String },
       truncatedTitle: { type: String },
-      mediaType: { type: String },
+      mediaTypes: { type: Array },
     };
   }
 
@@ -40,7 +40,7 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     this.truncatedTitle = "";
     this.itemUrl = "";
     this.thumbnailUrl = "";
-    this.mediaType = "";
+    this.mediaTypes = [];
 
     this._injectModel("RecordModel");
   }
@@ -54,19 +54,19 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
     if (this.data.id) {
       this.itemUrl = this.data.id;
       this.thumbnailUrl = this.data.thumbnailUrl || '/images/tree-bike-illustration.png';
-      this.mediaType = this.data.mediaType;
-      if (this.data.mediaType === "Image") {
-        this.mediaType = "image";
-      } else if (this.data.mediaType === "Video") {
-        this.mediaType = "video";
-      } else if (this.mediaType === "Audio") {
-        this.mediaType = "audio";
-      } else {
-        this.mediaType = "imageList";
-        let imageCount = this.data.format?.[0]?.split(' ')[0];
-        if( imageCount && parseInt(imageCount) < 2 ) {
-          this.mediaType = 'image';
-        }
+
+      this.mediaTypes = this.data.mediaTypes;
+      if (this.data.mediaTypes.includes("Image")) {
+        this.mediaTypes.push("image");
+      }
+      if (this.data.mediaTypes.includes("Video")) {
+        this.mediaTypes.push("video");
+      }
+      if (this.data.mediaTypes.includes("Audio")) {
+        this.mediaTypes.push("audio");
+      }
+      if( this.data.multiImage ) {
+        this.mediaTypes.push("imageList");
       }
     } else {
       this._getItem(this.id);

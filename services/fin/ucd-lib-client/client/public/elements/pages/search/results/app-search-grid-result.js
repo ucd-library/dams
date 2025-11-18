@@ -27,7 +27,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
       bounds: { type: Array },
       size: { type: Object },
       imageHeight: { type: Number },
-      mediaType: { type: String }
+      mediaTypes: { type: Array }
     };
   }
 
@@ -44,7 +44,7 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
     this.bounds = [];
     this.size = {};
     this.imageHeight = 0;
-    this.mediaType = '';
+    this.mediaTypes = [];
 
     this._injectModel("RecordModel");
   }
@@ -62,18 +62,17 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
       this.size = this.data.size;
 
       if (this.thumbnailUrl) this._renderImage();
-      if (this.data.mediaType === "Image") {
-        this.mediaType = "image";
-      } else if (this.data.mediaType === "Video") {
-        this.mediaType = "video";
-      } else if (this.mediaType === "Audio") {
-        this.mediaType = "audio";
-      } else {
-        this.mediaType = "imageList";
-        let imageCount = this.data.format?.[0]?.split(' ')[0];
-        if( imageCount && parseInt(imageCount) < 2 ) {
-          this.mediaType = 'image';
-        }
+      if (this.data.mediaTypes.includes("Image")) {
+        this.mediaTypes.push("image");
+      } 
+      if (this.data.mediaTypes.includes("Video")) {
+        this.mediaTypes.push("video");
+      } 
+      if (this.data.mediaTypes.includes("Audio")) {
+        this.mediaTypes.push("audio");
+      }
+      if( this.data.multiImage ) {
+        this.mediaTypes.push("imageList");
       }
     } else {
       this._getItem(this.id);

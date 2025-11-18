@@ -224,7 +224,7 @@ export default function render() {
         <app-image-viewer id="image"></app-image-viewer>
         <ucdlib-bookreader ?fullscreen="${this.brFullscreen}" id="bookreader" max-height="634"></ucdlib-bookreader>
         <app-video-viewer id="video"></app-video-viewer>
-        <app-audio-viewer id="audio"></app-audio-viewer>
+        <app-audio-viewer id="audio" .isMultimedia="${this.isMultimedia}"></app-audio-viewer>
       </ucdlib-pages>
 
       <div ?hidden="${!this.noMedia}">
@@ -307,12 +307,13 @@ export default function render() {
       </div>
 
       <app-media-viewer-nav
-        ?hidden="${!this.mediaType || this.mediaType === "audio"}"
+        ?hidden="${(!this.mediaType || this.mediaType === "audio") && !this.isMultimedia}"
         .isBookReader="${this.isBookReader}"
         .hideZoom="${this.mediaType === "bookreader" || this.mediaType === "video"}"
         .searchResults="${this.searchResults}"
         ?brsinglepage="${this.singlePage}"
         overrideImageList="${this.overrideImageList}"
+        .isMultimedia="${this.isMultimedia}"
         @zoom-in="${this._onZoomIn}"
         @br-bookview-toggle="${this._onToggleBookView}"
         @br-expand-view="${this._onExpandBookView}"

@@ -39,7 +39,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
       searchResultsCount: { type: Number },
       selectedResult: { type: Number },
       queryTerm: { type: String },
-      noMedia: { type: Boolean }
+      noMedia: { type: Boolean },
+      isMultimedia: { type: Boolean }
     };
   }
 
@@ -69,6 +70,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.queryTerm = "";
     this.regexPattern = /\{\{\{.*?\}\}\}/g;
     this.noMedia = false;
+    this.isMultimedia = false;
     this.$ = {};
   }
 
@@ -91,8 +93,18 @@ export default class AppMediaViewer extends Mixin(LitElement)
     let mediaType;
     this.noMedia = false;
 
-    let mediaGroups = e.selectedRecord?.clientMedia?.mediaGroups;
-    
+    let mediaGroups = e.selectedRecord?.clientMedia?.mediaGroups || [];
+    let selectedMediaGroup;
+
+    let videoMedia = mediaGroups.find(m => m.fileFormatSimple === 'video');
+    let audioMedia = mediaGroups.find(m => m.fileFormatSimple === 'audio');
+    let imageListMedia = mediaGroups.find(m => m['@shortType'].includes('ImageList'));
+    let pdfMedia = mediaGroups.find(m => m.fileFormatSimple === 'pdf');
+    let imageMedia = mediaGroups.find(m => m.fileFormatSimple === 'image' || m['@shortType'].includes('ImageObject'));
+
+    // coerce to boolean
+    this.isMultimedia = !!((audioMedia || videoMedia) && (pdfMedia || imageListMedia || imageMedia));
+
     if (!mediaGroups || !mediaGroups.length || !mediaGroups.filter(m => m['@type'].length > 0).length ) {
       // try to at least load a single image as fallback
       let thumbnailUrl = utils.getThumbnailFromClientMedia(e?.selectedRecord?.clientMedia);
@@ -105,43 +117,81 @@ export default class AppMediaViewer extends Mixin(LitElement)
       return; 
     }
 
-    this.itemId = e.selectedRecord?.graph?.root?.['@id'];    
-
-    // to check for imageList first, otherwise default to pdf for bookreader
-    let mediaGroup = mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
-    if( mediaGroup ){
-      mediaType = 'image';
-      let hasPdf = mediaGroups.filter(m => m.clientMedia?.pdf);
-      if( hasPdf.length ) renderAsBr = true;
-    }
-
-    if( !mediaGroup ) {
-      mediaGroups.forEach((media) => {
-        let type = utils.getMediaType(media);
-        if (type && !mediaGroup) {
-          mediaType = type.toLowerCase().replace(/object/i, "");
-          mediaGroup = media;
-        }
-      });
-    }
-
-    if (mediaType === "imagelist") {
-      mediaType = "image";
-    } else if (mediaType === "streamingvideo") {
-      mediaType = "video";
-    }
-
-    if (mediaType === "bagoffiles" && selectedRecordMedia.thumbnailUrl) {
-      this.bagOfFilesImage = selectedRecordMedia.thumbnailUrl;
-    } else {
-      this.bagOfFilesImage = "";
-    }
-
     // check for any overrides at collection/item level for the image viewer
-    let itemId = e.selectedRecord?.graph?.root?.['@id'];
+    this.itemId = e.selectedRecord?.graph?.root?.['@id'];
     let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))?.[0]?.['@id'];
+    let displayType = await this._getItemDisplayType(this.itemId, collectionId);
 
-    let displayType = await this._getItemDisplayType(itemId, collectionId);
+    if( this.isMultimedia ) {
+      // if( (!displayType || !displayType.includes('Image List')) ) {
+      //   this.isBookReader = true;
+      // }
+
+      // media display types to support:
+      // - if single image + audio (regardless if display type is set to bookreader), show nav with audio icon and image icon
+      // - if PDF / imagelist + audio, and item is set to imageList display type, show nav bar with audio icon and images
+      // - if PDF / imagelist + audio, and item is bookreader display type, show nav bar with audio icon and icon for pdf
+      // - TODO support video + audio/pdf/images later. no items have this yet
+      // - TODO if multiple audio/video files, show nav with multiple icons for each media file. no items have this yet
+
+      let firstLoad = (e.location.fullpath === this.itemId);
+
+      // first load, order as:
+      // video -> audio -> bookreader (depending on displayType pref) -> image(s)
+      if( firstLoad ) {
+        renderAsBr = false;
+
+        if( videoMedia ) mediaType = 'video';
+        else if( audioMedia ) mediaType = 'audio';
+
+        this.mediaType = mediaType;
+        this.noMedia = false;
+        return;
+
+      } else {
+        // else e.selectedRecord.selectedMedia would point to the selected media file from the url,
+        // so need to load that specific media (bookreader if pdf)
+        let media = e.selectedRecord.selectedMedia;
+        let type = utils.getMediaType(media);
+        if (type && !selectedMediaGroup) {
+          mediaType = type.toLowerCase().replace(/object/i, "");
+          selectedMediaGroup = media;
+        }
+      }
+    } else {
+      // media display types to support:
+      // - if audio only, show audio player and hide nav
+      // - if PDF / imagelist / single image only, show as current, with nav only for imagelist, hide nav for bookreader and single image
+      // to check for imageList first, otherwise default to pdf for bookreader
+      selectedMediaGroup = mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
+      if( selectedMediaGroup ){
+        mediaType = 'image';
+        let hasPdf = mediaGroups.filter(m => m.clientMedia?.pdf);
+        if( hasPdf.length ) renderAsBr = true;
+      }
+
+      if( !selectedMediaGroup ) {
+        mediaGroups.forEach((media) => {
+          let type = utils.getMediaType(media);
+          if (type && !selectedMediaGroup) {
+            mediaType = type.toLowerCase().replace(/object/i, "");
+            selectedMediaGroup = media;
+          }
+        });
+      }
+
+      if (mediaType === "imagelist") {
+        mediaType = "image";
+      } else if (mediaType === "streamingvideo") {
+        mediaType = "video";
+      }
+
+      if (mediaType === "bagoffiles" && selectedRecordMedia.thumbnailUrl) {
+        this.bagOfFilesImage = selectedRecordMedia.thumbnailUrl;
+      } else {
+        this.bagOfFilesImage = "";
+      }
+    }
 
     this.overrideImageList = false;
 
@@ -165,7 +215,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     }
 
     // single page images should use normal image viewer
-    if( renderAsBr && (mediaGroup?.clientMedia?.pages?.length === 1 || !mediaGroup?.clientMedia.pages?.length) ) {
+    if( renderAsBr && (selectedMediaGroup?.clientMedia?.pages?.length === 1 || !selectedMediaGroup?.clientMedia.pages?.length) ) {
       renderAsBr = false;
       if( mediaType === 'bookreader' ) mediaType = 'image';
     }
@@ -186,14 +236,14 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     if (
       renderAsBr ||
-      (!this.overrideImageList && mediaGroup.clientMedia && mediaGroup.clientMedia.pdf)
+      (!this.overrideImageList && selectedMediaGroup.clientMedia && selectedMediaGroup.clientMedia.pdf)
     ) {
       mediaType = "bookreader";
       this.isBookReader = true;
       let brData;
-      if (renderAsBr && !mediaGroup.clientMedia?.pdf?.manifest) {
+      if (renderAsBr && !selectedMediaGroup.clientMedia?.pdf?.manifest) {
         this.bookData = utils.buildIaReaderPages(
-          mediaGroup.hasPart || mediaGroup,
+          selectedMediaGroup.hasPart || selectedMediaGroup,
           e.selectedRecord?.clientMedia?.index
         );
       } else {
@@ -206,7 +256,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
           }
         });
       }
-      this.bookItemId = mediaGroup["@id"];
+      this.bookItemId = selectedMediaGroup["@id"];
 
       // TODO can this be removed since we switched to loadManifests() ?
       if (brData && brData.body) {

@@ -14,6 +14,10 @@ return html`
     fill: var(--color-aggie-blue-80);
   }
 
+  [hidden] {
+    display: none !important;
+  }
+
   .button {
     background-color: var(--color-aggie-blue-80);
     border-radius: 50%;
@@ -47,6 +51,10 @@ return html`
     width: 60%;
     margin: 0 auto;
     padding-bottom: 0.7rem;
+  }
+
+  .layout.multimedia {
+    border-bottom: none;
   }
 
   .plyr--audio {
@@ -129,11 +137,11 @@ return html`
   <div id="sprite-plyr" style="display: none;"></div>
   <div id="audio_poster"></div>
 
-  <div class="layout">
+  <div class="layout ${this.isMultimedia ? 'multimedia' : ''}">
     <audio id="audio_player" controls>
       <source>
     </audio>
-    <div class="button tooltip" data-tooltip-text="Share">
+    <div ?hidden="${this.isMultimedia}" class="button tooltip" data-tooltip-text="Share">
       <app-share-btn></app-share-btn>
     </div>
   </div>
