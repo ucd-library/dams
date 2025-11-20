@@ -124,8 +124,8 @@ export default function render() {
 
       .thumbnail-wrapper ucdlib-icon {
         position: absolute; 
-        top: .25rem; 
-        right: 1.1rem; 
+        top: 3px; 
+        right: 18px; 
         z-index: 5; 
         pointer-events: none; 
         fill: white;
@@ -467,7 +467,7 @@ export default function render() {
       >
         <div @click="${this._onToggleBookView}" 
           class="page-toggle tooltip ${this.brSinglePage ? 'two-page' : 'single-page'}" 
-          ?hidden="${!this.isBookReader}"
+          ?hidden="${!this.isBookReader || this.hidePageToggle}"
           data-tooltip-text="${this.brSinglePage ? 'Two-Page View' : 'Single-Page View'}">
           <ucdlib-icon
             icon="ucdlib-dams:fa-book-open"
@@ -497,7 +497,7 @@ export default function render() {
 
         <div
           @click="${this._onExpandBookView}"
-          ?hidden="${!this.isBookReader || this.brFullscreen}"
+          ?hidden="${!this.isBookReader || this.brFullscreen || this.hideZoom}"
           class="tooltip"
           data-tooltip-text="Fullscreen"
         >

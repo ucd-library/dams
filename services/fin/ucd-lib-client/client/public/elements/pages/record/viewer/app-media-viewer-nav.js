@@ -39,7 +39,8 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
       selectedResult: { type: Number },
       searchResults: { type: Array },
       searchResultsCount: { type: Number },
-      isMultimedia: { type: Boolean }
+      isMultimedia: { type: Boolean },
+      hidePageToggle: { type: Boolean }
     };
   }
 
@@ -75,6 +76,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.searchResults = [];
     this.searchResultsCount = 0;
     this.isMultimedia = false;
+    this.hidePageToggle = false;
 
     window.addEventListener("resize", () => this._resize());
     window.addEventListener("touchend", (e) => this._onTouchEnd(e));
@@ -351,49 +353,31 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     let thumbnails = [];
 
     let mediaGroups = clientMedia.mediaGroups || [];
-    // let videoMedia = mediaGroups.find(m => m.fileFormatSimple === 'video');
     let audioMedia = mediaGroups.find(m => m.fileFormatSimple === 'audio');
-    // let imageListMedia = mediaGroups.find(m => m['@shortType'].includes('ImageList'));
-    let pdfMedia = mediaGroups.find(m => m.fileFormatSimple === 'pdf');
-    // let imageMedia = mediaGroups.find(m => m.fileFormatSimple === 'image' || m['@shortType'].includes('ImageObject'));
 
     // if this.isMultimedia, prepend thumbnails for video/audio media first
     if( this.isMultimedia ) {
       // check the display type for the item
-      let collectionId = clientMedia.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))?.[0]?.['@id'];
-      let displayType = await this._getItemDisplayType(clientMedia.id, collectionId);
-      if( (!displayType || !displayType.includes('Image List')) ) {
-        this.isBookReader = true;
-      }
+      this.isBookReader = false; // for now, disable bookreader if multimedia.. aka imagelist
 
       let position = 1;
-      // if( videoMedia ) {
-      //   let thumb = this._renderThumbnail(videoMedia, videoMedia.clientMedia.images || [], selectedMediaPage, 'video');
-      //   if( thumb ) {
-      //     thumb.position = position++;
-      //     thumbnails.push(thumb);
-      //   }
-      // }
       if( audioMedia ) {
         let thumb = this._renderThumbnail(audioMedia, audioMedia.clientMedia.images || [], selectedMediaPage, 'audio');
         if( thumb ) {
-          if( selectedMedia['@id'] === thumb.id ) thumb.selected = true;
-          thumb.position = position++;
-          thumbnails.push(thumb);
-        }
-      }
-
-      if( pdfMedia && this.isBookReader ) {
-        let thumb = this._renderThumbnail(pdfMedia, pdfMedia.clientMedia.images || [], selectedMediaPage, 'pdf');
-        if( thumb ) {
-          if( selectedMedia['@id'] === thumb.id ) thumb.selected = true;
+          if( selectedMedia['@id'] === thumb.id ) {
+            thumb.selected = true;
+            this.hideZoom = true;
+            this.hidePageToggle = true;
+          } else {
+            this.hideZoom = false;
+            this.hidePageToggle = false;
+          }
           thumb.position = position++;
           thumbnails.push(thumb);
         }
       }
     }
 
-    // debugger;
     let imagesFound = false;
     // prioritize imagelist, then pdf. else combine pages
     let imageList = (clientMedia.mediaGroups || []).filter(m => m['@shortType'].includes('ImageList'))?.[0];

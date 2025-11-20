@@ -123,9 +123,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     let displayType = await this._getItemDisplayType(this.itemId, collectionId);
 
     if( this.isMultimedia ) {
-      // if( (!displayType || !displayType.includes('Image List')) ) {
-      //   this.isBookReader = true;
-      // }
+      this.isBookReader = false; // for now, disable bookreader if multimedia.. aka imagelist
 
       // media display types to support:
       // - if single image + audio (regardless if display type is set to bookreader), show nav with audio icon and image icon
@@ -220,6 +218,13 @@ export default class AppMediaViewer extends Mixin(LitElement)
       if( mediaType === 'bookreader' ) mediaType = 'image';
     }
 
+    if( renderAsBr && this.isMultimedia && mediaType === 'bookreader' ) {
+      // if multimedia with bookreader, and display type is bookreader,
+      // then override to image viewer to show imagelist instead
+      renderAsBr = false;
+      mediaType = 'image';
+    }
+
     if( renderAsBr ) {
       // if admin pref display saved for this item, then default to specific view
       // else set to single page mode if screen width < 800px, double if >= 800px
@@ -236,7 +241,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     if (
       renderAsBr ||
-      (!this.overrideImageList && selectedMediaGroup.clientMedia && selectedMediaGroup.clientMedia.pdf)
+      (!this.overrideImageList && selectedMediaGroup.clientMedia && selectedMediaGroup.clientMedia.pdf && !this.isMultimedia)
     ) {
       mediaType = "bookreader";
       this.isBookReader = true;
