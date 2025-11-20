@@ -137,10 +137,9 @@ export default class AppMediaViewer extends Mixin(LitElement)
       // first load, order as:
       // video -> audio -> bookreader (depending on displayType pref) -> image(s)
       if( firstLoad ) {
-        renderAsBr = false;
-
         if( videoMedia ) mediaType = 'video';
         else if( audioMedia ) mediaType = 'audio';
+        else mediaType = 'image'; // default if the `isMultimedia` flag is set but no audio/video found
 
         this.mediaType = mediaType;
         this.noMedia = false;

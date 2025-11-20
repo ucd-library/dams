@@ -56,13 +56,13 @@ export default class DamsItemCard extends Mixin(LitElement).with(LitCorkUtils) {
       this.thumbnailUrl = this.data.thumbnailUrl || '/images/tree-bike-illustration.png';
 
       this.mediaTypes = this.data.mediaTypes;
-      if (this.data.mediaTypes.includes("Image")) {
+      if (this.data.mediaTypes?.includes("Image")) {
         this.mediaTypes.push("image");
       }
-      if (this.data.mediaTypes.includes("Video")) {
+      if (this.data.mediaTypes?.includes("Video")) {
         this.mediaTypes.push("video");
       }
-      if (this.data.mediaTypes.includes("Audio")) {
+      if (this.data.mediaTypes?.includes("Audio")) {
         this.mediaTypes.push("audio");
       }
       if( this.data.multiImage ) {

@@ -451,7 +451,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     }
     let thumbnail = {
       // id: node["@id"]+(!uiPosition || uiPosition === undefined ? '' : ':'+uiPosition),
-      id: idRoot+(!uiPosition || uiPosition === undefined ? '' : ':'+uiPosition),
+      id: idRoot+(!uiPosition ? '' : ':'+uiPosition),
       icon: iconType,
       position: uiPosition,
       selected: uiPosition === selectedMediaPage,

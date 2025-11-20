@@ -62,13 +62,13 @@ export class AppSearchGridResult extends Mixin(LitElement).with(LitCorkUtils) {
       this.size = this.data.size;
 
       if (this.thumbnailUrl) this._renderImage();
-      if (this.data.mediaTypes.includes("Image")) {
+      if (this.data.mediaTypes?.includes("Image")) {
         this.mediaTypes.push("image");
       } 
-      if (this.data.mediaTypes.includes("Video")) {
+      if (this.data.mediaTypes?.includes("Video")) {
         this.mediaTypes.push("video");
       } 
-      if (this.data.mediaTypes.includes("Audio")) {
+      if (this.data.mediaTypes?.includes("Audio")) {
         this.mediaTypes.push("audio");
       }
       if( this.data.multiImage ) {

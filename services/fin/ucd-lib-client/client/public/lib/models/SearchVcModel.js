@@ -78,7 +78,7 @@ class SearchVcModel extends BaseModel {
         if( imageListMedia && imageListMedia.hasPart && imageListMedia.hasPart.length ) {
           multiImage = true;
           pageCount = ' (' + utils.formatNumberWithCommas(imageListMedia.hasPart.length) + ' page' + (imageListMedia.hasPart.length > 1 ? 's' : '') + ')';
-        } else if( imageListMedia && imageListMedia.hasPart || pdfMedia) {
+        } else if( (imageListMedia && imageListMedia.hasPart) || pdfMedia) {
           multiImage = true;
           pageCount = ' (Multi-page)';
         }
