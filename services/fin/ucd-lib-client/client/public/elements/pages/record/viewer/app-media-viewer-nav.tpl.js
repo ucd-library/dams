@@ -107,6 +107,29 @@ export default function render() {
       .thumbnail[selected] {
         border: 3px solid var(--default-secondary-color);
       }
+      
+      .thumbnail-wrapper { position: relative; }
+      
+      .thumbnail-wrapper.audio::after,
+      .thumbnail-wrapper.pdf::after { 
+        content: ''; 
+        position: absolute; 
+        inset: 0; 
+        background: rgba(2, 40, 81, 0.5); 
+        pointer-events: none; 
+        z-index: 2;
+        margin: 3px 8px 8px 9px;
+      }
+      .thumbnail-wrapper a.thumbnail { position: relative; z-index: 1; }
+
+      .thumbnail-wrapper ucdlib-icon {
+        position: absolute; 
+        top: 3px; 
+        right: 18px; 
+        z-index: 5; 
+        pointer-events: none; 
+        fill: white;
+      }
 
       ucdlib-icon {
         height: 50px;
@@ -119,6 +142,10 @@ export default function render() {
       #navRight {
         width: 36px;
         margin: auto;
+      }
+
+      #navLeft {
+        margin-right: 2rem;
       }
 
       iron-icon {
@@ -387,20 +414,31 @@ export default function render() {
           </div>
         </div>
 
-        <div id="thumbnails" ?hidden="${this.singleImage || this.isBookReader || this.thumbnails.length < 2}">
+        <div id="thumbnails" ?hidden="${this.singleImage || (this.isBookReader && !this.isMultimedia) || this.thumbnails.length < 2}">
           <div id="thumbnailInnerContainer">
             ${this.thumbnails.map((item, index) => html`
-              <a
-                class="thumbnail"
-                href="${item.id}"
-                alt="Page #${index+1}"
-                ?selected="${item.selected}"
-                title="${item.id}"
-                media-id="${item.id}"
-                ?disabled="${item.disabled}"
-                style="background-image:url(${item.src})">
-                <iron-icon icon="fin-icons:${item.icon}" ?hidden="${!item.icon}"></iron-icon>
-              </a>
+              <div class="thumbnail-wrapper ${item.mediaType || ''}" style="position: relative; display: inline-block;">
+                <a
+                  class="thumbnail ${item.mediaType || ''}"
+                  href="${item.id}"
+                  alt="Page #${index+1}"
+                  ?selected="${item.selected}"
+                  title="${item.id}"
+                  media-id="${item.id}"
+                  ?disabled="${item.disabled}"
+                  style="background-image:url(${item.src})">
+                  <iron-icon icon="fin-icons:${item.icon}" ?hidden="${!item.icon}"></iron-icon>
+                </a>
+                ${item.mediaType === 'audio' ? html`
+                  <ucdlib-icon 
+                    class="fa-volume-high" 
+                    icon="ucdlib-dams:fa-volume-high">
+                  </ucdlib-icon>` : html``}
+                ${item.mediaType === 'pdf' ? html`<ucdlib-icon
+                    class="item-stack-blank"
+                    icon="ucdlib-dams:item-stack-blank">
+                  </ucdlib-icon>` : html``}
+              </div>
             `)}
           </div>
         </div>
@@ -429,7 +467,7 @@ export default function render() {
       >
         <div @click="${this._onToggleBookView}" 
           class="page-toggle tooltip ${this.brSinglePage ? 'two-page' : 'single-page'}" 
-          ?hidden="${!this.isBookReader}"
+          ?hidden="${!this.isBookReader || this.hidePageToggle}"
           data-tooltip-text="${this.brSinglePage ? 'Two-Page View' : 'Single-Page View'}">
           <ucdlib-icon
             icon="ucdlib-dams:fa-book-open"
@@ -459,7 +497,7 @@ export default function render() {
 
         <div
           @click="${this._onExpandBookView}"
-          ?hidden="${!this.isBookReader || this.brFullscreen}"
+          ?hidden="${!this.isBookReader || this.brFullscreen || this.hideZoom}"
           class="tooltip"
           data-tooltip-text="Fullscreen"
         >

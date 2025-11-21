@@ -115,10 +115,14 @@ export default function render() {
         padding-top: 75%;
       }
 
-      .media-type {
+      .media-types {
         position: absolute;
         right: 0.25rem;
         bottom: 0.25rem;
+        display: flex;
+      }
+
+      .media-type {
         width: 2rem;
         height: 2rem;
         border-radius: 50%;
@@ -126,7 +130,7 @@ export default function render() {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0.5rem;
+        margin: 0.5rem 0.5rem 0 0;
       }
 
       .media-type__icon {
@@ -140,37 +144,41 @@ export default function render() {
       }
     </style>
 
-    <a
-      href="${this.itemUrl}"
-      class="marketing-highlight category-brand--secondary u-space-mb o-box"
-    >
+    <a href="${this.itemUrl}"
+      class="marketing-highlight category-brand--secondary u-space-mb o-box">
       <div class="marketing-highlight__image">
         <div
           class="aspect--4x3 u-background-image"
           role="img"
           aria-label=""
-          style="background-image:url(${this.thumbnailUrl});"
-        ></div>
-        <div
-          class="media-type"
-          ?hidden="${!this.mediaType || this.mediaType.toLowerCase() === "image"}"
-        >
-          <ucdlib-icon
-            ?hidden="${this.mediaType.toLowerCase() !== "imagelist"}"
-            class="vertical-link__image"
-            icon="ucdlib-dams:item-stack-blank"
-          ></ucdlib-icon>
-          <ucdlib-icon
-            style="margin-left: .2rem;"
-            ?hidden="${this.mediaType.toLowerCase() !== "video"}"
-            class="vertical-link__image"
-            icon="ucdlib-dams:fa-play"
-          ></ucdlib-icon>
-          <ucdlib-icon
-            ?hidden="${this.mediaType.toLowerCase() !== "audio"}"
-            class="vertical-link__image"
-            icon="ucdlib-dams:fa-volume-high"
-          ></ucdlib-icon>
+          style="background-image:url(${this.thumbnailUrl});">
+        </div>
+        <div class="media-types">
+          <div
+            class="media-type"
+            ?hidden="${!this.mediaTypes.includes("video")}">
+            <ucdlib-icon
+              style="margin-left: .2rem;"
+              class="vertical-link__image"
+              icon="ucdlib-dams:fa-play">
+            </ucdlib-icon>
+          </div>
+          <div
+            class="media-type"
+            ?hidden="${!this.mediaTypes.includes("audio")}">
+            <ucdlib-icon
+              class="vertical-link__image"
+              icon="ucdlib-dams:fa-volume-high">
+            </ucdlib-icon>  
+          </div>
+          <div
+            class="media-type"
+            ?hidden="${!this.mediaTypes.includes("imageList")}">
+            <ucdlib-icon
+              class="vertical-link__image"
+              icon="ucdlib-dams:item-stack-blank">
+            </ucdlib-icon>
+          </div>
         </div>
       </div>
       <div class="gold-dots"></div>

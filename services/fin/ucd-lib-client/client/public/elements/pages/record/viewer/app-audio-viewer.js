@@ -25,12 +25,17 @@ export default class AppAudioViewer extends Mixin(LitElement)
   .with(LitCorkUtils) {
   
   static get properties() {
-    return {};
+    return {
+      isMultimedia : { type : Boolean }
+    };
   }
 
   constructor() {
     super();
     this.render = render.bind(this);
+
+    this.isMultimedia = false;
+
     this._injectModel('AppStateModel', 'MediaModel');
     this.libsLoaded = false;
     this.$ = {};
