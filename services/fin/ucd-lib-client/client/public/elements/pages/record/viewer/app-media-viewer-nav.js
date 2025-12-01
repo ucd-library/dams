@@ -53,30 +53,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.icon = "";
     this.iconWidth = 36;
 
-    this.thumbnails = [];
-
-    this.thumbnailsPerFrame = 10;
-    this.leftMostThumbnail = 0;
-    this.breakControls = true;
-    this.showNavLeft = false;
-    this.showNavRight = false;
-    this.isLightbox = false;
-    this.isBookReader = false;
-    this.hideZoom = false;
-    this.brSinglePage = false;
-    this.overrideImageList = false;
-    this.brFullscreen = false;
-    this.singleImage = false;
-    this.mediaList = [];
-    this.showOpenLightbox = false;
-    this.searchingText = false;
-    this.brSearch = false;
-    this.searching = false;
-    this.selectedResult = 1;
-    this.searchResults = [];
-    this.searchResultsCount = 0;
-    this.isMultimedia = false;
-    this.hidePageToggle = false;
+    this._reset();
 
     window.addEventListener("resize", () => this._resize());
     window.addEventListener("touchend", (e) => this._onTouchEnd(e));
@@ -327,10 +304,29 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
   }
 
   _reset() {
-    this.singleImage = false;
-    // this.isBookReader = false;
-    this.brFullscreen = false;
     this.thumbnails = [];
+    this.thumbnailsPerFrame = 10;
+    this.leftMostThumbnail = 0;
+    this.breakControls = true;
+    this.showNavLeft = false;
+    this.showNavRight = false;
+    this.isLightbox = false;
+    this.isBookReader = false;
+    this.hideZoom = false;
+    this.brSinglePage = false;
+    this.overrideImageList = false;
+    this.brFullscreen = false;
+    this.singleImage = false;
+    this.mediaList = [];
+    this.showOpenLightbox = false;
+    this.searchingText = false;
+    this.brSearch = false;
+    this.searching = false;
+    this.selectedResult = 1;
+    this.searchResults = [];
+    this.searchResultsCount = 0;
+    this.isMultimedia = false;
+    this.hidePageToggle = false;
   }
 
   /**
@@ -344,6 +340,11 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
     let { graph, clientMedia, selectedMedia, selectedMediaPage} = item;
 
+    let mediaGroups = clientMedia.mediaGroups || [];
+    let audioMedia = mediaGroups.find(m => m.fileFormatSimple === 'audio');
+    let videoMedia = mediaGroups.find(m => m.fileFormatSimple === 'video');
+    if( audioMedia || videoMedia ) this.hideZoom = true;
+
     if ( clientMedia.mediaGroups.length === 1 &&
           selectedMediaPage === -1 ) {
       this.singleImage = true;
@@ -351,10 +352,6 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     }
 
     let thumbnails = [];
-    this.hideZoom = false;
-
-    let mediaGroups = clientMedia.mediaGroups || [];
-    let audioMedia = mediaGroups.find(m => m.fileFormatSimple === 'audio');
 
     // if this.isMultimedia, prepend thumbnails for video/audio media first
     if( this.isMultimedia ) {
