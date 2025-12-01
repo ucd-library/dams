@@ -351,6 +351,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     }
 
     let thumbnails = [];
+    this.hideZoom = false;
 
     let mediaGroups = clientMedia.mediaGroups || [];
     let audioMedia = mediaGroups.find(m => m.fileFormatSimple === 'audio');
