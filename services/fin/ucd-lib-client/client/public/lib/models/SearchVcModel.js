@@ -66,7 +66,7 @@ class SearchVcModel extends BaseModel {
       let audioMedia = mediaGroups.find(m => m.fileFormatSimple === 'audio');
       let imageListMedia = mediaGroups.find(m => m['@shortType'].includes('ImageList'));
       let pdfMedia = mediaGroups.find(m => m.fileFormatSimple === 'pdf');
-      let imageMedia = mediaGroups.find(m => m.fileFormatSimple === 'image' || m['@shortType'].includes('ImageObject'));
+      let imageMedia = mediaGroups.find(m => m['@shortType'].includes('ImageObject'));
 
       let pageCount = '';
       let mediaTypes = [];
@@ -78,9 +78,9 @@ class SearchVcModel extends BaseModel {
         if( imageListMedia && imageListMedia.hasPart && imageListMedia.hasPart.length ) {
           multiImage = true;
           pageCount = ' (' + utils.formatNumberWithCommas(imageListMedia.hasPart.length) + ' page' + (imageListMedia.hasPart.length > 1 ? 's' : '') + ')';
-        } else if( (imageListMedia && imageListMedia.hasPart) || pdfMedia) {
+        } 
+        else if( (imageListMedia && imageListMedia.hasPart) || pdfMedia) {
           multiImage = true;
-          pageCount = ' (Multi-page)';
         }
         mediaTypes.push('Image' + pageCount);
       }
