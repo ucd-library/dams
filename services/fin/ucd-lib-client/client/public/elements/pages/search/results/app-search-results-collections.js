@@ -44,7 +44,7 @@ class AppSearchResultsCollections extends Mixin(LitElement)
     this.filterDisplayResults();
     this._updateResultsDisplayed();
 
-    this._onCollectionSearchUpdate(await this.CollectionModel.search({ text: this.RecordModel.lastQuery?.text || '' }));
+    this._onCollectionSearchUpdate(await this.CollectionModel.search({ text: this.RecordModel.lastQuery?.text }));
   }
 
   _onCollectionSearchUpdate(e) {

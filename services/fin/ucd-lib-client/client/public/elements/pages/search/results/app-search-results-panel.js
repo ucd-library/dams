@@ -103,7 +103,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     // this._resizeAsync();
     this.filterDisplayResults();
 
-    this._onCollectionSearchUpdate(await this.CollectionModel.search({ text: this.RecordModel.lastQuery?.text || '' }));
+    this._onCollectionSearchUpdate(await this.CollectionModel.search({ text: this.RecordModel.lastQuery?.text }));
   }
 
   _reset() {
