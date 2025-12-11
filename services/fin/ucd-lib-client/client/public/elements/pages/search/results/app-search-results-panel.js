@@ -103,7 +103,7 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
     // this._resizeAsync();
     this.filterDisplayResults();
 
-    this._onCollectionSearchUpdate(await this.CollectionModel.search({ text: this.RecordModel.lastQuery?.text || '' }));
+    this._onCollectionSearchUpdate(await this.CollectionModel.search({ text: this.RecordModel.lastQuery?.text }));
   }
 
   _reset() {
@@ -125,6 +125,8 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
 
   _onCollectionSearchUpdate(e) {
     if( e.state !== 'loaded' ) return;
+    if( !this.RecordModel.lastQuery?.text ) return;
+
     // combine collection search with item search 
     // (ie match collections regardless of items in search, and show collections where items are matched from them)
     let collections = (e.payload?.results || []).map(c => ({ '@id': c.root?.['@id'] }));
