@@ -127,6 +127,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let pdf;
 
     if( this.isMultimedia ) {
+      this.fullSetSelected = false;
       let download = this.downloadOptions[0];
       this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = download.fileFormatSimple + ' (' + bytes(download.fileSize).toLowerCase() + ')';
       this.showImageFormats = false;
