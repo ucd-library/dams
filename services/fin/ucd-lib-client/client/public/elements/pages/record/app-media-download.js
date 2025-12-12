@@ -150,6 +150,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       if( !imageList && pdf ) {
         this.showDownloadLabel = true;
         // this._noSinglePageDownload();
+        this._renderDownloadAllFormats();
         this._renderDownloadSingleFormat();
         return;
       }
@@ -462,6 +463,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     }
     
     this._setDownloadHref(this.sources);
+    this._renderDownloadSingleFormat();
 
     if( this.isBookreader && !this.fullSetSelected ) {
       this._onBookreaderStateUpdate(this.BookReaderModel.getState());
