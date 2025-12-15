@@ -28,9 +28,7 @@ class ItemsModel extends FinEsDataModel {
         '_score',
         { 'name.raw' : 'asc' }
       ]
-    }
-    console.log('ItemsModel search', JSON.stringify(searchDocument, null, 2));
-    
+    }    
     return super.search(searchDocument, options, index);
   }
 
