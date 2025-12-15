@@ -56,6 +56,7 @@ export default function render() {
         display: flex;
         justify-content: center;
         box-sizing: border-box;
+        padding-top: 1rem;
       }
 
       h3 {
@@ -376,6 +377,13 @@ export default function render() {
         height: 1rem;
         background-color: #dcdcdc; 
       }
+
+      .masonry-titles .collection-name {
+        padding: 15px calc(1.5rem + 15px);
+        box-sizing: border-box;
+        line-height: 1.3;
+        font-size: 0.95rem;
+      }
     </style>
 
     <div class="header">
@@ -436,7 +444,7 @@ export default function render() {
       </div>
     </div>
 
-    <div ?hidden="${this.showError}" style="min-height: 100vh">
+    <div ?hidden="${this.showError}">
       <div ?hidden="${this.showLoading}">
         <div class="grid" ?hidden="${!this.loading || !this.isGridLayout}">
           ${[1,2,3,4,5,6,7,8.9,10].map(
@@ -571,6 +579,9 @@ export default function render() {
     >
       Digital Collections limits results to 10,000. Use keywords and/or filters
       to refine search.
+    </div>
+
+    <div class="masonry-titles" style="visibility: hidden; position: absolute; bottom: 0;">
     </div>
   `;
 }
