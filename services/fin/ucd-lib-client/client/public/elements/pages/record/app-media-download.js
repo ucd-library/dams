@@ -273,7 +273,18 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     } else {
       // get image from selected page
       let page = this.selectedMediaPage || 0;
-      this.href = imageList?.clientMedia?.download?.[page]?.url || firstMediaDownload;
+
+      // pull page from pdf if no imagelist
+      let url = '';
+      let imageUrl = this.AppStateModel.location.fullpath.replace(/:\d+$/, ''); // scrub :pageNumber suffix
+      if( !imageList ) {
+        let media = this.clientMedia.mediaGroups?.find(mg => mg['@id'] === imageUrl)?.clientMedia;
+        if( media?.pages ) {
+          url = media.pages[page-1]?.original?.url || media.pages[page-1]?.large?.url;
+        }
+      }
+
+      this.href = imageList?.clientMedia?.download?.[page]?.url || url || firstMediaDownload;
     }
   }
 
@@ -302,12 +313,19 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         if( this.archiveHref.indexOf(source.url?.split('/fcrepo/rest')?.[1]) > -1 ) multiImageSize += source.fileSize;
       }
     });
-
+  
     if( singlePdf && formats.length > 0 ) singlePdf = false; 
 
-    let fileSize = this.sources.find(s => s.url === this.href)?.fileSize;
     let imageLabel = singlePdf ? 'pdf ' : '';
-    if( formats.length ) imageLabel += formats.join(', ') + ' ';
+
+    let viewingPdf = this.AppStateModel.location.fullpath.replace(/:\d+$/, '')?.split('.')?.pop() === 'pdf';
+    if( viewingPdf ) {
+      singlePdf = true;
+      imageLabel = this.href.split('.').pop(); // get format from url, could be workflow image or pdf
+    }
+
+    let fileSize = this.sources.find(s => s.url === this.href)?.fileSize;
+    if( formats.length && !viewingPdf ) imageLabel += formats.join(', ') + ' ';
 
     // if multipage, combine file sizes
     if( multipage && multiImageSize ) {
@@ -445,6 +463,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       urls = sources.map(s => s.url.replace('/fcrepo/rest', ''));
     }
     
+    this._setDownloadHref(this.sources);
     this._setZipPaths(urls);
   }
 

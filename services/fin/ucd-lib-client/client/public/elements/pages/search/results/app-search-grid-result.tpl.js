@@ -91,10 +91,14 @@ export default function render() {
         }
       }
 
-      .media-type {
+      .media-types {
         position: absolute;
         right: 0.25rem;
-        bottom: 0.25rem;
+        bottom: 0.75rem;
+        display: flex;
+      }
+
+      .media-type {
         width: 2rem;
         height: 2rem;
         border-radius: 50%;
@@ -102,7 +106,7 @@ export default function render() {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0.5rem;
+        margin: 0.5rem 0.5rem 0 0;
       }
 
       ucdlib-icon {
@@ -120,27 +124,29 @@ export default function render() {
         onload="this.style.display = 'block';"
         />
       <div ?hidden="${!this.isVideo}" class="video-thumbnail"></div>
-      <div
-          class="media-type"
-          ?hidden="${!this.mediaType || this.mediaType === "image"}"
-        >
+      <div class="media-types">        
+        <div class="media-type"
+          ?hidden="${!this.mediaTypes.includes('video')}">
           <ucdlib-icon
-            ?hidden="${this.mediaType !== "imageList"}"
             class="vertical-link__image"
-            icon="ucdlib-dams:item-stack-blank"
-          ></ucdlib-icon>
-          <ucdlib-icon
-            style="margin-left: .2rem;"
-            ?hidden="${this.mediaType !== "video"}"
-            class="vertical-link__image"
-            icon="ucdlib-dams:fa-play"
-          ></ucdlib-icon>
-          <ucdlib-icon
-            ?hidden="${this.mediaType !== "audio"}"
-            class="vertical-link__image"
-            icon="ucdlib-dams:fa-volume-high"
-          ></ucdlib-icon>
+            icon="ucdlib-dams:fa-play">
+          </ucdlib-icon>
         </div>
+        <div class="media-type"
+          ?hidden="${!this.mediaTypes.includes('audio')}">
+          <ucdlib-icon
+            class="vertical-link__image"
+            icon="ucdlib-dams:fa-volume-high">
+          </ucdlib-icon>
+        </div>      
+        <div class="media-type"
+          ?hidden="${!this.mediaTypes.includes('imageList')}">
+          <ucdlib-icon
+            class="vertical-link__image"
+            icon="ucdlib-dams:item-stack-blank">
+          </ucdlib-icon>
+        </div>
+      </div>
     </div>
 
     <div class="card-text">

@@ -58,7 +58,7 @@ return html`
       <img
         class="header-icon"
         slot="header-icon"
-        src="/images/watercolors/watercolor-splat-sunset-about.png"/>
+        src="/images/watercolors/watercolor-splat-cyan-search-tips.png"/>
     </div>
 
     <div class="text-container">  
@@ -98,7 +98,7 @@ return html`
             <tr>
               <td>*</td>
               <td>Search variations of the word</td>
-              <td><strong>Agr* technology</strong> may include <em>agricultural technology, agrarian technology</em>, etc.</td>
+              <td><strong>agr* technology</strong> may include <em>agricultural technology, agrarian technology</em>, etc.</td>
             </tr>
             <tr>
               <td>""</td>

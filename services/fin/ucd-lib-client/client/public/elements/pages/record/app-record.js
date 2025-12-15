@@ -91,6 +91,7 @@ class AppRecord extends Mixin(LitElement)
     this.currentRecordId = "";
     this.name = "";
     this.collectionName = "";
+    this.renderedRecordId = "";
 
     this.date = "";
     this.publisher = "";
