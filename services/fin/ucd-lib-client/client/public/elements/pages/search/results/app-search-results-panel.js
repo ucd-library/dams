@@ -411,29 +411,26 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
   
     this._estimateViewHeight(eles, w, numCols);
 
-    let styledPadding = 0;
-    if( numCols === 1 ) styledPadding = 80; // margin+padding
+    // to calculate the height of the titles
+    let masonaryTitlesDiv = this.shadowRoot.querySelector('.masonry-titles');
+    masonaryTitlesDiv.innerHTML = '';
+    for( let i = 0; i < eles.length; i++ ) {
+      let div = document.createElement('div');
+      div.classList.add('collection-name');
+      div.style.width = eles[i].offsetWidth + 'px';
+      div.innerText = this.results[i].title || 'No Title';
+      masonaryTitlesDiv.appendChild(div);
+    }
 
     for (let i = 0; i < eles.length; i++) { 
-      let padding = (this.results[i].title ? Math.ceil(this.results[i].title.length / 24) * 22 : 40) + 25;
-      padding = window.innerWidth < 768 ? 0 : padding; // none needed for mobile
-
-      await eles[i].updateComplete; 
-      let img = eles[i].shadowRoot?.querySelector('img');
-      if( img ) {
-        await new Promise((resolve) => {
-          if( img.complete ) {
-            resolve();
-          } else { 
-            img.addEventListener('load', resolve);
-            img.addEventListener('error', resolve);
-          }
-        });
-      }
+      let titleHeight = masonaryTitlesDiv.children[i].offsetHeight;
+      let size = this.results[i].size || {};
 
       let containerWidth = eles[i].offsetWidth || (w * .92); // hack to get around offsetWidth intermittently being 0, not rendered yet?
-      let naturalWidth = img.naturalWidth || 1;
-      let naturalHeight = img.naturalHeight || 1;
+
+      let naturalWidth = size.width || 1;
+      let naturalHeight = size.height || 1;
+
       let aspectRatio = naturalHeight / naturalWidth;
       let scaledHeight = containerWidth * aspectRatio;
       
@@ -441,11 +438,13 @@ class AppSearchResultsPanel extends Mixin(LitElement).with(LitCorkUtils) {
       let cheight = colHeights[col];
       eles[i].style.left = leftOffset + col * w + "px";
       eles[i].style.top = cheight + "px";
-      colHeights[col] += Math.ceil(scaledHeight + padding + styledPadding);
+      colHeights[col] += Math.ceil(scaledHeight + titleHeight);
     }
 
     let maxHeight = Math.max.apply(Math, colHeights);
     this.shadowRoot.querySelector("#layout").style.height = maxHeight + "px";
+
+    masonaryTitlesDiv.innerHTML = '';
 
     this.requestUpdate();
   }
