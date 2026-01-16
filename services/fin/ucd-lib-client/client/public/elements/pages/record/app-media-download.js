@@ -127,6 +127,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     let pdf;
 
     if( this.isMultimedia ) {
+      this.fullSetSelected = false;
       let download = this.downloadOptions[0];
       this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = download.fileFormatSimple + ' (' + bytes(download.fileSize).toLowerCase() + ')';
       this.showImageFormats = false;
@@ -149,6 +150,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       if( !imageList && pdf ) {
         this.showDownloadLabel = true;
         // this._noSinglePageDownload();
+        this._renderDownloadAllFormats();
         this._renderDownloadSingleFormat();
         return;
       }
@@ -196,9 +198,12 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       // 2 page image download
       this.isTwoPageView = true;      
 
+      // if switching from single to two page view on odd page, selected page is the second page in the displayed bookreader view
+      let startIndex = pageNumber % 2 !== 0 ? pageNumber - 2 : pageNumber - 1;
+
       // set download href to 2 pages for archive download option
-      let image1 = pages[pageNumber - 1]?.download?.url?.replace('/fcrepo/rest', '');
-      let image2 = pages[pageNumber]?.download?.url?.replace('/fcrepo/rest', '');
+      let image1 = pages[startIndex]?.download?.url?.replace('/fcrepo/rest', '');
+      let image2 = pages[startIndex + 1]?.download?.url?.replace('/fcrepo/rest', '');
       let urls = [];
       if( image1 ) urls.push(image1);
       if( image2 ) urls.push(image2);
@@ -457,13 +462,15 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.showDownloadLabel = true;
     }
     
+    this._setDownloadHref(this.sources);
+    this._renderDownloadSingleFormat();
+
     if( this.isBookreader && !this.fullSetSelected ) {
       this._onBookreaderStateUpdate(this.BookReaderModel.getState());
     } else {
       urls = sources.map(s => s.url.replace('/fcrepo/rest', ''));
     }
     
-    this._setDownloadHref(this.sources);
     this._setZipPaths(urls);
   }
 
