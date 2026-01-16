@@ -91,6 +91,7 @@ class SearchVcModel extends BaseModel {
       } else { 
         size = {};
       }
+      if( Array.isArray(size) ) size = size[0];
 
       matchedItems.push({
         id: result.root["@id"],
