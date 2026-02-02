@@ -5,6 +5,7 @@ import priorityLinksCss from "@ucd-lib/theme-sass/4_component/_priority-links.cs
 import iconsCss from "@ucd-lib/theme-sass/4_component/_icons.css";
 import categoryBrandCss from "@ucd-lib/theme-sass/4_component/_category-brand.css";
 import verticalLinksCss from "@ucd-lib/theme-sass/4_component/_vertical-link.css";
+import buttonsCss from "@ucd-lib/theme-sass/2_base_class/_buttons.css";
 
 export default function render() {
   return html`
@@ -14,6 +15,7 @@ export default function render() {
         ${categoryBrandCss}
         ${verticalLinksCss}
         ${iconsCss}
+        ${buttonsCss}
         :host {
         display: block;
         position: relative;
@@ -33,7 +35,6 @@ export default function render() {
         align-items: center;
         justify-content: center;
         flex-flow: row wrap;
-        padding-bottom: 4rem;
         background-color: var(--color-white);
       }
       .browse-buttons > div {
@@ -88,6 +89,64 @@ export default function render() {
       .header-icon {
         width: 6rem;
       }
+
+      .calisphere-section {
+        display: flex;
+        align-items: center;
+        padding: 0 2rem;
+        gap: 2rem;
+      }
+
+      .calisphere-section > div {
+        flex: 1;
+      }
+
+      .calisphere-section img {
+        max-width: 100%;
+      }
+
+      .calisphere-extra-info {
+        margin-bottom: 0;
+        color: var(--black, #000);
+        font-size: 1rem;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 30.74px;
+      }
+
+      .calisphere-section h2 {
+        color: var(--ucd-blue-100, #022851);
+        margin-bottom: 1rem;
+      }
+
+      .calisphere-section .dots-separator {
+        display: block;
+        border-bottom: 5px dotted var(--color-dams-secondary); 
+        width: 75px;
+      }
+
+      .browse-selection-section p.calisphere-link {
+        color: var(--ucd-black-70, #4C4C4C);
+        font-size: .875rem;
+        font-style: italic;
+        line-height: 26px;
+        padding: 2rem 0 3rem 2rem;
+      }
+
+      .browse-selection-section p.calisphere-link a:hover {
+        color: #00b2e3;
+      }
+
+      a.explore-calisphere {
+        padding: 0 1.5rem 0 .75rem;
+        margin-top: 2rem;
+      }
+
+      @media (max-width: 768px) {
+        .calisphere-section {
+          display: block;
+        }
+      } 
     </style>
 
     <div class="browse-selection-section" ?hidden="${this.page !== "/browse"}">
@@ -170,6 +229,22 @@ export default function render() {
           </div>
         </div>
       </section>
+      <div class="calisphere-section">
+        <div class="current-index-panel">
+          <img src="/images/watercolor-schwier-87293-d31v5bn6t.jpg" alt="Calisphere Logo" />
+        </div>
+        <div>
+          <h2>Looking for more?</h2>
+          <div class="dots-separator"></div>
+          <p class="calisphere-extra-info">
+            Additional items from the library's Archives and Special Collections 
+            are available through the University of California's Calisphere.
+          </p>
+          <a href="https://calisphere.org/UCD/collections" alt="Explore Calisphere" class="btn btn--alt btn--round explore-calisphere">Explore Calisphere</a>
+        </div>
+      </div>
+
+      <p class="calisphere-link">Featured Image: <a href="/item/ark:/87293/d31v5bn6t" alt="Schwier (Hilda) Photograph Album">Schwier (Hilda) Photograph Album</a></p>
     </div>
 
     <app-browse-by

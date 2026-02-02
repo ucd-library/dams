@@ -136,6 +136,7 @@ export default function render() {
             <li><a href="/browse/collections">Collections</a></li>
             <li><a href="/search">Items</a></li>
             <li><a href="/search-tips">Search Tips</a></li>
+            <li><a href="https://calisphere.org/UCD/collections">Additional Items on Calisphere</a></li>
             <li><a href="/about">About Digital Collections</a></li>
             <!-- <li><a href="">FAQ</a></li> -->
           </ul>
