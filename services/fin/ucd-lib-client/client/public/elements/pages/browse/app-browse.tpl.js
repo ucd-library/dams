@@ -1,6 +1,8 @@
 import { html } from "lit";
 
 import { sharedStyles } from "../../styles/shared-styles";
+import SharedHtml from '../../utils/shared-html';
+
 import priorityLinksCss from "@ucd-lib/theme-sass/4_component/_priority-links.css";
 import iconsCss from "@ucd-lib/theme-sass/4_component/_icons.css";
 import categoryBrandCss from "@ucd-lib/theme-sass/4_component/_category-brand.css";
@@ -119,10 +121,8 @@ export default function render() {
         margin-bottom: 1rem;
       }
 
-      .calisphere-section .dots-separator {
-        display: block;
-        border-bottom: 5px dotted var(--color-dams-secondary); 
-        width: 75px;
+      .calisphere-section .header-dots {
+        margin: 0;
       }
 
       .browse-selection-section p.calisphere-link {
@@ -131,6 +131,10 @@ export default function render() {
         font-style: italic;
         line-height: 26px;
         padding: 2rem 0 3rem 2rem;
+      }
+
+      .browse-selection-section p.calisphere-link a {
+        text-decoration: underline;
       }
 
       .browse-selection-section p.calisphere-link a:hover {
@@ -235,7 +239,9 @@ export default function render() {
         </div>
         <div>
           <h2>Looking for more?</h2>
-          <div class="dots-separator"></div>
+
+          ${SharedHtml.headerDots()}
+
           <p class="calisphere-extra-info">
             Additional items from the library's Archives and Special Collections 
             are available through the University of California's Calisphere.
