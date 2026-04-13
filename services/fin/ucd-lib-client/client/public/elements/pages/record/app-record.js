@@ -139,60 +139,7 @@ class AppRecord extends Mixin(LitElement)
     this.firstStatusLoaded = false;
 
     this.workflowIntervalId = null;
-
-    this.availableRightsStatements = {
-      '/vocab/InC/1.0/' : {
-        label : 'In Copyright',
-        url : 'https://rightsstatements.org/vocab/InC/1.0/'
-      },
-      '/vocab/InC-OW-EU/1.0/' : {
-        label : 'In Copyright - EU Orphan Work',
-        url : 'https://rightsstatements.org/vocab/InC-OW-EU/1.0/'
-      },
-      '/vocab/InC-EDU/1.0/' : {
-        label : 'In Copyright - Educational Use Permitted',
-        url : 'https://rightsstatements.org/vocab/InC-EDU/1.0/'
-      },
-      '/vocab/InC-NC/1.0/' : {
-        label : 'In Copyright - Non-Commercial Use Permitted',
-        url : 'https://rightsstatements.org/vocab/InC-NC/1.0/'
-      },
-      '/vocab/InC-RUU/1.0/' : {
-        label : 'In Copyright - Rights Holder(s) Unlocatable or Unidentifiable',
-        url : 'https://rightsstatements.org/vocab/InC-RUU/1.0/'
-      },
-      '/vocab/NoC-CR/1.0/' : {
-        label : 'No Copyright - Contractual Restrictions',
-        url : 'https://rightsstatements.org/vocab/NoC-CR/1.0/'
-      },
-      '/vocab/NoC-NC/1.0/' : {
-        label : 'No Copyright - Non-Commercial Use Only',
-        url : 'https://rightsstatements.org/vocab/NoC-NC/1.0/'
-      },
-      '/vocab/NoC-OKLR/1.0/' : {
-        label : 'No Copyright - Other Known Legal Restrictions',
-        url : 'https://rightsstatements.org/vocab/NoC-OKLR/1.0/'
-      },
-      '/vocab/NoC-US/1.0/' : {
-        label : 'No Copyright - United States',
-        url : 'https://rightsstatements.org/vocab/NoC-US/1.0/'
-      },
-      '/vocab/CNE/1.0/' : {
-        label : 'Copyright Not Evaluated',
-        url : 'https://rightsstatements.org/vocab/CNE/1.0/'
-      },
-      '/vocab/UND/1.0/' : {
-        label : 'Copyright Undetermined',
-        url : 'https://rightsstatements.org/vocab/UND/1.0/'
-      },
-      '/vocab/NKC/1.0/' : {
-        label : 'No Known Copyright',
-        url : 'https://rightsstatements.org/vocab/NKC/1.0/'
-      }
-    };
-
     this.copyright = {};
-
   }
 
   _onPageClick(e) {
@@ -244,9 +191,9 @@ class AppRecord extends Mixin(LitElement)
 
     this._updateLinks(this.AppStateModel.location, record);
 
-    let licence = e.payload?.root?.license?.['@id'] || '';
-    let licensePath = licence?.split('rightsstatements.org')?.[1] || ''; // to handle http/https
-    this.copyright = this.availableRightsStatements[licensePath] || {};
+    let license = e.payload?.root?.license?.['@id'] || '';
+    let licensePath = license?.split('rightsstatements.org')?.[1] || ''; // to handle http/https
+    this.copyright = rightsDefinitions[licensePath] || {};
 
     if( APP_CONFIG.user?.loggedIn ) {
       let t = await this.RecordModel.getGitInfo(this.currentRecordId);
