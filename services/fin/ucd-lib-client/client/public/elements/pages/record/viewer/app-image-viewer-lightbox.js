@@ -69,7 +69,9 @@ export default class AppImageViewer extends Mixin(LitElement).with(
   _onAppStateUpdate(e) {
     if( this.AppStateModel.location.page !== 'item' ) {
       this._reset();
-      this.hide();
+      if (this.visible || e.showLightbox || this.AppStateModel.store?.data?.showLightbox) {
+        this.hide();
+      }
       return;
     } 
 
