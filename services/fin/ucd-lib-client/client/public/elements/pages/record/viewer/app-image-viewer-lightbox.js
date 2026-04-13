@@ -67,6 +67,12 @@ export default class AppImageViewer extends Mixin(LitElement).with(
    * @description bound to AppStateModel app-state-update event
    */
   _onAppStateUpdate(e) {
+    if( this.AppStateModel.location.page !== 'item' ) {
+      this._reset();
+      this.hide();
+      return;
+    } 
+
     if (e.showLightbox && !this.visible) {
       this.show();
     } else if (!e.showLightbox && this.visible) {
@@ -92,6 +98,14 @@ export default class AppImageViewer extends Mixin(LitElement).with(
 
     this.record = e;
     if (this.visible) this.renderCanvas();
+  }
+  
+  _reset() {
+    this.media = {};
+    this.visible = false;
+    this.loading = false;
+    this.renderedMedia = null;
+    this.record = null;
   }
 
   /**
