@@ -447,10 +447,10 @@ export default function render() {
 
     <div class="container" style="padding-bottom: 50px;">
       <h3>${this.name}</h3>
-      <div class="copyright">
+      <div class="copyright" ?hidden="${!this.copyright || !this.copyright.label || !this.copyright.url}">
         <span>&copy;</span>
-        <a href="http://rightsstatements.org/vocab/InC-NC/1.0/"
-          class="copyright-text">In Copyright - Non-Commercial Use Permitted</a>
+        <a href="${this.copyright.url}"
+          class="copyright-text">${this.copyright.label}</a>
       </div>
 
       <div class="part-of">
