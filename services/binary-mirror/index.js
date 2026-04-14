@@ -42,7 +42,7 @@ app.get('*', async (req, res) => {
   }
 
   if( req.query.download ) {
-    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(message.path)}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(message.path.split('?')[0])}"`);
   }
 
   try {
