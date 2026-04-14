@@ -41,6 +41,10 @@ app.get('*', async (req, res) => {
     return;
   }
 
+  if( req.query.download ) {
+    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(message.path)}"`);
+  }
+
   try {
     console.log('File request: '+message.path+' with ETag:', etag);
     await streamFile(message.path, etag, res);

@@ -507,6 +507,10 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       return;
     }
 
+    if( e.currentTarget?.href ) {
+      e.currentTarget.href = this._appendDownloadParam(e.currentTarget.href);
+    }
+
     let path = this.rootRecord["@id"].replace(config.fcrepoBasePath, "");
     gtag("event", "download", {
       event_category: "fullset",
@@ -524,6 +528,11 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       e.preventDefault();
       return;
     }
+
+    if( e.currentTarget?.href ) {
+      e.currentTarget.href = this._appendDownloadParam(e.currentTarget.href);
+    }
+
     let path = this.href.replace(config.fcrepoBasePath, "");
 
     gtag("event", "download", {
@@ -531,6 +540,12 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       event_label: path,
       value: 1,
     });
+  }
+
+  _appendDownloadParam(url) {
+    if (!url) return url;
+    if (url.includes('download=')) return url;
+    return url + (url.includes('?') ? '&' : '?') + 'download=true';
   }
 }
 
