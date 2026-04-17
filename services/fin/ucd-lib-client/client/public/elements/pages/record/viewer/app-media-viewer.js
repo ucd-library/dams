@@ -48,7 +48,8 @@ export default class AppMediaViewer extends Mixin(LitElement)
     super();
     this.render = render.bind(this);
     this.active = true;
-
+    this.$ = {};
+    
     this._injectModel("AppStateModel", "RecordModel", "FcAppConfigModel", "CollectionModel", "BookReaderModel");
     this._reset();
   }
@@ -71,7 +72,6 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.regexPattern = /\{\{\{.*?\}\}\}/g;
     this.noMedia = false;
     this.isMultimedia = false;
-    this.$ = {};
   }
 
   async firstUpdated() {

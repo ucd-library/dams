@@ -66,6 +66,11 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
   connectedCallback() {
     super.connectedCallback();
+    this._syncAttributeState();
+  }
+
+  _syncAttributeState() {
+    this.isLightbox = this.hasAttribute('is-lightbox');
   }
 
   async firstUpdated() {
@@ -310,7 +315,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
     this.breakControls = true;
     this.showNavLeft = false;
     this.showNavRight = false;
-    this.isLightbox = false;
+    this._syncAttributeState();
     this.isBookReader = false;
     this.hideZoom = false;
     this.brSinglePage = false;
