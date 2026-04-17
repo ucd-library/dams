@@ -64,6 +64,7 @@ class AppRecord extends Mixin(LitElement)
       workflowStatus: { type: String },
       workflowError: { type: Boolean },
       firstStatusLoaded: { type: Boolean },
+      copyright: { type: Object }
     };
   }
 
@@ -138,6 +139,7 @@ class AppRecord extends Mixin(LitElement)
     this.firstStatusLoaded = false;
 
     this.workflowIntervalId = null;
+    this.copyright = {};
   }
 
   _onPageClick(e) {
@@ -188,6 +190,10 @@ class AppRecord extends Mixin(LitElement)
     this.collectionId = this.record.collectionId;
 
     this._updateLinks(this.AppStateModel.location, record);
+
+    let license = e.payload?.root?.license?.['@id'] || '';
+    let licensePath = license?.split('rightsstatements.org')?.[1] || ''; // to handle http/https
+    this.copyright = rightsDefinitions[licensePath] || {};
 
     if( APP_CONFIG.user?.loggedIn ) {
       let t = await this.RecordModel.getGitInfo(this.currentRecordId);
