@@ -55,7 +55,11 @@ class CollectionImportModel {
 
       // update storage class and host path for local dev
       let pvc = templates.find(t => t.kind === 'PersistentVolumeClaim');
-      pvc.spec.storageClassName = config.k8s.platform === 'microk8s' ? 'microk8s-hostpath' : 'hostpath';
+      if( config.k8s.importStorageClass ) {
+        pvc.spec.storageClassName = config.k8s.importStorageClass;
+      } else {
+        pvc.spec.storageClassName = config.k8s.platform === 'microk8s' ? 'microk8s-hostpath' : 'hostpath';
+      }
     } else {
       templates = await kubectl.renderKustomizeTemplate(
         config.k8s.collectionImport.templateName, 
