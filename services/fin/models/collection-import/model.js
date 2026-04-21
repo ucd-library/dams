@@ -66,6 +66,12 @@ class CollectionImportModel {
     let job = templates.find(t => t.kind === 'Job');
     let importer = job.spec.template.spec.containers.find(c => c.name === 'importer');
 
+    if( config.k8s.collectionImport.intendedForLabel ) {
+      job.spec.template.spec.nodeSelector = {
+        'intended-for' : config.k8s.collectionImport.intendedForLabel
+      }
+    }
+
     if( config.k8s.collectionImport.image ) {
       importer.image = config.k8s.collectionImport.image;
     }
