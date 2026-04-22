@@ -8,7 +8,7 @@ config.k8s.collectionImport = {
   url : env.K8S_COLLECTION_IMPORT_URL,
   localDevHostPath : env.K8S_COLLECTION_IMPORT_LOCAL_DEV_HOST_PATH || '/mnt/',
   intendedForLabel : env.K8S_IMPORT_JOB_INTENDED_FOR,
-  importStorageClass : env.K8S_IMPORT_STORAGE_CLASS
+  storageClass : env.K8S_IMPORT_STORAGE_CLASS
 }
 
 module.exports = config;
