@@ -150,7 +150,7 @@ export default function render() {
         <div
           class="aspect--4x3 u-background-image"
           role="img"
-          aria-label=""
+          aria-label="${this.truncatedTitle}"
           style="background-image:url(${this.thumbnailUrl});">
         </div>
         <div class="media-types">
