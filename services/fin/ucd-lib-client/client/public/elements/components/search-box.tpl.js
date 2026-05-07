@@ -68,7 +68,7 @@ export default function render() {
           @change="${this._handleChange}"
         />
       </div>
-      <button @click="${this._fireSearch}" class="search-button">
+      <button @click="${this._fireSearch}" class="search-button" aria-label="Search Digital Collections">
         <ucdlib-icon icon="ucdlib-dams:fa-search"></ucdlib-icon>
       </button>
     </div>
