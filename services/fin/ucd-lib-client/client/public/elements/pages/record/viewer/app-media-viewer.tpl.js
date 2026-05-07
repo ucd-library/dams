@@ -259,6 +259,7 @@ export default function render() {
                 type="text"
                 id="br-search-input"
                 autocomplete="off"
+                aria-label="Search inside this item"
                 @change="${this._onBRSearch}"
               />
 
