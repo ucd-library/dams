@@ -153,7 +153,10 @@ ${this.href ? html`
     </div>
     </div>
     <div class="marketing-highlight__body ${this.darkBg ? 'dark' : ''}">
-      <h4 class="marketing-highlight__title">${this.cardTitle}</h4>
+      ${this.cardTitle
+        ? html`<h4 class="marketing-highlight__title">${this.cardTitle}</h4>`
+        : html``
+      }
       <p class="marketing-highlight__items"><span ?hidden="${!this.itemCt}">${this.itemCt || 0} item${this.itemCt == 1 ? '' : 's'}</span></p>
     </div>
   </a>` : html``}

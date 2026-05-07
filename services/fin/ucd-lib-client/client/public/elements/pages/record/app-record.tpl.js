@@ -447,7 +447,11 @@ export default function render() {
     <app-media-viewer></app-media-viewer>
 
     <div class="container" style="padding-bottom: 50px;">
-      <h1>${this.name}</h1>
+      ${this.name
+        ? html`<h1>${this.name}</h1>`
+        : html``
+      }
+      
       <div class="copyright" ?hidden="${!this.copyright || !this.copyright.label || !this.copyright.url}">
         <span>&copy;</span>
         <a href="${this.copyright.url}"
