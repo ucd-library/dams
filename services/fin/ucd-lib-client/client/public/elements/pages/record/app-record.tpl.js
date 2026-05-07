@@ -457,7 +457,10 @@ export default function render() {
         <div class="part-of-img-container"><img src="${this.collectionImg}" alt="" /></div>
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
-          <h4><a href="${this.collectionId}">${this.collectionName}</a></h4>
+          ${this.collectionId && this.collectionName
+            ? html`<h4><a href="${this.collectionId}">${this.collectionName}</a></h4>`
+            : html``
+          }
           <span>${this.collectionItemCount} items</span>
         </div>
       </div>
