@@ -134,7 +134,6 @@ export default function render() {
           class="filters-panel ${this.filtersCollapsed
             ? "off-canvas--left"
             : ""}"
-          aria-hidden="${this.filtersCollapsed}"
           data-${this.wideFiltersPanel ? "wide" : "normal"}
           @selected-tab-changed="${this._onFiltersTabUpdate}"
           @collapse-filters="${this._onCollapseFilters}"
