@@ -28,11 +28,12 @@ export default function render() {
         margin: auto;
       }
 
-      .container h3 {
+      .container h1 {
         font-weight: 800;
         text-align: center;
         color: var(--color-black-60);
         margin-bottom: 0.5rem;
+        font-size: 1.7425rem;
       }
 
       .copyright {
@@ -446,7 +447,7 @@ export default function render() {
     <app-media-viewer></app-media-viewer>
 
     <div class="container" style="padding-bottom: 50px;">
-      <h3>${this.name}</h3>
+      <h1>${this.name}</h1>
       <div class="copyright" ?hidden="${!this.copyright || !this.copyright.label || !this.copyright.url}">
         <span>&copy;</span>
         <a href="${this.copyright.url}"
