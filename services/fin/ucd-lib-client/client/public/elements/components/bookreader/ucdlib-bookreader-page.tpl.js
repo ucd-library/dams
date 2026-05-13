@@ -186,7 +186,7 @@ return html`
 </div>
 
 
-<div class="words" ?animating="${this.animating}">
+<div class="words" ?animating="${this.animating}" aria-hidden="true">
 ${this.ocrData.map((word, i) => html`
   <span 
     class="word"

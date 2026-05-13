@@ -119,6 +119,7 @@ export default function render() {
     <div class="image" id="imgRoot" style="height: ${this.imageHeight}px;">
       <img
         id="img"
+        alt="${this.title}"
         src="${this.thumbnailUrl}"
         style="height: ${this.imageHeight}px; width: 100%; display: none;"
         onload="this.style.display = 'block';"

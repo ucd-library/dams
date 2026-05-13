@@ -28,11 +28,12 @@ export default function render() {
         margin: auto;
       }
 
-      .container h3 {
+      .container h1 {
         font-weight: 800;
         text-align: center;
         color: var(--color-black-60);
         margin-bottom: 0.5rem;
+        font-size: 1.7425rem;
       }
 
       .copyright {
@@ -446,7 +447,11 @@ export default function render() {
     <app-media-viewer></app-media-viewer>
 
     <div class="container" style="padding-bottom: 50px;">
-      <h3>${this.name}</h3>
+      ${this.name
+        ? html`<h1>${this.name}</h1>`
+        : html``
+      }
+      
       <div class="copyright" ?hidden="${!this.copyright || !this.copyright.label || !this.copyright.url}">
         <span>&copy;</span>
         <a href="${this.copyright.url}"
@@ -457,7 +462,10 @@ export default function render() {
         <div class="part-of-img-container"><img src="${this.collectionImg}" alt="" /></div>
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
-          <h4><a href="${this.collectionId}">${this.collectionName}</a></h4>
+          ${this.collectionId && this.collectionName
+            ? html`<h4><a href="${this.collectionId}">${this.collectionName}</a></h4>`
+            : html``
+          }
           <span>${this.collectionItemCount} items</span>
         </div>
       </div>

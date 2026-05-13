@@ -110,6 +110,7 @@ export default function render() {
       <div
         style="background-image: url('${this.thumbnailUrl}')"
         class="img"
+        aria-label="${this.title}"
       ></div>
 
       <div class="data">

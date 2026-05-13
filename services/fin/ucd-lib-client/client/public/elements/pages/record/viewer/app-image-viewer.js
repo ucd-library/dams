@@ -17,6 +17,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       height: { type: String },
       spinnerTop: { type: Number },
       hasMultipleImages: { type: Boolean },
+      title: { type: String }
     };
   }
 
@@ -32,6 +33,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     this.height = '600px';
     this.spinnerTop = 300;
     this.hasMultipleImages = false;
+    this.title = '';
   }
 
   async firstUpdated() {
@@ -56,6 +58,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     if (this.mediaType !== "ImageList" && this.mediaType !== "ImageObject") return;
 
     this.loading = true;
+    this.title = graph.root?.name || '';
 
     let pages = [];
 
