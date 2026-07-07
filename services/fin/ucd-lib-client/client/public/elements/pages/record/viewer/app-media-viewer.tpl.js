@@ -238,10 +238,10 @@ export default function render() {
         ?hidden="${!this.isBookReader}"
       >
         <div>
-          <div style="padding: 1.5rem 1rem;">
-            <h5 style="color: var(--color-aggie-blue); display: inline; font-size: 1.5rem">
+          <div style="padding: 1.5rem 1rem;" role="region" aria-labelledby="search-panel-heading">
+            <h2 style="color: var(--color-aggie-blue); display: inline; font-size: 1.5rem">
               Search Inside
-            </h5>
+            </h2>
             <div class="search-collapse-btn" @click="${this._onToggleBRSearch}">
               <ucdlib-icon
                 icon="ucdlib-dams:fa-chevron-circle-left"
@@ -253,7 +253,7 @@ export default function render() {
             </div>
           </div>
 
-          <div class="search-content overflow">
+          <div class="search-content overflow" role="region" aria-label="Search inside panel">
             <div style="position: relative">
               <input
                 type="text"
@@ -273,7 +273,7 @@ export default function render() {
                 </ucdlib-icon>
               </div>
             </div>
-            <div style="text-align: center;">
+            <div style="text-align: center;" role="status" aria-live="polite" aria-atomic="true">
               <span style="font-size: .8rem; font-style: italic; "
                 >${this.searchResultsCount}
                 result${this.searchResultsCount === 1 ? "" : "s"}</span

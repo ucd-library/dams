@@ -446,7 +446,7 @@ export default function render() {
 
     <app-media-viewer></app-media-viewer>
 
-    <div class="container" style="padding-bottom: 50px;">
+    <div class="container" style="padding-bottom: 50px;" role="region" aria-label="Item metadata">
       ${this.name
         ? html`<h1>${this.name}</h1>`
         : html``
