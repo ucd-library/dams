@@ -128,16 +128,17 @@ export default function render() {
         margin: auto 0;
       }
 
-      .part-of .collection-info h4 {
+      .part-of .collection-info h2 {
         margin: 0.3rem 0 0;
         font-weight: 600;
+        font-size: 1.5rem;
       }
 
-      .part-of .collection-info h4 a {
+      .part-of .collection-info h2 a {
         color: var(--color-aggie-blue);
         text-decoration: none;
       }
-      .part-of .collection-info h4 a:hover {
+      .part-of .collection-info h2 a:hover {
         text-decoration: underline;
       }
 
@@ -189,7 +190,7 @@ export default function render() {
           margin: 2rem 1.5rem 2rem 1rem;
         }
 
-        .part-of .collection-info h4 {
+        .part-of .collection-info h2 {
           font-weight: 800;
           font-size: 1.2rem;
           margin: 0;
@@ -463,7 +464,7 @@ export default function render() {
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
           ${this.collectionId && this.collectionName
-            ? html`<h4><a href="${this.collectionId}">${this.collectionName}</a></h4>`
+            ? html`<h2><a href="${this.collectionId}">${this.collectionName}</a></h2>`
             : html``
           }
           <span>${this.collectionItemCount} items</span>
