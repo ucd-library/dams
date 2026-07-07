@@ -79,8 +79,11 @@ export function render() {
 return html`
 
   <div id="page-container">
-    <div id="single-page" 
-      ?fullscreen="${this.fullscreen}" 
+    <div id="single-page"
+      ?fullscreen="${this.fullscreen}"
+      tabindex="0"
+      role="group"
+      aria-label="Book page viewer. Use left and right arrow keys to turn pages."
       >
       <div id="single-page-scroll"></div>
     </div>

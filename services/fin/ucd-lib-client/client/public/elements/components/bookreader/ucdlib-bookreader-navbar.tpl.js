@@ -205,11 +205,12 @@ return html`
     aria-label="Book reader toolbar">
     <ucdlib-bookreader-slider></ucdlib-bookreader-slider>
     <div class="controls" role="region" aria-label="Pagination controls">  
-      <div id="prev" 
+      <div id="prev"
         role="button"
         tabindex="0"
         aria-label="Previous page"
-        @click="${this._prevPage}">
+        @click="${this._prevPage}"
+        @keydown="${this._onPrevKeyDown}">
         <ucdlib-icon icon="ucdlib-dams:fa-caret-left" aria-hidden="true"></ucdlib-icon>
       </div>
 
@@ -220,12 +221,13 @@ return html`
         ${this.selectedPageLabel} of ${this.numPages}
       </span>
 
-      <div id="next" 
-        style="width: 25px;" 
+      <div id="next"
+        style="width: 25px;"
         role="button"
         tabindex="0"
         aria-label="Next page"
-        @click="${this._nextPage}">
+        @click="${this._nextPage}"
+        @keydown="${this._onNextKeyDown}">
         <ucdlib-icon icon="ucdlib-dams:fa-caret-right" aria-hidden="true"></ucdlib-icon>
       </div>
     </div>
