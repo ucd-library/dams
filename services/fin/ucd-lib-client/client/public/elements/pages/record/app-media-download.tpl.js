@@ -234,6 +234,7 @@ export default function render() {
         </span>
       <select id="format"
         style="display: inline-block"
+        aria-label="Download format"
         @change="${this._onFormatSelected}"
         ?hidden="${!this.fullSetSelected || !this.showImageFormats || this.sources.length < 2}">
       </select>
