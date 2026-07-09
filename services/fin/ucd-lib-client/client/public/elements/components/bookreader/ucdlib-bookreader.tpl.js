@@ -83,7 +83,8 @@ return html`
       ?fullscreen="${this.fullscreen}"
       tabindex="0"
       role="group"
-      aria-label="Book page viewer. Use left and right arrow keys to turn pages."
+      aria-roledescription="book"
+      aria-label="${this.title ? this.title + ', book page viewer' : 'Book page viewer'}"
       >
       <div id="single-page-scroll"></div>
     </div>
