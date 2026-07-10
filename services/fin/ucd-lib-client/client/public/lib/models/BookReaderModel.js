@@ -226,7 +226,7 @@ class BookReaderModel extends BaseModel {
         originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
         scale = width / originalWidth;
         filename = page['@id']?.split('/').pop();
-        altText = utils.getAltText(record.clientMedia.getNode(page['@id']) || {}, rootNode);
+        altText = utils.getAltText(page['@id'] ? (record.clientMedia.getNode(page['@id']) || {}) : {}, rootNode);
         return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth, page: page.page, filename, altText};
     });
 
