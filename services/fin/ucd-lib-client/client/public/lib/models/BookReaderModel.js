@@ -1,6 +1,7 @@
 import {BaseModel} from '@ucd-lib/cork-app-utils';
 import BookReaderService from '../services/BookReaderService.js';
 import BookReaderStore from '../stores/BookReaderStore.js';
+import utils from '../utils';
 
 class BookReaderModel extends BaseModel {
 
@@ -225,7 +226,7 @@ class BookReaderModel extends BaseModel {
         originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
         scale = width / originalWidth;
         filename = page['@id']?.split('/').pop();
-        altText = this._getPageAltText(record.clientMedia.getNode(page['@id']) || {}, rootNode);
+        altText = utils.getAltText(record.clientMedia.getNode(page['@id']) || {}, rootNode);
         return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth, page: page.page, filename, altText};
     });
 
@@ -251,40 +252,6 @@ class BookReaderModel extends BaseModel {
     if( page.page === null || page.page === undefined ) return false;
     if( !page.ocr?.url || !page.ocr?.size ) return false;
     return true;
-  }
-
-  /**
-   * @method _getPageAltText
-   * @description get alt text for a book page image, checking the page's own linked
-   * data first (alternativeHeadline, then description, then name), falling back to
-   * the same fallback chain on the root item record if the page has none
-   *
-   * @param {Object} imageNode linked data node for the page image
-   * @param {Object} rootNode linked data node for the root item record
-   *
-   * @returns {String}
-   */
-  _getPageAltText(imageNode={}, rootNode={}) {
-    return this._firstValue(imageNode.alternativeHeadline) ||
-           this._firstValue(imageNode.description) ||
-           this._firstValue(imageNode.name) ||
-           this._firstValue(rootNode.alternativeHeadline) ||
-           this._firstValue(rootNode.description) ||
-           this._firstValue(rootNode.name) || '';
-  }
-
-  /**
-   * @method _firstValue
-   * @description normalize a linked data property value to a plain string,
-   * unwrapping arrays
-   *
-   * @param {String|Array} value
-   *
-   * @returns {String}
-   */
-  _firstValue(value) {
-    if( Array.isArray(value) ) value = value[0];
-    return value || '';
   }
 
   async getOcrData(page, itemId) {

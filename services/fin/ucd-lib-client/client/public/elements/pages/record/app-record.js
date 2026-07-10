@@ -523,7 +523,11 @@ class AppRecord extends Mixin(LitElement)
     } 
 
     if (!imagePath && mediaGroup?.['@shortType']?.includes('ImageList')) {
-      imagePath = mediaGroup.encodesCreativeWork?.['@id'] || mediaGroup.clientMedia?.images?.original?.url || path;
+      if( mediaGroup.encodesCreativeWork?.['@id'] && path !== mediaGroup.encodesCreativeWork?.['@id'] ) {
+        imagePath = mediaGroup.encodesCreativeWork?.['@id'];
+      } else {
+        imagePath = mediaGroup.clientMedia?.images?.original?.url || path;
+      }
     } else {
       imagePath = selectedRecord.selectedMedia?.['@id'];
     }

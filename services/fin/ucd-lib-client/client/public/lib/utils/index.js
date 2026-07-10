@@ -156,6 +156,29 @@ class Utils {
     return thumbnailUrl;
   }
 
+  /**
+   * @method getAltText
+   * @description get accessible alt text for an image, using a fallback chain of
+   * alternativeHeadline, then description, then name. Checks the image's own linked
+   * data node first, then falls back to the same chain on the root item record if
+   * the image has none
+   *
+   * @param {Object} imageNode linked data node for the image
+   * @param {Object} rootNode linked data node for the root item record
+   *
+   * @returns {String}
+   */
+  getAltText(imageNode={}, rootNode={}) {
+    const firstValue = (value) => Array.isArray(value) ? (value[0] || '') : (value || '');
+
+    return firstValue(imageNode.alternativeHeadline) ||
+           firstValue(imageNode.description) ||
+           firstValue(imageNode.name) ||
+           firstValue(rootNode.alternativeHeadline) ||
+           firstValue(rootNode.description) ||
+           firstValue(rootNode.name) || '';
+  }
+
   getCookie(name) {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? match[2] : null;
