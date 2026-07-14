@@ -6,8 +6,8 @@
   "@graph" : [{
     "@id" : "#authz-public",
     "@type" : ["acl:Authorization"],
-    "acl:accessTo" : [{"@id": "@base:"}],
-    "acl:default" : [{"@id": "@base:"}],
+    "acl:accessTo" : [{"@id": "/fcrepo/rest/application"}],
+    "acl:default" : [{"@id": "/fcrepo/rest/application"}],
     "acl:mode" : [{"@id": "acl:Read"}],
     "acl:agentClass" : [{"@id": "foaf:Agent"}]
   }]
