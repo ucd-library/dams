@@ -13,6 +13,7 @@ import "../../../utils/app-share-btn";
 import config from "../../../../lib/config";
 import utils from "../../../../lib/utils";
 import videoLibs from "../../../../lib/utils/video-lib-loader";
+import bytes from "bytes";
 
 import plyrCss from "plyr/dist/plyr.css";
 import shakaCss from "shaka-player/dist/controls.css";
@@ -26,7 +27,9 @@ export default class AppAudioViewer extends Mixin(LitElement)
   
   static get properties() {
     return {
-      isMultimedia : { type : Boolean }
+      isMultimedia : { type : Boolean },
+      transcript : { type : Object },
+      rootRecord : { type : Object }
     };
   }
 
@@ -35,6 +38,8 @@ export default class AppAudioViewer extends Mixin(LitElement)
     this.render = render.bind(this);
 
     this.isMultimedia = false;
+    this.transcript = null;
+    this.rootRecord = null;
 
     this._injectModel('AppStateModel', 'MediaModel');
     this.libsLoaded = false;
@@ -53,6 +58,33 @@ export default class AppAudioViewer extends Mixin(LitElement)
     if( selectedRecord && selectedRecord.selectedMedia ) this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
   }
 
+  /**
+   * @method _onSelectedRecordUpdate
+   * @description from AppStateModel/AppStateStore's dedicated 'selected-record-update'
+   * event (fired by setSelectedRecord) - unlike the generic _onAppStateUpdate, this is
+   * guaranteed to fire with clientMedia already populated, so this is where transcript
+   * should be read from (see app-media-download.js for the same pattern).
+   *
+   * @param {Object} record
+   */
+  _onSelectedRecordUpdate(record) {
+    this.transcript = record?.clientMedia?.transcript || null;
+    this.rootRecord = record?.graph?.root || null;
+  }
+
+  /**
+   * @method _transcriptLabel
+   * @description build the "Transcript: PDF (2.1mb)" style label shown above the player
+   *
+   * @returns {String}
+   */
+  _transcriptLabel() {
+    if( !this.transcript ) return '';
+    let format = (this.transcript.format || '').toUpperCase();
+    let size = this.transcript.fileSize ? ' (' + bytes(this.transcript.fileSize).toLowerCase() + ')' : '';
+    return `${this.transcript.label}: ${format}${size}`;
+  }
+
   async firstUpdated(e) {
     this.$.audio  = this.shadowRoot.getElementById('audio_player');
     this.$.poster = this.shadowRoot.getElementById('audio_poster');
@@ -67,6 +99,17 @@ export default class AppAudioViewer extends Mixin(LitElement)
     this.shadowRoot.querySelector('#sprite-plyr').innerHTML = SPRITE_SHEET;
 
     this._updateStyles();
+
+    // On a cold/direct page load, this element lives in a lazily-loaded chunk that can
+    // finish connecting AFTER RecordModel has already fetched the record and fired its
+    // one-shot 'selected-record-update'/'app-state-update' events - those are lost by
+    // the time we start listening. Resync with whatever is already selected, mirroring
+    // app-media-viewer.js/app-media-download.js's firstUpdated().
+    let selectedRecord = await this.AppStateModel.getSelectedRecord();
+    if( selectedRecord ) {
+      this._onSelectedRecordUpdate(selectedRecord);
+      if( selectedRecord.selectedMedia ) this._onSelectedRecordMediaUpdate(selectedRecord.selectedMedia);
+    }
   }
 
   _updateStyles() {

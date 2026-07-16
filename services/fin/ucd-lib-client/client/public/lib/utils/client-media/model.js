@@ -130,6 +130,32 @@ class ClientMedia {
       }
     }
 
+    this.resolveTranscript();
+  }
+
+  /**
+   * @method resolveTranscript
+   * @description resolve the root node's schema:transcript link (if present) into a
+   * simple downloadable descriptor, exposed as this.transcript. Deliberately not
+   * added to mediaGroups - a transcript is a text alternative for the primary
+   * audio/video, not a selectable media item, so it must never be crawled into the
+   * media viewer/nav UI (see MEDIA_LINK/CRAWL_LINKS in definition.js, which omit it).
+   */
+  resolveTranscript() {
+    let ref = this.root?.transcript;
+    if( !ref ) return;
+
+    let node = this.getNode(ref);
+    if( !node ) return;
+
+    let format = (node.fileFormat || node['@id']).split(/[/.]/).pop().toLowerCase();
+
+    this.transcript = {
+      url : '/fcrepo/rest'+node['@id'],
+      label : node.name || 'Transcript',
+      format,
+      fileSize : node.fileSize
+    };
   }
 
   /**

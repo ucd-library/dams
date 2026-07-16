@@ -5,7 +5,6 @@ import render from "./app-media-download.tpl.js";
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import config from "../../../lib/config";
-import utils from "../../../lib/utils";
 import bytes from "bytes";
 
 export default class AppMediaDownload extends Mixin(LitElement).with(
@@ -32,7 +31,10 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       isTwoPageView : { type: Boolean },
       downloadAllMedia : { type: Boolean },
       isBookreader : { type: Boolean },
-      disableDownload : { type: Boolean }
+      disableDownload : { type: Boolean },
+      transcript : { type: Object },
+      transcriptOptions : { type: Array },
+      selectedTranscriptDownload : { type: Object }
     };
   }
 
@@ -78,6 +80,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.downloadAllMedia = false;
     this.isBookreader = false;
     this.disableDownload = APP_CONFIG.disableFileDownloads;
+    this.transcript = null;
+    this.transcriptOptions = [];
+    this.selectedTranscriptDownload = null;
   }
 
   _onAppStateUpdate(e) {
@@ -96,6 +101,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.clientMedia = clientMedia;
     this.graphIndex = graph.index;
     this.selectedMediaPage = selectedMediaPage;
+    this.transcript = clientMedia.transcript || null;
 
     this.sources = this._getDownloadSources();
 
@@ -162,6 +168,53 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( pdf && !this.isMultimedia && this.firstLoad ) {
       this._toggleMultipleDownload(null, true);
     }
+
+    this._buildTranscriptOptions();
+  }
+
+  /**
+   * @method _buildTranscriptOptions
+   * @description build the primary-media + transcript dropdown options shown when a
+   * schema:transcript link is present (see ClientMedia.resolveTranscript()). Kept
+   * independent of the imagelist/pdf archive download flow (sources/archiveHref/
+   * #format) - this is just a simple choice between the selected media and its
+   * transcript, not a paged document.
+   */
+  _buildTranscriptOptions() {
+    if( !this.transcript ) {
+      this.transcriptOptions = [];
+      this.selectedTranscriptDownload = null;
+      return;
+    }
+
+    let mediaFormat = (this.href.split('.').pop() || '').toUpperCase();
+    let mediaFileSize = this.sources.find(s => s.url === this.href)?.fileSize;
+
+    let transcriptFormat = (this.transcript.format || '').toUpperCase();
+
+    this.transcriptOptions = [
+      {
+        label : mediaFormat + (mediaFileSize ? ' (' + bytes(mediaFileSize).toLowerCase() + ')' : ''),
+        url : this.href
+      },
+      {
+        label : this.transcript.label + ': ' + transcriptFormat + (this.transcript.fileSize ? ' (' + bytes(this.transcript.fileSize).toLowerCase() + ')' : ''),
+        url : this.transcript.url
+      }
+    ];
+
+    // default to the transcript being selected/shown, per design
+    this.selectedTranscriptDownload = this.transcriptOptions[1];
+  }
+
+  /**
+   * @method _onTranscriptFormatSelected
+   * @private
+   * @description bound to the transcript/media format dropdown change event
+   */
+  _onTranscriptFormatSelected() {
+    let value = this.shadowRoot.querySelector('#transcriptFormat').value;
+    this.selectedTranscriptDownload = this.transcriptOptions.find(o => o.url === value) || this.transcriptOptions[0];
   }
 
   /**

@@ -1,4 +1,5 @@
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import plyrCss from "plyr/dist/plyr.css"
 
 export default function render() { 
@@ -46,6 +47,7 @@ return html`
 
   .layout {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     border-bottom: 6px dotted var(--color-aggie-gold);
     width: 60%;
@@ -130,6 +132,33 @@ return html`
     background-color: var(--color-aggie-blue);
   }
 
+  .transcript-link {
+    display: flex;
+    justify-content: center;
+    flex-basis: 100%;
+    margin-top: 0.75rem;
+  }
+
+  .transcript-link .transcript-label {
+    text-wrap: nowrap;
+  }
+
+  .transcript-link-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #13639e;
+    font-size: 1rem;
+    text-decoration: underline;
+  }
+
+  .transcript-link-inner ucdlib-icon {
+    flex: none;
+    --ucdlib-icon-width: 1.1rem;
+    --ucdlib-icon-height: 1.1rem;
+    fill: #13639e;
+  }
+
   ${plyrCss}
 </style>
 <div class="container">
@@ -138,12 +167,27 @@ return html`
   <div id="audio_poster"></div>
 
   <div class="layout ${this.isMultimedia ? 'multimedia' : ''}">
-    <audio id="audio_player" controls>
+    <audio id="audio_player" controls
+      aria-label="${ifDefined(this.rootRecord?.name)}"
+      aria-details="${ifDefined(this.transcript ? 'transcript-link' : undefined)}">
       <source>
     </audio>
     <div ?hidden="${this.isMultimedia}" class="button tooltip" data-tooltip-text="Share">
       <app-share-btn></app-share-btn>
     </div>
+
+    <a class="transcript-link"
+      id="transcript-link"
+      ?hidden="${!this.transcript}"
+      href="${this.transcript?.url}"
+      download
+      target="_blank"
+      rel="noopener">
+      <span class="transcript-link-inner">
+        <ucdlib-icon icon="ucdlib-dams:fa-file-lines"></ucdlib-icon>
+        <span class="transcript-label">${this._transcriptLabel()}</span>
+      </span>
+    </a>
   </div>
 
 </div>
