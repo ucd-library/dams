@@ -135,7 +135,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( this.isMultimedia ) {
       this.fullSetSelected = false;
       let download = this.downloadOptions[0];
-      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = (download.fileFormatSimple || '').toUpperCase() + ' (' + bytes(download.fileSize).toLowerCase() + ')';
+      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = (download.fileFormatSimple || '') + ' (' + bytes(download.fileSize).toLowerCase() + ')';
       this.showImageFormats = false;
 
       // update all label to include video + other media (prob just thumbnail)
