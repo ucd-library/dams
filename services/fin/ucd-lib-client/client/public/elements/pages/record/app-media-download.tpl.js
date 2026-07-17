@@ -173,7 +173,7 @@ export default function render() {
     </style>
 
     <div id="wrapper">
-      <div class="layout" ?hidden="${!!this.transcript || !this.hasMultipleDownloadMedia || this.downloadAllMedia}">
+      <div class="layout" ?hidden="${!!this.transcriptOptions?.length || !this.hasMultipleDownloadMedia || this.downloadAllMedia}">
         <div class="radio" style="margin-right: 1rem">
           <input
             id="single"
@@ -197,7 +197,7 @@ export default function render() {
       </div>
     </div>
 
-    <div ?hidden="${!!this.transcript || this.fullSetSelected}">
+    <div ?hidden="${!!this.transcriptOptions?.length || this.fullSetSelected}">
       <div class="layout btns"
         ?hidden="${!this.selectedMediaHasSources}">
         <span id="multimedia-format-label"
@@ -228,13 +228,13 @@ export default function render() {
       </div>
     </div>
 
-    <div ?hidden="${!!this.transcript || ((this.fullSetSelected || this.isTwoPageView) && this.selectedMediaHasSources)}">
+    <div ?hidden="${!!this.transcriptOptions?.length || ((this.fullSetSelected || this.isTwoPageView) && this.selectedMediaHasSources)}">
       <div ?hidden="${this.selectedMediaHasSources}">
         <em>No downloadable items available</em>
       </div>
     </div>
 
-    <div style="display: flex;" ?hidden="${!!this.transcript}">
+    <div style="display: flex;" ?hidden="${!!this.transcriptOptions?.length}">
       <span id="multimedia-all-format-label"
         ?hidden="${!this.fullSetSelected || !this.isMultimedia}">
       </span>
@@ -259,7 +259,7 @@ export default function render() {
       </a>
     </div>
 
-    <div class="layout" ?hidden="${!this.transcript || this.disableDownload}">
+    <div class="layout" ?hidden="${!this.transcriptOptions?.length || this.disableDownload}">
       <select id="transcriptFormat"
         aria-label="Download format"
         @change="${this._onTranscriptFormatSelected}">

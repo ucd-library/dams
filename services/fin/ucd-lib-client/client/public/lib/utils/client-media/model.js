@@ -131,6 +131,43 @@ class ClientMedia {
     }
 
     this.resolveTranscript();
+    this.resolveSupplementaryDocuments();
+  }
+
+  /**
+   * @method resolveSupplementaryDocuments
+   * @description find any schema:associatedMedia links off the root node that are marked
+   * ucdlib:SupplementaryDocument (e.g. a biography alongside an audio interview) and expose
+   * them as plain downloads via this.supplementaryDownloads. Scans root's associatedMedia
+   * links directly (like resolveTranscript() does for schema:transcript) rather than
+   * filtering mediaGroups - a generic document's @type won't match any of
+   * DISPLAY_ORDER.DISPLAY_TYPES, so _crawlMedia() never adds it to mediaGroups in the
+   * first place, meaning it would never be found by filtering mediaGroups after the fact.
+   * Also strips it out of mediaGroups as a safety net, in case its @type or mimetype ever
+   * happens to also satisfy _crawlMedia()'s display-type check.
+   */
+  resolveSupplementaryDocuments() {
+    const SUPPLEMENTARY_TYPE = 'http://digital.ucdavis.edu/schema#SupplementaryDocument';
+
+    this.supplementaryDownloads = [];
+
+    let links = this.getMediaLinks(this.root);
+    for( let node of links ) {
+      if( !node['@type']?.includes(SUPPLEMENTARY_TYPE) ) continue;
+
+      let format = (node.fileFormat || node['@id']).split(/[/.]/).pop().toLowerCase();
+
+      this.supplementaryDownloads.push({
+        url : '/fcrepo/rest'+node['@id'],
+        label : node.name || 'Document',
+        format,
+        fileSize : node.fileSize
+      });
+    }
+
+    if( this.supplementaryDownloads.length ) {
+      this.mediaGroups = this.mediaGroups.filter(node => !node['@type']?.includes(SUPPLEMENTARY_TYPE));
+    }
   }
 
   /**
