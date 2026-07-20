@@ -28,6 +28,19 @@ class ClientEditsModel extends FinDataModel {
   async update(json) {
     let id = json['@id'].replace(/^\/application\/ucd-lib-client/, '');
 
+    let node = json;
+    if( json['@graph'] && json['@graph'].length > 0 ) {
+      node = json['@graph'][0];
+    }
+    if( !Array.isArray(node['@type']) ) {
+      node['@type'] = [node['@type']];
+    }
+
+    let isBinary = node['@type'].includes('http://fedora.info/definitions/v4/repository#Binary');
+    if( isBinary ) {
+      return;
+    }
+
     try {
       if( id.match(/^\/item\//) ) {
         await this.onItemUpdate(id);
