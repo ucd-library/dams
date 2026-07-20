@@ -144,7 +144,7 @@ export default function render() {
       }
 
       #transcriptFormat {
-        max-width: none;
+        max-width: 15rem;
         flex: 1;
       }
 
