@@ -170,7 +170,7 @@ export default function render() {
 
       @media (max-width: 600px) {
         .container {
-          width: 95%;
+          width: 90%;
         }
 
         .metadata-row,

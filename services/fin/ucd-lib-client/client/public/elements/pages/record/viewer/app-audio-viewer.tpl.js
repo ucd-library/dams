@@ -1,13 +1,16 @@
 import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { repeat } from 'lit-html/directives/repeat.js';
 import plyrCss from "plyr/dist/plyr.css"
 
-export default function render() { 
+export default function render() {
 return html`
 <style>
   :host {
     display: none;
-    padding: 20px 20px 0 20px;
+    width: 60%;
+    margin: auto;
+    padding: 20px 0 0 0;
     box-sizing: border-box;
   }
 
@@ -49,14 +52,8 @@ return html`
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    border-bottom: 6px dotted var(--color-aggie-gold);
-    width: 60%;
-    margin: 0 auto;
-    padding-bottom: 0.7rem;
-  }
-
-  .layout.multimedia {
-    border-bottom: none;
+    align-items: center;
+    width: 100%;
   }
 
   .plyr--audio {
@@ -69,18 +66,18 @@ return html`
     color: #daaa00 !important;
   }
 
-  button.plyr__control.plyr__control--overlaid, 
+  button.plyr__control.plyr__control--overlaid,
   button.plyr__control.plyr__control:hover {
     background: var(--color-dams-secondary, #FFBF00);
   }
-  .plyr--full-ui input[type=range] { 
+  .plyr--full-ui input[type=range] {
     color: var(--color-dams-secondary, #FFBF00) !important;
   }
 
   .volume-icon {
     fill: var(--color-aggie-blue-50, #B0D0ED);
-    height: 107px;
-    margin: 0 auto;
+    height: 96px;
+    margin: 2rem auto;
   }
 
   .tooltip {
@@ -98,6 +95,7 @@ return html`
     border-radius: 5px;
     background: var(--color-aggie-blue);
     color: #fff;
+    font-family: inherit;
     font-size: 1rem;
     font-weight: bold;
     white-space: nowrap;
@@ -135,8 +133,7 @@ return html`
   .transcript-link {
     display: flex;
     justify-content: center;
-    flex-basis: 100%;
-    margin-top: 0.75rem;
+    margin: 0.75rem 0;
   }
 
   .transcript-link .transcript-label {
@@ -159,21 +156,143 @@ return html`
     fill: #13639e;
   }
 
+  .media-wrap {
+    border-bottom: 6px dotted var(--color-aggie-gold);
+    padding-bottom: 0.7rem;
+    /* establishes a query container for .layout/.button-row below, so their
+       "did this wrap" styling can be driven by this box's own actual
+       rendered width rather than a viewport media query - a viewport query
+       can't reliably track this, since :host's width is itself a percentage
+       of the viewport (60%/90%), so the same viewport width doesn't map to a
+       consistent available width here across contexts */
+    container-type: inline-size;
+  }
+
+  .media-wrap.multimedia {
+    border-bottom: none;
+  }
+
+  .button-row {
+    display: flex;
+    align-items: center;
+  }
+
+  /* once the audio bar (up to 500px) and the button row no longer fit on one
+     line together, .layout's flex-wrap sends the button row to its own line -
+     at that same content width, let the audio bar grow to fill the full row
+     and right-align the wrapped button row within its own. Below the fits-
+     on-one-line case, .layout's justify-content:center keeps the pair
+     tightly grouped together, same as before. Threshold is an estimate of
+     the audio bar's 500px cap + the button row's own width - nudge it if it
+     doesn't line up exactly with where the wrap actually happens */
+  @container (max-width: 760px) {
+    .plyr--audio {
+      max-width: none !important;
+    }
+
+    .button-row {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+
+  .transcript-toggle {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.4rem;
+    padding: 0.6rem 1.25rem;
+    border: none;
+    border-radius: 9999px;
+    background: var(--color-aggie-blue-80, #13639e);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .transcript-toggle:hover,
+  .transcript-toggle[aria-expanded="true"] {
+    background: var(--color-aggie-blue, #002851);
+  }
+
+  .transcript-toggle:focus-visible {
+    outline: 2px solid var(--color-dams-secondary, #FFBF00);
+    outline-offset: 2px;
+  }
+
+  app-transcript-panel {
+    margin-top: 1.5rem;
+  }
+
+  @media(max-width: 768px) {
+    :host {
+      width: 90%;
+    }
+
+    /* fullscreen mobile sheet mode - stays in normal document flow (no
+       position:fixed - that fought the site header's own stacking
+       context/sticky positioning) and instead relies on
+       _onTranscriptSheetChange scrolling this element to the top of the
+       viewport plus locking page scroll there, with a solid white
+       background/padding so it visually covers whatever it's now sitting
+       flush against. Unlike video, the audio player area itself doesn't
+       shrink - only the button row is hidden, since the sheet's own close
+       icon takes over that job. position:relative (still in-flow) plus a
+       z-index above the site header's own 1000 makes sure this wins the
+       stacking order if the header is sticky/fixed and would otherwise still
+       render on top of it */
+    :host([fullscreen]) {
+      position: relative;
+      z-index: 1001;
+      width: 100%;
+      margin: 0;
+      padding: .25rem;
+      background: #fff;
+    }
+
+    :host([fullscreen]) .media-wrap {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    :host([fullscreen]) .button-row {
+      display: none;
+    }
+  }
+
   ${plyrCss}
 </style>
 <div class="container">
-  <ucdlib-icon class="volume-icon" icon="ucdlib-dams:fa-volume-high"></ucdlib-icon>
   <div id="sprite-plyr" style="display: none;"></div>
   <div id="audio_poster"></div>
 
-  <div class="layout ${this.isMultimedia ? 'multimedia' : ''}">
-    <audio id="audio_player" controls
-      aria-label="${ifDefined(this.rootRecord?.name)}"
-      aria-details="${ifDefined(this.transcript ? 'transcript-link' : undefined)}">
-      <source>
-    </audio>
-    <div ?hidden="${this.isMultimedia}" class="button tooltip" data-tooltip-text="Share">
-      <app-share-btn></app-share-btn>
+  <div class="media-wrap ${this.isMultimedia ? 'multimedia' : ''}">
+    <ucdlib-icon class="volume-icon" icon="ucdlib-dams:fa-volume-high"></ucdlib-icon>
+    <div class="layout">
+      <audio id="audio_player" controls
+        aria-label="${ifDefined(this.rootRecord?.name)}"
+        aria-details="${ifDefined(this.transcript ? 'transcript-link' : undefined)}">
+        <source>
+        ${repeat(this.tracks, (t) =>
+            html`<track kind="${t.kind}" label="${t.label}" src="${t.src}" srclang="${t.srclang}" default="${t.default}" />`)}
+      </audio>
+      <div class="button-row">
+        ${this.tracks.length ? html`
+          <button
+            type="button"
+            class="transcript-toggle"
+            aria-expanded="${this.showTranscript}"
+            aria-controls="transcript-panel"
+            @click="${() => this._onTranscriptToggle()}">
+            ${this.showTranscript ? 'Hide Transcript' : 'Show Transcript'}
+          </button>
+        ` : ''}
+
+        <div ?hidden="${this.isMultimedia}" class="button tooltip" data-tooltip-text="Share">
+          <app-share-btn></app-share-btn>
+        </div>
+      </div>
     </div>
 
     <a class="transcript-link"
@@ -188,6 +307,17 @@ return html`
         <span class="transcript-label">${this._transcriptLabel()}</span>
       </span>
     </a>
+
+    ${this.tracks.length && this.showTranscript ? html`
+      <app-transcript-panel
+        id="transcript-panel"
+        label="Audio transcript"
+        .cues="${this.transcriptCues}"
+        .activeCueId="${this.activeCueId}"
+        @cue-click="${(e) => this._onCueClick(e)}"
+        @transcript-sheet-change="${(e) => this._onTranscriptSheetChange(e)}">
+      </app-transcript-panel>
+    ` : ''}
   </div>
 
 </div>

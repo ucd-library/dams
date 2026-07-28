@@ -130,7 +130,7 @@ return html`
 
       .cite-collection {
         /* padding-top: 0; */
-        width: 95%;
+        width: 90%;
         padding: 1rem;
       }
 
