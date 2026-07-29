@@ -57,8 +57,8 @@ return html`
   }
 
   .plyr--audio {
-    max-width: 500px !important;
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
     border-radius: 5px;
   }
 
@@ -159,13 +159,6 @@ return html`
   .media-wrap {
     border-bottom: 6px dotted var(--color-aggie-gold);
     padding-bottom: 0.7rem;
-    /* establishes a query container for .layout/.button-row below, so their
-       "did this wrap" styling can be driven by this box's own actual
-       rendered width rather than a viewport media query - a viewport query
-       can't reliably track this, since :host's width is itself a percentage
-       of the viewport (60%/90%), so the same viewport width doesn't map to a
-       consistent available width here across contexts */
-    container-type: inline-size;
   }
 
   .media-wrap.multimedia {
@@ -175,32 +168,17 @@ return html`
   .button-row {
     display: flex;
     align-items: center;
-  }
-
-  /* once the audio bar (up to 500px) and the button row no longer fit on one
-     line together, .layout's flex-wrap sends the button row to its own line -
-     at that same content width, let the audio bar grow to fill the full row
-     and right-align the wrapped button row within its own. Below the fits-
-     on-one-line case, .layout's justify-content:center keeps the pair
-     tightly grouped together, same as before. Threshold is an estimate of
-     the audio bar's 500px cap + the button row's own width - nudge it if it
-     doesn't line up exactly with where the wrap actually happens */
-  @container (max-width: 760px) {
-    .plyr--audio {
-      max-width: none !important;
-    }
-
-    .button-row {
-      width: 100%;
-      justify-content: flex-end;
-    }
+    margin-left: auto;
   }
 
   .transcript-toggle {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     margin-left: 0.4rem;
-    padding: 0.6rem 1.25rem;
+    height: 50px;
+    box-sizing: border-box;
+    padding: 0 1.25rem;
     border: none;
     border-radius: 9999px;
     background: var(--color-aggie-blue-80, #13639e);

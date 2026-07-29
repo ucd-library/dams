@@ -184,7 +184,10 @@ return html`
         .transcript-toggle {
             display: inline-flex;
             align-items: center;
-            padding: 0.6rem 1.25rem;
+            justify-content: center;
+            height: 50px;
+            box-sizing: border-box;
+            padding: 0 1.25rem;
             border: none;
             border-radius: 9999px;
             background: var(--color-aggie-blue-80, #13639e);

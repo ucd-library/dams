@@ -257,7 +257,27 @@ export default function render() {
     .mobile-header-actions {
       display: flex;
       align-items: center;
-      gap: .25rem;
+      gap: .5rem;
+    }
+
+    .mobile-header .auto-scroll-toggle {
+      background: var(--color-aggie-gold-70, #FFDF80);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+    }
+
+    .auto-scroll-label-short {
+      display: none;
+    }
+
+    @media(max-width: 380px) {
+      .auto-scroll-label-full {
+        display: none;
+      }
+
+      .auto-scroll-label-short {
+        display: inline;
+      }
     }
 
     .icon-btn {
@@ -280,11 +300,6 @@ export default function render() {
       --ucdlib-icon-height: 1.25rem;
     }
 
-    .icon-btn:hover,
-    .icon-btn[aria-expanded="true"] {
-      background: var(--color-aggie-gold-70, #FFDF80);
-    }
-
     .transcript-panel.mobile .transcript-lines {
       flex: 1 1 auto;
       max-height: none;
@@ -300,6 +315,18 @@ export default function render() {
     <div class="transcript-panel-header mobile-header">
       <h5 class="transcript-heading">Transcript</h5>
       <div class="mobile-header-actions">
+        <div class="auto-scroll-toggle">
+          <span class="auto-scroll-label-full">Autoscroll</span>
+          <span class="auto-scroll-label-short">Auto</span>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="autoScrollToggleMobile"
+              ?checked="${this.autoScroll}"
+              @change="${(e) => this._onAutoScrollToggle(e)}">
+            <label for="autoScrollToggleMobile" class="toggle-button"></label>
+          </div>
+        </div>
         <button
           type="button"
           class="icon-btn"
