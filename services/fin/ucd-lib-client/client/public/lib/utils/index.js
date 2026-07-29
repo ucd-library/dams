@@ -33,17 +33,40 @@ class Utils {
     return () => mql.removeEventListener('change', listener);
   }
 
+  // scroll position recorded at lock time, restored on unlock
+  _lockedScrollY = 0;
+
   /**
    * @method lockBodyScroll
    * @description lock or unlock page scroll - used when a component enters a
    * fixed-position fullscreen mode (eg the bookreader fullscreen view, or the
-   * mobile transcript sheet) so the page underneath can't scroll behind it
+   * mobile transcript sheet) so the page underneath can't scroll behind it.
+   * Pins <body> with position:fixed at the current scroll offset rather than
+   * just setting overflow:hidden - Safari on iOS doesn't reliably honor
+   * overflow:hidden on <body> to block touch-driven scrolling, so that alone
+   * still lets the page scroll behind a "locked" fullscreen view there.
    *
    * @param {Boolean} locked
    */
   lockBodyScroll(locked) {
-    document.body.style.overflow = locked ? 'hidden' : '';
-    document.documentElement.style.overflow = locked ? 'hidden' : '';
+    if( locked ) {
+      this._lockedScrollY = window.scrollY;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${this._lockedScrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      window.scrollTo(0, this._lockedScrollY);
+      this._lockedScrollY = 0;
+    }
   }
 
   getYearFromDate(date) {
