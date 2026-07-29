@@ -15,7 +15,7 @@ export default function render() {
   .transcript-panel {
     box-sizing: border-box;
     background-color: var(--color-aggie-gold-60, #FFECB2);
-    border-radius: 2rem;
+    border-radius: 1.5rem;
     padding: 1.5rem;
   }
 
@@ -24,7 +24,7 @@ export default function render() {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: .5rem;
   }
 
   .transcript-heading {
@@ -123,8 +123,12 @@ export default function render() {
     background: #fff;
     font-family: inherit;
     font-size: 0.9rem;
-    font-weight: bold;
-    color: var(--color-aggie-blue, #002851);
+    color: var(--color-aggie-blue-80, #13639E);
+  }
+
+  .transcript-search::placeholder {
+    color: var(--color-aggie-blue-80, #13639E);
+    opacity: 1;
   }
 
   .transcript-search:focus-visible {
@@ -145,7 +149,7 @@ export default function render() {
 
   .transcript-empty {
     margin: 0;
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 0.25rem;
     font-style: italic;
     color: var(--color-aggie-blue-70, #13639e);
   }
@@ -158,7 +162,7 @@ export default function render() {
     background: none;
     border: none;
     border-radius: 1rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem;
     cursor: pointer;
     font: inherit;
     color: var(--color-aggie-blue, #002851);
@@ -177,19 +181,14 @@ export default function render() {
     outline-offset: -2px;
   }
 
-  .transcript-line.active {
-    font-weight: 700;
-  }
-
   .transcript-time {
     display: inline-block;
     margin-bottom: 0.25rem;
     padding: 0.15rem 0.6rem;
     border-radius: 9999px;
     background: var(--color-aggie-gold-70, #FFDF80);
-    color: var(--color-aggie-blue, #002851);
-    font-size: 0.8rem;
-    font-weight: bold;
+    color: var(--color-aggie-blue-80, #13639E);
+    font-size: 0.875rem;
   }
 
   .transcript-line.active .transcript-time {
@@ -322,7 +321,7 @@ export default function render() {
     <div class="transcript-panel-header">
       <h5 class="transcript-heading">Transcript</h5>
       <div class="auto-scroll-toggle">
-        <span>Auto Scroll</span>
+        <span>Autoscroll</span>
         <div class="toggle-switch">
           <input
             type="checkbox"

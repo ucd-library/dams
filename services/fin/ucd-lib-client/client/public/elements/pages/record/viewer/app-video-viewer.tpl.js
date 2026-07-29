@@ -195,8 +195,7 @@ return html`
             cursor: pointer;
         }
 
-        .transcript-toggle:hover,
-        .transcript-toggle[aria-expanded="true"] {
+        .transcript-toggle:hover {
             background: var(--color-aggie-blue, #002851);
         }
 
@@ -207,7 +206,7 @@ return html`
 
         app-transcript-panel {
             display: block;
-            margin-top: 1.5rem;
+            margin-top: .5rem;
         }
 
         @media(max-width: 768px) {
