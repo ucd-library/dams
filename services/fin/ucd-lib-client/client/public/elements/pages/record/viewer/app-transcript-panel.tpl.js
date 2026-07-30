@@ -191,6 +191,10 @@ export default function render() {
     font-size: 0.875rem;
   }
 
+  .transcript-line.active {
+    font-weight: 700;
+  }
+
   .transcript-line.active .transcript-time {
     background: var(--color-aggie-gold, #FFBF00);
   }
