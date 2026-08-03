@@ -341,6 +341,8 @@ class RecordModel extends ElasticSearchModel {
     if( !opts.debug ) opts.debug = false;
     if( !opts.name ) opts.name = 'default';
 
+    if( this.currentLocation.indexOf('?explain') > 0 ) opts.explain = true;
+
     if( !searchDocument.filters ) searchDocument.filters = {};
 
     if( searchDocument.limit + searchDocument.offset > this.MAX_WINDOW ) {
