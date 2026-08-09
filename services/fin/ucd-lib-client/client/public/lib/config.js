@@ -51,8 +51,15 @@ config.elasticSearch = {
   // and update the overlay .env vars with the current working set of fields, until reindexing is done
   textFields : {
     record : APP_CONFIG.itemTextFields.split(',').map(f => f.trim()),
-    collection : APP_CONFIG.collectionTextFields.split(',').map(f => f.trim())
+    collection : APP_CONFIG.collectionTextFields.split(',').map(f => f.trim()),
+    recentCollectionSortBy : APP_CONFIG.recentCollectionsSortByFields.split(',').map(f => {
+      let parts = f.trim().split(':');
+      return {
+        [parts[0]]: { order: parts[1] || 'desc' }
+      };
+    })
   },
+  
   
   // max number of facets filter options
   maxFacetCount : 50

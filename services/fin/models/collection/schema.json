@@ -32,7 +32,12 @@
         }
       }
     },
-    
+
+    "@graph.datePublished" : {
+      "type" : "date",
+      "format": "yyyy-MM-dd||yyyy-MM||yyyy"
+    },
+
     "@graph.yearPublished" : {
       "type" : "integer"
     },
