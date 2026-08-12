@@ -59,15 +59,21 @@ class RecordVcModel {
       let images;
       if( e.payload?.clientMedia?.mediaGroups ) {
         let groups = e.payload.clientMedia.mediaGroups;
-        let group = groups.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
+
+        // prefer the ImageList's own image (ClientMedia.handleImageList backs this with
+        // the lowest-position page) over any other/raw-graph match
+        let imageList = groups.find(g => utils.getMediaType(g) === 'ImageList');
+        let group = groups.find(g => utils.getMediaType(g) === 'ImageObject' || (g.filename || '').match(/\.(png|jpg)$/));
 
         let graph = e.payload.clientMedia.graph || [];
         if( !Array.isArray(graph) ) graph = [graph];
-        let graphImage = graph.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
+        let graphImage = graph.find(g => utils.getMediaType(g) === 'ImageObject' || (g.filename || '').match(/\.(png|jpg)$/));
 
         let imagesWithoutErrors = groups.filter(g => g.clientMedia?.images && !g.clientMedia.images.error);
 
-        if( group ) {
+        if( imageList?.clientMedia?.images ) {
+          images = imageList.clientMedia.images;
+        } else if( group ) {
           images = group.clientMedia?.images;
         } else if( graphImage && graphImage.clientMedia?.images ) {
           images = graphImage.clientMedia?.images;
