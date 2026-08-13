@@ -209,6 +209,7 @@ module.exports = async function(path, graph, headers, utils) {
   if( parsedDate ) {
     Object.assign(item, dateUtils.computeDateFields(parsedDate, {
       uncertaintyYears : dateUtils.resolveUncertaintyYears(item, null),
+      uncertaintyYearsExplicit : dateUtils.isUncertaintyYearsExplicit(item, null),
       approximatePrefix : dateUtils.resolveApproximatePrefix(item, null),
       uncertainSuffix : dateUtils.resolveUncertainSuffix(item, null)
     }));

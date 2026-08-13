@@ -80,6 +80,9 @@ class DateUtils {
    * @param {Object} parsedDate result of {@link parsePublishedDate}
    * @param {Object} [opts={}]
    * @param {Number} [opts.uncertaintyYears] number of years to pad an uncertain/approximate date by, on each side
+   * @param {Boolean} [opts.uncertaintyYearsExplicit] whether uncertaintyYears came from an actual
+   * item/collection override rather than the silent global default - controls whether "(±N years)"
+   * is shown at all, see {@link isUncertaintyYearsExplicit}
    * @param {String} [opts.approximatePrefix] word used before an approximate date, eg "circa"
    * @param {String} [opts.uncertainSuffix] word used after an uncertain date, eg "uncertain"
    *
@@ -125,6 +128,22 @@ class DateUtils {
     if( Number.isFinite(item?.dateUncertaintyYears) ) return item.dateUncertaintyYears;
     if( Number.isFinite(collection?.dateUncertaintyYears) ) return collection.dateUncertaintyYears;
     return DEFAULT_UNCERTAINTY_YEARS;
+  }
+
+  /**
+   * @method isUncertaintyYearsExplicit
+   * @description whether the circa/uncertain widening window came from an actual
+   * ucdlib:dateUncertaintyYears property on the item or its collection, rather than the silent
+   * global default. Controls whether "(±N years)" is shown in the display string at all - a
+   * cataloger who never set the property shouldn't see an implementation detail like the default.
+   *
+   * @param {Object} item flattened item/collection object being transformed
+   * @param {Object} [collection] flattened parent collection object, if known
+   *
+   * @returns {Boolean}
+   */
+  isUncertaintyYearsExplicit(item, collection) {
+    return Number.isFinite(item?.dateUncertaintyYears) || Number.isFinite(collection?.dateUncertaintyYears);
   }
 
   /**
@@ -186,18 +205,21 @@ class DateUtils {
       base = `${values[0]}`;
     }
 
+    // "uncertain" and "±N years" are mutually exclusive: once a real widening window is
+    // defined, showing it is more useful than the generic "uncertain" word, never both at once
+    let yearsSuffix = opts.uncertaintyYearsExplicit ? `±${uncertaintyYears} years` : null;
+    let uncertainWord = yearsSuffix || opts.uncertainSuffix || DEFAULT_UNCERTAIN_SUFFIX;
+
     if( precision === 'uncertain' ) {
-      let suffix = opts.uncertainSuffix || DEFAULT_UNCERTAIN_SUFFIX;
-      return `${base} (${suffix})`;
+      return `${base} (${uncertainWord})`;
     }
     if( precision === 'approximate' ) {
       let prefix = opts.approximatePrefix || DEFAULT_APPROXIMATE_PREFIX;
-      return `${prefix} ${base} (±${uncertaintyYears} years)`;
+      return yearsSuffix ? `${prefix} ${base} (${yearsSuffix})` : `${prefix} ${base}`;
     }
     if( precision === 'uncertain-approximate' ) {
       let prefix = opts.approximatePrefix || DEFAULT_APPROXIMATE_PREFIX;
-      let suffix = opts.uncertainSuffix || DEFAULT_UNCERTAIN_SUFFIX;
-      return `${prefix} ${base} (${suffix}, ±${uncertaintyYears} years)`;
+      return `${prefix} ${base} (${uncertainWord})`;
     }
 
     return base;
