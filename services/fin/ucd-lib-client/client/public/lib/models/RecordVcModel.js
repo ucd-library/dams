@@ -60,19 +60,30 @@ class RecordVcModel {
       if( e.payload?.clientMedia?.mediaGroups ) {
         let groups = e.payload.clientMedia.mediaGroups;
 
+        let graph = e.payload.clientMedia.graph || [];
+        if( !Array.isArray(graph) ) graph = [graph];
+
+        let isAudioVideo = groups.some(g => ['AudioObject', 'VideoObject', 'StreamingVideo'].includes(utils.getMediaType(g)));
+
         // prefer the ImageList's own image (ClientMedia.handleImageList backs this with
         // the lowest-position page) over any other/raw-graph match
         let imageList = groups.find(g => utils.getMediaType(g) === 'ImageList');
-        let group = groups.find(g => utils.getMediaType(g) === 'ImageObject' || (g.filename || '').match(/\.(png|jpg)$/));
 
-        let graph = e.payload.clientMedia.graph || [];
-        if( !Array.isArray(graph) ) graph = [graph];
+        // audio/video items: prefer a standalone image (eg a show/station logo) over a
+        // pdf's own rendered thumbnail, even if it isn't linked via associatedMedia/image
+        let logoImage = isAudioVideo
+          ? graph.find(g => g.fileFormatSimple === 'image' && g.clientMedia?.images && !g.clientMedia.images.error)
+          : null;
+
+        let group = groups.find(g => utils.getMediaType(g) === 'ImageObject' || (g.filename || '').match(/\.(png|jpg)$/));
         let graphImage = graph.find(g => utils.getMediaType(g) === 'ImageObject' || (g.filename || '').match(/\.(png|jpg)$/));
 
         let imagesWithoutErrors = groups.filter(g => g.clientMedia?.images && !g.clientMedia.images.error);
 
         if( imageList?.clientMedia?.images ) {
           images = imageList.clientMedia.images;
+        } else if( logoImage?.clientMedia?.images ) {
+          images = logoImage.clientMedia.images;
         } else if( group ) {
           images = group.clientMedia?.images;
         } else if( graphImage && graphImage.clientMedia?.images ) {
