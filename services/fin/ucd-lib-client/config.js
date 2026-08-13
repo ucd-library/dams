@@ -35,7 +35,7 @@ config.client = {
   // once yearPublishedStart/yearPublishedEnd have been backfilled by reindexing, flip this
   // to true so the date facet/filter switches over to them (needed for circa/range/uncertain
   // dates, which leave yearPublished null). Same env var name used by the models service.
-  useDateRangeFields : true, // process.env.USE_DATE_RANGE_FIELDS === 'true',
+  useDateRangeFields : process.env.USE_DATE_RANGE_FIELDS === 'true',
 
   env : {
     CLIENT_ENV : env,
