@@ -81,8 +81,11 @@ class DateUtils {
    * @param {Object} [opts={}]
    * @param {Number} [opts.uncertaintyYears] number of years to pad an uncertain/approximate date by, on each side
    * @param {Boolean} [opts.uncertaintyYearsExplicit] whether uncertaintyYears came from an actual
-   * item/collection override rather than the silent global default - controls whether "(±N years)"
-   * is shown at all, see {@link isUncertaintyYearsExplicit}
+   * item/collection override rather than the silent global default - controls both whether
+   * "(±N years)" is shown in the display string, and whether the search range gets widened at
+   * all (with no override, we don't know how fuzzy a "circa"/"uncertain" date really is, so
+   * the safer default is to only make it searchable at its exact cataloged year), see
+   * {@link isUncertaintyYearsExplicit}
    * @param {String} [opts.approximatePrefix] word used before an approximate date, eg "circa"
    * @param {String} [opts.uncertainSuffix] word used after an uncertain date, eg "uncertain"
    *
@@ -95,8 +98,9 @@ class DateUtils {
     let dateDisplay = this._formatDisplay(parsedDate, uncertaintyYears, opts);
 
     // the display string above uses the original (unwidened) year(s) - circa/uncertain dates
-    // still show their cataloged year, the widening only affects what's searchable
-    if( WIDENABLE_PRECISIONS.has(precision) ) {
+    // still show their cataloged year, the widening only affects what's searchable, and only
+    // applies at all once someone has actually defined how wide "fuzzy" should be
+    if( WIDENABLE_PRECISIONS.has(precision) && opts.uncertaintyYearsExplicit ) {
       startYear -= uncertaintyYears;
       endYear += uncertaintyYears;
     }
