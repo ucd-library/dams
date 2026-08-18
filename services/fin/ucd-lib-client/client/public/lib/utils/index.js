@@ -210,29 +210,52 @@ class Utils {
     let isAudioVideo = false;
     let rootImage = '';
 
+    // priority mirrors RecordModel.js's media selection: imagelist, then pdf, then any other image.
+    // resolved into tiers (rather than overwritten as mediaGroups are iterated) so the result
+    // doesn't depend on associatedMedia/mediaGroups array order.
+    let imageListThumbnail = '';
+    let pdfThumbnail = '';
+    let otherThumbnail = '';
+
     for (const mediaGroup of clientMedia.mediaGroups) {
-      if (mediaGroup.clientMedia?.images?.medium?.url) {
-        thumbnailUrl = mediaGroup.clientMedia.images.medium.url;
+      let mediaType = this.getMediaType(mediaGroup);
+
+      if (mediaType === "ImageList") {
+        if( !imageListThumbnail ) {
+          let firstPage = mediaGroup.clientMedia?.pages?.[0];
+          imageListThumbnail = firstPage?.medium?.url || '';
+        }
         continue;
       }
 
-      let mediaType = this.getMediaType(mediaGroup);
-      if (mediaType === "ImageObject") {
-        thumbnailUrl = "/fcrepo/rest" + mediaGroup["@id"];
-      } else if (mediaType === "ImageList") {
-        let firstImage = graph.filter(
-          (g) => parseInt(g.position) === 1 && g.clientMedia
-        )[0];
-        thumbnailUrl = firstImage?.clientMedia?.images?.medium?.url;
+      if (mediaGroup.clientMedia?.pdf) {
+        if( !pdfThumbnail ) pdfThumbnail = mediaGroup.clientMedia?.images?.medium?.url || '';
+        continue;
+      }
+
+      if (mediaGroup.clientMedia?.images?.medium?.url) {
+        if( !otherThumbnail ) otherThumbnail = mediaGroup.clientMedia.images.medium.url;
+      } else if (mediaType === "ImageObject") {
+        if( !otherThumbnail ) otherThumbnail = "/fcrepo/rest" + mediaGroup["@id"];
       } else if (mediaType === "VideoObject" || mediaType === 'AudioObject') {
         isAudioVideo = true;
-        // pull image from root node if exists
+        // pull image from root node if properly linked
         let rootNode = graph.filter((g) => g["@id"] === clientMedia["id"])[0];
-        if (rootNode) {
-          rootImage = "/fcrepo/rest" + rootNode.image?.["@id"];
+        if (rootNode?.image?.["@id"]) {
+          rootImage = "/fcrepo/rest" + rootNode.image["@id"];
         }
       }
     }
+
+    // audio/video items: prefer a standalone image (eg a show/station logo) over a
+    // pdf's own rendered thumbnail, even if it isn't linked via associatedMedia/image
+    let logoThumbnail = '';
+    if( isAudioVideo && !rootImage ) {
+      let logoNode = (graph || []).find(g => g.fileFormatSimple === 'image' && g.clientMedia?.images?.medium?.url);
+      logoThumbnail = logoNode?.clientMedia?.images?.medium?.url || '';
+    }
+
+    thumbnailUrl = imageListThumbnail || logoThumbnail || pdfThumbnail || otherThumbnail;
 
     if( isAudioVideo && rootImage ) thumbnailUrl = rootImage;
 
