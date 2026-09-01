@@ -1,25 +1,34 @@
+/**
+ * @description Standalone process that mounts this app's data model APIs
+ * (see `models/index.js`) and serves a merged OpenAPI/swagger doc for them.
+ * Self-hosted replacement for what fin's separate `services/fin/api`
+ * microservice does today, ported from the `aggie-experts` repo's
+ * `webapp/lib/api.js` (same fin/fcrepo-removal pattern). Run standalone via
+ * `npm run api` (own port, `config.api.port`) — not mounted into the main
+ * `index.js` app; `index.js` reverse-proxies `/api/*` to this process.
+ */
+const express = require('express');
+const bodyParser = require('body-parser');
 const swaggerJSDoc = require('swagger-jsdoc');
-const { logger, config } = require('@ucd-lib/experts-commons');
-const { initAuth } = require('../models/middleware/index.js');
+const { logger, config, keycloak } = require('@ucd-lib/fin-service-utils');
 const models = require('./models.js');
-const keycloak = require('./keycloak.js');
-const swaggerParameters = require('./swagger/parameters.json');
-const swaggerSchemas = require('./swagger/schemas.json');
-const swaggerResponses = require('./swagger/responses.json');
-const swaggerRequestBodies = require('./swagger/requestBodies.json');
+const swaggerParameters = require('../lib/swagger/parameters.json');
+const swaggerSchemas = require('../lib/swagger/schemas.json');
+const swaggerResponses = require('../lib/swagger/responses.json');
+const swaggerRequestBodies = require('../lib/swagger/requestBodies.json');
 
+const app = express();
 
 app.use(keycloak.setUser);
 
 const swaggerDefinition = {
   openapi: '3.0.0',
   "info": {
-    "title": "Aggie Experts API",
-    "version": "5.0", // TODO pull from config file for version?
-    "description": "Allows for the retrieval of expert information.",
-    "termsOfService": "https://experts.ucdavis.edu/termsofuse",
+    "title": "Digital Collections API",
+    "version": "1.0",
+    "description": "Allows for the retrieval of UC Davis Library Digital Collections item, collection, and search data.",
     "contact": {
-      "email": "experts@ucdavis.edu"
+      "email": "digital@ucdavis.edu"
     },
     "license": {
       "name": "Apache 2.0",
@@ -28,13 +37,13 @@ const swaggerDefinition = {
   },
   "servers": [
     {
-      "url": "http://experts.ucdavis.edu/api"
+      "url": "https://digital.ucdavis.edu/api"
     }
   ],
   "tags": [
     {
-      "name": "expert",
-      "description": "Expert Information"
+      "name": "digital-collections",
+      "description": "Digital Collections Information"
     },
   ],
   components: {
@@ -66,7 +75,7 @@ async function init() {
           let docs = Object.fromEntries(
             Object.entries(doc.docs).map(([method, operation]) => {
               if( !operation ) return [method, operation];
-              return [method, {...operation, tags: ['expert']}];
+              return [method, {...operation, tags: ['digital-collections']}];
             })
           );
           swaggerDefinition.paths[`/api/${doc.path.replace(/\/?api\/?/g, '')}`] = docs;
@@ -92,8 +101,6 @@ async function init() {
     const spec = req.user ? swaggerSpec : filterPrivateOps(swaggerSpec);
     res.json(spec);
   });
-
-  await initAuth();
 
   return app;
 }

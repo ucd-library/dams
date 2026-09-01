@@ -5,7 +5,21 @@ const {logger, keycloak, middleware, controllers} = require('@ucd-lib/fin-servic
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const httpProxy = require('http-proxy');
 const config = require('./config');
+
+// the api process (controllers/api.js) runs standalone, on its own port
+// (config.api.port); this proxies /api/* to it rather than mounting it
+// directly, so the api process can be deployed as its own service later
+// (see docs/PORT-PLAN.md Phase 0/7) without another client-side change.
+const apiProxy = httpProxy.createProxyServer({
+  target: process.env.API_INTERNAL_URL || `http://localhost:${config.api.port}`
+});
+apiProxy.on('error', (err, req, res) => {
+  logger.error('Error proxying to api service', err);
+  if( !res.headersSent ) res.status(502);
+  res.end('Bad gateway');
+});
 
 // create express instance
 const app = express();
@@ -33,9 +47,9 @@ app.use(bodyParser.json());
 app.use(keycloak.setUser);
 
 /**
- * setup api routes
+ * proxy /api/* to the standalone api process (controllers/api.js)
  */
-// require('./controllers/api')(app);
+app.use('/api', (req, res) => apiProxy.web(req, res));
 
 /**
  * setup ark/doi proxy
