@@ -9,9 +9,14 @@ class ElasticSearchModel extends BaseModel {
 
     this.facets = {};
     for( var key in config.elasticSearch.facets ) {
+      let facetConfig = config.elasticSearch.facets[key];
       this.facets[key] = {
-        type : config.elasticSearch.facets[key].type
+        // esType lets a facet use a different elasticsearch query/aggregation type
+        // than its ui widget type (eg a 'range' widget backed by a 'range-overlap' query)
+        type : facetConfig.esType || facetConfig.type
       }
+      if( facetConfig.startField ) this.facets[key].startField = facetConfig.startField;
+      if( facetConfig.endField ) this.facets[key].endField = facetConfig.endField;
     }
   }
 
@@ -87,17 +92,27 @@ class ElasticSearchModel extends BaseModel {
     let filters = {};
     let arr = JSON.parse(txt);
     arr.forEach(filter => {
-      filters[filter[0]] = this._setUrlFilterOp({
+      let parsedFilter = this._setUrlFilterOp({
         type : this._parseUrlFilterType(filter[1]),
         value : this._parseUrlFilterValue(filter)
-      }, filter[1])
+      }, filter[1]);
+
+      // startField/endField aren't carried in the url (no need to bloat it), so
+      // re-resolve them from config, same source appendRangeFilter() reads from
+      if( parsedFilter.type === 'range-overlap' ) {
+        let facetConfig = config.elasticSearch.facets[filter[0]] || {};
+        parsedFilter.startField = facetConfig.startField;
+        parsedFilter.endField = facetConfig.endField;
+      }
+
+      filters[filter[0]] = parsedFilter;
     });
     return filters;
   }
 
   _setUrlFilterOp(filter, op) {
-    if( op !== 'range' ) {
-      filter.op = op; 
+    if( op !== 'range' && op !== 'range-overlap' ) {
+      filter.op = op;
     }
     return filter;
   }
@@ -108,9 +123,9 @@ class ElasticSearchModel extends BaseModel {
   }
 
   _parseUrlFilterValue(filters) {
-    if( filters[1] === 'range' ) {
+    if( filters[1] === 'range' || filters[1] === 'range-overlap' ) {
       return filters[2];
-    }  
+    }
     return filters.splice(2, filters.length);
   }
 
@@ -307,11 +322,23 @@ class ElasticSearchModel extends BaseModel {
    * 
    * @return {Promise} service query promise
    */
-  appendRangeFilter(searchDocument, attr, value) {    
-    searchDocument.filters[attr] = {
-      type : 'range',
-      value
+  appendRangeFilter(searchDocument, attr, value) {
+    let facetConfig = config.elasticSearch.facets[attr] || {};
+
+    if( facetConfig.esType === 'range-overlap' ) {
+      searchDocument.filters[attr] = {
+        type : 'range-overlap',
+        startField : facetConfig.startField,
+        endField : facetConfig.endField,
+        value
+      }
+    } else {
+      searchDocument.filters[attr] = {
+        type : 'range',
+        value
+      }
     }
+
     return searchDocument;
   }
 

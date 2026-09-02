@@ -1,5 +1,6 @@
 const {dataModels, models, logger, pg, config} = require('@ucd-lib/fin-service-utils');
 const schema = require('./schema.json');
+const dateUtils = require('../date-utils.js');
 const {FinEsDataModel} = dataModels;
 const workflowUtils = require('../workflows.js');
 const validate = require('../validate.js');
@@ -173,13 +174,23 @@ class CollectionsModel extends FinEsDataModel {
 
   /**
    * @method getPublishedDateRange
-   * @description get the published date range for a collection
-   * 
+   * @description get the published date range for a collection. Aggregates on the legacy
+   * scalar yearPublished field until USE_DATE_RANGE_FIELDS is enabled (once items have been
+   * reindexed with yearPublishedStart/yearPublishedEnd populated), since a circa/range/
+   * uncertain date leaves yearPublished null and would otherwise drop out of this aggregation.
+   *
    * @param {String} id collection id
-   * 
+   *
    * @returns {Promise}
-   */ 
+   */
   async getPublishedDateRange(id) {
+    let minField = '@graph.yearPublished';
+    let maxField = '@graph.yearPublished';
+    if( dateUtils.useDateRangeFields() ) {
+      minField = '@graph.yearPublishedStart';
+      maxField = '@graph.yearPublishedEnd';
+    }
+
     let result = await this.client.search({
       index: this.itemAlias,
       body: {
@@ -191,16 +202,16 @@ class CollectionsModel extends FinEsDataModel {
           }
         },
         aggs: {
-          min_year: { min: { field: '@graph.yearPublished' } },
-          max_year: { max: { field: '@graph.yearPublished' } }
+          min_year: { min: { field: minField } },
+          max_year: { max: { field: maxField } }
         },
         size: 0
       }
     });
-  
+
     const minYear = result.aggregations.min_year.value;
     const maxYear = result.aggregations.max_year.value;
-  
+
     return { minYear, maxYear };
   }
 

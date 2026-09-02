@@ -1,5 +1,6 @@
 const {config, pg} = require('@ucd-lib/fin-service-utils');
 const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
+const dateUtils = require('../date-utils.js');
 
 // const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
 const ARCHIVAL_GROUP_REGEX = /^\/collection\/(ark:\/[a-z0-9]+\/[a-z0-9]+)/;
@@ -158,6 +159,22 @@ module.exports = async function(path, graph, headers, utils) {
   });
 
   await utils.add({
+    attr : 'dateUncertaintyYears',
+    value : ['ucdlib', 'dateUncertaintyYears'],
+    type : 'number'
+  });
+
+  await utils.add({
+    attr : 'uncertainDateLabel',
+    value : ['ucdlib', 'uncertainDateLabel']
+  });
+
+  await utils.add({
+    attr : 'approximateDateLabel',
+    value : ['ucdlib', 'approximateDateLabel']
+  });
+
+  await utils.add({
     attr : 'identifier',
     value : ['schema', 'identifier']
   });
@@ -188,7 +205,17 @@ module.exports = async function(path, graph, headers, utils) {
   // await utils.setImage(item);
   await utils.setIndexableContent(item);
 
-  utils.setYearFromDate(item);
+  let parsedDate = dateUtils.parsePublishedDate(item.datePublished);
+  if( parsedDate ) {
+    Object.assign(item, dateUtils.computeDateFields(parsedDate, {
+      uncertaintyYears : dateUtils.resolveUncertaintyYears(item, null),
+      uncertaintyYearsExplicit : dateUtils.isUncertaintyYearsExplicit(item, null),
+      approximatePrefix : dateUtils.resolveApproximatePrefix(item, null),
+      uncertainSuffix : dateUtils.resolveUncertainSuffix(item, null)
+    }));
+  } else {
+    utils.setYearFromDate(item);
+  }
 
   item._ = {};
   utils.stripFinHost(headers);

@@ -3,6 +3,7 @@ const ioUtils = require('@ucd-lib/fin-api/lib/io/utils.js');
 const fetch = require('node-fetch');
 
 const ControllerUtils = require('../utils.js');
+const dateUtils = require('../date-utils.js');
 
 const BINARY = 'http://fedora.info/definitions/v4/repository#Binary';
 // const ARCHIVAL_GROUP = 'http://fedora.info/definitions/v4/repository#ArchivalGroup';
@@ -87,7 +88,23 @@ module.exports = async function(path, graph, headers, utils) {
     attr : 'datePublished',
     value : ['schema', 'datePublished']
   });
-  
+
+  await utils.add({
+    attr : 'dateUncertaintyYears',
+    value : ['ucdlib', 'dateUncertaintyYears'],
+    type : 'number'
+  });
+
+  await utils.add({
+    attr : 'uncertainDateLabel',
+    value : ['ucdlib', 'uncertainDateLabel']
+  });
+
+  await utils.add({
+    attr : 'approximateDateLabel',
+    value : ['ucdlib', 'approximateDateLabel']
+  });
+
   await utils.add({
     attr : 'description',
     value : ['schema', 'description']
@@ -275,7 +292,28 @@ module.exports = async function(path, graph, headers, utils) {
   // await utils.setImage(item);
   await utils.setIndexableContent(item);
 
-  utils.setYearFromDate(item);  
+  let parsedDate = dateUtils.parsePublishedDate(item.datePublished);
+  if( parsedDate ) {
+    let dateCollection = null;
+    if( item.isPartOf ) {
+      try {
+        if( !Array.isArray(item.isPartOf) ) item.isPartOf = [item.isPartOf];
+        let collectionId = item.isPartOf.find(part => part['@id'].includes('/collection/'))?.['@id'];
+        if( collectionId ) dateCollection = await collectionModel.get(collectionId);
+      } catch(e) {
+        // collection lookup is best-effort; fall back to item-level/global defaults
+      }
+    }
+
+    Object.assign(item, dateUtils.computeDateFields(parsedDate, {
+      uncertaintyYears : dateUtils.resolveUncertaintyYears(item, dateCollection),
+      uncertaintyYearsExplicit : dateUtils.isUncertaintyYearsExplicit(item, dateCollection),
+      approximatePrefix : dateUtils.resolveApproximatePrefix(item, dateCollection),
+      uncertainSuffix : dateUtils.resolveUncertainSuffix(item, dateCollection)
+    }));
+  } else {
+    utils.setYearFromDate(item);
+  }
 
   item._ = {};
   if( !item.clientMedia ) {

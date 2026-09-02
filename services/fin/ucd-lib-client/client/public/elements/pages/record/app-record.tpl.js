@@ -485,7 +485,9 @@ export default function render() {
 
       <div ?hidden="${!this.date}" class="metadata-row">
         <div class="attr">Date</div>
-        <div class="value" id="dateValue">${this.date}</div>
+        <div class="value" id="dateValue">
+          ${this.date}
+        </div>
       </div>
 
       <div ?hidden="${!this.description || !this.description.length}" class="metadata-row">
