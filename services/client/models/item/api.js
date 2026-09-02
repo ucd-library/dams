@@ -1,5 +1,4 @@
-const {dataModels} = require('@ucd-lib/fin-service-utils');
 const model = require('./model.js');
-const {defaultEsApiGenerator} = dataModels;
+const createDefaultApi = require('../../lib/es-default-api.js');
 
-module.exports = defaultEsApiGenerator(model);
+module.exports = createDefaultApi(model);

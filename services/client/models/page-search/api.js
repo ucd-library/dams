@@ -1,4 +1,4 @@
-const {dataModels, logger} = require('@ucd-lib/fin-service-utils');
+const {logger} = require('../../lib/logger.js');
 const model = require('./model.js');
 const express = require('express');
 const router = express.Router();

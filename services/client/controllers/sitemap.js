@@ -1,6 +1,6 @@
 const config = require('../config.js');
-let collections = require('../../models/collection/index.js');
-let items = require('../../models/item/index.js');
+let collections = require('../models/collection/index.js');
+let items = require('../models/item/index.js');
 
 collections = collections.model;
 items = items.model;

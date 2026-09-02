@@ -1,25 +1,11 @@
-const {dataModels, MessagingClients, config} = require('@ucd-lib/fin-service-utils');
+const EsDataModel = require('../../lib/es-model.js');
 const schema = require('./schema.json');
-const {FinEsDataModel} = dataModels;
-const {RabbitMqClient, MessageWrapper} = MessagingClients;
-const workflowUtils = require('../workflows.js');
-const validate = require('../validate.js');
 
-class ItemsModel extends FinEsDataModel {
+class ItemsModel extends EsDataModel {
 
   constructor() {
     super('item');
     this.schema = schema;
-    this.transformService = 'es-item-transform';
-  }
-
-  connect() {
-    this.messaging = new RabbitMqClient('item');
-  }
-
-  is(id) {
-    if( id.match(/^\/item\//) ) return true;
-    return false;
   }
 
   search(searchDocument, options, index) {
@@ -30,53 +16,6 @@ class ItemsModel extends FinEsDataModel {
       ]
     }
     return super.search(searchDocument, options, index);
-  }
-
-  /**
-   * @method update
-   * @description adding additional logic to update to send a message reindex messages to any collection
-   * for this item so the itemCount is correct.
-   * 
-   * @param {*} jsonld 
-   * @param {*} index 
-   * @returns 
-   */
-  async update(jsonld, index) {
-    let result = await super.update(jsonld, index);
-
-    if( !jsonld['@graph'] ) return result;
-
-    if( !this.messaging ) {
-      await this.connect();
-    }
-
-    let reindex = [];
-    for( let node of jsonld['@graph'] ) {
-      if( !node.isPartOf ) continue;
-
-      let isPartOf = node.isPartOf;
-      if( !Array.isArray(isPartOf) ) {
-        isPartOf = [isPartOf];
-      }
-
-      for( let part of isPartOf ) {
-        if( part['@id'] && part['@id'].match(/^\/collection\//) ) {
-          reindex.push(part['@id']);
-        }
-      }
-    }
-
-    for( let id of reindex ) {
-      await this.messaging.sendMessage(MessageWrapper.createMessage(
-        ['http://digital.ucdavis.edu/schema#Reindex'],
-        {'@id': id}
-      ));
-    }
-
-    let node = jsonld['@graph'][0];
-    await workflowUtils.autoTriggerWorkflow(node);
-
-    return result;
   }
 
   async getByArk(ark) {
@@ -111,7 +50,7 @@ class ItemsModel extends FinEsDataModel {
       types = result['@type'] || [];
       if( types.includes('http://fedora.info/definitions/v4/repository#Resource') ) {
         files.push({
-          filename: result.filename, 
+          filename: result.filename,
           path: result['@id'],
           fileFormat : result.fileFormat,
           fileSize : result.fileSize
@@ -124,11 +63,6 @@ class ItemsModel extends FinEsDataModel {
     return files;
   }
 
-  async validate(jsonld) {
-    return validate.validateItem(jsonld, config.gateway.host);
-  }
-
-
   getDefaultIndexConfig(schema) {
     let config = super.getDefaultIndexConfig(schema);
     config.body.settings.analysis.char_filter = {
@@ -136,13 +70,6 @@ class ItemsModel extends FinEsDataModel {
         "type": "pattern_replace",
         "pattern": "[^\\w\\s]",
         "replacement": ""
-      }
-    };
-    config.body.settings.analysis.normalizer = {
-      "lowercase_normalizer": {
-        "type": "custom",
-        "char_filter": [],
-        "filter": ["lowercase"]
       }
     };
     config.body.settings.analysis.normalizer = {
@@ -155,7 +82,6 @@ class ItemsModel extends FinEsDataModel {
 
     return config;
   }
-
 
 }
 

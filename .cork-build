@@ -8,11 +8,7 @@
 
   "images" : {
     "dams-base-service" : {
-      "contextPath" : ".",
-      "dockerfile" : "services/client/Dockerfile",
-      "options" : {
-        "build-arg" : "FIN_SERVER_IMAGE=${fin.fin-base-service}"
-      }
+      "contextPath" : "services/client"
     },
     "dams-init" : {
       "contextPath" : "services/init",

@@ -1,158 +1,19 @@
-const {dataModels, logger, pg} = require('@ucd-lib/fin-service-utils');
-const api = require('@ucd-lib/fin-api');
-const {FinDataModel} = dataModels;
+const pg = require('../../lib/pg.js');
 
-class ClientEditsModel extends FinDataModel {
-
-  constructor() {
-    // base name for model
-    super('client-edits');
-
-    // this.TYPE = 'http://digital.ucdavis.edu/schema#DamsClientEdit';
-
-    this.isRegex = /^(\/application\/ucd-lib-client)?\/(item|collection)\//;
-
-    // the transform service to use for this model.
-    this.transformService = 'es-item-transform'
-  }
-
-  // you must override this function.  It should return true if the id 
-  // to the model.  The fin standard practice is to 
-  // bind a model to a root path in the ldp. In this case all `/item` paths
-  // would bind to this model.
-  is(id, types=[]) {
-    return this.isRegex.test(id) ? true : false;
-  //  return types.includes(this.TYPE);
-  }
-  
-  async update(json) {
-    let id = json['@id'].replace(/^\/application\/ucd-lib-client/, '');
-
-    let node = json;
-    if( json['@graph'] && json['@graph'].length > 0 ) {
-      node = json['@graph'][0];
-    }
-    if( !Array.isArray(node['@type']) ) {
-      node['@type'] = [node['@type']];
-    }
-
-    let isBinary = node['@type'].includes('http://fedora.info/definitions/v4/repository#Binary');
-    if( isBinary ) {
-      return;
-    }
-
-    try {
-      if( id.match(/^\/item\//) ) {
-        await this.onItemUpdate(id);
-      } else if( id.match(/^\/collection\//) ) {
-        await this.onCollectionUpdate(id);
-      }
-    } catch(e) {
-      logger.error('Error updating client edit: '+json['@id'], e);
-    }
-  }
-
-  async onItemUpdate(id) {
-    let edit = null;
-    let editId = '/application/ucd-lib-client'+id;
-
-    try {
-      edit = await this.fetch(editId);
-    } catch(e) {
-      // no edit found
-      return;
-    }
-
-    let item = await this.fetch(id);
-    let collections = new Set();
-
-    if( item['@graph'] ) {
-      item = item['@graph'];
-    }
-    if( !Array.isArray(item) ) {
-      item = [item];
-    }
-
-    for( let node of item ) {
-      let isPartOf = node['http://schema.org/isPartOf'] || [];
-      if( !Array.isArray(isPartOf) ) {
-        isPartOf = [isPartOf];
-      }
-
-      for( let p of isPartOf ) {
-        if( typeof p !== 'string' ) {
-          p = p['@id'];
-        }
-
-        if( !p.match(/\/fcrepo\/rest\/collection\//) ) {
-          continue;
-        }
-
-        collections.add(p.split('/fcrepo/rest').pop());
-      }
-    }
-
-    await pg.query(
-      `DELETE FROM dams_edits.edit WHERE edit_id = $1;`, 
-      [editId]
-    );
-
-    for( let collectionId of collections ) {
-      await pg.query(
-        `INSERT INTO dams_edits.edit (collection_id, item_id, edit_id, edit)
-         VALUES ($1, $2, $3, $4);`, 
-        [collectionId, id, editId, JSON.stringify(edit)]
-      );
-    }
-  }
-
-  async onCollectionUpdate(id) {
-    let edit = null;
-    let editId = '/application/ucd-lib-client'+id;
-
-    try {
-      edit = await this.fetch(editId);
-    } catch(e) {
-      // no edit found
-      return;
-    }
-
-    await pg.query(
-      `DELETE FROM dams_edits.edit WHERE edit_id = $1;`, 
-      [editId]
-    );
-
-    await pg.query(
-      `INSERT INTO dams_edits.edit (collection_id, edit_id, edit)
-       VALUES ($1, $2, $3);`, 
-      [id, editId, JSON.stringify(edit)]
-    );
-  }
-
-  async fetch(id) {
-    let resp = await api.get({
-      path : id,
-      headers : {
-        'Accept' : 'application/ld+json'
-      }
-    });
-    if( resp.last.statusCode !== 200 ) {
-      throw new Error(`Failed to get item for client edit: ${id}`);
-    }
-
-    return JSON.parse(resp.last.body);
-  }
-
-  async remove(id) {
-    if( !id.match(/^\/application\/ucd-lib-client/) ) {
-      return;
-    }
-
-    await pg.query(
-      `DELETE FROM dams_edits.edit WHERE edit_id = $1;`, 
-      [id]
-    );
-  }
+/**
+ * @class ClientEditsModel
+ * @description Read-side cache of collection/item display-config edits
+ * (collection hero image, watercolor theme, viewer-type overrides, etc).
+ *
+ * This used to also be the write path: fin's dbsync would call is()/update()
+ * whenever the browser PUT JSON-LD straight to
+ * /fcrepo/rest/application/ucd-lib-client/... and this model would denormalize
+ * that into Postgres. Both the dbsync hooks and the fcrepo fetch are gone -
+ * this is being replaced entirely by a direct JSON write API against
+ * Postgres/CaskFS (see docs/PORT-PLAN.md Phase 6, which also renames this
+ * model to app-config). Until that lands this is read-only.
+ */
+class ClientEditsModel {
 
   get(id) {
     if( id.match(/^\/item\//) ) {
@@ -165,7 +26,7 @@ class ClientEditsModel extends FinDataModel {
 
   async getItemEdits(id) {
     let resp = await pg.query(
-      `SELECT * FROM dams_edits.edit WHERE item_id = $1;`, 
+      `SELECT * FROM dams_edits.edit WHERE item_id = $1;`,
       [id]
     );
 
@@ -179,7 +40,7 @@ class ClientEditsModel extends FinDataModel {
 
   async getCollectionEdits(id) {
     let resp = await pg.query(
-      `SELECT * FROM dams_edits.edit WHERE collection_id = $1;`, 
+      `SELECT * FROM dams_edits.edit WHERE collection_id = $1;`,
       [id]
     );
 
@@ -223,9 +84,7 @@ class ClientEditsModel extends FinDataModel {
           obj['@id'] = edit[prop];
           try {
             obj['@id'] = new URL(obj['@id']).pathname.replace(/^\/fcrepo\/rest/, '');
-          } catch(e) {
-            console.log(e);
-          }
+          } catch(e) {}
         }
 
         if( !(prop.match(/^http:\/\/digital.ucdavis.edu\/schema/) ||

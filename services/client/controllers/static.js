@@ -3,15 +3,11 @@ const path = require('path');
 const fs = require('fs');
 const spaMiddleware = require('@ucd-lib/spa-router-middleware');
 const config = require('../config');
-const fetch = require('node-fetch');
-const authUtils = require('../lib/auth');
 const appConfig = require('../lib/fcrepo-app-config');
 
-const {seo, models, logger} = require('@ucd-lib/fin-service-utils');
+const models = require('./models.js');
+const { logger } = require('../lib/logger');
 const crypto = require('crypto');
-
-// const transform = seo.recordTransform;
-// const collectionTransform = seo.collectionTransform;
 
 appConfig.reload(true);
 

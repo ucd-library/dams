@@ -1,6 +1,105 @@
-let {config} = require('@ucd-lib/fin-service-utils');
+const path = require('path');
 
 let env = process.env.CLIENT_ENV || 'dev';
+
+/**
+ * Local, independent config - replaces @ucd-lib/fin-service-utils's config
+ * object (see docs/PORT-PLAN.md Phase 0). Only includes what this app's own
+ * code actually reads; there is no fcrepo/fin service to configure for
+ * anymore beyond the fcrepo-middleware shim's own CASK_URL (see
+ * lib/fcrepo-middeware.js).
+ */
+let config = {
+
+  server: {
+    url: process.env.SERVER_URL || 'http://localhost:8000'
+  },
+
+  models: {
+    rootDir: path.join(__dirname, 'models')
+  },
+
+  api: {
+    port: parseInt(process.env.API_PORT || '3004')
+  },
+
+  pg: {
+    host: process.env.PG_HOST || 'postgres',
+    port: parseInt(process.env.PG_PORT || '5432'),
+    user: process.env.PG_USER || 'postgres',
+    database: process.env.PG_DATABASE || 'dcf',
+    searchPath: ['public', 'dcf_edits']
+  },
+
+  elasticsearch: {
+    host: process.env.ES_HOST || 'elastic-search',
+    port: parseInt(process.env.ES_PORT || '9200'),
+    username: process.env.ELASTIC_USERNAME || 'elastic',
+    password: process.env.ELASTIC_PASSWORD || 'elastic',
+    get connStr() {
+      return `http://${this.host}:${this.port}`;
+    },
+    log: process.env.ES_LOG_LEVEL || 'error',
+    compactTypeInclude: [
+      /http:\/\/digital\.ucdavis\.edu\/schema#/,
+      /http:\/\/schema\.org\//
+    ],
+    fields: {
+      exclude: [
+        'roles', '@graph.indexableContent',
+        '@graph.createdBy', '@graph.lastModifiedBy', '@graph._', '@graph.textIndexable'
+      ],
+      excludeCompact: [
+        'roles', '@graph.indexableContent',
+        '@graph.createdBy', '@graph.lastModifiedBy', '@graph._',
+        '@graph.image', '@graph.textIndexable', '@graph.lastModified'
+      ]
+    }
+  },
+
+  // simplified stand-in for fin's FinAC role names - see lib/es-model.js
+  finac: {
+    agents: {
+      admin: 'admin',
+      public: 'public'
+    }
+  },
+
+  jwt: {
+    cookieName: process.env.JWT_COOKIE_NAME || 'dcf-jwt'
+  },
+
+  oidc: {
+    host: process.env.OIDC_BASE_URL || 'https://auth.library.ucdavis.edu',
+    realm: process.env.OIDC_REALM || 'internal',
+    clientId: process.env.OIDC_CLIENT_ID,
+    clientSecret: process.env.OIDC_CLIENT_SECRET,
+    roleIgnoreList: [
+      'default-roles-internal',
+      'uma_authorization',
+      'manage-account',
+      'manage-account-links',
+      'view-profile',
+      'offline_access'
+    ],
+    tokenCacheTTL: parseInt(process.env.OIDC_TOKEN_CACHE_TTL || String(1000 * 60 * 5))
+  },
+
+  // legacy fcrepo/fin values, still needed by the fcrepo-middleware shim
+  // and v1-redirect handling until Phase 2/9 land - see docs/PORT-PLAN.md
+  fcrepo: {
+    root: process.env.FCREPO_ROOT || '/fcrepo/rest',
+    dataMirror: {
+      url: process.env.FCREPO_DATA_MIRROR_URL || ''
+    }
+  },
+  gateway: {
+    host: process.env.GATEWAY_HOST || '',
+    proxy: {
+      disableFileDownloads: process.env.DISABLE_FILE_DOWNLOADS === 'true'
+    }
+  }
+};
 
 let clientPackage = require('./client/public/package.json');
 

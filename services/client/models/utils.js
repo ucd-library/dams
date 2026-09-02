@@ -1,4 +1,4 @@
-const {logger} = require('@ucd-lib/fin-service-utils');
+const {logger} = require('../lib/logger');
 
 class ControllerUtils {
 

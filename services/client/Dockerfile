@@ -1,56 +1,30 @@
-ARG FIN_SERVER_IMAGE
-FROM ${FIN_SERVER_IMAGE}
+# Independent standup - no longer FROM a fin base image or npm-linking
+# @ucd-lib/fin-service-utils/@ucd-lib/fin-api (see docs/PORT-PLAN.md Phase 0).
+FROM node:22-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ARG UCD_DAMS_REPO_SERVICE_ROOT=services/client
+WORKDIR /app
 
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/install-depends.sh /install-depends.sh
-RUN chmod +x /install-depends.sh && \
-    /install-depends.sh && \
-    rm /install-depends.sh
+COPY package.json .
+COPY package-lock.json .
+RUN npm install --omit=dev
 
-RUN npm install -g @ucd-lib/cork-kube
-
-# App code lives directly at $FIN_SERVICE_ROOT (not a nested subdir) so
-# index.js's relative `./models` require resolves to the same path
-# FIN_MODEL_ROOT/config.models.rootDir defaults to ($FIN_SERVICE_ROOT/models)
-# with no extra env override needed.
-WORKDIR ${FIN_SERVICE_ROOT}
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/package.json .
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/package-lock.json .
-RUN npm install
-RUN npm link @ucd-lib/fin-service-utils
-RUN npm link @ucd-lib/fin-api
-
-# Models (own package.json, separate deps from the app itself)
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package.json models/package.json
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models/package-lock.json models/package-lock.json
-RUN cd models && npm install
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/models models
-
-# Browser Client Code
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/client client
+# Browser client code
+COPY client client
 RUN cd client/public && npm install
 
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/controllers controllers
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/lib lib
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/index.js .
-COPY ${UCD_DAMS_REPO_SERVICE_ROOT}/config.js .
+COPY controllers controllers
+COPY lib lib
+COPY models models
+COPY index.js .
+COPY config.js .
 
 # development client build, so we have one by default
 RUN npm run build
 # production client build
 RUN npm run dist
 
-# Update fin cache settings
-ENV FIN_CACHE_PREDICATES '/^http://digital.ucdavis.edu/schema#/ http://www.loc.gov/premis/rdf/v1#hasMessageDigest \
-  http://schema.org/isPartOf http://schema.org/hasPart http://schema.org/associatedMedia http://schema.org/encodesCreativeWork'
+EXPOSE 8000
 
-# Set fin project name for nice label
-ENV PROJECT_NAME 'dams'
-
-ENV GCS_CLIENT_MEDIA_BUCKET=dams-client-media-prod
-ENV GCS_TMP_WORKFLOW_BUCKET=dams-prod-workflow-tmp-space
-
-CMD [ "bash", "-c", "tail -f /dev/null"]
+CMD [ "npm", "start" ]

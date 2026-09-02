@@ -1,5 +1,7 @@
 const config = require('../config');
-const {logger, models, pg} = require('@ucd-lib/fin-service-utils');
+const { logger } = require('../lib/logger');
+const models = require('./models.js');
+const pg = require('../lib/pg.js');
 const cors = require('cors');
 const v1CollectionLookup = require('./v1-collections.json');
 let item, collection;

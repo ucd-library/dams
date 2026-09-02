@@ -1,4 +1,5 @@
-const { config, logger } = require('@ucd-lib/fin-service-utils');
+const config = require('../config.js');
+const { logger } = require('../lib/logger.js');
 const fs = require('fs-extra');
 const path = require('path');
 const YAML = require('yaml');
