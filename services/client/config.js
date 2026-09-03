@@ -98,6 +98,18 @@ let config = {
     proxy: {
       disableFileDownloads: process.env.DISABLE_FILE_DOWNLOADS === 'true'
     }
+  },
+
+  // CaskFS connection used by the fcrepo-middleware shim (Phase 2) - see
+  // docs/PORT-PLAN.md Phase 1. CaskFS's own ACL is username-keyed, not
+  // Keycloak-role-keyed (see dams-deployment/cmds/provision-cask-dev-access.sh
+  // for the full explanation), so CASK_USER is the fixed identity this server
+  // presents as, scoped via a CaskFS-side role/grant on that username, not
+  // derived from the request.
+  cask: {
+    url: process.env.CASK_URL || 'http://cask.argonath-prod.svc.cluster.local:3001',
+    pathPrefix: process.env.CASK_PATH_PREFIX || '/cask',
+    user: process.env.CASK_USER || ''
   }
 };
 

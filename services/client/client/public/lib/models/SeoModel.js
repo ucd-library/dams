@@ -4,7 +4,7 @@ const CollectionModel = require('./CollectionModel');
 const config = require('../config');
 const clone = require('clone');
 
-const seo = require('../../../../../models/seo/index.js')
+const seo = require('../../../../models/seo/index.js')
 
 const transform = seo.recordTransform;
 const collectionTransform = seo.collectionTransform;
