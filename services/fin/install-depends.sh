@@ -13,7 +13,7 @@ apt update && apt install -y \
   python3-pip \
   rsync
 
-pip3 uninstall crcmod
+pip3 uninstall --break-system-packages crcmod
 pip3 install --break-system-packages --no-cache-dir -U crcmod
 
 mkdir -p /etc/apt/keyrings
