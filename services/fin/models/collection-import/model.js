@@ -67,7 +67,15 @@ class CollectionImportModel {
     let importer = job.spec.template.spec.containers.find(c => c.name === 'importer');
 
     if( config.k8s.collectionImport.image ) {
+      logger.info('Overriding collection import image with: '+config.k8s.collectionImport.image);
       importer.image = config.k8s.collectionImport.image;
+    }
+
+    if( config.k8s.collectionImport.intendedFor ) {
+      logger.info('Overriding collection import nodeSelector with: '+config.k8s.collectionImport.intendedFor);
+      job.spec.template.spec.nodeSelector = {
+        'intendedFor' : config.k8s.collectionImport.intendedFor
+      }
     }
 
     let finHostEnv = importer.env.find(e => e.name === 'FIN_URL');
