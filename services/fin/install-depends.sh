@@ -14,7 +14,7 @@ apt update && apt install -y \
   rsync
 
 pip3 uninstall crcmod
-pip3 install --no-cache-dir -U crcmod
+pip3 install --break-system-packages --no-cache-dir -U crcmod
 
 mkdir -p /etc/apt/keyrings
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
