@@ -1,9 +1,9 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 RUN apt-get update && apt-get install -y lighttpd procps curl apt-transport-https ca-certificates gnupg lsb-release vim iipimage-server
 
 RUN export LSB_RELEASE=$(lsb_release -c -s)
-ENV GCSFUSE_REPO=gcsfuse-bullseye
+ENV GCSFUSE_REPO=gcsfuse-bookworm
 RUN echo "deb https://packages.cloud.google.com/apt $GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | \
