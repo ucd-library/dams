@@ -10,17 +10,25 @@ const { logger } = require('./logger.js');
  * for the full explanation - so every request presents the same fixed
  * `x-user` identity regardless of the calling browser session.
  *
- * ARK-to-path resolution: CaskFS paths are not derived from the ARK (see
- * argonath's docs/cask-conventions.md "Item Identity") - the ARK only
- * exists as RDF data (a file's JSON-LD sidecar `@id`/`ark` property).
- * `resolvePath()` uses CaskFS's `/api/find?subject=` RDF-graph lookup
- * (already implemented server-side, unlike `/api/ld` which still 404s) to
- * go from an ARK-shaped subject URI to the file that carries it. This is a
+ * Identifier-to-path resolution: CaskFS paths are not derived from an
+ * item's identifier (see argonath's docs/cask-conventions.md "Item
+ * Identity") - the identifier only exists as RDF data (a file's JSON-LD
+ * sidecar `@id` property). This app deliberately treats that identifier as
+ * an **opaque string** throughout - confirmed 2026-09-10 with the user that
+ * real identifiers won't all be ARKs (a custom library box/folder ID
+ * scheme is also in play, minted alongside ARKs in Dagster) - nothing here
+ * parses or assumes any particular identifier shape. `resolvePath()` uses
+ * CaskFS's `/api/find?subject=` RDF-graph lookup (already implemented
+ * server-side, unlike `/api/ld` which still 404s) to go from that
+ * identifier to the file that carries it as its RDF subject. This is a
  * working assumption pending confirmation with whoever owns the argonath
  * ingestion pipeline (see docs/PORT-PLAN.md's "Critical discovery"): it
  * assumes ingestion mints an RDF subject equal to the full fcrepo-style
- * path this app is resolving (item ark, or ark+child-binary-path), not just
- * the bare item ark.
+ * path this app is resolving (an item's own identifier, or identifier plus
+ * a child-binary path), not just the bare item identifier - see
+ * docs/PORT-PLAN.md Phase 2 for why that second part is still an open
+ * question, separate from the identifier-shape question this comment
+ * covers.
  */
 class CaskClient {
 
@@ -64,9 +72,9 @@ class CaskClient {
 
   /**
    * @method resolvePath
-   * @description Resolve an RDF subject URI (an ARK, or an ARK plus a
-   * child-binary path segment - see class doc) to the CaskFS file path that
-   * carries it.
+   * @description Resolve an RDF subject URI (an opaque identifier - an ARK,
+   * a box/folder ID, or that plus a child-binary path segment; see class
+   * doc) to the CaskFS file path that carries it.
    *
    * @param {String} subject
    *
@@ -81,8 +89,8 @@ class CaskClient {
   /**
    * @method getMetadata
    * @description Fetch CaskFS file metadata (`GET /api/fs/{path}?metadata=true`),
-   * including the resolved on-disk CAS path (`fullPath`) the IIIF direct-mount
-   * proxy target needs.
+   * including `hash_value`, the CAS hash the IIIF direct-mount proxy target
+   * needs (see `casRelativePath()`).
    *
    * @param {String} filePath CaskFS file path (as returned by `resolvePath()`)
    *
@@ -102,12 +110,16 @@ class CaskClient {
    * to, relative to CaskFS's own CAS root - mirroring CaskFS's own
    * `cas.js#_getHashFilePath()` sharding convention (`<hash[0:3]>/<hash[3:6]>/<hash>`)
    * exactly. Deliberately computed from `hash_value` rather than read off
-   * `getMetadata()`'s `fullPath`: `fullPath` is CaskFS's own absolute,
-   * storage-backend-dependent view (a real disk path in local-storage mode,
-   * but just the bare hash-sharded path with no root at all in CaskFS's GCS
-   * cloud-storage mode - see `cas.js#diskPath()`), whereas this relative
-   * path is what the IIIF service's own direct mount of CaskFS's CAS root
-   * needs, whichever way that mount is backed (see docs/PORT-PLAN.md Phase 2).
+   * `getMetadata()`'s `fullPath`: `fullPath` is CaskFS's own absolute view
+   * of its own CAS root (`CASKFS_ROOT_DIR` on the CaskFS server), which is
+   * mounted at a different path in the IIIF service's own container (its
+   * `lighttpd.conf` hardcodes `/etc/gcs-fuse` - see docs/PORT-PLAN.md
+   * Phase 2), so `fullPath` isn't usable across that boundary - this
+   * relative path is what the IIIF service's own direct mount of CaskFS's
+   * CAS root needs instead, whichever way that mount is backed (there is no
+   * GCS anywhere in this architecture - see docs/PORT-PLAN.md's "No GCS
+   * anywhere in the new architecture" note - this is a plain shared-volume
+   * mount, not a cloud-storage-mode concern).
    *
    * @param {String} hash CAS hash value (`metadata.hash_value`)
    *

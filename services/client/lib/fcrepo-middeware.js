@@ -10,12 +10,14 @@ const { logger } = require('./logger.js');
  * forwards the request server-side via `http-proxy` rather than redirecting
  * the browser to an internal-only host.
  *
- * ARK resolution: CaskFS paths are not ARK-derived (see `lib/cask.js`'s doc
- * comment), so `fcrepoPath` (the ARK, plus any child-binary path segment)
- * is resolved to a real CaskFS file path via `cask.resolvePath()` before
- * any branch below runs. This is the working assumption flagged as an open
- * risk in docs/PORT-PLAN.md Phase 2 - confirm against the real argonath
- * ingestion contract once it lands.
+ * Identifier resolution: CaskFS paths are not derived from an item's
+ * identifier (see `lib/cask.js`'s doc comment) - `fcrepoPath` is treated as
+ * an opaque identifier (an ARK, a box/folder ID, or that plus any
+ * child-binary path segment - real identifiers won't all be ARKs, see
+ * docs/PORT-PLAN.md Phase 2) and resolved to a real CaskFS file path via
+ * `cask.resolvePath()` before any branch below runs. This is the working
+ * assumption flagged as an open risk in docs/PORT-PLAN.md Phase 2 - confirm
+ * against the real argonath ingestion contract once it lands.
  */
 const fcrepo = httpProxy.createProxyServer({
   selfHandleResponse: false,
@@ -31,7 +33,7 @@ fcrepo.on('error', (err, req, res) => {
 /**
  * @function parseFcrepoUrl
  * @description Split an incoming `/fcrepo/...` request URL into the
- * resolvable ARK/path portion and, if present, a fin-style `svc:xxx`
+ * resolvable identifier/path portion and, if present, a fin-style `svc:xxx`
  * service name plus its own sub-path.
  *
  * @param {String} url
@@ -57,7 +59,8 @@ function parseFcrepoUrl(url) {
  * @function sidecarToBinaryPath
  * @description CaskFS's RDF subject-to-file resolution (`cask.resolvePath()`)
  * resolves to whichever file actually carries the RDF triple - for a
- * binary's own ARK-addressed child path, that's its `.jsonld.json` sidecar
+ * binary's own identifier-addressed child path, that's its `.jsonld.json`
+ * sidecar
  * (see argonath's docs/cask-conventions.md "Sidecar Convention": "every
  * binary has a sibling `.jsonld.json` sidecar"), not the binary itself.
  * Binary-serving branches (svc:iiif, svc:gcs) need the real binary's path
