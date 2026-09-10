@@ -64,6 +64,10 @@ describe('lib/cask.js', () => {
     assert.equal(metadata.fullPath, '/cas/ab/cd/abcd1234');
   });
 
+  it('casRelativePath() mirrors CaskFS\'s own hash-sharding convention', () => {
+    assert.equal(cask.casRelativePath('abcdef0123456789'), '/cas/abc/def/abcdef0123456789');
+  });
+
   it('fileUrl() builds the content-stream URL for a file path', () => {
     assert.equal(
       cask.fileUrl('/gold/digital-dev/item-a/item.jsonld.json'),

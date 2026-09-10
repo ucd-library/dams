@@ -97,6 +97,27 @@ class CaskClient {
   }
 
   /**
+   * @method casRelativePath
+   * @description Build the path a binary's content-addressed hash resolves
+   * to, relative to CaskFS's own CAS root - mirroring CaskFS's own
+   * `cas.js#_getHashFilePath()` sharding convention (`<hash[0:3]>/<hash[3:6]>/<hash>`)
+   * exactly. Deliberately computed from `hash_value` rather than read off
+   * `getMetadata()`'s `fullPath`: `fullPath` is CaskFS's own absolute,
+   * storage-backend-dependent view (a real disk path in local-storage mode,
+   * but just the bare hash-sharded path with no root at all in CaskFS's GCS
+   * cloud-storage mode - see `cas.js#diskPath()`), whereas this relative
+   * path is what the IIIF service's own direct mount of CaskFS's CAS root
+   * needs, whichever way that mount is backed (see docs/PORT-PLAN.md Phase 2).
+   *
+   * @param {String} hash CAS hash value (`metadata.hash_value`)
+   *
+   * @returns {String}
+   */
+  casRelativePath(hash) {
+    return `/cas/${hash.slice(0, 3)}/${hash.slice(3, 6)}/${hash}`;
+  }
+
+  /**
    * @method fileUrl
    * @description Build the CaskFS URL for streaming a file's content
    * (`GET /api/fs/{path}`), for proxying non-IIIF binary/metadata reads.

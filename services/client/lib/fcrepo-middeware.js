@@ -54,6 +54,40 @@ function parseFcrepoUrl(url) {
 }
 
 /**
+ * @function sidecarToBinaryPath
+ * @description CaskFS's RDF subject-to-file resolution (`cask.resolvePath()`)
+ * resolves to whichever file actually carries the RDF triple - for a
+ * binary's own ARK-addressed child path, that's its `.jsonld.json` sidecar
+ * (see argonath's docs/cask-conventions.md "Sidecar Convention": "every
+ * binary has a sibling `.jsonld.json` sidecar"), not the binary itself.
+ * Binary-serving branches (svc:iiif, svc:gcs) need the real binary's path
+ * to get its own hash/content; strip the sidecar suffix to get there. A
+ * plain resolved path (an item/collection's own descriptive document, the
+ * plain-stream branch's territory) has no such suffix and passes through
+ * unchanged.
+ *
+ * @param {String} filePath resolved CaskFS file path
+ *
+ * @returns {String}
+ */
+function sidecarToBinaryPath(filePath) {
+  return filePath.endsWith('.jsonld.json') ? filePath.slice(0, -'.jsonld.json'.length) : filePath;
+}
+
+/**
+ * @function dirname
+ * @description POSIX-path dirname, without pulling in Node's `path` module
+ * for one line - CaskFS paths are always POSIX-style regardless of host OS.
+ *
+ * @param {String} filePath
+ *
+ * @returns {String}
+ */
+function dirname(filePath) {
+  return filePath.replace(/\/[^/]*$/, '') || '/';
+}
+
+/**
  * @function proxyToCask
  * @description Forward the request to CaskFS's file-content endpoint for
  * a resolved file path, presenting this server's CaskFS identity. Forwards
@@ -89,15 +123,15 @@ async function middleware(req, res, next) {
     }
 
     if( service === 'iiif' ) {
-      // resolve the on-disk CAS hash path, then proxy straight to the IIIF
+      // resolve the CAS-relative hash path, then proxy straight to the IIIF
       // service's own direct-mount of CaskFS's CAS root - Node never
       // streams the image bytes itself.
-      let metadata = await cask.getMetadata(resolvedPath);
-      if( !metadata?.fullPath ) {
+      let metadata = await cask.getMetadata(sidecarToBinaryPath(resolvedPath));
+      if( !metadata?.hash_value ) {
         return res.status(404).json({ error: true, message: `No binary content for: ${fcrepoPath}` });
       }
 
-      let iiifQuery = new URLSearchParams({ IIIF: `${metadata.fullPath}${servicePath}` });
+      let iiifQuery = new URLSearchParams({ IIIF: `${cask.casRelativePath(metadata.hash_value)}${servicePath}` });
       fcrepo.web(req, res, {
         target: `${config.iiif.host}/fcgi-bin/iipsrv.fcgi?${iiifQuery}`,
         ignorePath: true,
@@ -111,7 +145,7 @@ async function middleware(req, res, next) {
       // silver derivative products are addressed relative to the item's
       // own resolved CaskFS directory instead.
       let assetPath = servicePath.replace(/^\/[a-zA-Z0-9-]+/, '');
-      return proxyToCask(req, res, resolvedPath + assetPath);
+      return proxyToCask(req, res, dirname(sidecarToBinaryPath(resolvedPath)) + assetPath);
     }
 
     // plain resource stream: metadata document or binary, forwarded as-is

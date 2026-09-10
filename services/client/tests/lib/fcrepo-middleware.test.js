@@ -73,19 +73,25 @@ describe('lib/fcrepo-middeware.js', () => {
     assert.deepEqual(proxyWebCalls[0].headers, { 'x-user': JSON.stringify({ username: config.cask.user }) });
   });
 
-  it('resolves svc:iiif to the CAS-resolved fullPath and proxies to the IIIF service', async () => {
-    let findCalls = 0, metadataCalls = 0;
+  it('resolves svc:iiif to the CAS-relative hash path and proxies to the IIIF service', async () => {
+    let findCalls = 0, metadataCalls = 0, metadataUrl;
     global.fetch = async (url) => {
       if( url.includes('/api/find') ) {
         findCalls++;
+        // resolves to the binary's sidecar, per CaskFS's Sidecar Convention -
+        // not the binary itself.
         return {
           ok: true,
-          json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/item-a/photo.tif' }] })
+          json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/item-a/photo.tif.jsonld.json' }] })
         };
       }
       if( url.includes('metadata=true') ) {
         metadataCalls++;
-        return { ok: true, json: async () => ({ fullPath: '/cas/ab/cd/abcd1234' }) };
+        metadataUrl = url;
+        // fullPath deliberately omitted/different - the middleware must use
+        // hash_value (see lib/cask.js#casRelativePath's doc comment for why:
+        // fullPath is meaningless in CaskFS's GCS cloud-storage mode).
+        return { ok: true, json: async () => ({ hash_value: 'abcdef0123456789', fullPath: '/some/other/root/x' }) };
       }
       throw new Error('unexpected fetch call: ' + url);
     };
@@ -95,9 +101,11 @@ describe('lib/fcrepo-middeware.js', () => {
     assert.equal(res.status, 200);
     assert.equal(findCalls, 1);
     assert.equal(metadataCalls, 1);
+    // metadata must be fetched for the binary itself, not its sidecar
+    assert.ok(metadataUrl.includes('/api/fs/gold/digital-dev/item-a/photo.tif?'));
     assert.equal(proxyWebCalls.length, 1);
 
-    let expectedQuery = new URLSearchParams({ IIIF: '/cas/ab/cd/abcd1234/info.json' }).toString();
+    let expectedQuery = new URLSearchParams({ IIIF: '/cas/abc/def/abcdef0123456789/info.json' }).toString();
     assert.equal(proxyWebCalls[0].target, `${config.iiif.host}/fcgi-bin/iipsrv.fcgi?${expectedQuery}`);
     assert.equal(proxyWebCalls[0].ignorePath, true);
   });
@@ -107,7 +115,7 @@ describe('lib/fcrepo-middeware.js', () => {
       if( url.includes('/api/find') ) {
         return {
           ok: true,
-          json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/item-a/photo.tif' }] })
+          json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/item-a/photo.tif.jsonld.json' }] })
         };
       }
       return { ok: true, json: async () => ({}) };
@@ -121,7 +129,7 @@ describe('lib/fcrepo-middeware.js', () => {
   it('strips the legacy gcs bucket segment before proxying the svc:gcs branch', async () => {
     global.fetch = async () => ({
       ok: true,
-      json: async () => ({ totalCount: 1, results: [{ filepath: '/silver/g/c/latest/item-a' }] })
+      json: async () => ({ totalCount: 1, results: [{ filepath: '/silver/g/c/latest/item-a/item.jsonld.json' }] })
     });
 
     let res = await request(app()).get('/fcrepo/rest/ark:/87287/d73035/svc:gcs/some-bucket/manifest.json');
