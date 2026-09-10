@@ -110,6 +110,16 @@ let config = {
     url: process.env.CASK_URL || 'http://cask.argonath-prod.svc.cluster.local:3001',
     pathPrefix: process.env.CASK_PATH_PREFIX || '/cask',
     user: process.env.CASK_USER || ''
+  },
+
+  // IIIF image service the fcrepo-middleware shim's svc:iiif branch proxies
+  // to - see docs/PORT-PLAN.md Phase 2. Reached via the legacy
+  // urlTemplate convention (services/init/fcrepo/service/iiif.jsonld.json
+  // in the old fin-init data: `http://iiif:80/fcgi-bin/iipsrv.fcgi?IIIF=...`),
+  // just pointed at CaskFS's resolved on-disk path instead of a gcs-fuse
+  // mount.
+  iiif: {
+    host: process.env.IIIF_HOST || 'http://iiif'
   }
 };
 

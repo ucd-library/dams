@@ -44,6 +44,12 @@ async function main() {
   require('./controllers/sitemap').middleware(app);
 
   /**
+   * fcrepo-middleware shim: resolves legacy /fcrepo/rest/... URLs against
+   * CaskFS - see docs/PORT-PLAN.md Phase 2
+   */
+  app.use(require('./lib/fcrepo-middeware.js'));
+
+  /**
    * setup static routes
    */
   await require('./controllers/static')(app);
