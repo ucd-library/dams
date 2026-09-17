@@ -33,7 +33,7 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     this.maxValue = Number.MAX_VALUE;
     this.showUnknown = false;
 
-    this._injectModel("AppStateModel", "RecordModel", "CollectionModel", "FiltersModel");
+    this._injectModel("AppStateModel", "RecordModel", "CollectionModel");
   }
 
   async firstUpdated() {
@@ -135,23 +135,6 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
   }
 
   /**
-   * @method _onFilterBucketsUpdate
-   * @description from FilterService
-   * 
-   * @param {Object} e
-   */
-  _onFilterBucketsUpdate(e) {
-    if( e.filter !== '@graph.isPartOf.@id' ) return;
-
-    if( e.buckets.length === 1 ) {
-      this.selectedCollection = e.buckets[0].key;
-    } else {
-      this.selectedCollection = '';
-    }
-    this._renderFilters();
-  }
-
-  /**
    * @method _onRecordSearchUpdate
    * @description from RecordInterface
    *
@@ -161,29 +144,20 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     if (e.state !== "loaded") return;
 
     this.currentFilters = e.searchDocument.filters || {};
-    this._renderFilters();
+    this._renderFilters(e.payload?.aggregations?.ranges?.[this.filter]);
   }
 
   /**
    * @method _renderFilters
-   * @description called after a collection is selected or a filter set updates.
-   * make sure range filter is set correctly.
+   * @description called after a search completes. make sure range filter is set correctly
+   * against the live, currently-filtered range aggregation.
    *
+   * @param {Object} rangeFilter a {min, max} range aggregation from the live search
+   * result, already computed against every currently active filter
    */
-  async _renderFilters() {
+  _renderFilters(rangeFilter) {
     if (!this.currentFilters) return;
 
-    // grab default aggregations for collection
-    let result;
-    if( this.selectedCollection ) {
-      let facets = this.FiltersModel.getFacets();
-      result = await this.RecordModel.defaultSearch(this.selectedCollection, null, null, facets);        
-    } else {
-      result = await this.RecordModel.defaultSearch('');
-    }
-    this.default = result;
-
-    let rangeFilter = this.default?.payload?.aggregations?.ranges?.[this.filter];
     if (rangeFilter) {
       this.absMinValue = rangeFilter.min;
       this.absMaxValue = rangeFilter.max;
@@ -207,13 +181,21 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     if (this.currentFilters[this.filter]) {
       let value = this.currentFilters[this.filter].value;
 
-      this.minValue = value.gte;
-      this.maxValue = value.lte;
+      let clampedMin = Math.max(value.gte, this.absMinValue);
+      let clampedMax = Math.min(value.lte, this.absMaxValue);
+      if (clampedMin > clampedMax) clampedMin = clampedMax;
+
+      this.minValue = clampedMin;
+      this.maxValue = clampedMax;
       this.shadowRoot.querySelector("#minValueInput").value = this.minValue;
       this.shadowRoot.querySelector("#maxValueInput").value = this.maxValue;
       this.shadowRoot.querySelector("#unknown").checked = value.includeNull
         ? true
         : false;
+
+      if (clampedMin !== value.gte || clampedMax !== value.lte) {
+        this._onRangeNullChange();
+      }
     }
 
     // to trigger slider rerender when filters are removed
