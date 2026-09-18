@@ -115,8 +115,8 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
    * @description bound to min/max number inputs.
    */
   _onInputChange() {
-    let min = this.shadowRoot.querySelector("#minValueInput").value;
-    let max = this.shadowRoot.querySelector("#maxValueInput").value;
+    let min = parseInt(this.shadowRoot.querySelector("#minValueInput").value);
+    let max = parseInt(this.shadowRoot.querySelector("#maxValueInput").value);
 
     if (min < this.absMinValue) {
       this.shadowRoot.querySelector("#minValueInput").value = this.absMinValue;
@@ -136,15 +136,18 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
 
   /**
    * @method _onRecordSearchUpdate
-   * @description from RecordInterface
+   * @description from RecordInterface.
    *
    * @param {Object} e
    */
-  _onRecordSearchUpdate(e) {
+  async _onRecordSearchUpdate(e) {
     if (e.state !== "loaded") return;
+    if (e.name && e.name !== "default") return;
 
     this.currentFilters = e.searchDocument.filters || {};
-    this._renderFilters(e.payload?.aggregations?.ranges?.[this.filter]);
+
+    let bounds = await this.RecordModel.getRangeBounds(e.searchDocument, this.filter);
+    this._renderFilters(bounds?.aggregations?.ranges?.[this.filter]);
   }
 
   /**
@@ -181,8 +184,11 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
     if (this.currentFilters[this.filter]) {
       let value = this.currentFilters[this.filter].value;
 
-      let clampedMin = Math.max(value.gte, this.absMinValue);
-      let clampedMax = Math.min(value.lte, this.absMaxValue);
+      let valueMin = Number(value.gte);
+      let valueMax = Number(value.lte);
+
+      let clampedMin = Math.max(valueMin, this.absMinValue);
+      let clampedMax = Math.min(valueMax, this.absMaxValue);
       if (clampedMin > clampedMax) clampedMin = clampedMax;
 
       this.minValue = clampedMin;
@@ -193,7 +199,7 @@ export default class AppRangeFilter extends Mixin(LitElement).with(
         ? true
         : false;
 
-      if (clampedMin !== value.gte || clampedMax !== value.lte) {
+      if (clampedMin !== valueMin || clampedMax !== valueMax) {
         this._onRangeNullChange();
       }
     }
