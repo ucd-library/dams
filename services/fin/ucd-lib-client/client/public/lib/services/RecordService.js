@@ -84,7 +84,10 @@ class RecordService extends BaseService {
     if( opts.debug ) params.debug = true;
     if( opts.compact ) params.compact = true;
     if( opts.singleNode ) params['single-node'] = true;
+    if( opts.explain ) searchDocument.explain = true;
+
     opts.debug = true;
+
     return this.request({
       url : this.baseUrl,
       qs : params,

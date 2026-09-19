@@ -28,7 +28,7 @@ class ItemsModel extends FinEsDataModel {
         '_score',
         { 'name.raw' : 'asc' }
       ]
-    }
+    }    
     return super.search(searchDocument, options, index);
   }
 
