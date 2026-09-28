@@ -40,8 +40,9 @@ class ElasticSearchModel extends BaseModel {
   /**
    * @method urlToSearchDocument
    * @description given array of url parts, create app search document
-   * This document can be passed to fromSerializedToEsBody to create es
-   * search document
+   * This document can be passed to fromSerializedToEsBody to create es search document. 
+   * Parts are /search/{text}/{filters}/{sort}/{limit}/{offset}, empty parts are rendered as '/-/',
+   * since // can be truncated to / by some clients, and mess with the ordering of the query.
    * 
    * @param {Array} urlParts array of strings from url
    * 
@@ -51,30 +52,16 @@ class ElasticSearchModel extends BaseModel {
     if( !Array.isArray(urlParts) ) throw new Error('UrlParts should be an array');
     let searchDoc = this.emptySearchDocument();
 
-    let i = 0;
-    while( urlParts.length > 0 ) {
-      let part = decodeURIComponent(urlParts.splice(0, 1)[0]);
-      
-      switch(i) {
-        case 0:
-          searchDoc.text = part;
-          break;
-        case 1:
-          searchDoc.filters = part ? this._parseUrlFilters(part) : {};
-          break;
-        case 2:
-          searchDoc.sort = part ? JSON.parse(part) : null;
-          break;
-        case 3:
-          searchDoc.limit = part ? parseInt(part) : 20;
-          break;
-        case 4:
-          searchDoc.offset = part ? parseInt(part) : 0;
-          break;
-      }
+    // '-' marks an empty url part, but still allow search string to contain '-'
+    let [text, filters, sort, limit, offset] = urlParts.map(
+      part => part === '-' ? '' : decodeURIComponent(part)
+    );
 
-      i++;
-    }
+    if( text ) searchDoc.text = text;
+    if( filters ) searchDoc.filters = this._parseUrlFilters(filters);
+    if( sort ) searchDoc.sort = JSON.parse(sort);
+    if( limit ) searchDoc.limit = parseInt(limit);
+    if( offset ) searchDoc.offset = parseInt(offset);
 
     return searchDoc;
   }
@@ -166,13 +153,30 @@ class ElasticSearchModel extends BaseModel {
       return filters[0][2];
     }
 
+    // empty parts are rendered as '-' instead of '' so the url never contains '//'
     return [
-      encodeURIComponent(searchDocument.text),
+      this._encodeUrlText(searchDocument.text),
       encodeURIComponent(JSON.stringify(filters)),
-      encodeURIComponent(searchDocument.sort ? JSON.stringify(searchDocument.sort) : ''),
-      searchDocument.limit || '',
-      searchDocument.offset || ''
+      searchDocument.sort ? encodeURIComponent(JSON.stringify(searchDocument.sort)) : '-',
+      searchDocument.limit || '-',
+      searchDocument.offset || '-'
     ].join('/')
+  }
+
+  /**
+   * @method _encodeUrlText
+   * @private
+   * @description encode the search text url part. Empty text is rendered as '-',
+   * a literal '-' search is rendered as %2D so it isn't read back as empty.
+   *
+   * @param {String} text search text
+   *
+   * @returns {String} url part
+   */
+  _encodeUrlText(text) {
+    if( !text ) return '-';
+    if( text === '-' ) return '%2D';
+    return encodeURIComponent(text);
   }
 
   /**
