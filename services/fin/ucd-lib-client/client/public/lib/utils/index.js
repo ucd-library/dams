@@ -242,7 +242,8 @@ class Utils {
         // pull image from root node if properly linked
         let rootNode = graph.filter((g) => g["@id"] === clientMedia["id"])[0];
         if (rootNode?.image?.["@id"]) {
-          rootImage = "/fcrepo/rest" + rootNode.image["@id"];
+          let imageNode = (graph || []).find((g) => g["@id"] === rootNode.image["@id"]);
+          rootImage = imageNode?.clientMedia?.images?.medium?.url || "/images/tree-bike-illustration.png";
         }
       }
     }
