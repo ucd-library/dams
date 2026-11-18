@@ -41,7 +41,8 @@ main:
                                                     cpu: "4000m"
                                             command: "dams-workflow"
                                             args: ${["process-video", "-i", args.finWorkflowId]}
-                                      timeoutSeconds: 3600
+                                      timeoutSeconds: 28800
+                                      maxRetries: 0
                                       serviceAccountName: ${"dams-production@" + project_id + ".iam.gserviceaccount.com"}
           result: create_job_result
       - convert_video:
@@ -50,7 +51,7 @@ main:
               name: ${"namespaces/" + project_id + "/jobs/dams-" + args.finWorkflowId}
               location: ${location}
               connector_params:
-                timeout: 7200
+                timeout: 30600
           result: job_execution
       - check_job_status:
           switch:
